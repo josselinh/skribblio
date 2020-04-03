@@ -1,0 +1,38 @@
+Structure du dossier pour le volume Windows
+Le num‚ro de s‚rie du volume est 40AE-3052
+C:.
+ÃÄÄÄapp
+³   ÃÄÄÄConsole
+³   ÃÄÄÄExceptions
+³   ÃÄÄÄHttp
+³   ³   ÃÄÄÄControllers
+³   ³   ÀÄÄÄMiddleware
+³   ÀÄÄÄProviders
+ÃÄÄÄbootstrap
+³   ÀÄÄÄcache
+ÃÄÄÄconfig
+ÃÄÄÄdatabase
+³   ÃÄÄÄfactories
+³   ÃÄÄÄmigrations
+³   ÀÄÄÄseeds
+ÃÄÄÄpublic
+ÃÄÄÄresources
+³   ÃÄÄÄjs
+³   ÃÄÄÄlang
+³   ³   ÀÄÄÄen
+³   ÃÄÄÄsass
+³   ÀÄÄÄviews
+ÃÄÄÄroutes
+ÃÄÄÄstorage
+³   ÃÄÄÄapp
+³   ³   ÀÄÄÄpublic
+³   ÃÄÄÄframework
+³   ³   ÃÄÄÄcache
+³   ³   ³   ÀÄÄÄdata
+³   ³   ÃÄÄÄsessions
+³   ³   ÃÄÄÄtesting
+³   ³   ÀÄÄÄviews
+³   ÀÄÄÄlogs
+ÀÄÄÄtests
+    ÃÄÄÄFeature
+    ÀÄÄÄUnit
