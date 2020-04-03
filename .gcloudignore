@@ -1,4 +1,5 @@
 .env
+.env.proxy
 .env.example
 .idea
 .git
