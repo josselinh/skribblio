@@ -1,38 +1,38 @@
 Structure du dossier pour le volume Windows
-Le num‚ro de s‚rie du volume est 40AE-3052
+Le numï¿½ro de sï¿½rie du volume est 40AE-3052
 C:.
-ÃÄÄÄapp
-³   ÃÄÄÄConsole
-³   ÃÄÄÄExceptions
-³   ÃÄÄÄHttp
-³   ³   ÃÄÄÄControllers
-³   ³   ÀÄÄÄMiddleware
-³   ÀÄÄÄProviders
-ÃÄÄÄbootstrap
-³   ÀÄÄÄcache
-ÃÄÄÄconfig
-ÃÄÄÄdatabase
-³   ÃÄÄÄfactories
-³   ÃÄÄÄmigrations
-³   ÀÄÄÄseeds
-ÃÄÄÄpublic
-ÃÄÄÄresources
-³   ÃÄÄÄjs
-³   ÃÄÄÄlang
-³   ³   ÀÄÄÄen
-³   ÃÄÄÄsass
-³   ÀÄÄÄviews
-ÃÄÄÄroutes
-ÃÄÄÄstorage
-³   ÃÄÄÄapp
-³   ³   ÀÄÄÄpublic
-³   ÃÄÄÄframework
-³   ³   ÃÄÄÄcache
-³   ³   ³   ÀÄÄÄdata
-³   ³   ÃÄÄÄsessions
-³   ³   ÃÄÄÄtesting
-³   ³   ÀÄÄÄviews
-³   ÀÄÄÄlogs
-ÀÄÄÄtests
-    ÃÄÄÄFeature
-    ÀÄÄÄUnit
+ï¿½ï¿½ï¿½ï¿½app
+ï¿½   ï¿½ï¿½ï¿½ï¿½Console
+ï¿½   ï¿½ï¿½ï¿½ï¿½Exceptions
+ï¿½   ï¿½ï¿½ï¿½ï¿½Http
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½Controllers
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½Middleware
+ï¿½   ï¿½ï¿½ï¿½ï¿½Providers
+ï¿½ï¿½ï¿½ï¿½bootstrap
+ï¿½   ï¿½ï¿½ï¿½ï¿½cache
+ï¿½ï¿½ï¿½ï¿½config
+ï¿½ï¿½ï¿½ï¿½database
+ï¿½   ï¿½ï¿½ï¿½ï¿½factories
+ï¿½   ï¿½ï¿½ï¿½ï¿½migrations
+ï¿½   ï¿½ï¿½ï¿½ï¿½seeds
+ï¿½ï¿½ï¿½ï¿½public
+ï¿½ï¿½ï¿½ï¿½resources
+ï¿½   ï¿½ï¿½ï¿½ï¿½js
+ï¿½   ï¿½ï¿½ï¿½ï¿½lang
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½en
+ï¿½   ï¿½ï¿½ï¿½ï¿½sass
+ï¿½   ï¿½ï¿½ï¿½ï¿½views
+ï¿½ï¿½ï¿½ï¿½routes
+ï¿½ï¿½ï¿½ï¿½storage
+ï¿½   ï¿½ï¿½ï¿½ï¿½app
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½public
+ï¿½   ï¿½ï¿½ï¿½ï¿½framework
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½cache
+ï¿½   ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½data
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½sessions
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½testing
+ï¿½   ï¿½   ï¿½ï¿½ï¿½ï¿½views
+ï¿½   ï¿½ï¿½ï¿½ï¿½logs
+ï¿½ï¿½ï¿½ï¿½tests
+    ï¿½ï¿½ï¿½ï¿½Feature
+    ï¿½ï¿½ï¿½ï¿½Unit
