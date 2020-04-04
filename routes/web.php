@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', 'WelcomeController@index')->name('home');
+Route::get('/release', 'WelcomeController@release')->name('release');
 
 Route::namespace('Sentence')->prefix('sentence')->group(function () {
     Route::get('/export', 'SentenceController@export')->name('sentence.export');

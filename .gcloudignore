@@ -6,4 +6,4 @@
 .gitignore
 vendor
 node_modules
-bootstrap/cache/*
+1_fresh_laravel_install.txt

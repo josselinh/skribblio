@@ -88,6 +88,8 @@
             <a href="{{ route('group.index') }}">{{ __('menu.groups.root') }}</a>
 
             <a href="{{ route('sentence.export') }}">{{ __('menu.sentences.export') }}</a>
+
+            <a href="{{ route('release') }}">{{ __('menu.release') }}</a>
         </div>
     </div>
 </div>
