@@ -65,7 +65,6 @@
 </head>
 <body>
 <div class="flex-center position-ref full-height">
-    @if (Route::has('login'))
         <div class="top-right links">
             @auth
                 <a href="{{ route('sentence.index') }}">{{ __('menu.home') }}</a>
@@ -77,7 +76,6 @@
                 @endif
             @endauth
         </div>
-    @endif
 
     <div class="content">
         <div class="title m-b-md">
@@ -85,15 +83,11 @@
         </div>
 
         <div class="links">
-            <a href="{{ route('sentence.index') }}">{{ __('menu.sentences') }}</a>
+            <a href="{{ route('sentence.index') }}">{{ __('menu.sentences.root') }}</a>
 
-            <a href="{{ route('group.index') }}">{{ __('menu.groups') }}</a>
+            <a href="{{ route('group.index') }}">{{ __('menu.groups.root') }}</a>
 
-            @can('sentence-import')
-                <a href="{{ route('sentence.import') }}">{{ __('menu.import') }}</a>
-            @endcan
-
-            <a href="{{ route('sentence.export') }}">{{ __('menu.export') }}</a>
+            <a href="{{ route('sentence.export') }}">{{ __('menu.sentences.export') }}</a>
         </div>
     </div>
 </div>

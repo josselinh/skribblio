@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Group extends Model
 {
+    public const VISIBILITY_PUBLIC = 1;
+    public const VISIBILITY_PUBLIC_UNALTERABLE = 2;
+    public const VISIBILITY_PRIVATE = 3;
+
     /**
      * The table associated with the model.
      *

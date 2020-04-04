@@ -24,11 +24,13 @@ Route::namespace('Sentence')->prefix('sentence')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::namespace('Group')->prefix('group')->group(function () {
         Route::get('/', 'GroupController@index')->name('group.index');
+        Route::get('/add', 'GroupController@add')->name('group.add');
         Route::post('/add/do', 'GroupController@doAdd')->name('group.add.do');
     });
 
     Route::namespace('Sentence')->prefix('sentence')->group(function () {
         Route::get('/', 'SentenceController@index')->name('sentence.index');
+        Route::get('/add', 'SentenceController@add')->name('sentence.add');
         Route::post('/add/do', 'SentenceController@doAdd')->name('sentence.add.do');
         Route::get('/import', 'SentenceController@import')->name('sentence.import');
         Route::post('/import/do', 'SentenceController@doImport')->name('sentence.import.do');

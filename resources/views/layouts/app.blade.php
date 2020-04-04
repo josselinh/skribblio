@@ -35,27 +35,41 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('sentence.index') }}">{{ __('menu.sentences') }}</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('group.index') }}">{{ __('menu.groups') }}</a>
-                    </li>
-
-                    @can('sentence-import')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('sentence.import') }}">{{ __('menu.import') }}</a>
+                @auth
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="menuDropdownSentences" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ __('menu.sentences.root') }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="menuDropdownSentences">
+                                <a class="dropdown-item"
+                                   href="{{ route('sentence.index') }}">{{ __('menu.sentences.index') }}</a>
+                                <a class="dropdown-item" href="{{ route('sentence.add') }}">{{ __('menu.sentences.add') }}</a>
+                                @can('sentence-import')
+                                    <a class="dropdown-item"
+                                       href="{{ route('sentence.import') }}">{{ __('menu.sentences.import') }}</a>
+                                @endcan
+                                <a class="dropdown-item"
+                                   href="{{ route('sentence.export') }}">{{ __('menu.sentences.export') }}</a>
+                            </div>
                         </li>
-                    @endcan
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('sentence.export') }}">{{ __('menu.export') }}</a>
-                    </li>
-                </ul>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="menuDropdownGroups" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ __('menu.groups.root') }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="menuDropdownGroups">
+                                <a class="dropdown-item"
+                                   href="{{ route('group.index') }}">{{ __('menu.groups.index') }}</a>
+                                <a class="dropdown-item" href="{{ route('group.add') }}">{{ __('menu.groups.add') }}</a>
+                            </div>
+                        </li>
+                    </ul>
+            @endauth
 
-                <!-- Right Side Of Navbar -->
+            <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ml-auto">
                     <!-- Authentication Links -->
                     @guest

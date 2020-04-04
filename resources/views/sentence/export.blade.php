@@ -17,20 +17,6 @@
                         </div>
                     @endforeach
                 </fieldset>
-
-                <fieldset class="form-group col-md-6">
-                    <legend>{{ __('sentence.export.users.title') }}</legend>
-
-                    @foreach($users as $user)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="users[]" value="{{ $user->id }}"
-                                   id="sentenceExportUsers{{ ucwords($user->name) }}" checked="checked">
-                            <label class="form-check-label" for="sentenceExportUsers{{ ucwords($user->name) }}">
-                                {{ $user->name }}
-                            </label>
-                        </div>
-                    @endforeach
-                </fieldset>
             </div>
 
             <button type="submit" class="btn btn-primary">{{ __('sentence.export.submit') }}</button>
@@ -38,7 +24,7 @@
 
         <div class="row mt-5">
             <div class="col bg-secondary text-white">
-                <samp>{{ $sentences->pluck('sentence')->unique()->implode(',') }}</samp>
+                <samp>{{ $sentences->pluck('sentence')->unique()->implode(', ') }}</samp>
             </div>
         </div>
     </div>

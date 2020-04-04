@@ -13,12 +13,22 @@ return [
                 'created_at' => 'Créée le',
             ]
         ],
-        'add' => [
+    ],
+    'add' => [
+        'name' => [
             'label' => 'Nom du groupe',
-            'submit' => 'Ajouter',
         ],
+        'visibility' => [
+            'label' => 'Visibilité',
+        ],
+        'submit' => 'Ajouter',
     ],
     'doAdd' => [
         'success' => 'Le groupe a été ajouté avec succès',
     ],
+    'visibility' => [
+        'public' => 'Public',
+        'public_unalterable' => 'Public non-modifiable',
+        'private' => 'Privée',
+    ]
 ];

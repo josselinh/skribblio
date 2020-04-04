@@ -35,12 +35,20 @@ class SentenceController extends Controller
      */
     public function index(Request $request): View
     {
+        $sentences = $this->sentenceManager->search($request->only(['search', 'group', 'author']), auth()->id());
+
+        return view('sentence.index', compact('sentences'));
+    }
+
+    /**
+     * @return View
+     */
+    public function add(): View
+    {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search();
+        $groups = $groupManager->search(null, auth()->id());
 
-        $sentences = $this->sentenceManager->search($request->only(['search', 'group', 'author']));
-
-        return view('sentence.index', compact('sentences', 'groups'));
+        return view('sentence.add', compact('groups'));
     }
 
     /**
@@ -60,7 +68,7 @@ class SentenceController extends Controller
     public function import(): View
     {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search();
+        $groups = $groupManager->search(null, auth()->id());
 
         return view('sentence.import', compact('groups'));
     }
@@ -85,17 +93,16 @@ class SentenceController extends Controller
         $sentences = collect();
 
         $groupManager = new GroupManager();
-        $groups = $groupManager->search();
+        $groups = $groupManager->search(null, auth()->id());
 
-        $userManager = new UserManager();
-        $users = $userManager->search();
-
-        $filters = $request->only(['groups', 'users']);
+        $filters = $request->only(['groups']);
 
         if (!empty($filters)) {
-            $sentences = $this->sentenceManager->export($filters);
+            $filters['positive_note'] = true;
+
+            $sentences = $this->sentenceManager->export($filters, auth()->id());
         }
 
-        return view('sentence.export', compact('sentences', 'groups', 'users'));
+        return view('sentence.export', compact('sentences', 'groups'));
     }
 }
