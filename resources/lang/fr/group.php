@@ -8,7 +8,7 @@ return [
         'table' => [
             'th' => [
                 'name' => 'Nom',
-                'go_to_sentences' => 'Lien vers les phrases',
+                'sentences' => 'Phrases',
                 'author' => 'Auteur',
                 'created_at' => 'Créée le',
             ]

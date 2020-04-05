@@ -35,7 +35,7 @@ class SentenceController extends Controller
      */
     public function index(Request $request): View
     {
-        $sentences = $this->sentenceManager->search($request->only(['search', 'group', 'author']), auth()->id());
+        $sentences = $this->sentenceManager->paginate($request->only(['search', 'group', 'author']), auth()->id());
 
         return view('sentence.index', compact('sentences'));
     }

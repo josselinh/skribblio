@@ -53,11 +53,10 @@ class SentenceManager
     /**
      * @param array|null $filters
      * @param int|null $userId
-     * @return Collection
      */
-    public function search(?array $filters = [], int $userId = null): Collection
+    public function paginate(?array $filters = [], int $userId = null)
     {
-        return $this->applyFilters(Sentence::query()->with(['user', 'group']), $filters, $userId)->get();
+        return $this->applyFilters(Sentence::query()->with(['user', 'group']), $filters, $userId)->paginate(25);
     }
 
     /**

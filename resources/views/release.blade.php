@@ -4,6 +4,16 @@
     <div class="container">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">2020-04-05 - v1.0.2</h6>
+            </div>
+            <div class="card-body">
+                <p>Amélioration du CSS</p>
+                <p>Pagination sur la page qui liste les phrases</p>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">2020-04-05 - v1.0.1</h6>
             </div>
             <div class="card-body">

@@ -5,12 +5,12 @@
         <div class="row">
             <div class="col-sm-12">
                 <form class="form-inline">
-                    <div class="form-group">
-                        <input type="text" name="search" class="form-control mr-1" autocomplete="off"
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input type="text" name="search" class="form-control" autocomplete="off"
                                value="{{ request()->input('search') }}"/>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">{{ __('group.index.search.submit') }}</button>
+                    <button type="submit" class="btn btn-primary mb-2">{{ __('group.index.search.submit') }}</button>
                 </form>
             </div>
         </div>
@@ -23,7 +23,7 @@
                         <tr>
                             <th scope="col">{{ __('group.index.table.th.name') }}</th>
                             <th scope="col"
-                                class="groups-table__sentences">{{ __('group.index.table.th.go_to_sentences') }}</th>
+                                class="groups-table__sentences">{{ __('group.index.table.th.sentences') }}</th>
                             <th scope="col" class="groups-table__author">{{ __('group.index.table.th.author') }}</th>
                             <th scope="col"
                                 class="groups-table__created_at">{{ __('group.index.table.th.created_at') }}</th>

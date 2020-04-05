@@ -5,12 +5,12 @@
         <div class="row">
             <div class="col-sm-12">
                 <form class="form-inline">
-                    <div class="form-group">
-                        <input type="text" name="search" class="form-control mr-1" autocomplete="off"
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input type="text" name="search" class="form-control" autocomplete="off"
                                value="{{ request()->input('search') }}"/>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">{{__('sentence.index.search.submit')}}</button>
+                    <button type="submit" class="btn btn-primary mb-2">{{__('sentence.index.search.submit')}}</button>
                 </form>
             </div>
         </div>
@@ -52,6 +52,8 @@
                         @endforeach
                         </tbody>
                     </table>
+
+                    {{ $sentences->withQueryString()->links() }}
                 </div>
             </div>
         </div>
