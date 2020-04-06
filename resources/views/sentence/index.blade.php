@@ -29,6 +29,8 @@
                                 class="sentences-table__author">{{ __('sentence.index.table.th.author') }}</th>
                             <th scope="col"
                                 class="sentences-table__created_at">{{ __('sentence.index.table.th.created_at') }}</th>
+                            <th scope="col"
+                                class="sentences-table__actions">{{ __('sentence.index.table.th.actions') }}</th>
                         </tr>
                         </thead>
 
@@ -40,7 +42,9 @@
 
                             <tr>
                                 <td>{{ $sentence->sentence }}</td>
-                                <td class="sentences-table__note">{{ $sentence->note }}</td>
+                                <td class="sentences-table__note">
+                                    {{ $sentence->note }}
+                                </td>
                                 <td class="sentences-table__group"><a
                                         href="{{ route('sentence.index', ['group' => $sentence->group->id]) }}">{{ $sentence->group->name }}</a>
                                 </td>
@@ -48,6 +52,9 @@
                                         href="{{ route('sentence.index', ['author' => $sentence->user->id]) }}">{{ $sentence->user->name }}</a>
                                 </td>
                                 <td class="sentences-table__created_at">{{ $sentence->created_at }}</td>
+                                <td class="sentences-table__actions">
+                                    <x-sentence-vote-buttons :sentence="$sentence"/>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

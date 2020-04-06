@@ -12,6 +12,7 @@ return [
                 'group' => 'Groupe',
                 'author' => 'Auteur',
                 'created_at' => 'Créée le',
+                'actions' => 'Actions',
             ],
         ],
         'add' => [
@@ -38,6 +39,9 @@ return [
     ],
     'doImport' => [
         'success' => 'L\'import a été effectué avec succès',
+    ],
+    'doVote' => [
+        'success' => 'Le vote a été appliqué avec succès',
     ],
     'export' => [
         'groups' => [

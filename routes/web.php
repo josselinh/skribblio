@@ -35,5 +35,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/add/do', 'SentenceController@doAdd')->name('sentence.add.do');
         Route::get('/import', 'SentenceController@import')->name('sentence.import');
         Route::post('/import/do', 'SentenceController@doImport')->name('sentence.import.do');
+        Route::post('/vote/do', 'SentenceController@doVote')->name('sentence.vote.do');
     });
 });

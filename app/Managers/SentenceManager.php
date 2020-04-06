@@ -2,10 +2,12 @@
 
 namespace App\Managers;
 
+use App\Exceptions\Sentence\VoteAlreadyExistsException;
 use App\Jobs\ImportSentenceJob;
 use App\Models\Sentence;
+use App\Models\Vote;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 class SentenceManager
@@ -51,12 +53,42 @@ class SentenceManager
     }
 
     /**
+     * @param int $sentenceId
+     * @param int $note
+     * @param int $userId
+     * @return Vote
+     * @throws VoteAlreadyExistsException
+     */
+    public function vote(int $sentenceId, int $note, int $userId): Vote
+    {
+        /** Get Sentence @var Sentence $sentence */
+        $sentence = Sentence::findOrFail($sentenceId);
+
+        /** Get or create new Vote @var Vote $vote */
+        $vote = Vote::firstOrNew(
+            ['sentence_id' => $sentence->id, 'user_id' => $userId],
+            ['note' => 0]
+        );
+
+        // Update the note
+        if ($vote->note !== $note) {
+            $vote->note = $note;
+            $vote->save();
+
+            return $vote;
+        }
+
+        throw new VoteAlreadyExistsException();
+    }
+
+    /**
      * @param array|null $filters
      * @param int|null $userId
+     * @return LengthAwarePaginator
      */
-    public function paginate(?array $filters = [], int $userId = null)
+    public function paginate(?array $filters = [], int $userId = null): LengthAwarePaginator
     {
-        return $this->applyFilters(Sentence::query()->with(['user', 'group']), $filters, $userId)->paginate(25);
+        return $this->applyFilters(Sentence::query()->with(['user', 'group', 'votes']), $filters, $userId)->paginate(25);
     }
 
     /**

@@ -4,6 +4,15 @@
     <div class="container">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">2020-04-06 - v1.0.3</h6>
+            </div>
+            <div class="card-body">
+                <p>Mise en place du système de vote</p>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">2020-04-05 - v1.0.2</h6>
             </div>
             <div class="card-body">

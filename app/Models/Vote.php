@@ -4,16 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Sentence extends Model
+class Vote extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sentences';
+    protected $table = 'sentences_votes';
 
     /**
      * The primary key associated with the table.
@@ -27,23 +26,7 @@ class Sentence extends Model
      *
      * @var array
      */
-    protected $fillable = ['sentence', 'group_id', 'user_id', 'note'];
-
-    /**
-     * @return BelongsTo
-     */
-    public function group(): BelongsTo
-    {
-        return $this->belongsTo(Group::class);
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function votes(): HasMany
-    {
-        return $this->hasMany(Vote::class);
-    }
+    protected $fillable = ['sentence_id', 'user_id', 'note'];
 
     /**
      * @return BelongsTo
@@ -51,5 +34,13 @@ class Sentence extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function sentences(): BelongsTo
+    {
+        return $this->belongsTo(Sentence::class);
     }
 }

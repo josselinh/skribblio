@@ -7,3 +7,4 @@
 vendor
 node_modules
 1_fresh_laravel_install.txt
+database/migrations/*

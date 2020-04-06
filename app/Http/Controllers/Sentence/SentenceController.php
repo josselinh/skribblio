@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Sentence;
 
+use App\Exceptions\Sentence\VoteAlreadyExistsException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SentenceAddRequest;
 use App\Http\Requests\SentenceImportRequest;
 use App\Managers\GroupManager;
 use App\Managers\SentenceManager;
-use App\Managers\UserManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -104,5 +104,17 @@ class SentenceController extends Controller
         }
 
         return view('sentence.export', compact('sentences', 'groups'));
+    }
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws VoteAlreadyExistsException
+     */
+    public function doVote(Request $request): RedirectResponse
+    {
+        $this->sentenceManager->vote($request->input('sentence_id'), $request->input('note'), auth()->id());
+
+        return back()->with('alert-success', __('sentence.doVote.success'));
     }
 }
