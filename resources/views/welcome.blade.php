@@ -89,7 +89,7 @@
 
             <a href="{{ route('sentence.export') }}">{{ __('menu.sentences.export') }}</a>
 
-            <a href="{{ route('release') }}">v1.0.3</a>
+            <a href="{{ route('release') }}">v1.0.4</a>
         </div>
     </div>
 </div>

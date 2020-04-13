@@ -4,6 +4,16 @@
     <div class="container">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">2020-04-13 - v1.0.4</h6>
+            </div>
+            <div class="card-body">
+                <p>Ajout de fontawesome</p>
+                <p>Ajout d'une règle d'unicité sur les phrases</p>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">2020-04-06 - v1.0.3</h6>
             </div>
             <div class="card-body">
