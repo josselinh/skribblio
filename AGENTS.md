@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Laravel 7 application. Business logic is in `app/` (models, managers, jobs, requests, and controllers); routes are in `routes/`; Blade templates and frontend sources are in `resources/views/`, `resources/js/`, and `resources/sass/`. Database migrations, seeders, and factories live in `database/`. PHPUnit tests are under `tests/Unit/` and `tests/Feature/`. Compiled frontend assets are emitted to `public/` by Laravel Mix; edit source files under `resources/` instead.
+This is a Laravel 13 application. Business logic is in `app/` (models, managers, jobs, requests, and controllers); routes are in `routes/`; Blade templates and frontend sources are in `resources/views/`, `resources/js/`, and `resources/sass/`. Database migrations, seeders, and factories live in `database/`. PHPUnit tests are under `tests/Unit/` and `tests/Feature/`. Compiled frontend assets are emitted to `public/build/` by Vite; edit source files under `resources/` instead.
 
 ## Build, Test, and Development Commands
 
@@ -11,11 +11,11 @@ This is a Laravel 7 application. Business logic is in `app/` (models, managers, 
 - `php artisan migrate --seed` creates and seeds the database.
 - `php artisan serve` runs the Laravel development server.
 - `vendor/bin/phpunit` runs the unit and feature suites (SQLite in memory is configured in `phpunit.xml`).
-- `npm run dev` builds frontend assets for development; `npm run watch` rebuilds on changes; `npm run prod` creates production assets.
+- `npm run dev` starts the Vite development server; `npm run build` creates production assets.
 
 ## Coding Style & Naming Conventions
 
-Follow the surrounding Laravel/PHP conventions and keep changes consistent with nearby files. Use PSR-4 namespaces under `App\` and `Tests\`; name PHP classes in `StudlyCase`, methods and variables in `camelCase`, and migrations with timestamped snake_case filenames. Keep route definitions in the appropriate `routes/` file and use Laravel requests for input validation. Frontend assets use Vue 2 and Sass, compiled through `webpack.mix.js`. No separate formatter or linter is configured in the repository.
+Follow the surrounding Laravel/PHP conventions and keep changes consistent with nearby files. Use PSR-4 namespaces under `App\`, `Database\`, and `Tests\`; name PHP classes in `StudlyCase`, methods and variables in `camelCase`, and migrations with timestamped snake_case filenames. Keep route definitions in the appropriate `routes/` file and use Laravel requests for input validation. Frontend assets use JavaScript and Sass, compiled through Vite. No separate formatter or linter is configured in the repository.
 
 ## Testing Guidelines
 

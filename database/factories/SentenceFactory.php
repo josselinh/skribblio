@@ -1,15 +1,19 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
 use App\Models\Sentence;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Sentence::class, function (Faker $faker) {
-    return [
-        'sentence' => $faker->text(30),
-        'note' => $faker->numberBetween(-10, 10),
-    ];
-});
+class SentenceFactory extends Factory
+{
+    protected $model = Sentence::class;
 
-
+    public function definition(): array
+    {
+        return [
+            'sentence' => $this->faker->text(30),
+            'note' => $this->faker->numberBetween(-10, 10),
+        ];
+    }
+}

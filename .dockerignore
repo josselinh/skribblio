@@ -7,3 +7,5 @@ node_modules
 storage/logs
 public/css
 public/js
+public/build
+public/hot

@@ -2,11 +2,11 @@
 
 Outil communautaire pour préparer des parties de Skribbl.io. Il permet de créer des utilisateurs, d'organiser des mots en groupes, de voter pour les mots préférés et d'exporter la liste d'un groupe. L'export est formaté pour être copié directement dans Skribbl.io au début d'une partie.
 
-L'application est construite avec Laravel 7 et Laravel Mix 5 pour compiler les fichiers JavaScript et Sass.
+L'application utilise Laravel 13, PHP 8.5 et Vite pour compiler les fichiers JavaScript et Sass.
 
 ## Environnement de développement Docker
 
-L'environnement Compose fournit PHP-FPM 7.4, MySQL 8, Nginx et Node.js 14. Le code source est monté dans les conteneurs. Nginx sert l'application depuis `public/`, MySQL conserve ses données dans un volume Docker, et Node conserve ses dépendances dans un volume séparé.
+L'environnement Compose fournit PHP-FPM 8.5, MySQL 9.7 LTS, Nginx et Node.js 26. Le code source est monté dans les conteneurs. Nginx sert l'application depuis `public/`, MySQL conserve ses données dans un volume Docker, et Node conserve ses dépendances dans un volume séparé.
 
 ### Prérequis
 
@@ -28,9 +28,10 @@ Construisez et démarrez les services :
 ```sh
 docker compose up -d --build
 docker compose exec app composer install
-docker compose exec node npm install --no-package-lock --no-audit
+docker compose exec node npm install
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --seed
+docker compose exec node npm run build
 ```
 
 L'application est ensuite accessible à l'adresse <http://localhost:8080>. Pour les démarrages suivants, utilisez simplement `docker compose up -d`.
@@ -92,10 +93,11 @@ docker compose logs -f app nginx db node
 docker compose exec app php artisan <commande>
 docker compose exec app composer <commande>
 
-# Compilation des assets avec Laravel Mix
+# Compilation et rechargement des assets avec Vite
 docker compose exec node npm run dev
-docker compose exec node npm run watch
-docker compose exec node npm run prod
+docker compose exec node npm run build
+# Installer les dépendances JavaScript (package-lock.json versionné)
+docker compose exec node npm install
 
 # Arrêter les conteneurs en conservant la base de données
 docker compose down
@@ -103,12 +105,14 @@ docker compose down
 
 ### Données et permissions
 
-Le volume `mysql_data` conserve les données après `docker compose down`. `docker compose down -v` supprime aussi ce volume et efface définitivement la base locale.
+Le volume `mysql_data_97` conserve les données MySQL 9.7 après `docker compose down`. `docker compose down -v` supprime ce volume et efface définitivement cette base locale. L'ancien volume MySQL 8 est conservé séparément lors de la migration et n'est pas utilisé par la nouvelle stack.
 
-Sur Linux, PHP-FPM utilise par défaut l'UID et le GID `1000` afin que les fichiers créés restent accessibles depuis l'hôte. Si votre utilisateur a d'autres identifiants, construisez l'image ainsi :
+Sur Linux, PHP-FPM et Node utilisent par défaut l'UID et le GID `1000` afin que les fichiers créés restent accessibles depuis l'hôte. Si votre utilisateur a d'autres identifiants, définissez-les dans le terminal avant de construire et démarrer les conteneurs :
 
 ```sh
-DOCKER_UID="$(id -u)" DOCKER_GID="$(id -g)" docker compose build --no-cache app
+export DOCKER_UID="$(id -u)"
+export DOCKER_GID="$(id -g)"
+docker compose up -d --build
 ```
 
-Les répertoires `storage/` et `bootstrap/cache/` doivent rester accessibles en écriture par PHP-FPM.
+Les répertoires `storage/` et `bootstrap/cache/` doivent rester accessibles en écriture par PHP-FPM. En cas de montée de version de MySQL, le volume de données existant peut nécessiter une recréation locale ; dans ce cas, réinitialisez le schéma avec `docker compose exec app php artisan migrate --seed` après avoir supprimé le volume avec `docker compose down -v`.
