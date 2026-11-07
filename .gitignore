@@ -9,6 +9,7 @@
 /vendor
 /.idea
 /.env
+/.env.docker
 /.env.proxy
 /.env.backup
 /.phpunit.result.cache

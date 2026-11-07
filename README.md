@@ -1,79 +1,114 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+# Skribblio
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Outil communautaire pour préparer des parties de Skribbl.io. Il permet de créer des utilisateurs, d'organiser des mots en groupes, de voter pour les mots préférés et d'exporter la liste d'un groupe. L'export est formaté pour être copié directement dans Skribbl.io au début d'une partie.
 
-## About Laravel
+L'application est construite avec Laravel 7 et Laravel Mix 5 pour compiler les fichiers JavaScript et Sass.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Environnement de développement Docker
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+L'environnement Compose fournit PHP-FPM 7.4, MySQL 8, Nginx et Node.js 14. Le code source est monté dans les conteneurs. Nginx sert l'application depuis `public/`, MySQL conserve ses données dans un volume Docker, et Node conserve ses dépendances dans un volume séparé.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prérequis
 
-## Learning Laravel
+- Docker Engine
+- Docker Compose v2 (`docker compose`)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Installation et démarrage
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Depuis la racine du dépôt :
 
-## Laravel Sponsors
+```sh
+cp .env.docker.example .env.docker
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Modifiez les mots de passe d'exemple dans `.env.docker` avant de démarrer. Gardez les valeurs `DB_DATABASE`, `DB_USERNAME` et `DB_PASSWORD` cohérentes avec `MYSQL_DATABASE`, `MYSQL_USER` et `MYSQL_PASSWORD`. `.env.docker` est local et ignoré par Git.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-- [Appoly](https://www.appoly.co.uk)
-- [OP.GG](https://op.gg)
-- [云软科技](http://www.yunruan.ltd/)
+Construisez et démarrez les services :
 
-## Contributing
+```sh
+docker compose up -d --build
+docker compose exec app composer install
+docker compose exec node npm install --no-package-lock --no-audit
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+L'application est ensuite accessible à l'adresse <http://localhost:8080>. Pour les démarrages suivants, utilisez simplement `docker compose up -d`.
 
-## Code of Conduct
+### Base de données et données de démonstration
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+La base est créée au premier démarrage avec les valeurs de `.env.docker`. Depuis le conteneur Laravel, les commandes suivantes permettent de gérer le schéma et les données :
 
-## Security Vulnerabilities
+```sh
+# Appliquer les migrations
+docker compose exec app php artisan migrate
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Afficher l'état des migrations
+docker compose exec app php artisan migrate:status
 
-## License
+# Ajouter les données de démonstration
+docker compose exec app php artisan db:seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+`migrate --seed` applique les migrations puis exécute les seeders. Ils créent un compte administrateur, cinq utilisateurs Faker, ainsi que leurs groupes et phrases. Exécutez `db:seed` une seule fois sur une base vide : les seeders ne sont pas conçus pour être rejoués sur une base déjà remplie.
+
+Les valeurs de connexion par défaut de `.env.docker.example` sont :
+
+| Paramètre | Valeur |
+| --- | --- |
+| Hôte depuis les conteneurs | `db` |
+| Port | `3306` |
+| Base | `laravel` |
+| Utilisateur | `laravel` |
+| Mot de passe local d'exemple | `local-dev-password` |
+
+Si ces valeurs sont modifiées dans `.env.docker`, mettez à jour les variables `DB_*` et `MYSQL_*` correspondantes.
+
+Le compte administrateur de démonstration est :
+
+| Identifiant | Valeur |
+| --- | --- |
+| E-mail | `josselin@skribblio.com` |
+| Mot de passe | `josselin` |
+
+Les cinq comptes Faker utilisent le mot de passe `1234`. Ces identifiants sont réservés au développement local ; ne les utilisez pas en production.
+
+Pour ouvrir un client MySQL dans le conteneur :
+
+```sh
+docker compose exec db sh -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"'
+```
+
+Le service MySQL n'expose pas de port sur l'hôte. Depuis l'application, son adresse est `db:3306`.
+
+### Commandes courantes
+
+```sh
+# État et journaux des services
+docker compose ps
+docker compose logs -f app nginx db node
+
+# Commandes Laravel et Composer
+docker compose exec app php artisan <commande>
+docker compose exec app composer <commande>
+
+# Compilation des assets avec Laravel Mix
+docker compose exec node npm run dev
+docker compose exec node npm run watch
+docker compose exec node npm run prod
+
+# Arrêter les conteneurs en conservant la base de données
+docker compose down
+```
+
+### Données et permissions
+
+Le volume `mysql_data` conserve les données après `docker compose down`. `docker compose down -v` supprime aussi ce volume et efface définitivement la base locale.
+
+Sur Linux, PHP-FPM utilise par défaut l'UID et le GID `1000` afin que les fichiers créés restent accessibles depuis l'hôte. Si votre utilisateur a d'autres identifiants, construisez l'image ainsi :
+
+```sh
+DOCKER_UID="$(id -u)" DOCKER_GID="$(id -g)" docker compose build --no-cache app
+```
+
+Les répertoires `storage/` et `bootstrap/cache/` doivent rester accessibles en écriture par PHP-FPM.
