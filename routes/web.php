@@ -1,22 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Group\GroupController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Sentence\SentenceController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Auth::routes();
+use App\Http\Controllers\WelcomeController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 Route::get('/release', [WelcomeController::class, 'release'])->name('release');
@@ -26,6 +14,14 @@ Route::prefix('sentence')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return redirect()->route('sentence.index');
+    })->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     Route::prefix('group')->group(function () {
         Route::get('/', [GroupController::class, 'index'])->name('group.index');
         Route::get('/add', [GroupController::class, 'add'])->name('group.add');
@@ -41,3 +37,5 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/vote/do', [SentenceController::class, 'doVote'])->name('sentence.vote.do');
     });
 });
+
+require __DIR__.'/auth.php';

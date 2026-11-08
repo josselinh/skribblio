@@ -1,66 +1,63 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <form class="form-inline">
-                    <div class="form-group mx-sm-3 mb-2">
-                        <input type="text" name="search" class="form-control" autocomplete="off"
-                               value="{{ request()->input('search') }}"/>
-                    </div>
+    <div class="space-y-6">
+        <div>
+            <form method="GET" class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <input type="text" name="search"
+                       class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm max-w-sm"
+                       autocomplete="off"
+                       placeholder="{{ __('group.index.search.submit') }}..."
+                       value="{{ request()->input('search') }}"/>
 
-                    <button type="submit" class="btn btn-primary mb-2">{{ __('group.index.search.submit') }}</button>
-                </form>
-            </div>
+                <button type="submit"
+                        class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none transition ease-in-out duration-150 w-full sm:w-auto">
+                    {{ __('group.index.search.submit') }}
+                </button>
+            </form>
         </div>
 
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-sm groups-table">
-                        <thead>
-                        <tr>
-                            <th scope="col">{{ __('group.index.table.th.name') }}</th>
-                            <th scope="col"
-                                class="groups-table__sentences">{{ __('group.index.table.th.sentences') }}</th>
-                            <th scope="col" class="groups-table__author">{{ __('group.index.table.th.author') }}</th>
-                            <th scope="col"
-                                class="groups-table__created_at">{{ __('group.index.table.th.created_at') }}</th>
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                    <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500 font-medium">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">{{ __('group.index.table.th.name') }}</th>
+                        <th scope="col" class="px-4 py-3 w-28 text-center">{{ __('group.index.table.th.sentences') }}</th>
+                        <th scope="col" class="px-6 py-3 w-56">{{ __('group.index.table.th.author') }}</th>
+                        <th scope="col" class="px-6 py-3 w-48">{{ __('group.index.table.th.created_at') }}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                    @forelse($groups as $group)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-medium text-gray-900">{{ $group->name }}</td>
+                            <td class="px-4 py-4 text-center">
+                                <a href="{{ route('sentence.index', ['group' => $group->id]) }}"
+                                   class="inline-flex items-center text-indigo-600 hover:text-indigo-900 p-1 hover:bg-indigo-50 rounded"
+                                   title="{{ __('group.index.table.th.sentences') }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                </a>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">
+                                <a href="{{ route('group.index', ['author' => $group->user->id]) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
+                                    {{ $group->user->name }}
+                                </a>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">{{ $group->created_at }}</td>
                         </tr>
-                        </thead>
-
-                        <tbody>
-                        @foreach($groups as $group)
-                            @php
-                                /** @var $group \App\Models\Group */
-                            @endphp
-
-                            <tr>
-                                <td>{{$group->name}}</td>
-                                <td class="groups-table__sentences"><a
-                                        href="{{ route('sentence.index', ['group' => $group->id]) }}">
-                                        <svg class="bi bi-link" width="1em" height="1em" viewBox="0 0 16 16"
-                                             fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M6.354 5.5H4a3 3 0 000 6h3a3 3 0 002.83-4H9c-.086 0-.17.01-.25.031A2 2 0 017 10.5H4a2 2 0 110-4h1.535c.218-.376.495-.714.82-1z"/>
-                                            <path
-                                                d="M6.764 6.5H7c.364 0 .706.097 1 .268A1.99 1.99 0 019 6.5h.236A3.004 3.004 0 008 5.67a3 3 0 00-1.236.83z"/>
-                                            <path
-                                                d="M9 5.5a3 3 0 00-2.83 4h1.098A2 2 0 019 6.5h3a2 2 0 110 4h-1.535a4.02 4.02 0 01-.82 1H12a3 3 0 100-6H9z"/>
-                                            <path
-                                                d="M8 11.33a3.01 3.01 0 001.236-.83H9a1.99 1.99 0 01-1-.268 1.99 1.99 0 01-1 .268h-.236c.332.371.756.66 1.236.83z"/>
-                                        </svg>
-                                    </a></td>
-                                <td class="sentences-table__author"><a
-                                        href="{{ route('group.index', ['author' => $group->user->id]) }}">{{ $group->user->name }}</a>
-                                </td>
-                                <td class="sentences-table__created_at">{{ $group->created_at }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                Aucun groupe trouvé.
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
