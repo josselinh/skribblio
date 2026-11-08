@@ -48,6 +48,12 @@ services:
       - ./:/var/www/html
       - node_modules:/var/www/html/node_modules
 
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   mysql_data_97:
   node_modules:
