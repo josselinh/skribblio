@@ -3,95 +3,40 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Skribbl.io - tools</title>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:300,400,600&display=swap" rel="stylesheet" />
 
-    <!-- Styles -->
-    <style>
-        html, body {
-            background-color: #fff;
-            color: #636b6f;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 200;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .full-height {
-            height: 100vh;
-        }
-
-        .flex-center {
-            align-items: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        .position-ref {
-            position: relative;
-        }
-
-        .top-right {
-            position: absolute;
-            right: 10px;
-            top: 18px;
-        }
-
-        .content {
-            text-align: center;
-        }
-
-        .title {
-            font-size: 84px;
-        }
-
-        .links > a {
-            color: #636b6f;
-            padding: 0 25px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: .1rem;
-            text-decoration: none;
-            text-transform: uppercase;
-        }
-
-        .m-b-md {
-            margin-bottom: 30px;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-<div class="flex-center position-ref full-height">
-        <div class="top-right links">
+<body class="font-sans antialiased bg-white text-gray-600 min-h-screen flex flex-col justify-between">
+    <div class="relative min-h-screen flex flex-col justify-center items-center">
+        <!-- Top Right Links -->
+        <div class="absolute top-4 right-6 space-x-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
             @auth
-                <a href="{{ route('sentence.index') }}">{{ __('menu.home') }}</a>
+                <a href="{{ route('sentence.index') }}" class="hover:text-gray-900 transition">{{ __('menu.home') }}</a>
             @else
-                <a href="{{ route('login') }}">{{ __('menu.login') }}</a>
-
+                <a href="{{ route('login') }}" class="hover:text-gray-900 transition">{{ __('menu.login') }}</a>
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}">{{ __('menu.register') }}</a>
+                    <a href="{{ route('register') }}" class="hover:text-gray-900 transition">{{ __('menu.register') }}</a>
                 @endif
             @endauth
         </div>
 
-    <div class="content">
-        <div class="title m-b-md">
-            Skribbl.io <sup>tools</sup>
-        </div>
+        <!-- Center Content -->
+        <div class="text-center px-4">
+            <h1 class="text-6xl sm:text-7xl md:text-8xl font-light text-gray-700 tracking-tight mb-8">
+                Skribbl.io <sup class="text-2xl sm:text-3xl text-indigo-600 font-normal">tools</sup>
+            </h1>
 
-        <div class="links">
-            <a href="{{ route('sentence.index') }}">{{ __('menu.sentences.root') }}</a>
-
-            <a href="{{ route('group.index') }}">{{ __('menu.groups.root') }}</a>
-
-            <a href="{{ route('sentence.export') }}">{{ __('menu.sentences.export') }}</a>
-
-            <a href="{{ route('release') }}">v1.0.4</a>
+            <div class="flex flex-wrap justify-center gap-6 text-xs sm:text-sm font-semibold uppercase tracking-widest text-gray-500">
+                <a href="{{ route('sentence.index') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.root') }}</a>
+                <a href="{{ route('group.index') }}" class="hover:text-gray-900 transition">{{ __('menu.groups.root') }}</a>
+                <a href="{{ route('sentence.export') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.export') }}</a>
+                <a href="{{ route('release') }}" class="hover:text-gray-900 transition">v1.0.4</a>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>
