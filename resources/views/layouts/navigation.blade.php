@@ -98,9 +98,6 @@
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <a href="{{ route('sentence.export') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
-                        {{ __('menu.sentences.export') }}
-                    </a>
                     <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
                         {{ __('menu.login') }}
                     </a>

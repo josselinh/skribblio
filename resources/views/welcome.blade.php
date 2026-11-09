@@ -31,8 +31,10 @@
             </h1>
 
             <div class="flex flex-wrap justify-center gap-6 text-xs sm:text-sm font-semibold uppercase tracking-widest text-gray-500">
-                <a href="{{ route('sentence.index') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.root') }}</a>
-                <a href="{{ route('group.index') }}" class="hover:text-gray-900 transition">{{ __('menu.groups.root') }}</a>
+                @auth
+                    <a href="{{ route('sentence.index') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.root') }}</a>
+                    <a href="{{ route('group.index') }}" class="hover:text-gray-900 transition">{{ __('menu.groups.root') }}</a>
+                @endauth
                 <a href="{{ route('sentence.export') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.export') }}</a>
                 <a href="{{ route('release') }}" class="hover:text-gray-900 transition">v1.0.4</a>
             </div>
