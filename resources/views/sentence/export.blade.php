@@ -36,7 +36,7 @@
         </div>
 
         <div class="bg-gray-800 text-gray-100 rounded-lg shadow-sm p-6 overflow-x-auto">
-            <div class="text-xs uppercase font-semibold text-gray-400 mb-2">Résultat :</div>
+            <div class="text-xs uppercase font-semibold text-gray-400 mb-2">{{ __('sentence.export.result') }}</div>
             <p class="font-mono text-sm leading-relaxed select-all">
                 {{ $sentences->pluck('sentence')->unique()->implode(', ') }}
             </p>

@@ -51,5 +51,6 @@ return [
             'title' => 'Auteurs',
         ],
         'submit' => 'Exporter',
+        'result' => 'Résultat :',
     ],
 ];
