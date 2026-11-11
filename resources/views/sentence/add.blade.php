@@ -27,9 +27,9 @@
                     </label>
                     <select name="group" id="sentenceImportAddGroup"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('group') border-red-300 @enderror">
-                        <option disabled @if(is_null(old('group'))) selected @endif>{{ __('sentence.import.group.placeholder') }}</option>
+                        <option disabled @selected(is_null(old('group', request('group'))))>{{ __('sentence.import.group.placeholder') }}</option>
                         @foreach($groups as $group)
-                            <option value="{{ $group->id }}" @if(old('group') == $group->id) selected @endif>{{ $group->name }}</option>
+                            <option value="{{ $group->id }}" @selected(old('group', request('group')) == $group->id)>{{ $group->name }}</option>
                         @endforeach
                     </select>
                     @error('group')

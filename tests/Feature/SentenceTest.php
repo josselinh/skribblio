@@ -21,6 +21,18 @@ class SentenceTest extends TestCase
         $response = $this->actingAs($user)->get(route('sentence.index'));
 
         $response->assertStatus(200);
+        $response->assertDontSee(route('sentence.add', ['group' => $group->id]));
+    }
+
+    public function test_sentence_index_shows_add_button_when_filtered_by_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create();
+
+        $response = $this->actingAs($user)->get(route('sentence.index', ['group' => $group->id]));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('sentence.add', ['group' => $group->id]));
     }
 
     public function test_sentence_add_can_be_rendered(): void
@@ -30,6 +42,35 @@ class SentenceTest extends TestCase
         $response = $this->actingAs($user)->get(route('sentence.add'));
 
         $response->assertStatus(200);
+    }
+
+    public function test_sentence_add_preselects_group_from_query_parameter(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create();
+
+        $response = $this->actingAs($user)->get(route('sentence.add', ['group' => $group->id]));
+
+        $response->assertStatus(200);
+        $response->assertSee('value="' . $group->id . '" selected', false);
+    }
+
+    public function test_sentence_do_add_creates_sentence_and_redirects_to_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create();
+
+        $response = $this->actingAs($user)->post(route('sentence.add.do'), [
+            'name' => 'Test sentence',
+            'group' => $group->id,
+        ]);
+
+        $response->assertRedirect(route('sentence.index', ['group' => $group->id]));
+        $this->assertDatabaseHas('sentences', [
+            'sentence' => 'Test sentence',
+            'group_id' => $group->id,
+            'user_id' => $user->id,
+        ]);
     }
 
     public function test_sentence_export_can_be_rendered(): void

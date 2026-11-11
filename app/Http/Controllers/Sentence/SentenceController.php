@@ -60,9 +60,8 @@ class SentenceController extends Controller
         $group = $this->sentenceManager->add($request->input('name'), $request->input('group'), auth()->id());
 
         return redirect()
-            ->route('sentence.index', ['author' => auth()->id()])
-            ->with('alert-success', __('sentence.doAdd.success'))
-            ->withInput();
+            ->route('sentence.index', ['group' => $request->input('group')])
+            ->with('alert-success', __('sentence.doAdd.success'));
     }
 
     /**
