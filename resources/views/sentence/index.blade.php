@@ -53,7 +53,7 @@
                             <td class="px-4 py-4 text-center text-gray-600 font-semibold">{{ $sentence->note }}</td>
                             <td class="px-6 py-4 text-gray-600">
                                 <a href="{{ route('sentence.index', ['group' => $sentence->group->id]) }}" class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                    {{ $sentence->group->name }}
+                                    {!! (new \App\Presenters\GroupPresenter($sentence->group))->name() !!}
                                 </a>
                             </td>
                             <td class="px-6 py-4 text-gray-600">

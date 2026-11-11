@@ -35,6 +35,34 @@ class SentenceTest extends TestCase
         $response->assertSee(route('sentence.add', ['group' => $group->id]));
     }
 
+    public function test_sentence_index_displays_lock_icon_for_public_unalterable_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+        Sentence::factory()->for($user)->for($group)->create();
+
+        $response = $this->actingAs($user)->get(route('sentence.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('title="' . __('group.visibility.public_unalterable') . '"', false);
+    }
+
+    public function test_sentence_index_does_not_display_lock_icon_for_public_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC,
+        ]);
+        Sentence::factory()->for($user)->for($group)->create();
+
+        $response = $this->actingAs($user)->get(route('sentence.index'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('title="' . __('group.visibility.public_unalterable') . '"', false);
+    }
+
     public function test_sentence_add_can_be_rendered(): void
     {
         $user = User::factory()->create();
@@ -88,6 +116,34 @@ class SentenceTest extends TestCase
         $response = $this->actingAs($user)->get(route('group.index'));
 
         $response->assertStatus(200);
+    }
+
+    public function test_group_index_displays_lock_icon_for_public_unalterable_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create([
+            'name' => 'Lock Group',
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('group.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('title="' . __('group.visibility.public_unalterable') . '"', false);
+    }
+
+    public function test_group_index_does_not_display_lock_icon_for_public_group(): void
+    {
+        $user = User::factory()->create();
+        $group = Group::factory()->for($user)->create([
+            'name' => 'Open Group',
+            'visibility' => Group::VISIBILITY_PUBLIC,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('group.index'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('title="' . __('group.visibility.public_unalterable') . '"', false);
     }
 
     public function test_group_add_can_be_rendered(): void

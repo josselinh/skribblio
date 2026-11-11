@@ -32,7 +32,9 @@
                     <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse($groups as $group)
                         <tr class="hover:bg-gray-50 transition">
-                            <td class="px-6 py-4 font-medium text-gray-900">{{ $group->name }}</td>
+                            <td class="px-6 py-4 font-medium text-gray-900">
+                                {!! (new \App\Presenters\GroupPresenter($group))->name() !!}
+                            </td>
                             <td class="px-4 py-4 text-center">
                                 <a href="{{ route('sentence.index', ['group' => $group->id]) }}"
                                    class="inline-flex items-center text-indigo-600 hover:text-indigo-900 p-1 hover:bg-indigo-50 rounded"

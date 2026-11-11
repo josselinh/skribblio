@@ -37,6 +37,14 @@ class Group extends Model
     protected $fillable = ['name', 'user_id', 'visibility'];
 
     /**
+     * @return bool
+     */
+    public function isPublicUnalterable(): bool
+    {
+        return $this->visibility === self::VISIBILITY_PUBLIC_UNALTERABLE;
+    }
+
+    /**
      * @return BelongsTo
      */
     public function user(): BelongsTo
