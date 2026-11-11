@@ -40,6 +40,14 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->id === 1;
+    }
+
+    /**
      * @return HasMany
      */
     public function sentences(): HasMany

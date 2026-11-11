@@ -8,6 +8,7 @@ use App\Http\Requests\SentenceAddRequest;
 use App\Http\Requests\SentenceImportRequest;
 use App\Managers\GroupManager;
 use App\Managers\SentenceManager;
+use App\Models\Group;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -36,8 +37,9 @@ class SentenceController extends Controller
     public function index(Request $request): View
     {
         $sentences = $this->sentenceManager->paginate($request->only(['search', 'group', 'author']), auth()->id());
+        $currentGroup = $request->filled('group') ? Group::find($request->input('group')) : null;
 
-        return view('sentence.index', compact('sentences'));
+        return view('sentence.index', compact('sentences', 'currentGroup'));
     }
 
     /**
@@ -46,7 +48,7 @@ class SentenceController extends Controller
     public function add(): View
     {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search(null, auth()->id());
+        $groups = $groupManager->search(filters: ['writable' => true], userId: auth()->id());
 
         return view('sentence.add', compact('groups'));
     }
@@ -70,7 +72,7 @@ class SentenceController extends Controller
     public function import(): View
     {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search(null, auth()->id());
+        $groups = $groupManager->search(filters: ['writable' => true], userId: auth()->id());
 
         return view('sentence.import', compact('groups'));
     }
