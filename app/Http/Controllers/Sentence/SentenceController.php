@@ -48,7 +48,7 @@ class SentenceController extends Controller
     public function add(): View
     {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search(filters: ['writable' => true], userId: auth()->id());
+        $groups = $groupManager->search(['writable' => true], auth()->id());
 
         return view('sentence.add', compact('groups'));
     }
@@ -72,7 +72,7 @@ class SentenceController extends Controller
     public function import(): View
     {
         $groupManager = new GroupManager();
-        $groups = $groupManager->search(filters: ['writable' => true], userId: auth()->id());
+        $groups = $groupManager->search(null, auth()->id());
 
         return view('sentence.import', compact('groups'));
     }
@@ -97,14 +97,14 @@ class SentenceController extends Controller
         $sentences = collect();
 
         $groupManager = new GroupManager();
-        $groups = $groupManager->search(null, auth()->id());
+        $groups = $groupManager->search(null, auth()?->id());
 
         $filters = $request->only(['groups']);
 
         if (!empty($filters)) {
             $filters['positive_note'] = true;
 
-            $sentences = $this->sentenceManager->export($filters, auth()->id());
+            $sentences = $this->sentenceManager->export($filters, auth()?->id());
         }
 
         return view('sentence.export', compact('sentences', 'groups'));

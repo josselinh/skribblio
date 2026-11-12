@@ -4,7 +4,9 @@ namespace App\Managers;
 
 use App\Exceptions\Sentence\VoteAlreadyExistsException;
 use App\Jobs\ImportSentenceJob;
+use App\Models\Group;
 use App\Models\Sentence;
+use App\Models\User;
 use App\Models\Vote;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -86,7 +88,7 @@ class SentenceManager
      * @param int|null $userId
      * @return LengthAwarePaginator
      */
-    public function paginate(?array $filters = [], int $userId = null): LengthAwarePaginator
+    public function paginate(?array $filters = [], ?int $userId = null): LengthAwarePaginator
     {
         return $this->applyFilters(Sentence::query()->with(['user', 'group', 'votes']), $filters, $userId)->paginate(25);
     }
@@ -99,18 +101,22 @@ class SentenceManager
      */
     private function applyFilters(Builder $qb, ?array $filters = [], ?int $userId = null): Builder
     {
-        $qb->whereHas('group', function ($belongsTo) use ($userId) {
-            $belongsTo->where(function (Builder $where) use ($userId) {
-                $where->orWhereIn('visibility', [1, 2]);
+        $user = $userId ? User::find($userId) : null;
 
-                if (!empty($userId)) {
-                    $where->orWhere(function (Builder $_where) use ($userId) {
-                        $_where->whereIn('visibility', [1, 2, 3]);
-                        $_where->where('user_id', $userId);
-                    });
+        // Visibility
+        if ($user?->isAdmin()) {
+            // Admin can see all groups
+        } else {
+            $qb->whereHas('group', function (Builder $where) use ($user) {
+                $where->where(function (Builder $_where) {
+                    $_where->whereIn('visibility', [Group::VISIBILITY_PUBLIC, Group::VISIBILITY_PUBLIC_UNALTERABLE]);
+                });
+
+                if ($user) {
+                    $where->orWhere('user_id', $user->id);
                 }
             });
-        });
+        }
 
         if (!empty($filters['search'])) {
             $qb->where('sentence', 'like', '%' . $filters['search'] . '%');

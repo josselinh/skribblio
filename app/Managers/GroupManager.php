@@ -3,6 +3,7 @@
 namespace App\Managers;
 
 use App\Models\Group;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -25,25 +26,40 @@ class GroupManager
 
     /**
      * @param array|null $filters
+     * @param int|null $userId
      * @return Collection
      */
     public function search(?array $filters = [], ?int $userId = null): Collection
     {
-        // Create new query
-        $qb = Group::query();
+        return $this->applyFilters(Group::query()->with('user'), $filters, $userId)->get();
+    }
 
-        // Default filters
+    /**
+     * @param Builder $qb
+     * @param array|null $filters
+     * @param int|null $userId
+     * @return Builder
+     */
+    private function applyFilters(Builder $qb, ?array $filters = [], ?int $userId = null): Builder
+    {
+        $user = $userId ? User::find($userId) : null;
+
         // Visibility
-        $qb->where(function (Builder $where) use ($userId) {
-            $where->orWhereIn('visibility', [1, 2]);
-
-            if (!empty($userId)) {
-                $where->orWhere(function (Builder $_where) use ($userId) {
-                    $_where->whereIn('visibility', [1, 2, 3]);
-                    $_where->where('user_id', $userId);
+        if ($user?->isAdmin()) {
+            // Admin can see all groups
+        } else {
+            $qb->where(function (Builder $where) use ($filters, $user) {
+                $where->when(!empty($filters['writable']) && $filters['writable'] === true, function (Builder $when) {
+                    $when->where('visibility', Group::VISIBILITY_PUBLIC);
+                }, function (Builder $when) {
+                    $when->whereIn('visibility', [Group::VISIBILITY_PUBLIC, Group::VISIBILITY_PUBLIC_UNALTERABLE]);
                 });
-            }
-        });
+
+                if ($user) {
+                    $where->orWhere('user_id', $user->id);
+                }
+            });
+        }
 
         if (!empty($filters['search'])) {
             $qb->where('name', 'like', '%' . $filters['search'] . '%');
@@ -55,6 +71,6 @@ class GroupManager
 
         $qb->orderBy('created_at', 'desc');
 
-        return $qb->get();
+        return $qb;
     }
 }

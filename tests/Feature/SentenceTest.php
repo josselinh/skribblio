@@ -101,6 +101,123 @@ class SentenceTest extends TestCase
         ]);
     }
 
+    public function test_user_cannot_add_sentence_to_public_unalterable_group_of_another_user(): void
+    {
+        $userX = User::factory()->create(['id' => 2]);
+        $userY = User::factory()->create(['id' => 3]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($userY)->post(route('sentence.add.do'), [
+            'name' => 'Unauthorized sentence',
+            'group' => $group->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('sentences', [
+            'sentence' => 'Unauthorized sentence',
+            'group_id' => $group->id,
+        ]);
+    }
+
+    public function test_owner_can_add_sentence_to_their_public_unalterable_group(): void
+    {
+        $userX = User::factory()->create(['id' => 2]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($userX)->post(route('sentence.add.do'), [
+            'name' => 'Owner sentence',
+            'group' => $group->id,
+        ]);
+
+        $response->assertRedirect(route('sentence.index', ['group' => $group->id]));
+        $this->assertDatabaseHas('sentences', [
+            'sentence' => 'Owner sentence',
+            'group_id' => $group->id,
+            'user_id' => $userX->id,
+        ]);
+    }
+
+    public function test_admin_can_add_sentence_to_public_unalterable_group_of_another_user(): void
+    {
+        $admin = User::factory()->create(['id' => 1]);
+        $userX = User::factory()->create(['id' => 2]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('sentence.add.do'), [
+            'name' => 'Admin sentence',
+            'group' => $group->id,
+        ]);
+
+        $response->assertRedirect(route('sentence.index', ['group' => $group->id]));
+        $this->assertDatabaseHas('sentences', [
+            'sentence' => 'Admin sentence',
+            'group_id' => $group->id,
+            'user_id' => $admin->id,
+        ]);
+    }
+
+    public function test_public_unalterable_group_of_another_user_not_listed_in_add_form(): void
+    {
+        $userX = User::factory()->create(['id' => 2]);
+        $userY = User::factory()->create(['id' => 3]);
+        $group = Group::factory()->for($userX)->create([
+            'name' => 'Unalterable Group',
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($userY)->get(route('sentence.add'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Unalterable Group');
+    }
+
+    public function test_public_unalterable_group_does_not_show_add_button_for_another_user_on_index(): void
+    {
+        $userX = User::factory()->create(['id' => 2]);
+        $userY = User::factory()->create(['id' => 3]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($userY)->get(route('sentence.index', ['group' => $group->id]));
+
+        $response->assertStatus(200);
+        $response->assertDontSee(route('sentence.add', ['group' => $group->id]));
+    }
+
+    public function test_public_unalterable_group_shows_add_button_for_owner_on_index(): void
+    {
+        $userX = User::factory()->create(['id' => 2]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($userX)->get(route('sentence.index', ['group' => $group->id]));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('sentence.add', ['group' => $group->id]));
+    }
+
+    public function test_public_unalterable_group_shows_add_button_for_admin_on_index(): void
+    {
+        $admin = User::factory()->create(['id' => 1]);
+        $userX = User::factory()->create(['id' => 2]);
+        $group = Group::factory()->for($userX)->create([
+            'visibility' => Group::VISIBILITY_PUBLIC_UNALTERABLE,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('sentence.index', ['group' => $group->id]));
+
+        $response->assertStatus(200);
+        $response->assertSee(route('sentence.add', ['group' => $group->id]));
+    }
+
     public function test_sentence_export_can_be_rendered(): void
     {
         $response = $this->get(route('sentence.export'));
