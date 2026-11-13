@@ -36,8 +36,14 @@ class SentenceController extends Controller
      */
     public function index(Request $request): View
     {
+        $currentGroup = null;
+
+        if ($request->filled('group')) {
+            $currentGroup = Group::findOrFail($request->integer('group'));
+            $this->authorize('view', $currentGroup);
+        }
+
         $sentences = $this->sentenceManager->paginate($request->only(['search', 'group', 'author']), auth()->id());
-        $currentGroup = $request->filled('group') ? Group::find($request->input('group')) : null;
 
         return view('sentence.index', compact('sentences', 'currentGroup'));
     }

@@ -45,6 +45,7 @@ Request flow: `routes/web.php` → Controller → Form Request (validation) → 
 
 - Admin = user with `id === 1` (`User::isAdmin()`). Admins see and edit everything.
 - `Group` visibility constants: `VISIBILITY_PUBLIC = 1` (everyone can read and add), `VISIBILITY_PUBLIC_UNALTERABLE = 2` (everyone reads, only owner/admin adds; shown with a lock icon), `VISIBILITY_PRIVATE = 3` (owner/admin only). Always use the constants.
+- Visibility rules live in two places that must stay in sync: SQL side in each manager's `applyFilters()` (filtering lists), PHP side in `app/Policies/GroupPolicy.php` (`view`, `addSentence` on a loaded group; `before()` grants admins everything). Changing one means changing the other.
 - Schema: `groups(name unique ≤30, user_id, visibility)`, `sentences(sentence ≤30, note, group_id, user_id)` unique on `(sentence, group_id)`, `votes(sentence_id, user_id, note)` unique on `(sentence_id, user_id)`.
 - A sentence is exported only when `note >= 0`. `sentence.export` is public (guests see public groups only); all other group/sentence routes require `auth`.
 
