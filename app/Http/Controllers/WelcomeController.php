@@ -13,12 +13,4 @@ class WelcomeController extends Controller
     {
         return view('welcome');
     }
-
-    /**
-     * @return View
-     */
-    public function release(): View
-    {
-        return view('release');
-    }
 }

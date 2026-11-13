@@ -7,7 +7,6 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
-Route::get('/release', [WelcomeController::class, 'release'])->name('release');
 
 Route::prefix('sentence')->group(function () {
     Route::get('/export', [SentenceController::class, 'export'])->name('sentence.export');

@@ -1,34 +1,71 @@
-# Repository Guidelines
+# AGENTS.md
 
-## Project Purpose & Context
+Skribblio: community tool to prepare Skribbl.io games. Users create word **groups**, add **sentences** (words, max 30 chars) to them, **vote** on them, and **export** a group as a comma-separated list to paste into Skribbl.io.
 
-This project is not intended for production deployment. Its primary purpose is personal training and experimentation with Laravel and AI-assisted software development. Explanations should remain pedagogical, clear, and focused on learning modern Laravel best practices and effective pair programming with AI.
+Not for production: a personal playground for learning Laravel and AI pair programming. The user writes in French and is learning: **answer in French**, explain the "why" briefly and point to the modern Laravel way when relevant. Code, comments, commits and identifiers stay in English.
 
-## Project Structure & Module Organization
+## Stack
 
-This is a Laravel 13 application. Business logic is in `app/` (models, managers, jobs, requests, and controllers); routes are in `routes/`; Blade templates and frontend sources are in `resources/views/`, `resources/js/`, and `resources/css/`. Database migrations, seeders, and factories live in `database/`. PHPUnit tests are under `tests/Unit/` and `tests/Feature/`. Compiled frontend assets are emitted to `public/build/` by Vite; edit source files under `resources/` instead.
+- Laravel 13, PHP 8.5 (FrankenPHP), MySQL 8.4, PHPUnit 12.
+- Breeze (Blade) + Tailwind CSS 3 + Alpine.js, built with Vite. No Livewire, Inertia, Vue or Sass.
+- Dev-only: Debugbar, Mailpit (http://localhost:8025).
+- Editor: VSCodium (open-source VS Code build, uses the Open VSX extension registry, not the Microsoft Marketplace).
+- UI language is French only (`config/app.php` locale `fr`). Translations live in `resources/lang/fr/{group,menu,sentence}.php` (note: `resources/lang`, not `lang/`). Use `__('file.key')`; never hardcode UI strings.
 
-## Build, Test, and Development Commands
+## Commands (everything runs in Docker)
 
-- `composer install` and `npm install` install PHP and JavaScript dependencies.
-- `cp .env.example .env`, then `php artisan key:generate`, configures a local environment; set database details in `.env` as needed.
-- `php artisan migrate --seed` creates and seeds the database.
-- `php artisan serve` runs the Laravel development server.
-- `vendor/bin/phpunit` runs the unit and feature suites (SQLite in memory is configured in `phpunit.xml`).
-- `npm run dev` starts the Vite development server; `npm run build` creates production assets.
+PHP, Composer and Node are **not installed on the host**. Prefix every command with `docker compose exec app`:
 
-## Coding Style & Naming Conventions
+```sh
+docker compose exec app vendor/bin/phpunit                    # all tests (SQLite in memory)
+docker compose exec app vendor/bin/phpunit --filter=SentenceTest
+docker compose exec app php artisan <cmd>                     # e.g. route:list, make:*, migrate
+docker compose exec app composer <cmd>
+docker compose exec app npm run build                         # needed after Blade/Tailwind class changes if Vite dev is not running
+```
 
-Follow the surrounding Laravel/PHP conventions and keep changes consistent with nearby files. Use PSR-4 namespaces under `App\`, `Database\`, and `Tests\`; name PHP classes in `StudlyCase`, methods and variables in `camelCase`, and migrations with timestamped snake_case filenames. Keep route definitions in the appropriate `routes/` file and use Laravel requests for input validation. Frontend assets use JavaScript and Tailwind CSS, compiled through Vite. No separate formatter or linter is configured in the repository.
+The host has little RAM: avoid heavy tooling, long-running watchers or extra services. Do not run `docker compose down -v` (deletes the database).
 
-## Testing Guidelines
+## Architecture
 
-Add regression coverage in `tests/Feature/` for HTTP behavior and `tests/Unit/` for isolated logic. Name test files and classes with the `Test` suffix, following the existing `ExampleTest.php` pattern. Run `vendor/bin/phpunit` before submitting changes; the suite uses an in-memory SQLite database and does not require local database data.
+Request flow: `routes/web.php` → Controller → Form Request (validation) → **Manager** (business logic, queries) → Eloquent model → Blade view.
 
-## Commit & Pull Request Guidelines
+- `app/Managers/{Group,Sentence,User}Manager.php`: all business logic and query building. Each has a private `applyFilters(Builder, ?array $filters, ?int $userId)` that also enforces **visibility**. Put new query logic here, not in controllers. Controllers currently instantiate managers with `new` (legacy); constructor injection is preferred for new code.
+- `app/Http/Controllers/{Group,Sentence}/`: action naming is `add` (shows form) / `doAdd` (handles POST), routes `group.add` / `group.add.do`. Keep this convention.
+- `app/Http/Requests/*Request.php`: validation (`authorize()` currently returns `true`, no authorization).
+- `app/Observers/VoteObserver.php`: keeps `sentences.note` (denormalized vote total) in sync on vote save.
+- `app/Presenters/GroupPresenter.php`: display helpers returning `HtmlString` (always `e()` user data).
+- `app/Jobs/ImportSentenceJob.php`: one job per imported sentence (queue is `sync` locally).
+- `app/View/Components/`: Breeze layouts + `SentenceVoteButtons`.
+- Flash messages: `->with('alert-success', __('...'))`, rendered by `layouts/alerts.blade.php`.
 
-Recent commits use short, sentence-case imperative summaries (for example, “Add votes” and “Improve navbar + Separate add page from index”). Keep each commit focused and describe its user-visible change. Pull requests should explain the motivation and implementation, link related issues when available, list relevant test/build commands and outcomes, and include screenshots for visible UI changes.
+## Domain rules
 
-## Security & Configuration Tips
+- Admin = user with `id === 1` (`User::isAdmin()`). Admins see and edit everything.
+- `Group` visibility constants: `VISIBILITY_PUBLIC = 1` (everyone can read and add), `VISIBILITY_PUBLIC_UNALTERABLE = 2` (everyone reads, only owner/admin adds; shown with a lock icon), `VISIBILITY_PRIVATE = 3` (owner/admin only). Always use the constants.
+- Schema: `groups(name unique ≤30, user_id, visibility)`, `sentences(sentence ≤30, note, group_id, user_id)` unique on `(sentence, group_id)`, `votes(sentence_id, user_id, note)` unique on `(sentence_id, user_id)`.
+- A sentence is exported only when `note >= 0`. `sentence.export` is public (guests see public groups only); all other group/sentence routes require `auth`.
 
-Keep secrets and machine-specific values in `.env`; do not commit credentials. Review migrations and seeders for unintended data changes before submitting them.
+## Laravel conventions to follow
+
+- Use `php artisan make:*` to create classes (`--no-interaction`); check sibling files before creating new ones and reuse existing components/managers.
+- Validation in Form Requests (array rules), never inline in controllers.
+- Eloquent over `DB::`; eager-load relations (`with()`) to avoid N+1; declare return types on relations.
+- Use named routes (`route('sentence.index')`) and `config()` (never `env()` outside config files).
+- Any schema change = new migration (never edit existing ones). Update factories/seeders accordingly.
+- PHP 8 style for new code: constructor property promotion, typed properties and return types, `casts()` method. Do not mass-rewrite old code unless asked.
+- Tailwind 3 utility classes, consistent with existing Breeze views and `x-*` components in `resources/views/components/`.
+
+## Testing
+
+- Do not write or add tests unless the user explicitly asks for them. Existing tests can still be run to check a change. Feature tests live in `tests/Feature/` (PHPUnit classes, `RefreshDatabase`, factories, `actingAs`). There is no `tests/Unit/` suite in `phpunit.xml` yet; add it there if a unit test is needed.
+- Run the smallest relevant subset with `--filter` first, then the full suite before finishing.
+- Tests use SQLite: avoid MySQL-only SQL.
+
+## Known issues (don't rediscover them)
+
+- `README.md` still mentions Sass; the project uses Tailwind.
+
+## Commits & PRs
+
+Short sentence-case imperative messages (`Add votes`, `Fix groups visibilities`), one focused change per commit. Commit only when asked. Never commit `.env` or secrets.

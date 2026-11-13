@@ -25,8 +25,6 @@ class SentenceController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:sentence-import')->only(['import', 'importDo']);
-
         $this->sentenceManager = new SentenceManager();
     }
 
@@ -100,14 +98,15 @@ class SentenceController extends Controller
         $groups = $groupManager->search(null, auth()?->id());
 
         $filters = $request->only(['groups']);
+        $submitted = !empty($filters);
 
-        if (!empty($filters)) {
+        if ($submitted) {
             $filters['positive_note'] = true;
 
             $sentences = $this->sentenceManager->export($filters, auth()?->id());
         }
 
-        return view('sentence.export', compact('sentences', 'groups'));
+        return view('sentence.export', compact('sentences', 'groups', 'submitted'));
     }
 
     /**

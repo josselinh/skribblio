@@ -2,12 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Group;
-use App\Models\User;
 use App\Models\Vote;
 use App\Observers\VoteObserver;
-use App\Policies\GroupPolicy;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,12 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(Group::class, GroupPolicy::class);
-
         Vote::observe(VoteObserver::class);
-
-        Gate::define('sentence-import', function (User $user): bool {
-            return $user->isAdmin();
-        });
     }
 }

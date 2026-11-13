@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Group;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SentenceImportRequest extends FormRequest
@@ -14,17 +13,7 @@ class SentenceImportRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $groupId = $this->input('group');
-        if (!$groupId) {
-            return true;
-        }
-
-        $group = Group::find($groupId);
-        if (!$group) {
-            return true;
-        }
-
-        return $this->user()->can('addSentence', $group);
+        return true;
     }
 
     /**

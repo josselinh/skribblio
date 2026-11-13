@@ -36,7 +36,6 @@
                     <a href="{{ route('group.index') }}" class="hover:text-gray-900 transition">{{ __('menu.groups.root') }}</a>
                 @endauth
                 <a href="{{ route('sentence.export') }}" class="hover:text-gray-900 transition">{{ __('menu.sentences.export') }}</a>
-                <a href="{{ route('release') }}" class="hover:text-gray-900 transition">v1.0.4</a>
             </div>
         </div>
     </div>
