@@ -3,7 +3,6 @@
 namespace App\Managers;
 
 use App\Exceptions\Sentence\VoteAlreadyExistsException;
-use App\Jobs\ImportSentenceJob;
 use App\Models\Group;
 use App\Models\Sentence;
 use App\Models\User;
@@ -14,21 +13,6 @@ use Illuminate\Support\Collection;
 
 class SentenceManager
 {
-    /**
-     * @param string $sentences
-     * @param int $groupId
-     * @param int $userId
-     */
-    public function import(string $sentences, int $groupId, int $userId): void
-    {
-        /** @var array $sentences */
-        $sentences = array_unique(array_filter(array_map('trim', explode(',', $sentences))));
-
-        foreach ($sentences as $sentence) {
-            ImportSentenceJob::dispatch($sentence, $groupId, $userId);
-        }
-    }
-
     /**
      * @param array|null $filters
      * @param int|null $userId
@@ -52,6 +36,24 @@ class SentenceManager
             'group_id' => $groupId,
             'user_id' => $userId,
         ]);
+    }
+
+    /**
+     * @param array<int, string> $sentences
+     * @return int Number of inserted sentences
+     */
+    public function addMany(array $sentences, int $groupId, int $userId): int
+    {
+        // insertOrIgnore bypasses Eloquent: timestamps must be set manually.
+        $now = now();
+
+        return Sentence::insertOrIgnore(array_map(fn (string $sentence): array => [
+            'sentence' => $sentence,
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ], $sentences));
     }
 
     /**

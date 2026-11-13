@@ -31,8 +31,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SentenceController::class, 'index'])->name('sentence.index');
         Route::get('/add', [SentenceController::class, 'add'])->name('sentence.add');
         Route::post('/add/do', [SentenceController::class, 'doAdd'])->name('sentence.add.do');
-        Route::get('/import', [SentenceController::class, 'import'])->name('sentence.import');
-        Route::post('/import/do', [SentenceController::class, 'doImport'])->name('sentence.import.do');
+        Route::get('/import', [SentenceController::class, 'import'])->name('sentence.import')->can('import-sentences');
+        Route::post('/import/do', [SentenceController::class, 'doImport'])->name('sentence.import.do')->can('import-sentences');
         Route::post('/vote/do', [SentenceController::class, 'doVote'])->name('sentence.vote.do');
     });
 });

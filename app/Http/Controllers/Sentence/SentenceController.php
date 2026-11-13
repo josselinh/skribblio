@@ -6,11 +6,13 @@ use App\Exceptions\Sentence\VoteAlreadyExistsException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SentenceAddRequest;
 use App\Http\Requests\SentenceImportRequest;
+use App\Jobs\ImportSentencesJob;
 use App\Managers\GroupManager;
 use App\Managers\SentenceManager;
 use App\Models\Group;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class SentenceController extends Controller
@@ -81,7 +83,15 @@ class SentenceController extends Controller
      */
     public function doImport(SentenceImportRequest $request): RedirectResponse
     {
-        $this->sentenceManager->import($request->input('sentences'), $request->input('group'), auth()->id());
+        $groupId = $request->integer('group');
+        $userId = auth()->id();
+
+        collect(explode(',', $request->input('sentences')))
+            ->map(fn (string $sentence): string => trim($sentence))
+            ->filter()
+            ->unique()
+            ->chunk(config('skribblio.import.chunk_size'))
+            ->each(fn (Collection $chunk) => ImportSentencesJob::dispatch($chunk->values()->all(), $groupId, $userId));
 
         return redirect()->route('sentence.index', ['group' => $request->input('group')])->with('alert-success', __('sentence.doImport.success'));
     }

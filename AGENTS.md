@@ -30,12 +30,14 @@ The host has little RAM: avoid heavy tooling, long-running watchers or extra ser
 
 Request flow: `routes/web.php` → Controller → Form Request (validation) → **Manager** (business logic, queries) → Eloquent model → Blade view.
 
-- `app/Managers/{Group,Sentence,User}Manager.php`: all business logic and query building. Each has a private `applyFilters(Builder, ?array $filters, ?int $userId)` that also enforces **visibility**. Put new query logic here, not in controllers. Controllers currently instantiate managers with `new` (legacy); constructor injection is preferred for new code.
+- `app/Managers/{Group,Sentence,User}Manager.php`: business logic and query building (all database reads/writes). Each has a private `applyFilters(Builder, ?array $filters, ?int $userId)` that also enforces **visibility**. Put new query logic here, not in controllers. Controllers currently instantiate managers with `new` (legacy); constructor injection is preferred for new code.
+- Controllers may do light orchestration that doesn't touch the database: parsing request input and dispatching jobs (e.g. `SentenceController::doImport()` splits the input and dispatches `ImportSentencesJob` per chunk). This is intentional; don't move it back into a manager.
 - `app/Http/Controllers/{Group,Sentence}/`: action naming is `add` (shows form) / `doAdd` (handles POST), routes `group.add` / `group.add.do`. Keep this convention.
 - `app/Http/Requests/*Request.php`: validation (`authorize()` currently returns `true`, no authorization).
 - `app/Observers/VoteObserver.php`: keeps `sentences.note` (denormalized vote total) in sync on vote save.
 - `app/Presenters/GroupPresenter.php`: display helpers returning `HtmlString` (always `e()` user data).
-- `app/Jobs/ImportSentenceJob.php`: one job per imported sentence (queue is `sync` locally).
+- `app/Jobs/ImportSentencesJob.php`: one job per chunk of imported sentences (size from `config('skribblio.import.chunk_size')`, env `SKRIBBLIO_IMPORT_CHUNK_SIZE`), calling `SentenceManager::addMany()` (`insertOrIgnore`: duplicates are skipped, too-long words are truncated by MySQL). Queue is `sync` locally.
+- Import routes (`sentence.import`, `sentence.import.do`) are admin-only via the `import-sentences` Gate (`AppServiceProvider`).
 - `app/View/Components/`: Breeze layouts + `SentenceVoteButtons`.
 - Flash messages: `->with('alert-success', __('...'))`, rendered by `layouts/alerts.blade.php`.
 

@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Models\Vote;
 use App\Observers\VoteObserver;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vote::observe(VoteObserver::class);
+
+        Gate::define('import-sentences', fn (User $user): bool => $user->isAdmin());
     }
 }

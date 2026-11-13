@@ -31,9 +31,11 @@
                                 <x-dropdown-link :href="route('sentence.add')">
                                     {{ __('menu.sentences.add') }}
                                 </x-dropdown-link>
-                                <x-dropdown-link :href="route('sentence.import')">
-                                    {{ __('menu.sentences.import') }}
-                                </x-dropdown-link>
+                                @can('import-sentences')
+                                    <x-dropdown-link :href="route('sentence.import')">
+                                        {{ __('menu.sentences.import') }}
+                                    </x-dropdown-link>
+                                @endcan
                                 <x-dropdown-link :href="route('sentence.export')">
                                     {{ __('menu.sentences.export') }}
                                 </x-dropdown-link>
@@ -132,9 +134,11 @@
                 <x-responsive-nav-link :href="route('sentence.add')" :active="request()->routeIs('sentence.add')">
                     {{ __('menu.sentences.add') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('sentence.import')" :active="request()->routeIs('sentence.import')">
-                    {{ __('menu.sentences.import') }}
-                </x-responsive-nav-link>
+                @can('import-sentences')
+                    <x-responsive-nav-link :href="route('sentence.import')" :active="request()->routeIs('sentence.import')">
+                        {{ __('menu.sentences.import') }}
+                    </x-responsive-nav-link>
+                @endcan
                 <x-responsive-nav-link :href="route('sentence.export')" :active="request()->routeIs('sentence.export')">
                     {{ __('menu.sentences.export') }}
                 </x-responsive-nav-link>
