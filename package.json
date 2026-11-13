@@ -1,4 +1,5 @@
 {
+    "name": "skribblio",
     "private": true,
     "type": "module",
     "scripts": {

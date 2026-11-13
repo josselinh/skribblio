@@ -1,0 +1,15 @@
+{
+    "recommendations": [
+        "bmewburn.vscode-intelephense-client",
+        "laravel.vscode-laravel",
+        "onecentlin.laravel-blade",
+        "bradlc.vscode-tailwindcss",
+        "EditorConfig.EditorConfig",
+        "ms-azuretools.vscode-docker",
+        "mikestead.dotenv"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode-remote.remote-containers",
+        "felixfbecker.php-intellisense"
+    ]
+}

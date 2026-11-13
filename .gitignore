@@ -10,12 +10,9 @@
 /vendor
 /.idea
 /.env
-/.env.docker
-/.env.proxy
 /.env.backup
 /.phpunit.result.cache
 /Homestead.json
 /Homestead.yaml
 /npm-debug.log
 /yarn-error.log
-/app.yaml

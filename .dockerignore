@@ -1,11 +1,4 @@
-.git
-.env
-.env.*
-!.env.docker.example
-vendor
-node_modules
-storage/logs
-public/css
-public/js
-public/build
-public/hot
+# L'image ne contient pas le code du projet (il est monté en volume par
+# compose.yaml) : on n'envoie donc rien à Docker lors du build.
+# Le build est plus rapide et aucun secret (.env) ne finit dans l'image.
+*

@@ -1,0 +1,56 @@
+# Environnement de développement de Skribblio.
+#
+# Les identifiants de la base sont lus dans le fichier .env de Laravel :
+# Docker Compose le charge automatiquement pour remplacer les ${VARIABLES}.
+# Il n'y a donc qu'un seul fichier de configuration à maintenir.
+
+services:
+  # Laravel servi par FrankenPHP, avec Composer et Node.js pour les commandes.
+  app:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    ports:
+      - "8000:8000" # application : http://localhost:8000
+      - "5173:5173" # serveur Vite (npm run dev) pour le rechargement à chaud
+    volumes:
+      - .:/app # le code du projet, modifiable depuis VSCodium
+    depends_on:
+      mysql:
+        condition: service_healthy # attend que MySQL accepte les connexions
+      mailpit:
+        condition: service_started
+
+  mysql:
+    image: mysql:8.4 # version LTS (support long terme)
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes" # Laravel n'utilise pas le compte root
+    # Désactive le Performance Schema : économise ~200 Mo de RAM en local.
+    command: --performance-schema=OFF
+    ports:
+      - "127.0.0.1:3306:3306" # accessible uniquement depuis la machine (client SQL)
+    volumes:
+      - mysql_data:/var/lib/mysql # les données survivent à "docker compose down"
+    healthcheck:
+      # Connexion TCP (127.0.0.1) : pendant son initialisation, MySQL n'écoute
+      # que sur son socket local. Le test ne réussit donc qu'une fois prêt.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$MYSQL_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # Capture tous les e-mails envoyés par l'application (rien ne part sur Internet).
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "8025:8025" # interface web : http://localhost:8025
+      # Le port SMTP (1025) n'est utilisé que par "app", il n'est pas exposé.
+
+volumes:
+  mysql_data:
