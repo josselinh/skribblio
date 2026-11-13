@@ -38,7 +38,11 @@ services:
       start_period: 20s
 
   node:
-    image: node:26-bookworm-slim
+    build:
+      context: docker/node
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
     user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     working_dir: /var/www/html
     command: ["sh", "-c", "tail -f /dev/null"]

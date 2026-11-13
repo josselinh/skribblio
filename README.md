@@ -36,6 +36,14 @@ docker compose exec node npm run build
 
 L'application est ensuite accessible à l'adresse <http://localhost:8080>. Pour les démarrages suivants, utilisez simplement `docker compose up -d`.
 
+Si `npm install` échoue avec `EACCES: permission denied` sur `node_modules`, le volume `node_modules` a été créé par une ancienne version de la configuration et appartient à root. Recréez-le :
+
+```sh
+docker compose rm -sf node
+docker volume rm skribblio_node_modules
+docker compose up -d --build node
+```
+
 ### Base de données et données de démonstration
 
 La base est créée au premier démarrage avec les valeurs de `.env.docker`. Depuis le conteneur Laravel, les commandes suivantes permettent de gérer le schéma et les données :
