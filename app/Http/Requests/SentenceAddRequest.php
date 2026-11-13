@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Group;
 use App\Models\Sentence;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -15,7 +16,10 @@ class SentenceAddRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $group = Group::find($this->integer('group'));
+
+        // Missing or unknown group: let the validation rules report it.
+        return $group === null || $this->user()->can('addSentence', $group);
     }
 
     /**
