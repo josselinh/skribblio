@@ -24,6 +24,16 @@ class UserFactory extends Factory
         ];
     }
 
+    /**
+     * Admin is the user with id 1 (see User::isAdmin()).
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'id' => 1,
+        ]);
+    }
+
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [

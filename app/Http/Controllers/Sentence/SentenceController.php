@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sentence;
 use App\Exceptions\Sentence\VoteAlreadyExistsException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SentenceAddRequest;
+use App\Http\Requests\SentenceExportRequest;
 use App\Http\Requests\SentenceImportRequest;
 use App\Jobs\ImportSentencesJob;
 use App\Managers\GroupManager;
@@ -103,17 +104,17 @@ class SentenceController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param SentenceExportRequest $request
      * @return View
      */
-    public function export(Request $request): View
+    public function export(SentenceExportRequest $request): View
     {
         $sentences = collect();
 
         $groupManager = new GroupManager();
         $groups = $groupManager->search(null, auth()?->id());
 
-        $filters = $request->only(['groups']);
+        $filters = $request->safe()->only(['groups']);
         $submitted = !empty($filters);
 
         if ($submitted) {

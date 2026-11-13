@@ -24,6 +24,8 @@
                             </label>
                         @endforeach
                     </div>
+
+                    <x-input-error :messages="$errors->first('groups*')" class="mt-2" />
                 </div>
 
                 <div class="flex justify-start">
