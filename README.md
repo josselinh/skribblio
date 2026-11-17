@@ -1,58 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Skribblio Tools
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Skribblio Tools** est une application web qui aide à préparer des parties de [Skribbl.io](https://skribbl.io).
 
-## About Laravel
+Elle permet de constituer des listes de mots personnalisés, seul ou à plusieurs, puis de les exporter pour les utiliser directement comme mots personnalisés lors d'une partie Skribbl.io.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Création de listes de mots personnalisés
+- Édition des listes seul ou en collaboration avec d'autres utilisateurs
+- Export d'une liste dans un format prêt à coller dans Skribbl.io
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Stack technique
 
-## Learning Laravel
+- [Laravel](https://laravel.com) (PHP 8.5)
+- [Laravel Sail](https://laravel.com/docs/sail) pour l'environnement de développement Docker
+- MySQL 8.4 pour la base de données
+- Redis pour le cache et les files d'attente (jobs)
+- Mailpit pour intercepter les e-mails en local
+- Vite et Tailwind CSS pour le front-end
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Démarrer le projet avec Sail
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Prérequis
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- [Docker](https://docs.docker.com/get-docker/) avec Docker Compose
+- Git
 
-## Agentic Development
+PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : tout tourne dans les conteneurs Sail.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Installation
 
-```bash
-composer require laravel/boost --dev
+1. Cloner le dépôt :
 
-php artisan boost:install
+   ```sh
+   git clone git@github.com:josselinh/skribblio2.git
+   cd skribblio2
+   ```
+
+2. Créer le fichier d'environnement :
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Installer les dépendances PHP (Sail n'est pas encore disponible à cette étape, on passe donc par un conteneur Composer) :
+
+   ```sh
+   docker run --rm \
+       -u "$(id -u):$(id -g)" \
+       -v "$(pwd):/var/www/html" \
+       -w /var/www/html \
+       laravelsail/php85-composer:latest \
+       composer install --ignore-platform-reqs
+   ```
+
+4. Démarrer les conteneurs :
+
+   ```sh
+   ./vendor/bin/sail up -d
+   ```
+
+5. Générer la clé de l'application et créer les tables :
+
+   ```sh
+   ./vendor/bin/sail artisan key:generate
+   ./vendor/bin/sail artisan migrate
+   ```
+
+6. Installer les dépendances front-end et lancer Vite :
+
+   ```sh
+   ./vendor/bin/sail npm install
+   ./vendor/bin/sail npm run dev
+   ```
+
+L'application est alors accessible sur <http://localhost:8000>.
+
+### Traiter les jobs
+
+Les jobs sont placés dans une file Redis. Pour qu'ils soient exécutés, lancez un worker dans un terminal dédié :
+
+```sh
+./vendor/bin/sail artisan queue:work
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Services disponibles
 
-## Contributing
+| Service             | URL / port                  |
+| ------------------- | --------------------------- |
+| Application         | <http://localhost:8000>     |
+| Vite (dev server)   | <http://localhost:5173>     |
+| Mailpit (web)       | <http://localhost:8025>     |
+| MySQL               | `localhost:3306`            |
+| Redis               | `localhost:6379`            |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Les ports sont modifiables dans le fichier `.env` (`APP_PORT`, `VITE_PORT`, `FORWARD_DB_PORT`, `FORWARD_REDIS_PORT`, `FORWARD_MAILPIT_DASHBOARD_PORT`).
 
-## Code of Conduct
+### Commandes utiles
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```sh
+./vendor/bin/sail up -d            # Démarrer les conteneurs
+./vendor/bin/sail stop             # Arrêter les conteneurs
+./vendor/bin/sail artisan test     # Lancer les tests
+./vendor/bin/sail bin pint         # Formater le code PHP
+./vendor/bin/sail shell            # Ouvrir un shell dans le conteneur
+```
 
-## Security Vulnerabilities
+Astuce : ajoutez un alias pour taper simplement `sail` au lieu de `./vendor/bin/sail` :
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```sh
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+```
