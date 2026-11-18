@@ -1,0 +1,62 @@
+# Skribblio Tools — Project Guidelines
+
+Skribblio Tools lets users build custom word lists (alone or collaboratively) and export them for Skribbl.io games. The whole app is private: every page requires a registered, logged-in user with a verified email address (the email is used for notifications).
+
+## Architecture
+
+- The front-end is a **Vue 3 + TypeScript single-page application** living in `resources/js`, built by Vite. It is not Inertia and not Blade: do not add Blade pages or Inertia.
+- Laravel is a **JSON API** consumed by the SPA. Laravel serves a single view, `resources/views/app.blade.php`, for every front-end path (see `routes/web.php`).
+- `routes/web.php` declares named SPA routes (`dashboard`, `login`, `password.reset`, `verification.notice`) because Laravel and Fortify generate redirects and email links to those names. Any other front-end path is handled by `Route::fallback`, which returns a JSON 404 for `api/*` or JSON requests.
+- **Authentication**: Sanctum in SPA mode (session cookie + CSRF, `statefulApi()` in `bootstrap/app.php`) with **Fortify headless** (`'views' => false`). Fortify features enabled: registration, password reset, email verification, profile update, password update. Two-factor auth and passkeys are intentionally disabled.
+- Fortify endpoints live at the root (`/login`, `/register`, `/logout`, `/forgot-password`, `/reset-password`, `/email/verification-notification`); the app's API lives under `/api`.
+- After authentication, users land on `/dashboard` (Fortify `home` is `/dashboard`).
+
+## Domain model
+
+- **Word** (`words`): `name`, `word_group_id`, `created_by`. Belongs to exactly one group; the name is unique within its group. A word has no visibility of its own: it is visible to whoever can see its group.
+- **WordGroup** (`word_groups`): `name`, `visibility`, `created_by`. Has many words; belongs to many group collections through the `groups_collections` pivot (keys `group_collection_id`, `word_group_id`). The model is named `GroupCollection`, not `Collection`, to avoid confusion with Laravel's collection classes.
+- **GroupCollection** (`group_collections`): `name`, `visibility`, `created_by`. Belongs to many word groups through `groups_collections`. **A collection must always contain at least one group** (enforce it when creating a collection or detaching a group; the database cannot).
+- **Favorites**: users favorite groups (`favorite_word_groups`) and collections (`favorite_group_collections`), with composite primary keys.
+- `visibility` is the `App\Enums\Visibility` enum (`Public`: every logged-in user can see; `Private`: only the creator). Groups and collections share the `App\Models\Concerns\HasVisibility` trait (`creator()`, `isCreatedBy()`, `isVisibleTo()`, `visibleTo($user)` scope).
+- Authorization lives in `app/Policies`:
+    - Only the creator can update or delete a group or a collection.
+    - **Anyone who can see a group can add words to it** (so anyone for a public group).
+    - A word can be edited or deleted by its author or by the creator of its group.
+    - The creator of a collection can attach any group they can see, including other users' public groups.
+    - Favoriting requires being able to see the item.
+- A public collection may contain private groups. Other users must not see those groups: filter with `$groupCollection->wordGroups()->visibleTo($user)` and tell them that some groups are hidden.
+- Deletions cascade: deleting a user deletes everything they created; deleting a group deletes its words and detaches it from collections; deleting a collection keeps its groups.
+- Factories have `public()`, `private()` and `createdBy($user)` states. `GroupCollectionFactory` attaches a group automatically when none was attached, to respect the "at least one group" rule.
+- Planned (not built yet): access requests to private groups and collections through a shareable link; the creator accepts or refuses pending requests. `visibleTo()`/`isVisibleTo()` will then also need to include granted users.
+
+## Back-end conventions
+
+- **Every primary key is a UUID**: models use `HasUuids`, migrations use `$table->uuid('id')->primary()` and `foreignUuid()` / `uuidMorphs()`. Never use `id()` or `foreignId()`.
+- New business endpoints go inside the `auth:sanctum` + `verified` group of `routes/api.php`, in controllers under `app/Http/Controllers/Api`, validated by Form Requests (authorizing through the policy). Current endpoints:
+    - `GET /api/word-groups`: the current user's own groups (12 per page, most recently updated first). `POST /api/word-groups` creates one; `GET`/`PATCH /api/word-groups/{id}` show/update one.
+    - `GET`/`POST /api/word-groups/{id}/words`: list (20 per page, most recently added first) / add the words of a group. `PATCH`/`DELETE /api/words/{id}` (shallow routes) rename/delete a word.
+- Resources expose a `can` object (e.g. `can.update`, `can.add_word`) computed from the policies, so the SPA shows or hides actions without duplicating authorization rules.
+- A private group the user cannot see answers **404, not 403** (`Response::denyAsNotFound()` in the policy; Form Requests return `Gate::inspect(...)` to keep that status).
+- Adding, renaming or deleting a word touches its group's `updated_at` (`#[Touches(['wordGroup'])]` on `Word`). Only `GET /api/user` is reachable by unverified users (the SPA needs it to know where to redirect).
+- API responses always go through Eloquent API Resources (`app/Http/Resources`), with snake_case keys and ISO 8601 dates.
+- The application locale is French (`APP_LOCALE=fr`). Translations come from `laravel-lang/common` (dev dependency) and are published in `lang/`; refresh them with `vendor/bin/sail artisan lang:update`. Add new user-facing strings in French.
+
+## Front-end conventions
+
+- Directory layout in `resources/js`: `pages/` (route components, `pages/auth/` for authentication, one sub-folder per domain such as `pages/word-groups/`), `components/` (reusable UI), `api/` (one module per API resource, e.g. `api/wordGroups.ts`, exposing typed functions), `stores/` (Pinia, setup syntax, for shared state such as the logged-in user), `composables/`, `router/`, `lib/` (HTTP client, formatting, labels), `types/`. Use the `@/` alias for imports.
+- Authenticated pages are wrapped in `components/AppLayout.vue` (header + main container).
+- Editing happens in place on the detail page (e.g. `WordGroupDetails` toggles an inline form, `WordRow` edits or deletes a word inline with an in-page confirmation) rather than on separate edit pages. Data lists are tables; collections of items to open are cards.
+- Paginated lists use Laravel's paginator (`PaginatedResponse<T>` in `types/api.ts`), keep the page in the URL query (`?page=N`) and render `components/PaginationNav.vue`.
+- Show user-facing dates with `formatDateTime()` from `@/lib/format` and visibility labels from `@/lib/visibility`.
+- To show a one-off status message on the next page, pass it in the router `state` (`router.push({ name, state: { status } })`); the target page reads it once from `window.history.state` and removes it.
+- Always call the server through the shared axios instance `http` from `@/lib/http` (it sends credentials and the XSRF token). Call `ensureCsrfCookie()` before guest-side state-changing auth requests.
+- Every API payload has a TypeScript interface in `resources/js/types` that mirrors its API Resource (`models.ts` for resources, `api.ts` for response envelopes such as `ResourceResponse<T>`).
+- Use the `useForm` composable for forms: it exposes `data`, `errors` (first Laravel validation message per field), `isProcessing`, `submit()` and `reset()`.
+- Protect routes with `meta` in `router/index.ts`: `requiresVerified` (default for app pages), `requiresAuth` (logged in, verified or not), `guestOnly`.
+- The UI is written in French. Styling uses Tailwind CSS v4 utility classes.
+- Use `<script setup lang="ts">` with typed `defineProps<…>()` and `defineModel()`.
+
+## Verification
+
+- PHP: `vendor/bin/sail artisan test --compact` (PHPUnit feature tests) and `vendor/bin/sail bin pint --dirty --format agent`.
+- Front-end: `vendor/bin/sail npm run type-check` (vue-tsc); `vendor/bin/sail npm run build` type-checks and builds.
