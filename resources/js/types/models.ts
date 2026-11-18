@@ -22,9 +22,13 @@ export interface WordGroup {
     is_favorite?: boolean;
     /** Only in favorites lists: false when it became private and the user can no longer open it. */
     is_accessible?: boolean;
+    /** Only in the "shared with me" list: granted, or requested and waiting. */
+    access_status?: AccessStatus;
     /** Actions the current user may perform on the group. */
     can: {
         update: boolean;
+        share: boolean;
+        manage_access: boolean;
         add_word: boolean;
     };
 }
@@ -56,9 +60,13 @@ export interface GroupCollection {
     is_favorite?: boolean;
     /** Only in favorites lists: false when it became private and the user can no longer open it. */
     is_accessible?: boolean;
+    /** Only in the "shared with me" list: granted, or requested and waiting. */
+    access_status?: AccessStatus;
     /** Actions the current user may perform on the collection. */
     can: {
         update: boolean;
+        share: boolean;
+        manage_access: boolean;
     };
 }
 
@@ -68,9 +76,40 @@ export interface GroupCollectionDetail extends GroupCollection {
     word_groups: WordGroup[];
     /** Groups of the collection hidden from the current user (private groups of other users). */
     hidden_word_groups_count: number;
+    /** Hidden groups the current user already requested access to. */
+    hidden_word_groups_requested_count: number;
 }
 
 /** Who created the groups or collections returned by a search. */
 export type AuthorFilter = 'all' | 'me' | 'others';
 
 export type FavoriteKind = 'word-groups' | 'group-collections';
+
+export type AccessStatus = 'granted' | 'pending';
+
+/** An access request received by the creator of a private group or collection. */
+export interface AccessRequest {
+    id: string;
+    kind: FavoriteKind;
+    item: { id: string; name: string };
+    requester: Pick<User, 'id' | 'name'>;
+    /** Set when the request was sent from a collection containing the group. */
+    via_group_collection: { id: string; name: string } | null;
+    created_at: string | null;
+}
+
+/** What a user sees when opening a share link. */
+export interface ShareInvitation {
+    kind: FavoriteKind;
+    /** Only when the item is accessible. */
+    id?: string;
+    name: string;
+    creator: { name: string };
+    status: 'accessible' | 'pending' | 'refused' | 'none';
+}
+
+/** Pending requests and members of a private item, for its creator. */
+export interface ItemAccess {
+    pending_requests: AccessRequest[];
+    members: (Pick<User, 'id' | 'name'> & { granted_at: string | null })[];
+}

@@ -32,12 +32,16 @@ class GroupCollectionResource extends JsonResource
             'word_groups_count' => $this->whenCounted('wordGroups'),
             'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
             'is_accessible' => $this->whenHas('is_accessible'),
+            'access_status' => $this->whenHas('access_status'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'word_groups' => WordGroupResource::collection($this->whenLoaded('wordGroups')),
             'hidden_word_groups_count' => $this->whenHas('hidden_word_groups_count'),
+            'hidden_word_groups_requested_count' => $this->whenHas('hidden_word_groups_requested_count'),
             'can' => [
                 'update' => $request->user()->can('update', $this->resource),
+                'share' => $request->user()->can('share', $this->resource),
+                'manage_access' => $request->user()->can('manageAccess', $this->resource),
             ],
         ];
     }

@@ -9,6 +9,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Création de listes de mots personnalisés
 - Édition des listes seul ou en collaboration avec d'autres utilisateurs
 - Favoris : groupes et collections favoris sur le tableau de bord
+- Partage des groupes et collections privés par lien de demande d'accès, avec validation par le créateur et notifications par e-mail
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
 - Export d'une liste dans un format prêt à coller dans Skribbl.io
 
@@ -80,6 +81,19 @@ Règles d'accès (définies dans `app/Policies`) :
 - Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués.
 - On peut mettre en favori tout groupe ou toute collection que l'on peut voir. Les favoris sont listés sur le tableau de bord. Si un favori devient privé, il y reste affiché mais grisé et non cliquable ; on peut toujours le retirer des favoris.
 - Supprimer un utilisateur supprime tout ce qu'il a créé. Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.
+
+### Partage des groupes et collections privés
+
+1. Sur un groupe ou une collection **privé**, le créateur clique sur « Partager » et copie le lien (`/share/…`). Il peut régénérer ce lien : l'ancien ne fonctionne alors plus.
+2. La personne qui ouvre le lien (après connexion ou inscription) envoie une demande d'accès. Le créateur est prévenu par e-mail.
+3. Le créateur accepte ou refuse la demande depuis la page de l'élément ou son tableau de bord. Le demandeur est prévenu par e-mail. Le créateur peut retirer un accès à tout moment.
+
+Règles :
+
+- Une personne autorisée sur un groupe privé peut le voir et y ajouter des mots.
+- Une personne autorisée sur une collection privée voit aussi les groupes privés qu'elle contient, **mais uniquement ceux du créateur de la collection** : partager une collection ne donne jamais accès aux groupes d'autres personnes.
+- Sur une collection, un bouton permet de demander en une fois l'accès à tous les groupes privés masqués ; leurs noms ne sont pas révélés au demandeur.
+- Les e-mails partent par la file d'attente : lancez `./vendor/bin/sail artisan queue:work` en local.
 
 ### Organisation du front-end
 

@@ -31,10 +31,13 @@ class WordGroupResource extends JsonResource
             'words_count' => $this->whenCounted('words'),
             'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
             'is_accessible' => $this->whenHas('is_accessible'),
+            'access_status' => $this->whenHas('access_status'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [
                 'update' => $request->user()->can('update', $this->resource),
+                'share' => $request->user()->can('share', $this->resource),
+                'manage_access' => $request->user()->can('manageAccess', $this->resource),
                 'add_word' => $request->user()->can('addWord', $this->resource),
             ],
         ];

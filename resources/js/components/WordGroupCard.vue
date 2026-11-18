@@ -27,12 +27,12 @@ function updateFavorite(isFavorite: boolean): void {
         :updated-at="wordGroup.updated_at"
         updated-label="Modifié le"
         :is-accessible="wordGroup.is_accessible !== false"
-        inaccessible-message="Ce groupe est devenu privé : vous n'y avez plus accès."
+        :inaccessible-message="wordGroup.access_status === 'pending' ? 'Demande d’accès en attente.' : 'Ce groupe est devenu privé : vous n’y avez plus accès.'"
     >
         <template #meta>
             <CardMeta :creator="wordGroup.creator" :count="wordGroup.words_count" :count-labels="['mot', 'mots']" />
         </template>
-        <template v-if="wordGroup.is_favorite !== undefined" #favorite>
+        <template v-if="wordGroup.is_favorite !== undefined && wordGroup.access_status !== 'pending'" #favorite>
             <FavoriteButton
                 kind="word-groups"
                 :id="wordGroup.id"

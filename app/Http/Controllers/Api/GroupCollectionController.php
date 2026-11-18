@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AccessRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGroupCollectionRequest;
 use App\Http\Requests\UpdateGroupCollectionRequest;
 use App\Http\Resources\GroupCollectionResource;
 use App\Models\GroupCollection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -66,9 +68,13 @@ class GroupCollectionController extends Controller
             ->get();
 
         $groupCollection->setRelation('wordGroups', $visibleWordGroups);
+        $hiddenWordGroups = $groupCollection->wordGroups()->whereNotIn('word_groups.id', $visibleWordGroups->modelKeys());
+        $groupCollection->setAttribute('hidden_word_groups_count', $hiddenWordGroups->count());
         $groupCollection->setAttribute(
-            'hidden_word_groups_count',
-            $groupCollection->wordGroups()->count() - $visibleWordGroups->count(),
+            'hidden_word_groups_requested_count',
+            $hiddenWordGroups->whereHas('accessRequests', fn (Builder $query) => $query
+                ->where('user_id', $request->user()->getKey())
+                ->where('status', AccessRequestStatus::Pending))->count(),
         );
 
         return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));

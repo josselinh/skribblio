@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { fetchFavoriteGroupCollections, fetchFavoriteWordGroups } from '@/api/favorites';
 import { fetchMyGroupCollections } from '@/api/groupCollections';
+import { fetchReceivedAccessRequests, fetchSharedGroupCollections, fetchSharedWordGroups } from '@/api/sharing';
 import { fetchMyWordGroups } from '@/api/wordGroups';
+import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
-import type { FavoriteKind } from '@/types/models';
+import type { AccessRequest, FavoriteKind } from '@/types/models';
 
 const route = useRoute();
 
@@ -18,13 +20,35 @@ const favoriteWordGroups = usePaginatedList(fetchFavoriteWordGroups, 'favorite_g
 const favoriteGroupCollections = usePaginatedList(fetchFavoriteGroupCollections, 'favorite_collections_page');
 const wordGroups = usePaginatedList(fetchMyWordGroups, 'groups_page');
 const groupCollections = usePaginatedList(fetchMyGroupCollections, 'collections_page');
+const sharedWordGroups = usePaginatedList(fetchSharedWordGroups, 'shared_groups_page');
+const sharedGroupCollections = usePaginatedList(fetchSharedGroupCollections, 'shared_collections_page');
+
+/** Pending requests on the user's groups and collections; the section only shows when there are some. */
+const receivedAccessRequests = ref<AccessRequest[]>([]);
+
+async function loadReceivedAccessRequests(): Promise<void> {
+    try {
+        receivedAccessRequests.value = await fetchReceivedAccessRequests();
+    } catch {
+        receivedAccessRequests.value = [];
+    }
+}
+
+function onAccessRequestDecided(decided: AccessRequest): void {
+    receivedAccessRequests.value = receivedAccessRequests.value.filter((accessRequest) => accessRequest.id !== decided.id);
+}
+
+void loadReceivedAccessRequests();
 
 /**
  * Keeps the star of the same item in sync across lists, and reloads the favorites list
  * so that the item appears in or disappears from it.
  */
 async function onFavoriteSaved(kind: FavoriteKind, id: string, isFavorite: boolean): Promise<void> {
-    const lists = kind === 'word-groups' ? [wordGroups, favoriteWordGroups] : [groupCollections, favoriteGroupCollections];
+    const lists =
+        kind === 'word-groups'
+            ? [wordGroups, favoriteWordGroups, sharedWordGroups]
+            : [groupCollections, favoriteGroupCollections, sharedGroupCollections];
     for (const list of lists) {
         list.result.value?.data.filter((item) => item.id === id).forEach((item) => (item.is_favorite = isFavorite));
     }
@@ -62,6 +86,22 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
         <StatusMessage :message="status" />
 
         <div class="space-y-12">
+            <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
+                <h2 id="received-access-requests-title" class="text-lg font-semibold">
+                    Demandes d'accès reçues
+                    <span class="font-normal text-zinc-500">({{ receivedAccessRequests.length }})</span>
+                </h2>
+                <ul class="mt-4 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
+                    <AccessRequestItem
+                        v-for="accessRequest in receivedAccessRequests"
+                        :key="accessRequest.id"
+                        :access-request="accessRequest"
+                        show-item
+                        @decided="onAccessRequestDecided"
+                    />
+                </ul>
+            </section>
+
             <CardListSection
                 section-id="favorite-word-groups"
                 title="Mes groupes favoris"
@@ -152,6 +192,41 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
                         </RouterLink>
                     </div>
                 </template>
+                <template #item="{ item }">
+                    <GroupCollectionCard
+                        :group-collection="item"
+                        @favorite-saved="onFavoriteSaved('group-collections', item.id, $event)"
+                    />
+                </template>
+            </CardListSection>
+
+            <CardListSection
+                section-id="shared-word-groups"
+                title="Groupes partagés avec moi"
+                :result="sharedWordGroups.result.value"
+                :is-loading="sharedWordGroups.isLoading.value"
+                :has-failed="sharedWordGroups.hasFailed.value"
+                empty-message="Aucun groupe privé partagé avec vous. Ouvrez un lien de partage pour demander l’accès."
+                paginated
+                page-param="shared_groups_page"
+                @retry="sharedWordGroups.reload"
+            >
+                <template #item="{ item }">
+                    <WordGroupCard :word-group="item" @favorite-saved="onFavoriteSaved('word-groups', item.id, $event)" />
+                </template>
+            </CardListSection>
+
+            <CardListSection
+                section-id="shared-group-collections"
+                title="Collections partagées avec moi"
+                :result="sharedGroupCollections.result.value"
+                :is-loading="sharedGroupCollections.isLoading.value"
+                :has-failed="sharedGroupCollections.hasFailed.value"
+                empty-message="Aucune collection privée partagée avec vous. Ouvrez un lien de partage pour demander l’accès."
+                paginated
+                page-param="shared_collections_page"
+                @retry="sharedGroupCollections.reload"
+            >
                 <template #item="{ item }">
                     <GroupCollectionCard
                         :group-collection="item"

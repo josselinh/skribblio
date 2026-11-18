@@ -47,4 +47,20 @@ class WordGroupPolicy
     {
         return $this->view($user, $wordGroup);
     }
+
+    /**
+     * Only the creator can share a private item (get or regenerate its access request link).
+     */
+    public function share(User $user, WordGroup $wordGroup): bool
+    {
+        return $wordGroup->isCreatedBy($user) && $wordGroup->isPrivate();
+    }
+
+    /**
+     * Only the creator sees and decides the access requests, and revokes access.
+     */
+    public function manageAccess(User $user, WordGroup $wordGroup): bool
+    {
+        return $wordGroup->isCreatedBy($user);
+    }
 }

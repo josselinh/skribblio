@@ -47,7 +47,7 @@ class WordGroupControllerTest extends TestCase
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'add_word' => true],
+                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word' => true],
             ]);
     }
 
@@ -114,7 +114,7 @@ class WordGroupControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.id', $wordGroup->id)
-            ->assertJsonPath('data.can', ['update' => false, 'add_word' => true]);
+            ->assertJsonPath('data.can', ['update' => false, 'share' => false, 'manage_access' => false, 'add_word' => true]);
     }
 
     public function test_show_returns_404_for_private_group_of_another_user(): void

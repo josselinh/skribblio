@@ -3,8 +3,11 @@ import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
+import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
+import AccessManagement from '@/components/AccessManagement.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
+import SharePanel from '@/components/SharePanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
@@ -37,6 +40,28 @@ const hiddenGroupsMessage = computed(() => {
         ? '1 groupe de cette collection est privé et n’est pas visible pour vous.'
         : `${count} groupes de cette collection sont privés et ne sont pas visibles pour vous.`;
 });
+
+/** Whether some hidden groups were not requested yet. */
+const canRequestHiddenGroups = computed(
+    () =>
+        groupCollection.value !== null &&
+        groupCollection.value.hidden_word_groups_requested_count < groupCollection.value.hidden_word_groups_count,
+);
+const isRequestingHiddenGroups = ref(false);
+const hiddenGroupsRequestFailed = ref(false);
+
+async function requestHiddenGroups(): Promise<void> {
+    isRequestingHiddenGroups.value = true;
+    hiddenGroupsRequestFailed.value = false;
+    try {
+        await requestHiddenWordGroupsAccess(groupCollectionId.value);
+        await loadGroupCollection();
+    } catch {
+        hiddenGroupsRequestFailed.value = true;
+    } finally {
+        isRequestingHiddenGroups.value = false;
+    }
+}
 
 async function loadGroupCollection(): Promise<void> {
     try {
@@ -128,13 +153,37 @@ watch(
                 </EditableNameVisibility>
             </div>
 
-            <p
+            <div v-if="groupCollection.can.share" class="mt-4">
+                <SharePanel kind="group-collections" :id="groupCollection.id" />
+            </div>
+
+            <div
                 v-if="hiddenGroupsMessage"
                 role="note"
-                class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+                class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
             >
-                {{ hiddenGroupsMessage }}
-            </p>
+                <p>{{ hiddenGroupsMessage }}</p>
+                <button
+                    v-if="canRequestHiddenGroups"
+                    type="button"
+                    :disabled="isRequestingHiddenGroups"
+                    class="rounded-lg border border-amber-300 bg-white px-3 py-1.5 font-medium hover:bg-amber-100 disabled:opacity-60"
+                    @click="requestHiddenGroups"
+                >
+                    Demander l'accès aux groupes privés
+                </button>
+                <p v-else class="font-medium">Demande d'accès envoyée.</p>
+                <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600">
+                    Une erreur est survenue, veuillez réessayer.
+                </p>
+            </div>
+
+            <AccessManagement
+                v-if="groupCollection.can.manage_access && groupCollection.visibility === 'private'"
+                class="mt-8"
+                kind="group-collections"
+                :id="groupCollection.id"
+            />
 
             <section class="mt-8" aria-labelledby="collection-groups-title">
                 <h2 id="collection-groups-title" class="text-lg font-semibold">

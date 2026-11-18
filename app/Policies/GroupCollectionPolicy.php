@@ -49,4 +49,20 @@ class GroupCollectionPolicy
     {
         return $this->view($user, $groupCollection);
     }
+
+    /**
+     * Only the creator can share a private item (get or regenerate its access request link).
+     */
+    public function share(User $user, GroupCollection $groupCollection): bool
+    {
+        return $groupCollection->isCreatedBy($user) && $groupCollection->isPrivate();
+    }
+
+    /**
+     * Only the creator sees and decides the access requests, and revokes access.
+     */
+    public function manageAccess(User $user, GroupCollection $groupCollection): bool
+    {
+        return $groupCollection->isCreatedBy($user);
+    }
 }

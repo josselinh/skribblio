@@ -6,7 +6,9 @@ import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
+import AccessManagement from '@/components/AccessManagement.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
+import SharePanel from '@/components/SharePanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
 import WordRow from '@/components/WordRow.vue';
@@ -121,6 +123,16 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                     </template>
                 </EditableNameVisibility>
             </div>
+
+            <div v-if="wordGroup.can.share" class="mt-4">
+                <SharePanel kind="word-groups" :id="wordGroup.id" />
+            </div>
+            <AccessManagement
+                v-if="wordGroup.can.manage_access && wordGroup.visibility === 'private'"
+                class="mt-8"
+                kind="word-groups"
+                :id="wordGroup.id"
+            />
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
 

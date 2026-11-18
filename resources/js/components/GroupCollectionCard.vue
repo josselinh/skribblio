@@ -27,7 +27,7 @@ function updateFavorite(isFavorite: boolean): void {
         :updated-at="groupCollection.updated_at"
         updated-label="Modifiée le"
         :is-accessible="groupCollection.is_accessible !== false"
-        inaccessible-message="Cette collection est devenue privée : vous n'y avez plus accès."
+        :inaccessible-message="groupCollection.access_status === 'pending' ? 'Demande d’accès en attente.' : 'Cette collection est devenue privée : vous n’y avez plus accès.'"
     >
         <template #meta>
             <CardMeta
@@ -36,7 +36,7 @@ function updateFavorite(isFavorite: boolean): void {
                 :count-labels="['groupe', 'groupes']"
             />
         </template>
-        <template v-if="groupCollection.is_favorite !== undefined" #favorite>
+        <template v-if="groupCollection.is_favorite !== undefined && groupCollection.access_status !== 'pending'" #favorite>
             <FavoriteButton
                 kind="group-collections"
                 :id="groupCollection.id"

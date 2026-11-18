@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { consumePendingRedirect, rememberPendingRedirect } from '@/lib/pendingRedirect';
 import { useAuthStore } from '@/stores/auth';
 
 declare module 'vue-router' {
@@ -56,6 +57,12 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/share/:type(groups|collections)/:token',
+            name: 'share',
+            component: () => import('@/pages/share/SharePage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),
@@ -98,11 +105,27 @@ router.beforeEach(async (to) => {
     await auth.ensureLoaded();
 
     if ((to.meta.requiresAuth || to.meta.requiresVerified) && !auth.isAuthenticated) {
+        if (to.name === 'share') {
+            rememberPendingRedirect(to.fullPath);
+        }
+
         return { name: 'login', query: to.name !== 'dashboard' ? { redirect: to.fullPath } : {} };
     }
 
     if (to.meta.requiresVerified && !auth.isVerified) {
+        if (to.name === 'share') {
+            rememberPendingRedirect(to.fullPath);
+        }
+
         return { name: 'verify-email' };
+    }
+
+    /* Back from the email verification link: resume the page the user wanted to open. */
+    if (to.name === 'dashboard' && to.query.verified === '1') {
+        const pendingRedirect = consumePendingRedirect();
+        if (pendingRedirect) {
+            return pendingRedirect;
+        }
     }
 
     if (to.name === 'verify-email' && auth.isVerified) {

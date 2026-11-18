@@ -79,4 +79,24 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(GroupCollection::class, 'favorite_group_collections')->withTimestamps();
     }
+
+    /**
+     * Private groups of other users this user was granted access to.
+     *
+     * @return BelongsToMany<WordGroup, $this>
+     */
+    public function sharedWordGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(WordGroup::class, 'word_group_members')->withTimestamps();
+    }
+
+    /**
+     * Private collections of other users this user was granted access to.
+     *
+     * @return BelongsToMany<GroupCollection, $this>
+     */
+    public function sharedGroupCollections(): BelongsToMany
+    {
+        return $this->belongsToMany(GroupCollection::class, 'group_collection_members')->withTimestamps();
+    }
 }

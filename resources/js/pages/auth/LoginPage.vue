@@ -4,6 +4,7 @@ import AuthCard from '@/components/AuthCard.vue';
 import FormField from '@/components/FormField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import { useForm } from '@/composables/useForm';
+import { consumePendingRedirect } from '@/lib/pendingRedirect';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore();
@@ -25,6 +26,7 @@ async function submit(): Promise<void> {
     const isSuccessful = await form.submit((data) => auth.login(data));
 
     if (isSuccessful) {
+        consumePendingRedirect();
         await router.push(redirectTarget());
     } else {
         form.reset('password');
