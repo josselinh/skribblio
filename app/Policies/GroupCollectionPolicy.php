@@ -5,15 +5,17 @@ namespace App\Policies;
 use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\WordGroup;
+use Illuminate\Auth\Access\Response;
 
 class GroupCollectionPolicy
 {
     /**
      * A collection is visible to everyone when public, to its creator only when private.
+     * Other users get a 404 so that they cannot tell whether a private collection exists.
      */
-    public function view(User $user, GroupCollection $groupCollection): bool
+    public function view(User $user, GroupCollection $groupCollection): Response
     {
-        return $groupCollection->isVisibleTo($user);
+        return $groupCollection->isVisibleTo($user) ? Response::allow() : Response::denyAsNotFound();
     }
 
     public function create(User $user): bool

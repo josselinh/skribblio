@@ -38,6 +38,18 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/collections/new',
+            name: 'group-collections.create',
+            component: () => import('@/pages/group-collections/CreateGroupCollectionPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
+            path: '/collections/:id',
+            name: 'group-collections.show',
+            component: () => import('@/pages/group-collections/ShowGroupCollectionPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),

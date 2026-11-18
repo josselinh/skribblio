@@ -12,6 +12,8 @@ export interface WordGroup {
     id: string;
     name: string;
     visibility: Visibility;
+    /** Only present in search results. */
+    creator?: Pick<User, 'id' | 'name'>;
     created_at: string | null;
     updated_at: string | null;
     /** Actions the current user may perform on the group. */
@@ -32,4 +34,24 @@ export interface Word {
         update: boolean;
         delete: boolean;
     };
+}
+
+export interface GroupCollection {
+    id: string;
+    name: string;
+    visibility: Visibility;
+    created_at: string | null;
+    updated_at: string | null;
+    /** Actions the current user may perform on the collection. */
+    can: {
+        update: boolean;
+    };
+}
+
+/** A collection as returned by its detail endpoint. */
+export interface GroupCollectionDetail extends GroupCollection {
+    /** Only the groups the current user can see. */
+    word_groups: WordGroup[];
+    /** Groups of the collection hidden from the current user (private groups of other users). */
+    hidden_word_groups_count: number;
 }

@@ -12,9 +12,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class WordGroupResource extends JsonResource
 {
     /**
-     * Transform the resource into an array. `can` tells the SPA which actions the current user may perform.
+     * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
+     * `creator` is only included when the relation is loaded.
      *
-     * @return array{id: string, name: string, visibility: string, created_at: ?string, updated_at: ?string, can: array{update: bool, add_word: bool}}
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
@@ -22,6 +23,10 @@ class WordGroupResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'visibility' => $this->visibility->value,
+            'creator' => $this->whenLoaded('creator', fn (): array => [
+                'id' => $this->creator->id,
+                'name' => $this->creator->name,
+            ]),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [

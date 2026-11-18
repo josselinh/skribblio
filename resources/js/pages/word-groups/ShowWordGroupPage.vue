@@ -2,12 +2,12 @@
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { fetchWordGroup } from '@/api/wordGroups';
+import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
+import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
-import WordGroupDetails from '@/components/WordGroupDetails.vue';
 import WordRow from '@/components/WordRow.vue';
 import type { PaginatedResponse } from '@/types/api';
 import type { Word, WordGroup } from '@/types/models';
@@ -49,6 +49,10 @@ async function loadWords(): Promise<void> {
     } finally {
         areWordsLoading.value = false;
     }
+}
+
+async function saveWordGroup(payload: NameVisibilityPayload): Promise<void> {
+    wordGroup.value = await updateWordGroup(wordGroupId.value, payload);
 }
 
 /** A new word is listed first: show page 1 so that it is visible. */
@@ -99,7 +103,13 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
 
         <template v-else-if="wordGroup">
             <div class="mt-2">
-                <WordGroupDetails :word-group="wordGroup" @updated="wordGroup = $event" />
+                <EditableNameVisibility
+                    :name="wordGroup.name"
+                    :visibility="wordGroup.visibility"
+                    :can-edit="wordGroup.can.update"
+                    name-label="Nom du groupe"
+                    :save="saveWordGroup"
+                />
             </div>
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />

@@ -73,7 +73,8 @@ Règles d'accès (définies dans `app/Policies`) :
 - Seul le créateur peut modifier ou supprimer un groupe ou une collection.
 - Tout le monde peut ajouter des mots à un groupe public. Un mot peut être modifié ou supprimé par son auteur ou par le créateur du groupe. Ajouter, renommer ou supprimer un mot met à jour la date de modification du groupe.
 - Un groupe privé auquel on n'a pas accès répond « introuvable » (404), pour ne pas révéler son existence.
-- Le créateur d'une collection peut y ajouter ses groupes et les groupes publics des autres utilisateurs.
+- Le créateur d'une collection peut y ajouter ses groupes et les groupes publics des autres utilisateurs. On ne peut pas retirer le dernier groupe d'une collection. Ajouter ou retirer un groupe met à jour la date de modification de la collection.
+- Une collection privée, comme un groupe privé, répond « introuvable » (404) aux autres utilisateurs.
 - Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués.
 - On peut mettre en favori tout groupe ou toute collection que l'on peut voir.
 - Supprimer un utilisateur supprime tout ce qu'il a créé. Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.

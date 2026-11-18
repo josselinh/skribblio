@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { RouterLink, useRoute } from 'vue-router';
 
-defineProps<{
-    currentPage: number;
-    lastPage: number;
-}>();
+const props = withDefaults(
+    defineProps<{
+        currentPage: number;
+        lastPage: number;
+        /** Query string parameter holding the page, to have several paginated lists on one page. */
+        pageParam?: string;
+    }>(),
+    { pageParam: 'page' },
+);
 
 const route = useRoute();
 
 function pageLocation(page: number) {
-    return { query: { ...route.query, page: page > 1 ? String(page) : undefined } };
+    return { query: { ...route.query, [props.pageParam]: page > 1 ? String(page) : undefined } };
 }
 </script>
 

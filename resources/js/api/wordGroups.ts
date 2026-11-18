@@ -14,6 +14,13 @@ export async function fetchMyWordGroups(page = 1): Promise<PaginatedResponse<Wor
     return data;
 }
 
+/** Groups the current user can see (their own first, then public ones) whose name contains the query. */
+export async function searchWordGroups(query: string): Promise<WordGroup[]> {
+    const { data } = await http.get<{ data: WordGroup[] }>('/api/word-groups/search', { params: { q: query } });
+
+    return data.data;
+}
+
 export async function fetchWordGroup(id: string): Promise<WordGroup> {
     const { data } = await http.get<ResourceResponse<WordGroup>>(`/api/word-groups/${id}`);
 
