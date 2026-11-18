@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -30,5 +32,51 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Word groups created by the user.
+     *
+     * @return HasMany<WordGroup, $this>
+     */
+    public function wordGroups(): HasMany
+    {
+        return $this->hasMany(WordGroup::class, 'created_by');
+    }
+
+    /**
+     * Words created by the user, in any group.
+     *
+     * @return HasMany<Word, $this>
+     */
+    public function words(): HasMany
+    {
+        return $this->hasMany(Word::class, 'created_by');
+    }
+
+    /**
+     * Group collections created by the user.
+     *
+     * @return HasMany<GroupCollection, $this>
+     */
+    public function groupCollections(): HasMany
+    {
+        return $this->hasMany(GroupCollection::class, 'created_by');
+    }
+
+    /**
+     * @return BelongsToMany<WordGroup, $this>
+     */
+    public function favoriteWordGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(WordGroup::class, 'favorite_word_groups')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany<GroupCollection, $this>
+     */
+    public function favoriteGroupCollections(): BelongsToMany
+    {
+        return $this->belongsToMany(GroupCollection::class, 'favorite_group_collections')->withTimestamps();
     }
 }
