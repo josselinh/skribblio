@@ -42,8 +42,11 @@ class GroupCollectionPolicy
         return $groupCollection->isCreatedBy($user) && $wordGroup->isVisibleTo($user);
     }
 
-    public function favorite(User $user, GroupCollection $groupCollection): bool
+    /**
+     * Favoriting requires being able to see the item. Removing a favorite is always allowed.
+     */
+    public function favorite(User $user, GroupCollection $groupCollection): Response
     {
-        return $groupCollection->isVisibleTo($user);
+        return $this->view($user, $groupCollection);
     }
 }

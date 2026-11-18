@@ -26,6 +26,7 @@ class WordGroupController extends Controller
     {
         $wordGroups = $request->user()
             ->wordGroups()
+            ->withIsFavorite($request->user())
             ->latest('updated_at')
             ->latest('id')
             ->paginate(self::PER_PAGE);
@@ -39,21 +40,22 @@ class WordGroupController extends Controller
     public function store(StoreWordGroupRequest $request): JsonResponse
     {
         $wordGroup = $request->user()->wordGroups()->create($request->validated());
+        $wordGroup->setAttribute('is_favorite', false);
 
         return (new WordGroupResource($wordGroup))->response()->setStatusCode(201);
     }
 
-    public function show(WordGroup $wordGroup): WordGroupResource
+    public function show(Request $request, WordGroup $wordGroup): WordGroupResource
     {
         Gate::authorize('view', $wordGroup);
 
-        return new WordGroupResource($wordGroup);
+        return new WordGroupResource($wordGroup->loadIsFavorite($request->user()));
     }
 
     public function update(UpdateWordGroupRequest $request, WordGroup $wordGroup): WordGroupResource
     {
         $wordGroup->update($request->validated());
 
-        return new WordGroupResource($wordGroup);
+        return new WordGroupResource($wordGroup->loadIsFavorite($request->user()));
     }
 }

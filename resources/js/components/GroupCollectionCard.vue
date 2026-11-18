@@ -1,31 +1,50 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
 import CardMeta from '@/components/CardMeta.vue';
-import VisibilityBadge from '@/components/VisibilityBadge.vue';
-import { formatDateTime } from '@/lib/format';
+import FavoriteButton from '@/components/FavoriteButton.vue';
+import ItemCard from '@/components/ItemCard.vue';
 import type { GroupCollection } from '@/types/models';
 
-defineProps<{
+const props = defineProps<{
     groupCollection: GroupCollection;
 }>();
+
+const emit = defineEmits<{
+    /** The favorite star was toggled and the server confirmed it. */
+    favoriteSaved: [isFavorite: boolean];
+}>();
+
+function updateFavorite(isFavorite: boolean): void {
+    // The card's parent owns the data; it is kept in sync here so that the star reflects the change at once.
+    props.groupCollection.is_favorite = isFavorite;
+}
 </script>
 
 <template>
-    <RouterLink
+    <ItemCard
         :to="{ name: 'group-collections.show', params: { id: groupCollection.id } }"
-        class="flex h-full flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-zinc-400 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-zinc-900"
+        :name="groupCollection.name"
+        :visibility="groupCollection.visibility"
+        :updated-at="groupCollection.updated_at"
+        updated-label="Modifiée le"
+        :is-accessible="groupCollection.is_accessible !== false"
+        inaccessible-message="Cette collection est devenue privée : vous n'y avez plus accès."
     >
-        <div class="flex items-start justify-between gap-2">
-            <h3 class="truncate font-medium" :title="groupCollection.name">{{ groupCollection.name }}</h3>
-            <VisibilityBadge :visibility="groupCollection.visibility" />
-        </div>
-        <CardMeta
-            :creator="groupCollection.creator"
-            :count="groupCollection.word_groups_count"
-            :count-labels="['groupe', 'groupes']"
-        />
-        <p v-if="groupCollection.updated_at" class="text-sm text-zinc-500">
-            Modifiée le <time :datetime="groupCollection.updated_at">{{ formatDateTime(groupCollection.updated_at) }}</time>
-        </p>
-    </RouterLink>
+        <template #meta>
+            <CardMeta
+                :creator="groupCollection.creator"
+                :count="groupCollection.word_groups_count"
+                :count-labels="['groupe', 'groupes']"
+            />
+        </template>
+        <template v-if="groupCollection.is_favorite !== undefined" #favorite>
+            <FavoriteButton
+                kind="group-collections"
+                :id="groupCollection.id"
+                :name="groupCollection.name"
+                :model-value="groupCollection.is_favorite"
+                @update:model-value="updateFavorite"
+                @saved="emit('favoriteSaved', $event)"
+            />
+        </template>
+    </ItemCard>
 </template>

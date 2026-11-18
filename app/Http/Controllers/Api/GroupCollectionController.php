@@ -27,6 +27,7 @@ class GroupCollectionController extends Controller
     {
         $groupCollections = $request->user()
             ->groupCollections()
+            ->withIsFavorite($request->user())
             ->latest('updated_at')
             ->latest('id')
             ->paginate(self::PER_PAGE);
@@ -43,7 +44,7 @@ class GroupCollectionController extends Controller
             $groupCollection = $request->user()->groupCollections()->create($request->safe()->only(['name', 'visibility']));
             $groupCollection->wordGroups()->attach($request->wordGroups());
 
-            return $groupCollection;
+            return $groupCollection->setAttribute('is_favorite', false);
         });
 
         return (new GroupCollectionResource($groupCollection))->response()->setStatusCode(201);
@@ -60,6 +61,7 @@ class GroupCollectionController extends Controller
         $visibleWordGroups = $groupCollection->wordGroups()
             ->visibleTo($request->user())
             ->with('creator')
+            ->withIsFavorite($request->user())
             ->orderBy('name')
             ->get();
 
@@ -69,13 +71,13 @@ class GroupCollectionController extends Controller
             $groupCollection->wordGroups()->count() - $visibleWordGroups->count(),
         );
 
-        return new GroupCollectionResource($groupCollection);
+        return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));
     }
 
     public function update(UpdateGroupCollectionRequest $request, GroupCollection $groupCollection): GroupCollectionResource
     {
         $groupCollection->update($request->validated());
 
-        return new GroupCollectionResource($groupCollection);
+        return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));
     }
 }

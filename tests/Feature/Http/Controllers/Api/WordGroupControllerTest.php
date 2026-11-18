@@ -44,6 +44,7 @@ class WordGroupControllerTest extends TestCase
                 'id' => $newerGroup->id,
                 'name' => $newerGroup->name,
                 'visibility' => 'public',
+                'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
                 'can' => ['update' => true, 'add_word' => true],

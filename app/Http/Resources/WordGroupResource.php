@@ -13,7 +13,8 @@ class WordGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
-     * `creator` and `words_count` are only included when loaded.
+     * `creator`, `words_count` and `is_favorite` are only included when loaded; `is_accessible` only in the
+     * favorites list, where groups that became private are flagged with `false`.
      *
      * @return array<string, mixed>
      */
@@ -28,6 +29,8 @@ class WordGroupResource extends JsonResource
                 'name' => $this->creator->name,
             ]),
             'words_count' => $this->whenCounted('words'),
+            'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
+            'is_accessible' => $this->whenHas('is_accessible'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [

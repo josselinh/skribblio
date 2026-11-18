@@ -8,6 +8,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 
 - Création de listes de mots personnalisés
 - Édition des listes seul ou en collaboration avec d'autres utilisateurs
+- Favoris : groupes et collections favoris sur le tableau de bord
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
 - Export d'une liste dans un format prêt à coller dans Skribbl.io
 
@@ -77,7 +78,7 @@ Règles d'accès (définies dans `app/Policies`) :
 - Le créateur d'une collection peut y ajouter ses groupes et les groupes publics des autres utilisateurs. On ne peut pas retirer le dernier groupe d'une collection. Ajouter ou retirer un groupe met à jour la date de modification de la collection.
 - Une collection privée, comme un groupe privé, répond « introuvable » (404) aux autres utilisateurs.
 - Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués.
-- On peut mettre en favori tout groupe ou toute collection que l'on peut voir.
+- On peut mettre en favori tout groupe ou toute collection que l'on peut voir. Les favoris sont listés sur le tableau de bord. Si un favori devient privé, il y reste affiché mais grisé et non cliquable ; on peut toujours le retirer des favoris.
 - Supprimer un utilisateur supprime tout ce qu'il a créé. Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.
 
 ### Organisation du front-end

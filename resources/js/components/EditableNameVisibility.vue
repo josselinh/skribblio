@@ -74,6 +74,7 @@ async function submit(): Promise<void> {
         <div class="flex min-w-0 items-center gap-3">
             <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
             <VisibilityBadge :visibility="visibility" />
+            <slot name="after-title" />
         </div>
         <button
             v-if="canEdit"

@@ -4,7 +4,7 @@ import { RouterLink, useRoute, useRouter, type LocationQueryRaw } from 'vue-rout
 import { fetchGroupCollectionSearchResults, fetchWordGroupSearchResults } from '@/api/search';
 import AppLayout from '@/components/AppLayout.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
-import SearchResultsSection from '@/components/SearchResultsSection.vue';
+import CardListSection from '@/components/CardListSection.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
 import type { AuthorFilter } from '@/types/models';
@@ -159,7 +159,7 @@ const pillClass = (isActive: boolean) =>
         </div>
 
         <div class="mt-8 space-y-10">
-            <SearchResultsSection
+            <CardListSection
                 v-if="type !== 'group-collections'"
                 section-id="word-groups"
                 title="Groupes"
@@ -174,9 +174,9 @@ const pillClass = (isActive: boolean) =>
                 <template #item="{ item }">
                     <WordGroupCard :word-group="item" />
                 </template>
-            </SearchResultsSection>
+            </CardListSection>
 
-            <SearchResultsSection
+            <CardListSection
                 v-if="type !== 'word-groups'"
                 section-id="group-collections"
                 title="Collections"
@@ -197,7 +197,7 @@ const pillClass = (isActive: boolean) =>
                 <template #item="{ item }">
                     <GroupCollectionCard :group-collection="item" />
                 </template>
-            </SearchResultsSection>
+            </CardListSection>
         </div>
     </AppLayout>
 </template>

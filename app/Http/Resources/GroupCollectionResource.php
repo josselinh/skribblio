@@ -14,7 +14,8 @@ class GroupCollectionResource extends JsonResource
     /**
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform.
      * `word_groups` (only the groups the user can see) and `hidden_word_groups_count` are only included
-     * on the detail endpoint; `creator` and `word_groups_count` only when loaded (search).
+     * on the detail endpoint; `creator`, `word_groups_count` and `is_favorite` only when loaded; `is_accessible`
+     * only in the favorites list, where collections that became private are flagged with `false`.
      *
      * @return array<string, mixed>
      */
@@ -29,6 +30,8 @@ class GroupCollectionResource extends JsonResource
                 'name' => $this->creator->name,
             ]),
             'word_groups_count' => $this->whenCounted('wordGroups'),
+            'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
+            'is_accessible' => $this->whenHas('is_accessible'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'word_groups' => WordGroupResource::collection($this->whenLoaded('wordGroups')),

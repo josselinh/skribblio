@@ -40,8 +40,11 @@ class WordGroupPolicy
         return $this->view($user, $wordGroup);
     }
 
-    public function favorite(User $user, WordGroup $wordGroup): bool
+    /**
+     * Favoriting requires being able to see the item. Removing a favorite is always allowed.
+     */
+    public function favorite(User $user, WordGroup $wordGroup): Response
     {
-        return $wordGroup->isVisibleTo($user);
+        return $this->view($user, $wordGroup);
     }
 }

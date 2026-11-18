@@ -18,6 +18,10 @@ export interface WordGroup {
     words_count?: number;
     created_at: string | null;
     updated_at: string | null;
+    /** Whether the current user favorited it; absent on some endpoints. */
+    is_favorite?: boolean;
+    /** Only in favorites lists: false when it became private and the user can no longer open it. */
+    is_accessible?: boolean;
     /** Actions the current user may perform on the group. */
     can: {
         update: boolean;
@@ -48,6 +52,10 @@ export interface GroupCollection {
     word_groups_count?: number;
     created_at: string | null;
     updated_at: string | null;
+    /** Whether the current user favorited it; absent on some endpoints. */
+    is_favorite?: boolean;
+    /** Only in favorites lists: false when it became private and the user can no longer open it. */
+    is_accessible?: boolean;
     /** Actions the current user may perform on the collection. */
     can: {
         update: boolean;
@@ -64,3 +72,5 @@ export interface GroupCollectionDetail extends GroupCollection {
 
 /** Who created the groups or collections returned by a search. */
 export type AuthorFilter = 'all' | 'me' | 'others';
+
+export type FavoriteKind = 'word-groups' | 'group-collections';

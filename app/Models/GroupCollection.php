@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Favoritable;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use Database\Factories\GroupCollectionFactory;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class GroupCollection extends Model
 {
     /** @use HasFactory<GroupCollectionFactory> */
-    use HasFactory, HasSearchableName, HasUuids, HasVisibility;
+    use Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility;
 
     /**
      * @return BelongsToMany<WordGroup, $this>

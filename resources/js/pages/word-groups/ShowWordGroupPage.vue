@@ -6,6 +6,7 @@ import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
 import WordRow from '@/components/WordRow.vue';
@@ -109,7 +110,16 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                     :can-edit="wordGroup.can.update"
                     name-label="Nom du groupe"
                     :save="saveWordGroup"
-                />
+                >
+                    <template v-if="wordGroup.is_favorite !== undefined" #after-title>
+                        <FavoriteButton
+                            v-model="wordGroup.is_favorite"
+                            kind="word-groups"
+                            :id="wordGroup.id"
+                            :name="wordGroup.name"
+                        />
+                    </template>
+                </EditableNameVisibility>
             </div>
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />

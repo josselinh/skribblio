@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
@@ -115,7 +116,16 @@ watch(
                     :can-edit="groupCollection.can.update"
                     name-label="Nom de la collection"
                     :save="saveGroupCollection"
-                />
+                >
+                    <template v-if="groupCollection.is_favorite !== undefined" #after-title>
+                        <FavoriteButton
+                            v-model="groupCollection.is_favorite"
+                            kind="group-collections"
+                            :id="groupCollection.id"
+                            :name="groupCollection.name"
+                        />
+                    </template>
+                </EditableNameVisibility>
             </div>
 
             <p
