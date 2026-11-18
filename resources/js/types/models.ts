@@ -14,6 +14,8 @@ export interface WordGroup {
     visibility: Visibility;
     /** Only present in search results. */
     creator?: Pick<User, 'id' | 'name'>;
+    /** Only present in search results. */
+    words_count?: number;
     created_at: string | null;
     updated_at: string | null;
     /** Actions the current user may perform on the group. */
@@ -40,6 +42,10 @@ export interface GroupCollection {
     id: string;
     name: string;
     visibility: Visibility;
+    /** Only present in search results. */
+    creator?: Pick<User, 'id' | 'name'>;
+    /** Only present in search results. */
+    word_groups_count?: number;
     created_at: string | null;
     updated_at: string | null;
     /** Actions the current user may perform on the collection. */
@@ -55,3 +61,6 @@ export interface GroupCollectionDetail extends GroupCollection {
     /** Groups of the collection hidden from the current user (private groups of other users). */
     hidden_word_groups_count: number;
 }
+
+/** Who created the groups or collections returned by a search. */
+export type AuthorFilter = 'all' | 'me' | 'others';

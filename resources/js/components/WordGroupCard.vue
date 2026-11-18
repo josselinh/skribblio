@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import CardMeta from '@/components/CardMeta.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { formatDateTime } from '@/lib/format';
 import type { WordGroup } from '@/types/models';
@@ -18,6 +19,7 @@ defineProps<{
             <h3 class="truncate font-medium" :title="wordGroup.name">{{ wordGroup.name }}</h3>
             <VisibilityBadge :visibility="wordGroup.visibility" />
         </div>
+        <CardMeta :creator="wordGroup.creator" :count="wordGroup.words_count" :count-labels="['mot', 'mots']" />
         <p v-if="wordGroup.updated_at" class="text-sm text-zinc-500">
             Modifié le <time :datetime="wordGroup.updated_at">{{ formatDateTime(wordGroup.updated_at) }}</time>
         </p>

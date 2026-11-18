@@ -8,6 +8,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 
 - Création de listes de mots personnalisés
 - Édition des listes seul ou en collaboration avec d'autres utilisateurs
+- Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
 - Export d'une liste dans un format prêt à coller dans Skribbl.io
 
 ## Stack technique

@@ -13,7 +13,7 @@ class WordGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
-     * `creator` is only included when the relation is loaded.
+     * `creator` and `words_count` are only included when loaded.
      *
      * @return array<string, mixed>
      */
@@ -27,6 +27,7 @@ class WordGroupResource extends JsonResource
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
             ]),
+            'words_count' => $this->whenCounted('words'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [

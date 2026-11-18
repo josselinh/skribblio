@@ -1,12 +1,17 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type WatchSource } from 'vue';
 import { useRoute } from 'vue-router';
 import type { PaginatedResponse } from '@/types/api';
 
 /**
  * Loads a paginated API list whose current page lives in the URL query (`?{pageParam}=N`),
- * and reloads it whenever that page changes.
+ * and reloads it whenever that page or one of the extra `sources` (e.g. search filters) changes.
+ * `fetchPage` may return null when the list should not be shown.
  */
-export function usePaginatedList<T>(fetchPage: (page: number) => Promise<PaginatedResponse<T>>, pageParam = 'page') {
+export function usePaginatedList<T>(
+    fetchPage: (page: number) => Promise<PaginatedResponse<T> | null>,
+    pageParam = 'page',
+    sources: WatchSource[] = [],
+) {
     const route = useRoute();
 
     const result = ref<PaginatedResponse<T> | null>(null);
@@ -31,7 +36,7 @@ export function usePaginatedList<T>(fetchPage: (page: number) => Promise<Paginat
         }
     }
 
-    watch(currentPage, reload, { immediate: true });
+    watch([currentPage, ...sources], reload, { immediate: true });
 
     return { result, isLoading, hasFailed, currentPage, reload };
 }

@@ -23,11 +23,10 @@ class SearchWordGroupController extends Controller
     {
         $request->validate(['q' => ['nullable', 'string', 'max:255']]);
         $user = $request->user();
-        $search = addcslashes($request->string('q')->trim()->toString(), '\\%_');
 
         $wordGroups = WordGroup::visibleTo($user)
             ->with('creator')
-            ->when($search !== '', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+            ->nameContains($request->input('q'))
             ->orderByRaw('created_by = ? desc', [$user->getKey()])
             ->orderBy('name')
             ->limit(self::LIMIT)

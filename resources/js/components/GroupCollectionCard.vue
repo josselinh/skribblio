@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import CardMeta from '@/components/CardMeta.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { formatDateTime } from '@/lib/format';
 import type { GroupCollection } from '@/types/models';
@@ -18,6 +19,11 @@ defineProps<{
             <h3 class="truncate font-medium" :title="groupCollection.name">{{ groupCollection.name }}</h3>
             <VisibilityBadge :visibility="groupCollection.visibility" />
         </div>
+        <CardMeta
+            :creator="groupCollection.creator"
+            :count="groupCollection.word_groups_count"
+            :count-labels="['groupe', 'groupes']"
+        />
         <p v-if="groupCollection.updated_at" class="text-sm text-zinc-500">
             Modifiée le <time :datetime="groupCollection.updated_at">{{ formatDateTime(groupCollection.updated_at) }}</time>
         </p>

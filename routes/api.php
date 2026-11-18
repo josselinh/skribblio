@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\GroupCollectionController;
 use App\Http\Controllers\Api\GroupCollectionWordGroupController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SearchWordGroupController;
 use App\Http\Controllers\Api\WordController;
 use App\Http\Controllers\Api\WordGroupController;
@@ -13,6 +14,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn (Request $request) => new UserResource($request->user()))->name('api.user');
 
     Route::middleware('verified')->group(function () {
+        Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
+        Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
         Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update']);
         Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['index', 'store', 'update', 'destroy']);

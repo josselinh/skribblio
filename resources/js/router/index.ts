@@ -50,6 +50,12 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/search',
+            name: 'search',
+            component: () => import('@/pages/search/SearchPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),

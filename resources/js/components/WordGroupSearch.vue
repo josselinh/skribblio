@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { searchWordGroups } from '@/api/wordGroups';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
+import { creatorLabel } from '@/lib/creator';
 import { useAuthStore } from '@/stores/auth';
 import type { WordGroup } from '@/types/models';
 
@@ -81,10 +82,6 @@ function select(wordGroup: WordGroup): void {
     emit('select', wordGroup);
     query.value = '';
 }
-
-function creatorLabel(wordGroup: WordGroup): string {
-    return wordGroup.creator?.id === auth.user?.id ? 'vous' : (wordGroup.creator?.name ?? '');
-}
 </script>
 
 <template>
@@ -122,7 +119,7 @@ function creatorLabel(wordGroup: WordGroup): string {
                     <span class="truncate">{{ wordGroup.name }}</span>
                     <span class="flex shrink-0 items-center gap-2 text-xs text-zinc-500">
                         <VisibilityBadge :visibility="wordGroup.visibility" />
-                        {{ creatorLabel(wordGroup) }}
+                        {{ creatorLabel(wordGroup.creator, auth.user?.id) }}
                     </span>
                 </button>
             </li>

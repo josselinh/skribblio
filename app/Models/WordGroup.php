@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use Database\Factories\WordGroupFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class WordGroup extends Model
 {
     /** @use HasFactory<WordGroupFactory> */
-    use HasFactory, HasUuids, HasVisibility;
+    use HasFactory, HasSearchableName, HasUuids, HasVisibility;
 
     /**
      * @return HasMany<Word, $this>
