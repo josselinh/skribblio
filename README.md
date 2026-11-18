@@ -12,7 +12,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Partage des groupes et collections privés par lien de demande d'accès, avec validation par le créateur et notifications par e-mail
 - Page de chaque utilisateur (en cliquant sur son nom) avec ses groupes et collections visibles
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
-- Export d'un groupe ou d'une collection dans un format prêt à coller dans Skribbl.io
+- Export d'un groupe, d'une collection ou d'une sélection de plusieurs groupes et collections dans un format prêt à coller dans Skribbl.io
 
 ## Stack technique
 
@@ -89,7 +89,8 @@ Sur la page d'un groupe ou d'une collection, le bouton « Exporter pour Skribbl.
 
 - Skribbl.io demande au moins 10 mots, de 32 caractères au plus, pour 20 000 caractères au total : le panneau compte les mots et les caractères et avertit quand une limite n'est pas respectée.
 - Options : retirer les doublons (activé par défaut, sans tenir compte des majuscules), mélanger l'ordre, et tirer au hasard une sélection qui tient dans la limite de caractères.
-- L'API (`GET /api/word-groups/{id}/export`, `GET /api/group-collections/{id}/export`) renvoie la liste brute des mots ; le dédoublonnage, le mélange et la mise en forme se font dans le front (`resources/js/lib/skribbl.ts`).
+- Depuis le tableau de bord, « Créer un export » permet de choisir plusieurs groupes et collections : leurs mots sont réunis dans une seule liste. La sélection peut ensuite être enregistrée comme nouvelle collection, qui reprend les groupes des collections choisies (elle ne suit pas leurs changements ultérieurs). Rien n'est enregistré tant qu'on ne crée pas la collection.
+- L'API (`GET /api/word-groups/{id}/export`, `GET /api/group-collections/{id}/export`, et `GET /api/exports/composition` pour une sélection) renvoie la liste brute des mots ; le dédoublonnage, le mélange et la mise en forme se font dans le front (`resources/js/lib/skribbl.ts`).
 
 ### Partage des groupes et collections privés
 

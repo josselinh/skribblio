@@ -86,6 +86,18 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
         <StatusMessage :message="status" />
 
         <div class="space-y-12">
+            <div
+                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs"
+            >
+                <div>
+                    <p class="font-semibold">Exporter pour Skribbl.io</p>
+                    <p class="text-sm text-zinc-500">
+                        Réunissez les mots de plusieurs groupes et collections en une liste prête à coller.
+                    </p>
+                </div>
+                <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">Créer un export</RouterLink>
+            </div>
+
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
                 <h2 id="received-access-requests-title" class="text-lg font-semibold">
                     Demandes d'accès reçues
