@@ -106,6 +106,38 @@ class WordControllerTest extends TestCase
             ->assertJsonValidationErrors(['name' => 'Le champ nom est obligatoire.']);
     }
 
+    public function test_store_accepts_a_word_of_32_characters_with_spaces(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+
+        $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'tour '.str_repeat('e', 27)])
+            ->assertCreated();
+    }
+
+    public function test_store_rejects_word_longer_than_32_characters_with_422(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+
+        $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => str_repeat('a', 33)])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('name');
+    }
+
+    public function test_store_rejects_word_containing_a_comma_with_422(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+
+        $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat, chien'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.']);
+    }
+
     public function test_update_renames_word_for_its_author(): void
     {
         $author = User::factory()->create();
@@ -139,6 +171,17 @@ class WordControllerTest extends TestCase
             ->patchJson("/api/words/{$word->id}", ['name' => 'chien'])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['name' => 'Ce mot est déjà dans le groupe.']);
+    }
+
+    public function test_update_rejects_name_containing_a_comma_with_422(): void
+    {
+        $author = User::factory()->create();
+        $word = Word::factory()->for(WordGroup::factory()->createdBy($author))->create(['name' => 'chat']);
+
+        $this->actingAs($author)
+            ->patchJson("/api/words/{$word->id}", ['name' => 'chat,chien'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('name');
     }
 
     public function test_update_returns_403_for_user_who_is_neither_author_nor_group_creator(): void

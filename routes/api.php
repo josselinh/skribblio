@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\SharedWithMeController;
 use App\Http\Controllers\Api\ShareInvitationController;
 use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Controllers\Api\WordController;
+use App\Http\Controllers\Api\WordExportController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
 use App\Http\Resources\UserResource;
@@ -69,6 +70,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('word-groups', 'wordGroups')->name('word-groups');
             Route::get('group-collections', 'groupCollections')->name('group-collections');
         });
+
+        // Skribbl.io export: every word, unpaginated.
+        Route::get('word-groups/{word_group}/export', [WordExportController::class, 'wordGroup'])->name('word-groups.export');
+        Route::get('group-collections/{group_collection}/export', [WordExportController::class, 'groupCollection'])->name('group-collections.export');
 
         Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
         Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');

@@ -3,6 +3,7 @@ import { nextTick, ref, useTemplateRef } from 'vue';
 import { deleteWord, updateWord } from '@/api/words';
 import UserLink from '@/components/UserLink.vue';
 import { useForm } from '@/composables/useForm';
+import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
 import { formatDateTime } from '@/lib/format';
 import type { Word } from '@/types/models';
 
@@ -60,6 +61,7 @@ async function confirmDelete(): Promise<void> {
                     ref="input"
                     v-model="form.data.name"
                     type="text"
+                    :maxlength="SKRIBBL_MAX_WORD_LENGTH"
                     autocomplete="off"
                     :aria-invalid="form.errors.value.name ? true : undefined"
                     class="block w-full min-w-32 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none aria-invalid:border-red-500"

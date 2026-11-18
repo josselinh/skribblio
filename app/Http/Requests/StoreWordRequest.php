@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Word;
 use App\Models\WordGroup;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -31,7 +32,8 @@ class StoreWordRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:255',
+                'max:'.Word::NAME_MAX_LENGTH,
+                'not_regex:/,/',
                 Rule::unique('words', 'name')->where('word_group_id', $this->wordGroup()->getKey()),
             ],
         ];
@@ -46,6 +48,7 @@ class StoreWordRequest extends FormRequest
     {
         return [
             'name.unique' => 'Ce mot est déjà dans le groupe.',
+            'name.not_regex' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
         ];
     }
 

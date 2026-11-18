@@ -8,6 +8,7 @@ import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import SharePanel from '@/components/SharePanel.vue';
+import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
@@ -40,6 +41,10 @@ const hiddenGroupsMessage = computed(() => {
         ? '1 groupe de cette collection est privé et n’est pas visible pour vous.'
         : `${count} groupes de cette collection sont privés et ne sont pas visibles pour vous.`;
 });
+
+const exportNote = computed(() =>
+    hiddenGroupsMessage.value ? 'Les mots des groupes qui vous sont masqués ne sont pas exportés.' : null,
+);
 
 /** Whether some hidden groups were not requested yet. */
 const canRequestHiddenGroups = computed(
@@ -153,6 +158,7 @@ watch(
                 </EditableNameVisibility>
             </div>
 
+            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" />
             <div v-if="groupCollection.can.share" class="mt-4">
                 <SharePanel kind="group-collections" :id="groupCollection.id" />
             </div>

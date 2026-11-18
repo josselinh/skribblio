@@ -9,6 +9,7 @@ import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import SharePanel from '@/components/SharePanel.vue';
+import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
 import WordRow from '@/components/WordRow.vue';
@@ -124,6 +125,7 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                 </EditableNameVisibility>
             </div>
 
+            <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
             <div v-if="wordGroup.can.share" class="mt-4">
                 <SharePanel kind="word-groups" :id="wordGroup.id" />
             </div>

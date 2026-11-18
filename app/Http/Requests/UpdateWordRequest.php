@@ -28,7 +28,8 @@ class UpdateWordRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:255',
+                'max:'.Word::NAME_MAX_LENGTH,
+                'not_regex:/,/',
                 Rule::unique('words', 'name')
                     ->where('word_group_id', $this->word()->word_group_id)
                     ->ignore($this->word()),
@@ -45,6 +46,7 @@ class UpdateWordRequest extends FormRequest
     {
         return [
             'name.unique' => 'Ce mot est déjà dans le groupe.',
+            'name.not_regex' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
         ];
     }
 

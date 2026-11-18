@@ -12,7 +12,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Partage des groupes et collections privés par lien de demande d'accès, avec validation par le créateur et notifications par e-mail
 - Page de chaque utilisateur (en cliquant sur son nom) avec ses groupes et collections visibles
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
-- Export d'une liste dans un format prêt à coller dans Skribbl.io
+- Export d'un groupe ou d'une collection dans un format prêt à coller dans Skribbl.io
 
 ## Stack technique
 
@@ -68,7 +68,7 @@ User n ──── n WordGroup              favoris : favorite_word_groups
 User n ──── n GroupCollection        favoris : favorite_group_collections
 ```
 
-- **Mot** (`words`) : un nom, unique dans son groupe. Un mot n'a pas de visibilité propre : il est visible par ceux qui voient son groupe.
+- **Mot** (`words`) : un nom, unique dans son groupe, de 32 caractères au plus et sans virgule (règles de Skribbl.io). Un mot n'a pas de visibilité propre : il est visible par ceux qui voient son groupe.
 - **Groupe** (`word_groups`) et **collection** (`group_collections`, modèle `GroupCollection`) : un nom et une visibilité, `public` (visible par tous les utilisateurs connectés) ou `private` (visible par son créateur uniquement).
 - Une collection contient **au moins un groupe**. Un groupe peut appartenir à plusieurs collections.
 
@@ -82,6 +82,14 @@ Règles d'accès (définies dans `app/Policies`) :
 - Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués.
 - On peut mettre en favori tout groupe ou toute collection que l'on peut voir. Les favoris sont listés sur le tableau de bord. Si un favori devient privé, il y reste affiché mais grisé et non cliquable ; on peut toujours le retirer des favoris.
 - Supprimer un utilisateur supprime tout ce qu'il a créé. Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.
+
+### Export pour Skribbl.io
+
+Sur la page d'un groupe ou d'une collection, le bouton « Exporter pour Skribbl.io » affiche tous les mots séparés par des virgules, prêts à coller dans le champ « Custom words » d'un salon privé. Tous ceux qui voient le groupe ou la collection peuvent l'exporter ; pour une collection, seuls les groupes visibles sont inclus.
+
+- Skribbl.io demande au moins 10 mots, de 32 caractères au plus, pour 20 000 caractères au total : le panneau compte les mots et les caractères et avertit quand une limite n'est pas respectée.
+- Options : retirer les doublons (activé par défaut, sans tenir compte des majuscules), mélanger l'ordre, et tirer au hasard une sélection qui tient dans la limite de caractères.
+- L'API (`GET /api/word-groups/{id}/export`, `GET /api/group-collections/{id}/export`) renvoie la liste brute des mots ; le dédoublonnage, le mélange et la mise en forme se font dans le front (`resources/js/lib/skribbl.ts`).
 
 ### Partage des groupes et collections privés
 

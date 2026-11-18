@@ -23,6 +23,11 @@ class Word extends Model
     use HasFactory, HasUuids;
 
     /**
+     * Longest word that Skribbl.io accepts in a custom word list.
+     */
+    public const int NAME_MAX_LENGTH = 32;
+
+    /**
      * @return BelongsTo<WordGroup, $this>
      */
     public function wordGroup(): BelongsTo

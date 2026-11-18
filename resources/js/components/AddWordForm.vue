@@ -2,6 +2,7 @@
 import { nextTick, useTemplateRef } from 'vue';
 import { createWord } from '@/api/words';
 import { useForm } from '@/composables/useForm';
+import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
 import type { Word } from '@/types/models';
 
 const props = defineProps<{
@@ -38,6 +39,7 @@ async function submit(): Promise<void> {
                 ref="input"
                 v-model="form.data.name"
                 type="text"
+                :maxlength="SKRIBBL_MAX_WORD_LENGTH"
                 placeholder="Nouveau mot…"
                 autocomplete="off"
                 :aria-invalid="form.errors.value.name ? true : undefined"
