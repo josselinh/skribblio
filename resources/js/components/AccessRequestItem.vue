@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { decideAccessRequest } from '@/api/sharing';
+import UserLink from '@/components/UserLink.vue';
 import { formatDateTime } from '@/lib/format';
 import type { AccessRequest } from '@/types/models';
 
@@ -40,7 +41,7 @@ async function decide(accept: boolean): Promise<void> {
     <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div class="min-w-0 text-sm">
             <p>
-                <span class="font-medium">{{ accessRequest.requester.name }}</span>
+                <UserLink :user="accessRequest.requester" class="font-medium" />
                 <template v-if="showItem">
                     demande l'accès {{ accessRequest.kind === 'word-groups' ? 'au groupe' : 'à la collection' }}
                     <RouterLink

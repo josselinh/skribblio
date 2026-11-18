@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SearchWordGroupController;
 use App\Http\Controllers\Api\SharedWithMeController;
 use App\Http\Controllers\Api\ShareInvitationController;
+use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Controllers\Api\WordController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
@@ -61,6 +62,13 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('shared/word-groups', [SharedWithMeController::class, 'wordGroups'])->name('shared.word-groups');
         Route::get('shared/group-collections', [SharedWithMeController::class, 'groupCollections'])->name('shared.group-collections');
+
+        // Another user's page: their groups and collections visible to the current user.
+        Route::controller(UserProfileController::class)->prefix('users/{user}')->name('users.')->group(function () {
+            Route::get('/', 'show')->name('show');
+            Route::get('word-groups', 'wordGroups')->name('word-groups');
+            Route::get('group-collections', 'groupCollections')->name('group-collections');
+        });
 
         Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
         Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');

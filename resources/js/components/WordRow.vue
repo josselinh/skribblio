@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue';
 import { deleteWord, updateWord } from '@/api/words';
+import UserLink from '@/components/UserLink.vue';
 import { useForm } from '@/composables/useForm';
 import { formatDateTime } from '@/lib/format';
 import type { Word } from '@/types/models';
@@ -67,7 +68,7 @@ async function confirmDelete(): Promise<void> {
             </form>
             <template v-else>{{ word.name }}</template>
         </td>
-        <td class="px-4 py-2.5 text-zinc-600">{{ word.creator.name }}</td>
+        <td class="px-4 py-2.5 text-zinc-600"><UserLink :user="word.creator" /></td>
         <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600">
             <time v-if="word.created_at" :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
         </td>

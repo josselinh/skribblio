@@ -10,6 +10,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Édition des listes seul ou en collaboration avec d'autres utilisateurs
 - Favoris : groupes et collections favoris sur le tableau de bord
 - Partage des groupes et collections privés par lien de demande d'accès, avec validation par le créateur et notifications par e-mail
+- Page de chaque utilisateur (en cliquant sur son nom) avec ses groupes et collections visibles
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
 - Export d'une liste dans un format prêt à coller dans Skribbl.io
 

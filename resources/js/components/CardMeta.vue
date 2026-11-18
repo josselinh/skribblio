@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { creatorLabel } from '@/lib/creator';
-import { useAuthStore } from '@/stores/auth';
+import UserLink from '@/components/UserLink.vue';
 import type { User } from '@/types/models';
 
-/** "par Bob · 42 mots" line of a card, shown in search results. */
+/** "par Bob · 42 mots" line of a card; the creator's name links to their page. */
 const props = defineProps<{
     creator?: Pick<User, 'id' | 'name'>;
     count?: number;
@@ -12,16 +11,16 @@ const props = defineProps<{
     countLabels: [string, string];
 }>();
 
-const auth = useAuthStore();
-
-const parts = computed(() =>
-    [
-        props.creator ? `par ${creatorLabel(props.creator, auth.user?.id)}` : null,
-        props.count !== undefined ? `${props.count} ${props.count > 1 ? props.countLabels[1] : props.countLabels[0]}` : null,
-    ].filter((part): part is string => part !== null),
+const countLabel = computed(() =>
+    props.count === undefined ? null : `${props.count} ${props.count > 1 ? props.countLabels[1] : props.countLabels[0]}`,
 );
 </script>
 
 <template>
-    <p v-if="parts.length > 0" class="text-sm text-zinc-600">{{ parts.join(' · ') }}</p>
+    <!-- Above the card's stretched link so that the creator's name stays clickable. -->
+    <p v-if="creator || countLabel" class="relative z-10 text-sm text-zinc-600">
+        <template v-if="creator">par <UserLink :user="creator" self-label="vous" /></template>
+        <template v-if="creator && countLabel"> · </template>
+        <template v-if="countLabel">{{ countLabel }}</template>
+    </p>
 </template>

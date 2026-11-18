@@ -69,6 +69,12 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/users/:id',
+            name: 'users.show',
+            component: () => import('@/pages/users/UserPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),
@@ -135,6 +141,11 @@ router.beforeEach(async (to) => {
     }
 
     if (to.name === 'verify-email' && auth.isVerified) {
+        return { name: 'dashboard' };
+    }
+
+    /* The current user's own page is their dashboard. */
+    if (to.name === 'users.show' && to.params.id === auth.user?.id) {
         return { name: 'dashboard' };
     }
 
