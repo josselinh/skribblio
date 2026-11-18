@@ -26,6 +26,18 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/groups/new',
+            name: 'word-groups.create',
+            component: () => import('@/pages/word-groups/CreateWordGroupPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
+            path: '/groups/:id',
+            name: 'word-groups.show',
+            component: () => import('@/pages/word-groups/ShowWordGroupPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),
