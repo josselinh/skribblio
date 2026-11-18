@@ -63,6 +63,12 @@ export const router = createRouter({
             meta: { requiresVerified: true },
         },
         {
+            path: '/profile',
+            name: 'profile',
+            component: () => import('@/pages/ProfilePage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('@/pages/auth/LoginPage.vue'),

@@ -18,6 +18,17 @@ export interface RegisterPayload {
     password_confirmation: string;
 }
 
+export interface ProfileInformationPayload {
+    name: string;
+    email: string;
+}
+
+export interface UpdatePasswordPayload {
+    current_password: string;
+    password: string;
+    password_confirmation: string;
+}
+
 export interface ResetPasswordPayload {
     token: string;
     email: string;
@@ -90,6 +101,19 @@ export const useAuthStore = defineStore('auth', () => {
         return data.message;
     }
 
+    /**
+     * Updates the name and email. Changing the email un-verifies the account until the new address
+     * is confirmed (a verification email is sent), which the refreshed user reflects.
+     */
+    async function updateProfileInformation(payload: ProfileInformationPayload): Promise<void> {
+        await http.put('/user/profile-information', payload);
+        await fetchUser();
+    }
+
+    async function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
+        await http.put('/user/password', payload);
+    }
+
     /** Forgets the current user locally, e.g. after the session expired server-side. */
     function clear(): void {
         user.value = null;
@@ -107,6 +131,8 @@ export const useAuthStore = defineStore('auth', () => {
         resendVerificationEmail,
         sendPasswordResetLink,
         resetPassword,
+        updateProfileInformation,
+        updatePassword,
         clear,
     };
 });

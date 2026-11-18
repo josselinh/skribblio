@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import UserMenu from '@/components/UserMenu.vue';
 
-const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -12,11 +11,6 @@ const searchQuery = ref('');
 async function search(): Promise<void> {
     await router.push({ name: 'search', query: { q: searchQuery.value.trim() || undefined } });
     searchQuery.value = '';
-}
-
-async function logout(): Promise<void> {
-    await auth.logout();
-    await router.push({ name: 'login' });
 }
 </script>
 
@@ -41,10 +35,7 @@ async function logout(): Promise<void> {
                         class="block w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-none"
                     />
                 </form>
-                <div class="flex items-center gap-4 text-sm">
-                    <span class="text-zinc-500">{{ auth.user?.name }}</span>
-                    <button type="button" class="underline hover:text-zinc-900" @click="logout">Se déconnecter</button>
-                </div>
+                <UserMenu />
             </div>
         </header>
         <main class="mx-auto max-w-5xl px-4 py-8">
