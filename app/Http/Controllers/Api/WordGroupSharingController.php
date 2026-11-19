@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\WordGroup;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -40,6 +41,14 @@ class WordGroupSharingController extends Controller
     public function revoke(WordGroup $wordGroup, User $user): Response
     {
         return $this->revokeResponse($wordGroup, $user);
+    }
+
+    /**
+     * The current user, a member, leaves the item.
+     */
+    public function leave(Request $request, WordGroup $wordGroup): Response
+    {
+        return $this->leaveResponse($wordGroup, $request->user());
     }
 
     protected function sharePathPrefix(): string

@@ -82,4 +82,17 @@ class WordGroupPolicy
     {
         return $wordGroup->isCreatedBy($user);
     }
+
+    /**
+     * A member (accepted through the share link) can leave the item, giving up the access it gave them. A
+     * private item the user cannot see answers 404.
+     */
+    public function leave(User $user, WordGroup $wordGroup): Response
+    {
+        if (! $wordGroup->isVisibleTo($user)) {
+            return Response::denyAsNotFound();
+        }
+
+        return $wordGroup->isMember($user) ? Response::allow() : Response::deny('Vous n’êtes pas membre de ce groupe.');
+    }
 }

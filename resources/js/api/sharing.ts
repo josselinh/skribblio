@@ -26,6 +26,11 @@ export async function revokeAccess(kind: FavoriteKind, id: string, userId: strin
     await http.delete(`/api/${kind}/${id}/members/${userId}`);
 }
 
+/** The current user, a member, gives up their access to the item. */
+export async function leaveItem(kind: FavoriteKind, id: string): Promise<void> {
+    await http.delete(`/api/${kind}/${id}/membership`);
+}
+
 /** Pending requests on the current user's groups and collections, most recent first. */
 export async function fetchReceivedAccessRequests(): Promise<AccessRequest[]> {
     const { data } = await http.get<{ data: AccessRequest[] }>('/api/access-requests/received');

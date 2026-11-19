@@ -42,6 +42,7 @@ class WordGroupResource extends JsonResource
                 'delete' => $request->user()->can('delete', $this->resource),
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
+                'leave' => $request->user()->can('leave', $this->resource),
                 'add_word' => $request->user()->can('addWord', $this->resource),
                 'duplicate' => $request->user()->can('duplicate', $this->resource),
                 'remove_from_collection' => $this->whenPivotLoaded('groups_collections', fn (): bool => $request->user()

@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Share link and access management of a private group or collection, for its creator.
+ * Share link and access management of a private group or collection, for its creator; leaving it, for its members.
  */
 trait ManagesSharing
 {
@@ -54,6 +54,19 @@ trait ManagesSharing
         Gate::authorize('manageAccess', $item);
 
         $item->revokeAccess($user);
+
+        return response()->noContent();
+    }
+
+    /**
+     * The current user gives up their membership, as if the creator had revoked it (they can ask again
+     * through the share link), and loses their favorites on what they can no longer see.
+     */
+    protected function leaveResponse(WordGroup|GroupCollection $item, User $user): Response
+    {
+        Gate::authorize('leave', $item);
+
+        $item->leave($user);
 
         return response()->noContent();
     }

@@ -64,4 +64,58 @@ class GroupCollectionSharingControllerTest extends TestCase
             ->postJson("/api/group-collections/{$groupCollection->id}/hidden-word-groups/access-requests")
             ->assertNotFound();
     }
+
+    public function test_member_leaving_a_private_collection_no_longer_sees_its_creators_private_groups(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached($privateGroup)->create();
+        $groupCollection->members()->attach($member);
+
+        $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
+
+        $this->assertFalse($groupCollection->fresh()->isVisibleTo($member));
+        $this->assertFalse($privateGroup->fresh()->isVisibleTo($member));
+    }
+
+    public function test_leaving_returns_403_for_a_viewer_who_is_not_a_member(): void
+    {
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/group-collections/{$groupCollection->id}/membership")
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Vous n’êtes pas membre de cette collection.');
+    }
+
+    public function test_leaving_a_private_collection_removes_the_favorites_hidden_since(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $publicGroup = WordGroup::factory()->public()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached([$privateGroup, $publicGroup])->create();
+        $groupCollection->members()->attach($member);
+        $member->favoriteGroupCollections()->attach($groupCollection);
+        $member->favoriteWordGroups()->attach([$privateGroup->id, $publicGroup->id]);
+
+        $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
+
+        $this->assertDatabaseMissing('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
+        $this->assertDatabaseMissing('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $privateGroup->id]);
+        $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $publicGroup->id]);
+    }
+
+    public function test_leaving_a_public_collection_keeps_it_in_favorites(): void
+    {
+        $member = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->create();
+        $groupCollection->members()->attach($member);
+        $member->favoriteGroupCollections()->attach($groupCollection);
+
+        $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
+
+        $this->assertDatabaseHas('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
+    }
 }

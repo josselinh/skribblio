@@ -127,6 +127,29 @@ trait Shareable
     }
 
     /**
+     * The user, a member, gives up their access, as if the creator had revoked it. Their favorites on what
+     * they can no longer see are removed with it.
+     */
+    public function leave(User $user): void
+    {
+        DB::transaction(function () use ($user): void {
+            $this->revokeAccess($user);
+            $this->removeFavoritesHiddenFrom($user);
+        });
+    }
+
+    /**
+     * Removes the user's favorite on the item once they can no longer see it (a public item, or a group still
+     * visible through a collection, stays in their favorites).
+     */
+    protected function removeFavoritesHiddenFrom(User $user): void
+    {
+        if (! $this->fresh()->isVisibleTo($user)) {
+            $this->favoritedBy()->detach($user);
+        }
+    }
+
+    /**
      * Hides the share token from serialization.
      */
     protected function initializeShareable(): void

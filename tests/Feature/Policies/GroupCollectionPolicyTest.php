@@ -115,4 +115,16 @@ class GroupCollectionPolicyTest extends TestCase
 
         $this->assertFalse($member->can('detachWordGroup', [$groupCollection->fresh(), $wordGroup]));
     }
+
+    public function test_only_members_can_leave_a_collection(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->createdBy($creator)->create();
+        $groupCollection->members()->attach($member);
+
+        $this->assertTrue($member->can('leave', $groupCollection));
+        $this->assertFalse($creator->can('leave', $groupCollection));
+        $this->assertFalse(User::factory()->create()->can('leave', $groupCollection));
+    }
 }

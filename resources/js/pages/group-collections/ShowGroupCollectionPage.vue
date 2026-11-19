@@ -9,6 +9,7 @@ import AccessManagement from '@/components/AccessManagement.vue';
 import DeleteButton from '@/components/DeleteButton.vue';
 import DuplicateButton from '@/components/DuplicateButton.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
+import LeaveButton from '@/components/LeaveButton.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
@@ -78,6 +79,12 @@ async function requestHiddenGroups(): Promise<void> {
     } finally {
         isRequestingHiddenGroups.value = false;
     }
+}
+
+/** After leaving a public collection, which stays visible: reloads it, as the user's rights changed. */
+async function onLeft(status: string): Promise<void> {
+    await loadGroupCollection();
+    flashStatus.value = status;
 }
 
 async function loadGroupCollection(): Promise<void> {
@@ -182,6 +189,13 @@ watch(
                             :purpose="accessPurpose"
                         />
                         <DeleteButton v-if="groupCollection.can.delete" kind="group-collections" :id="groupCollection.id" />
+                        <LeaveButton
+                            v-if="groupCollection.can.leave"
+                            kind="group-collections"
+                            :id="groupCollection.id"
+                            :visibility="groupCollection.visibility"
+                            @left="onLeft"
+                        />
                     </template>
                 </EditableNameVisibility>
             </div>
