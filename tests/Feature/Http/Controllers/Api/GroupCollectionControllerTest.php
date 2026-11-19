@@ -40,7 +40,7 @@ class GroupCollectionControllerTest extends TestCase
                 'is_favorite' => false,
                 'created_at' => $newerCollection->created_at->toIso8601String(),
                 'updated_at' => $newerCollection->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word_group' => true, 'duplicate' => true],
+                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'add_word_group' => true, 'duplicate' => true],
             ]);
     }
 
@@ -248,5 +248,41 @@ class GroupCollectionControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.can.add_word_group', true)
             ->assertJsonPath('data.word_groups.*.can.remove_from_collection', [false, true]);
+    }
+
+    public function test_destroy_deletes_collection_and_keeps_its_groups(): void
+    {
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->createdBy($creator)->hasAttached($wordGroup)->create();
+
+        $this->actingAs($creator)
+            ->deleteJson("/api/group-collections/{$groupCollection->id}")
+            ->assertNoContent();
+
+        $this->assertModelMissing($groupCollection);
+        $this->assertModelExists($wordGroup);
+    }
+
+    public function test_destroy_returns_403_for_another_user_on_public_collection(): void
+    {
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/group-collections/{$groupCollection->id}")
+            ->assertForbidden();
+
+        $this->assertModelExists($groupCollection);
+    }
+
+    public function test_destroy_returns_404_for_private_collection_of_another_user(): void
+    {
+        $groupCollection = GroupCollection::factory()->private()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/group-collections/{$groupCollection->id}")
+            ->assertNotFound();
+
+        $this->assertModelExists($groupCollection);
     }
 }

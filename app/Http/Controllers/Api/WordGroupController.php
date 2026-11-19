@@ -10,6 +10,7 @@ use App\Models\WordGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 class WordGroupController extends Controller
@@ -57,5 +58,19 @@ class WordGroupController extends Controller
         $wordGroup->update($request->validated());
 
         return new WordGroupResource($wordGroup->loadIsFavorite($request->user()));
+    }
+
+    /**
+     * Delete a group with its words; it is removed from the collections containing it, which may leave a collection empty.
+     * Users who cannot see the item get a 404, the others a 403.
+     */
+    public function destroy(WordGroup $wordGroup): Response
+    {
+        Gate::authorize('view', $wordGroup);
+        Gate::authorize('delete', $wordGroup);
+
+        $wordGroup->delete();
+
+        return response()->noContent();
     }
 }

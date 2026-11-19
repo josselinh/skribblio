@@ -41,6 +41,7 @@ class GroupCollectionResource extends JsonResource
             'hidden_word_groups_requested_count' => $this->whenHas('hidden_word_groups_requested_count'),
             'can' => [
                 'update' => $request->user()->can('update', $this->resource),
+                'delete' => $request->user()->can('delete', $this->resource),
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
                 'add_word_group' => $request->user()->can('addWordGroup', $this->resource),

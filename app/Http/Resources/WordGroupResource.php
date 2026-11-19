@@ -38,6 +38,7 @@ class WordGroupResource extends JsonResource
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [
                 'update' => $request->user()->can('update', $this->resource),
+                'delete' => $request->user()->can('delete', $this->resource),
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
                 'add_word' => $request->user()->can('addWord', $this->resource),
