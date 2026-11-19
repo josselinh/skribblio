@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Sharing of a private group or collection: a secret link lets other users request access, the creator
- * accepts (the requester becomes a member) or refuses, and can revoke access later. The using model
- * also uses HasVisibility and defines `members()` and `accessRequests()` relations.
+ * Sharing of a private group or collection, or of a public one whose contributions are restricted to its
+ * members: a secret link lets other users request access (to see the item, or to contribute to it), the
+ * creator accepts (the requester becomes a member) or refuses, and can revoke access later. The using
+ * model also uses HasVisibility and AcceptsContributions, and defines `members()` and `accessRequests()`
+ * relations.
  *
  * @property ?string $share_token
  */
@@ -41,15 +43,39 @@ trait Shareable
     }
 
     /**
+     * Whether the user already has what the share link gives: contributing to a public item open to its
+     * members only (being its creator or a member), seeing the item otherwise.
+     */
+    public function hasAccess(User $user): bool
+    {
+        return $this->restrictsContributionsToMembers()
+            ? $this->isCreatedBy($user) || $this->isMember($user)
+            : $this->isVisibleTo($user);
+    }
+
+    /**
+     * Where the user's request stands: `pending`, `refused`, or `none` (no request, or an accepted one whose
+     * access was revoked since).
+     */
+    public function accessRequestStatusOf(User $user): string
+    {
+        return match ($this->accessRequests()->where('user_id', $user->getKey())->first()?->status) {
+            AccessRequestStatus::Pending => 'pending',
+            AccessRequestStatus::Refused => 'refused',
+            default => 'none',
+        };
+    }
+
+    /**
      * Records a pending access request from the user and notifies the creator. Returns null when the user
-     * can already see the item. Asking again while a request is pending does nothing; asking again after a
+     * already has access (see hasAccess()). Asking again while a request is pending does nothing; asking again after a
      * refusal sends a new request.
      *
      * @param  array<string, mixed>  $attributes  Extra attributes of the request (e.g. `via_group_collection_id`).
      */
     public function requestAccess(User $user, array $attributes = []): WordGroupAccessRequest|GroupCollectionAccessRequest|null
     {
-        if ($this->isVisibleTo($user)) {
+        if ($this->hasAccess($user)) {
             return null;
         }
 

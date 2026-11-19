@@ -2,15 +2,17 @@
 import { ref } from 'vue';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
 import ModalDialog from '@/components/ModalDialog.vue';
-import type { FavoriteKind } from '@/types/models';
+import type { AccessPurpose, FavoriteKind } from '@/types/models';
 
 /**
- * "Partager" button of a private group or collection, opening a modal with the access request link and its
- * copy and regenerate actions. The link is loaded on the first opening.
+ * "Partager" button of a private group or collection, or of a public one open to its members only, opening a
+ * modal with the access (or contribution) request link and its copy and regenerate actions. The link is
+ * loaded on the first opening.
  */
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
+    purpose: AccessPurpose;
 }>();
 
 const isOpen = ref(false);
@@ -76,11 +78,17 @@ async function regenerate(): Promise<void> {
 
     <ModalDialog v-model:open="isOpen" title="Partager">
         <p>
-            Les personnes qui ouvrent ce lien peuvent vous demander l'accès. Vous accepterez ou refuserez chaque demande.
+            {{
+                purpose === 'contribution'
+                    ? 'Les personnes qui ouvrent ce lien peuvent vous demander à contribuer. Vous accepterez ou refuserez chaque demande.'
+                    : "Les personnes qui ouvrent ce lien peuvent vous demander l'accès. Vous accepterez ou refuserez chaque demande."
+            }}
         </p>
         <p v-if="hasFailed" role="alert" class="mt-3 text-red-600">Une erreur est survenue, veuillez réessayer.</p>
 
-        <label for="share-url" class="mt-4 block font-medium text-zinc-900">Lien de demande d'accès</label>
+        <label for="share-url" class="mt-4 block font-medium text-zinc-900">
+            {{ purpose === 'contribution' ? 'Lien de demande de contribution' : "Lien de demande d'accès" }}
+        </label>
         <div class="mt-1 flex flex-col gap-2 sm:flex-row">
             <input
                 id="share-url"

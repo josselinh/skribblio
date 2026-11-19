@@ -1,19 +1,52 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { fetchItemAccess, revokeAccess } from '@/api/sharing';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { formatDateTime } from '@/lib/format';
-import type { FavoriteKind, ItemAccess } from '@/types/models';
+import type { AccessPurpose, FavoriteKind, ItemAccess } from '@/types/models';
 
-/** Pending access requests and people with access of a private item, for its creator. */
+/**
+ * Pending requests and members of a shared item, for its creator: people with access to a private item,
+ * or allowed to contribute to a public item open to its members only (`purpose`).
+ */
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
+    purpose: AccessPurpose;
 }>();
 
 const access = ref<ItemAccess | null>(null);
 const hasFailed = ref(false);
-const memberBeingRevoked = ref<string | null>(null);
+type Member = ItemAccess['members'][number];
+
+/** Member whose access is being confirmed for removal, in `ConfirmDialog`. */
+const memberBeingRevoked = ref<Member | null>(null);
+const isRevoking = ref(false);
+const revokeError = ref<string | null>(null);
+
+const isConfirmingRevocation = computed({
+    get: () => memberBeingRevoked.value !== null,
+    set: (isOpen: boolean) => {
+        if (!isOpen) {
+            memberBeingRevoked.value = null;
+        }
+    },
+});
+
+const revocationMessage = computed(() => {
+    const name = memberBeingRevoked.value?.name ?? '';
+    const item = props.kind === 'word-groups' ? 'ce groupe' : 'cette collection';
+
+    return props.purpose === 'contribution'
+        ? `${name} ne pourra plus contribuer à ${item}. Ses contributions sont conservées, et cette personne pourra vous redemander l'autorisation.`
+        : `${name} n'aura plus accès à ${item}. Cette personne pourra vous redemander l'accès avec le lien de partage.`;
+});
+
+function confirmRevocation(member: Member): void {
+    revokeError.value = null;
+    memberBeingRevoked.value = member;
+}
 
 async function load(): Promise<void> {
     hasFailed.value = false;
@@ -24,12 +57,20 @@ async function load(): Promise<void> {
     }
 }
 
-async function revoke(userId: string): Promise<void> {
+async function revoke(): Promise<void> {
+    if (!memberBeingRevoked.value) {
+        return;
+    }
+    isRevoking.value = true;
+    revokeError.value = null;
     try {
-        await revokeAccess(props.kind, props.id, userId);
-    } finally {
+        await revokeAccess(props.kind, props.id, memberBeingRevoked.value.id);
         memberBeingRevoked.value = null;
         await load();
+    } catch {
+        revokeError.value = 'Une erreur est survenue, veuillez réessayer.';
+    } finally {
+        isRevoking.value = false;
     }
 }
 
@@ -46,7 +87,8 @@ watch(() => props.id, load, { immediate: true });
         <template v-else-if="access">
             <div v-if="access.pending_requests.length > 0">
                 <h2 class="text-lg font-semibold">
-                    Demandes d'accès <span class="font-normal text-zinc-500">({{ access.pending_requests.length }})</span>
+                    {{ purpose === 'contribution' ? 'Demandes de contribution' : "Demandes d'accès" }}
+                    <span class="font-normal text-zinc-500">({{ access.pending_requests.length }})</span>
                 </h2>
                 <ul class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
                     <AccessRequestItem
@@ -60,7 +102,8 @@ watch(() => props.id, load, { immediate: true });
 
             <div>
                 <h2 class="text-lg font-semibold">
-                    Personnes ayant accès <span class="font-normal text-zinc-500">({{ access.members.length }})</span>
+                    {{ purpose === 'contribution' ? 'Personnes autorisées à contribuer' : 'Personnes ayant accès' }}
+                    <span class="font-normal text-zinc-500">({{ access.members.length }})</span>
                 </h2>
                 <p v-if="access.members.length === 0" class="mt-2 text-sm text-zinc-500">
                     Personne d'autre que vous pour l'instant. Partagez le lien pour recevoir des demandes.
@@ -73,16 +116,11 @@ watch(() => props.id, load, { immediate: true });
                                 Depuis le <time :datetime="member.granted_at">{{ formatDateTime(member.granted_at) }}</time>
                             </p>
                         </div>
-                        <div v-if="memberBeingRevoked === member.id" class="flex gap-3">
-                            <span class="text-zinc-500">Retirer l'accès ?</span>
-                            <button type="button" class="text-zinc-500 hover:text-zinc-900" @click="memberBeingRevoked = null">Non</button>
-                            <button type="button" class="font-medium text-red-600 hover:underline" @click="revoke(member.id)">Oui</button>
-                        </div>
                         <button
-                            v-else
                             type="button"
                             class="text-red-600 hover:text-red-800"
-                            @click="memberBeingRevoked = member.id"
+                            aria-haspopup="dialog"
+                            @click="confirmRevocation(member)"
                         >
                             Retirer
                         </button>
@@ -90,5 +128,16 @@ watch(() => props.id, load, { immediate: true });
                 </ul>
             </div>
         </template>
+
+        <ConfirmDialog
+            v-model:open="isConfirmingRevocation"
+            :title="purpose === 'contribution' ? 'Retirer l’autorisation de contribuer ?' : 'Retirer l’accès ?'"
+            :message="revocationMessage"
+            confirm-label="Retirer"
+            processing-label="Retrait…"
+            :is-processing="isRevoking"
+            :error="revokeError"
+            @confirm="revoke"
+        />
     </section>
 </template>

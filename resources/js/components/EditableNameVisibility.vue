@@ -12,6 +12,7 @@ export interface NameVisibilityPayload {
     name: string;
     visibility: Visibility;
     accepts_contributions: boolean;
+    contributions_members_only: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ const props = defineProps<{
     name: string;
     visibility: Visibility;
     acceptsContributions: boolean;
+    contributionsMembersOnly: boolean;
     kind: FavoriteKind;
     canEdit: boolean;
     /** Label of the name field, e.g. "Nom du groupe". */
@@ -36,12 +38,14 @@ const form = useForm<NameVisibilityPayload>({
     name: props.name,
     visibility: props.visibility,
     accepts_contributions: props.acceptsContributions,
+    contributions_members_only: props.contributionsMembersOnly,
 });
 
 function startEditing(): void {
     form.data.name = props.name;
     form.data.visibility = props.visibility;
     form.data.accepts_contributions = props.acceptsContributions;
+    form.data.contributions_members_only = props.contributionsMembersOnly;
     form.errors.value = {};
     isEditing.value = true;
 }
@@ -65,8 +69,11 @@ async function submit(): Promise<void> {
         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
         <ContributionsField
             v-model="form.data.accepts_contributions"
+            v-model:members-only="form.data.contributions_members_only"
             :kind="kind"
+            :visibility="form.data.visibility"
             :error="form.errors.value.accepts_contributions"
+            :members-only-error="form.errors.value.contributions_members_only"
         />
         <div class="flex justify-end gap-2">
             <button
@@ -90,7 +97,10 @@ async function submit(): Promise<void> {
         <div class="flex min-w-0 flex-wrap items-center gap-3">
             <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
             <VisibilityBadge :visibility="visibility" />
-            <ContributionsBadge v-if="acceptsContributions" />
+            <ContributionsBadge
+                v-if="acceptsContributions"
+                :members-only="contributionsMembersOnly && visibility === 'public'"
+            />
             <slot name="after-title" />
         </div>
         <div class="flex flex-wrap items-center justify-end gap-2">

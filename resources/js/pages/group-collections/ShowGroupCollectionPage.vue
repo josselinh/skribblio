@@ -16,8 +16,9 @@ import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import { consumeHistoryStatus } from '@/lib/historyStatus';
+import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { ValidationErrorResponse } from '@/types/api';
-import type { GroupCollectionDetail, WordGroup } from '@/types/models';
+import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
 
 const route = useRoute();
 
@@ -36,6 +37,10 @@ const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((word
 /** Includes the groups hidden from the user: the collection must keep at least one group. */
 const totalWordGroupsCount = computed(() =>
     groupCollection.value ? groupCollection.value.word_groups.length + groupCollection.value.hidden_word_groups_count : 0,
+);
+
+const accessPurpose = computed<AccessPurpose>(() =>
+    groupCollection.value && restrictsContributionsToMembers(groupCollection.value) ? 'contribution' : 'access',
 );
 
 const hiddenGroupsMessage = computed(() => {
@@ -152,6 +157,7 @@ watch(
                     :name="groupCollection.name"
                     :visibility="groupCollection.visibility"
                     :accepts-contributions="groupCollection.accepts_contributions"
+                    :contributions-members-only="groupCollection.contributions_members_only"
                     kind="group-collections"
                     :can-edit="groupCollection.can.update"
                     name-label="Nom de la collection"
@@ -171,7 +177,12 @@ watch(
                             kind="group-collections"
                             :id="groupCollection.id"
                         />
-                        <ShareButton v-if="groupCollection.can.share" kind="group-collections" :id="groupCollection.id" />
+                        <ShareButton
+                            v-if="groupCollection.can.share"
+                            kind="group-collections"
+                            :id="groupCollection.id"
+                            :purpose="accessPurpose"
+                        />
                         <DeleteButton v-if="groupCollection.can.delete" kind="group-collections" :id="groupCollection.id" />
                     </template>
                 </EditableNameVisibility>
@@ -201,10 +212,11 @@ watch(
             </div>
 
             <AccessManagement
-                v-if="groupCollection.can.manage_access && groupCollection.visibility === 'private'"
+                v-if="groupCollection.can.share"
                 class="mt-8"
                 kind="group-collections"
                 :id="groupCollection.id"
+                :purpose="accessPurpose"
             />
 
             <section class="mt-8" aria-labelledby="collection-groups-title">
@@ -222,6 +234,10 @@ watch(
                     />
                 </div>
 
+                <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500">
+                    Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes.
+                    Demandez-lui son lien de partage pour lui proposer de contribuer.
+                </p>
                 <p v-else class="mt-3 text-sm text-zinc-500">
                     Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.
                 </p>

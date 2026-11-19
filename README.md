@@ -106,6 +106,7 @@ Les colonnes `created_at` et `updated_at` (dates de création et de dernière mo
 | `name`                  | chaîne                | Nom du groupe                                                                    |
 | `visibility`            | chaîne                | `public` (visible par tous les utilisateurs connectés) ou `private` (créateur et membres) ; enum `App\Enums\Visibility` |
 | `accepts_contributions` | booléen (`false`)     | Ouvert aux contributions : ceux qui voient le groupe peuvent y ajouter des mots et modifier les leurs |
+| `contributions_members_only` | booléen (`false`) | Sur un groupe public ouvert aux contributions, seuls les membres (acceptés via le lien de partage) contribuent ; sans effet sur un groupe privé ou fermé |
 | `share_token`           | chaîne(64), nullable, unique | Jeton secret du lien de partage (`/share/groups/{token}`), généré à la demande ; le régénérer invalide l'ancien lien. Jamais renvoyé par l'API en dehors du lien lui-même |
 | `created_by`            | UUID → `users`        | Créateur ; le supprimer supprime le groupe                                       |
 
@@ -126,6 +127,7 @@ Les colonnes `created_at` et `updated_at` (dates de création et de dernière mo
 | `name`                  | chaîne                       | Nom de la collection                                                    |
 | `visibility`            | chaîne                       | `public` ou `private`, comme pour les groupes                           |
 | `accepts_contributions` | booléen (`false`)            | Ouverte aux contributions : ceux qui voient la collection peuvent y ajouter des groupes et retirer ceux qu'ils ont ajoutés |
+| `contributions_members_only` | booléen (`false`)       | Comme pour les groupes : sur une collection publique ouverte, seuls ses membres contribuent |
 | `share_token`           | chaîne(64), nullable, unique | Jeton secret du lien de partage (`/share/collections/{token}`)         |
 | `created_by`            | UUID → `users`               | Créateur ; le supprimer supprime la collection                          |
 
@@ -176,7 +178,7 @@ Supprimer l'utilisateur ou l'élément supprime le favori.
 | `decided_at`                            | date, nullable                             | Date à laquelle le créateur a accepté ou refusé                             |
 | `via_group_collection_id`               | UUID → `group_collections`, nullable       | Groupes uniquement : collection depuis laquelle la demande a été faite (« demander l'accès aux groupes masqués »). Le demandeur ne connaît pas le nom du groupe, qui ne doit pas lui être révélé ; passe à `null` si la collection est supprimée |
 
-**`word_group_members`** et **`group_collection_members`** : les personnes dont la demande a été acceptée (clé primaire composée élément + utilisateur). Un membre voit l'élément privé ; le créateur peut lui retirer l'accès en supprimant la ligne.
+**`word_group_members`** et **`group_collection_members`** : les personnes dont la demande a été acceptée (clé primaire composée élément + utilisateur). Un membre voit l'élément privé, ou contribue à l'élément public réservé à ses membres ; le créateur peut lui retirer l'accès en supprimant la ligne.
 
 | Champ                                   | Type                                       | Description                    |
 | --------------------------------------- | ------------------------------------------ | ------------------------------ |
@@ -217,6 +219,7 @@ Règles d'accès (définies dans `app/Policies`) :
 
 - Seul le créateur peut renommer un groupe ou une collection, changer sa visibilité, ouvrir ou fermer les contributions, et le supprimer.
 - **Contributions** : le créateur gère toujours le contenu. Tant qu'un groupe est ouvert aux contributions, tous ceux qui le voient peuvent y ajouter des mots et modifier ou supprimer les leurs. Tant qu'une collection est ouverte, tous ceux qui la voient peuvent y ajouter des groupes et retirer ceux qu'ils ont ajoutés. Une fois fermé, seul le créateur modifie le contenu ; les contributions déjà faites sont conservées, et rouvrir rend leurs droits aux contributeurs.
+- **Contributions sur autorisation** : un groupe ou une collection public peut être ouvert aux contributions des seules personnes que le créateur autorise. Tout le monde le consulte et peut voter, mais pour contribuer il faut demander l'autorisation via le lien de partage, comme pour un élément privé. Retirer l'autorisation conserve les contributions déjà faites ; rendre l'élément privé fait de ces personnes des membres qui le voient.
 - Ajouter, renommer ou supprimer un mot met à jour la date de modification du groupe ; ajouter ou retirer un groupe met à jour celle de la collection.
 - Un groupe ou une collection privé auquel on n'a pas accès répond « introuvable » (404), pour ne pas révéler son existence.
 - Qui peut ajouter des groupes à une collection peut y ajouter tout groupe qu'il voit : ses propres groupes (même privés) et les groupes publics des autres. On ne peut pas retirer le dernier groupe d'une collection.
@@ -237,14 +240,14 @@ Sur la page d'un groupe ou d'une collection, le bouton « Exporter pour Skribbl.
 
 ### Partage des groupes et collections privés
 
-1. Sur un groupe ou une collection **privé**, le créateur clique sur « Partager » et copie le lien (`/share/…`). Il peut régénérer ce lien : l'ancien ne fonctionne alors plus.
+1. Sur un groupe ou une collection **privé** (ou public avec contributions sur autorisation : le lien sert alors à demander à contribuer), le créateur clique sur « Partager » et copie le lien (`/share/…`). Il peut régénérer ce lien : l'ancien ne fonctionne alors plus.
 2. La personne qui ouvre le lien (après connexion ou inscription) envoie une demande d'accès. Le créateur est prévenu par e-mail.
-3. Le créateur accepte ou refuse la demande depuis la page de l'élément ou son tableau de bord. Le demandeur est prévenu par e-mail. Le créateur peut retirer un accès à tout moment.
+3. Le créateur accepte (après confirmation) ou refuse la demande depuis la page de l'élément ou son tableau de bord. Le demandeur est prévenu par e-mail. Le créateur peut retirer un accès à tout moment.
 
 Règles :
 
 - Une personne autorisée sur un groupe privé peut le voir et y ajouter des mots.
-- Une personne autorisée sur une collection privée voit aussi les groupes privés qu'elle contient, **mais uniquement ceux du créateur de la collection** : partager une collection ne donne jamais accès aux groupes d'autres personnes.
+- Une personne autorisée sur une collection privée voit aussi les groupes privés qu'elle contient, **mais uniquement ceux du créateur de la collection** : partager une collection ne donne jamais accès aux groupes d'autres personnes. Être autorisé à contribuer à une collection publique ne donne pas accès à ses groupes privés.
 - Sur une collection, un bouton permet de demander en une fois l'accès à tous les groupes privés masqués ; leurs noms ne sont pas révélés au demandeur.
 - Les e-mails partent par la file d'attente : lancez `./vendor/bin/sail artisan queue:work` en local.
 

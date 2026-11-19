@@ -2,6 +2,7 @@
 import CardMeta from '@/components/CardMeta.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { WordGroup } from '@/types/models';
 
 const props = defineProps<{
@@ -25,6 +26,7 @@ function updateFavorite(isFavorite: boolean): void {
         :name="wordGroup.name"
         :visibility="wordGroup.visibility"
         :accepts-contributions="wordGroup.accepts_contributions"
+        :contributions-members-only="restrictsContributionsToMembers(wordGroup)"
         :updated-at="wordGroup.updated_at"
         updated-label="Modifié le"
         :is-accessible="wordGroup.is_accessible !== false"

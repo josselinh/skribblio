@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable(['name', 'visibility', 'accepts_contributions'])]
+#[Fillable(['name', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
 class WordGroup extends Model
 {
     /** @use HasFactory<WordGroupFactory> */
@@ -32,6 +32,7 @@ class WordGroup extends Model
      */
     protected $attributes = [
         'accepts_contributions' => false,
+        'contributions_members_only' => false,
     ];
 
     /**
@@ -51,6 +52,7 @@ class WordGroup extends Model
                 'name' => $this->copyName(),
                 'visibility' => Visibility::Private,
                 'accepts_contributions' => false,
+                'contributions_members_only' => false,
             ]);
 
             $now = now();
@@ -107,7 +109,8 @@ class WordGroup extends Model
     }
 
     /**
-     * Users granted access to this private group.
+     * Users granted access to this group: to see it while private, to contribute to it while public and
+     * open to its members only.
      *
      * @return BelongsToMany<User, $this>
      */
@@ -125,14 +128,16 @@ class WordGroup extends Model
     }
 
     /**
-     * A private group is also shared with the members of a collection containing it, when that
+     * A private group is also shared with the members of a private collection containing it, when that
      * collection belongs to the group's creator: sharing a collection never exposes other people's groups.
+     * The members of a public collection (allowed to contribute to it) do not see its private groups.
      */
     protected function isSharedWith(User $user): bool
     {
-        return $this->members()->whereKey($user->getKey())->exists()
+        return $this->isMember($user)
             || $this->groupCollections()
                 ->where('group_collections.created_by', $this->created_by)
+                ->where('group_collections.visibility', Visibility::Private)
                 ->whereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()))
                 ->exists();
     }
@@ -145,6 +150,7 @@ class WordGroup extends Model
         $query->orWhereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()))
             ->orWhereHas('groupCollections', fn (Builder $query) => $query
                 ->whereColumn('group_collections.created_by', 'word_groups.created_by')
+                ->where('group_collections.visibility', Visibility::Private)
                 ->whereHas('members', fn (Builder $query) => $query->whereKey($user->getKey())));
     }
 }

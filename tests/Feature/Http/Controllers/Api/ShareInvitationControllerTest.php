@@ -27,6 +27,7 @@ class ShareInvitationControllerTest extends TestCase
                 'kind' => 'word-groups',
                 'name' => 'Animaux',
                 'creator' => ['name' => 'Alice'],
+                'purpose' => 'access',
                 'status' => 'none',
             ]]);
     }
@@ -108,5 +109,28 @@ class ShareInvitationControllerTest extends TestCase
             ->assertJsonPath('data.status', 'pending');
 
         $this->assertDatabaseHas('group_collection_access_requests', ['user_id' => $requester->id, 'status' => 'pending']);
+    }
+
+    public function test_share_link_of_a_group_open_to_members_only_asks_to_contribute(): void
+    {
+        Notification::fake();
+        $wordGroup = WordGroup::factory()->openToMembersOnly()->create();
+        $token = $wordGroup->ensureShareToken();
+        $requester = User::factory()->create();
+
+        $this->actingAs($requester)->getJson("/api/share/word-groups/{$token}")
+            ->assertJsonPath('data.id', $wordGroup->id)
+            ->assertJsonPath('data.purpose', 'contribution')
+            ->assertJsonPath('data.status', 'none');
+        $this->actingAs($requester)->postJson("/api/share/word-groups/{$token}/access-request")
+            ->assertJsonPath('data.status', 'pending');
+
+        Notification::assertSentTo($wordGroup->creator, AccessRequested::class,
+            fn (AccessRequested $notification): bool => str_contains($notification->toMail($wordGroup->creator)->subject, 'demande à contribuer'));
+
+        $wordGroup->acceptAccessRequest($wordGroup->accessRequests()->sole());
+
+        $this->actingAs($requester)->getJson("/api/share/word-groups/{$token}")->assertJsonPath('data.status', 'accessible');
+        $this->assertTrue($requester->can('addWord', $wordGroup->fresh()));
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 
 /**
- * Tells the requester that the creator accepted or refused their access request. When the request
+ * Tells the requester that the creator accepted or refused their access (or contribution) request. When the request
  * was sent from a collection, the group's name is not disclosed if it was refused.
  *
  * Dropped when the request or the user was deleted (e.g. an account deleted) before it was sent.
@@ -40,6 +40,17 @@ class AccessRequestDecided extends Notification implements ShouldQueue
     {
         $creatorName = $this->accessRequest->item->creator->name;
         $mail = (new MailMessage)->greeting("Bonjour {$notifiable->name},");
+
+        if ($this->accessRequest->isForContribution()) {
+            return $this->accessRequest->isAccepted()
+                ? $mail
+                    ->subject("Vous pouvez contribuer {$this->accessRequest->accessTarget()}")
+                    ->line("{$creatorName} vous autorise à contribuer {$this->accessRequest->accessTarget()}.")
+                    ->action('Ouvrir', url($this->accessRequest->itemPath()))
+                : $mail
+                    ->subject('Demande de contribution refusée')
+                    ->line("{$creatorName} a refusé votre demande de contribution {$this->accessRequest->accessTarget()}.");
+        }
 
         if ($this->accessRequest->isAccepted()) {
             return $mail

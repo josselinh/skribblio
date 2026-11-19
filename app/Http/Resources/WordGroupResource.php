@@ -26,6 +26,7 @@ class WordGroupResource extends JsonResource
             'name' => $this->name,
             'visibility' => $this->visibility->value,
             'accepts_contributions' => $this->accepts_contributions,
+            'contributions_members_only' => $this->contributions_members_only,
             'creator' => $this->whenLoaded('creator', fn (): array => [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,

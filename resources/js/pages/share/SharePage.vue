@@ -6,15 +6,33 @@ import { fetchShareInvitation, requestAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
 import type { FavoriteKind, ShareInvitation } from '@/types/models';
 
-/** Page opened from a share link: request access to a private group or collection. */
+/**
+ * Page opened from a share link: request access to a private group or collection, or ask to contribute
+ * to a public one open to its members only.
+ */
 const route = useRoute();
 const router = useRouter();
 
 const kind = computed<FavoriteKind>(() => (route.params.type === 'collections' ? 'group-collections' : 'word-groups'));
 const token = computed(() => String(route.params.token));
-const itemLabel = computed(() => (kind.value === 'word-groups' ? 'le groupe privé' : 'la collection privée'));
 
 const invitation = ref<ShareInvitation | null>(null);
+const isContribution = computed(() => invitation.value?.purpose === 'contribution');
+const itemLabel = computed(() => {
+    if (kind.value === 'word-groups') {
+        return isContribution.value ? 'le groupe' : 'le groupe privé';
+    }
+
+    return isContribution.value ? 'la collection' : 'la collection privée';
+});
+const itemRoute = computed(() =>
+    invitation.value?.id
+        ? {
+              name: invitation.value.kind === 'word-groups' ? 'word-groups.show' : 'group-collections.show',
+              params: { id: invitation.value.id },
+          }
+        : null,
+);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isRequesting = ref(false);
 const requestFailed = ref(false);
@@ -73,11 +91,16 @@ watch([kind, token], load, { immediate: true });
             <div v-else-if="invitation" class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
                 <p class="text-sm text-zinc-500">{{ invitation.creator.name }} partage {{ itemLabel }}</p>
                 <h1 class="mt-1 text-2xl font-semibold">{{ invitation.name }}</h1>
+                <p v-if="isContribution" class="mt-2 text-sm text-zinc-600">
+                    Tout le monde peut le consulter, mais seules les personnes autorisées par
+                    {{ invitation.creator.name }} peuvent y contribuer.
+                    <RouterLink v-if="itemRoute" :to="itemRoute" class="font-medium underline">Voir le contenu</RouterLink>
+                </p>
 
                 <div class="mt-6">
                     <template v-if="invitation.status === 'pending'">
                         <p role="status" class="rounded-lg bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-                            Demande d'accès envoyée. Vous recevrez un email dès que {{ invitation.creator.name }} l'aura traitée.
+                            {{ isContribution ? 'Demande de contribution envoyée.' : "Demande d'accès envoyée." }} Vous recevrez un email dès que {{ invitation.creator.name }} l'aura traitée.
                         </p>
                     </template>
                     <template v-else-if="invitation.status !== 'accessible'">
@@ -90,7 +113,7 @@ watch([kind, token], load, { immediate: true });
                             class="w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
                             @click="sendRequest"
                         >
-                            Envoyer une demande d'accès
+                            {{ isContribution ? 'Demander à contribuer' : "Envoyer une demande d'accès" }}
                         </button>
                         <p v-if="requestFailed" role="alert" class="mt-2 text-sm text-red-600">
                             Une erreur est survenue, veuillez réessayer.

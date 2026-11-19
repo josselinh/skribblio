@@ -14,6 +14,8 @@ export interface WordGroup {
     visibility: Visibility;
     /** Whether the users who can see it can add words (and manage theirs). */
     accepts_contributions: boolean;
+    /** While public and open: only its members (accepted through the share link) contribute. */
+    contributions_members_only: boolean;
     /** Only present in search results. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
@@ -72,6 +74,8 @@ export interface GroupCollection {
     visibility: Visibility;
     /** Whether the users who can see it can add groups (and remove the ones they added). */
     accepts_contributions: boolean;
+    /** While public and open: only its members (accepted through the share link) contribute. */
+    contributions_members_only: boolean;
     /** Only present in search results. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
@@ -121,10 +125,17 @@ export type FavoriteKind = 'word-groups' | 'group-collections';
 
 export type AccessStatus = 'granted' | 'pending';
 
-/** An access request received by the creator of a private group or collection. */
+/**
+ * What a share link gives: `access` to a private item, `contribution` to a public item open to its
+ * members only.
+ */
+export type AccessPurpose = 'access' | 'contribution';
+
+/** An access (or contribution) request received by the creator of a group or collection. */
 export interface AccessRequest {
     id: string;
     kind: FavoriteKind;
+    purpose: AccessPurpose;
     item: { id: string; name: string };
     requester: Pick<User, 'id' | 'name'>;
     /** Set when the request was sent from a collection containing the group. */
@@ -135,14 +146,16 @@ export interface AccessRequest {
 /** What a user sees when opening a share link. */
 export interface ShareInvitation {
     kind: FavoriteKind;
-    /** Only when the item is accessible. */
+    /** Only when the user can see the item. */
     id?: string;
     name: string;
     creator: { name: string };
+    purpose: AccessPurpose;
+    /** `accessible`: the user already has what the link gives. */
     status: 'accessible' | 'pending' | 'refused' | 'none';
 }
 
-/** Pending requests and members of a private item, for its creator. */
+/** Pending requests and members of a shared item, for its creator. */
 export interface ItemAccess {
     pending_requests: AccessRequest[];
     members: (Pick<User, 'id' | 'name'> & { granted_at: string | null })[];

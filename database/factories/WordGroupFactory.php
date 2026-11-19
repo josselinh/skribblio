@@ -47,6 +47,17 @@ class WordGroupFactory extends Factory
         ]);
     }
 
+    /**
+     * Public and open to contributions from its members only (users accepted through the share link).
+     */
+    public function openToMembersOnly(): static
+    {
+        return $this->public()->state(fn (array $attributes) => [
+            'accepts_contributions' => true,
+            'contributions_members_only' => true,
+        ]);
+    }
+
     public function closedToContributions(): static
     {
         return $this->state(fn (array $attributes) => [

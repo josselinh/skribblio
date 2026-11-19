@@ -16,6 +16,8 @@ defineProps<{
     name: string;
     visibility: Visibility;
     acceptsContributions: boolean;
+    /** Public and open to its members only. */
+    contributionsMembersOnly: boolean;
     updatedAt: string | null;
     updatedLabel: string;
     isAccessible: boolean;
@@ -50,7 +52,7 @@ defineProps<{
             </div>
             <slot name="meta" />
             <div v-if="acceptsContributions && isAccessible">
-                <ContributionsBadge />
+                <ContributionsBadge :members-only="contributionsMembersOnly" />
             </div>
             <p v-if="!isAccessible" class="text-sm text-zinc-600">{{ inaccessibleMessage }}</p>
             <p v-else-if="updatedAt" class="text-sm text-zinc-500">

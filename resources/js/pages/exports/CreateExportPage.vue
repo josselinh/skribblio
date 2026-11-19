@@ -121,7 +121,7 @@ function searchGroupCollections(query: string): Promise<GroupCollection[]> {
     );
 }
 
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false, contributions_members_only: false });
 
 /** Saves the selected groups as a new collection. */
 async function saveAsGroupCollection(): Promise<void> {
@@ -255,8 +255,11 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                         <ContributionsField
                             v-model="form.data.accepts_contributions"
+                            v-model:members-only="form.data.contributions_members_only"
+                            :visibility="form.data.visibility"
                             kind="group-collections"
                             :error="form.errors.value.accepts_contributions"
+                            :members-only-error="form.errors.value.contributions_members_only"
                         />
                         <p v-if="saveError" role="alert" class="text-sm text-red-600">{{ saveError }}</p>
                         <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
