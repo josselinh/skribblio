@@ -14,6 +14,32 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Recherche par nom parmi ses groupes et collections et ceux, publics, des autres utilisateurs
 - Export d'un groupe, d'une collection ou d'une sélection de plusieurs groupes et collections dans un format prêt à coller dans Skribbl.io
 
+## Aperçu
+
+### Tableau de bord
+
+Les favoris, les groupes et collections de l'utilisateur, ceux qui sont partagés avec lui, et un accès direct à la création d'un export.
+
+![Tableau de bord avec les groupes et collections favoris, personnels et partagés](docs/screenshots/dashboard.png)
+
+### Page d'un groupe
+
+Ajout de mots en lot, liste des mots avec leur auteur, et gestion des personnes ayant accès à un groupe privé.
+
+![Page d'un groupe privé avec le formulaire d'ajout de mots et la liste des mots](docs/screenshots/group.png)
+
+### Export pour Skribbl.io
+
+Sur une collection, on choisit les groupes à exporter et on obtient une liste prête à coller dans le champ « Custom words » d'un salon privé, avec les compteurs de mots et de caractères et les options pour retirer les doublons ou mélanger l'ordre.
+
+![Panneau d'export d'une collection avec la liste de mots séparés par des virgules](docs/screenshots/export-collection.png)
+
+### Explorer
+
+Pour découvrir les groupes et collections publics des autres utilisateurs, avec des filtres par type, par auteur et par tri.
+
+![Page Explorer listant les groupes et collections publics](docs/screenshots/explorer.png)
+
 ## Stack technique
 
 - [Laravel](https://laravel.com) 13 (PHP 8.5) : API JSON
