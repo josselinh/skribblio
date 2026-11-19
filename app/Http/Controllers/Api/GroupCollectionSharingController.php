@@ -66,6 +66,14 @@ class GroupCollectionSharingController extends Controller
         return response()->json(['data' => ['requested_count' => $hiddenWordGroups->count()]]);
     }
 
+    /**
+     * The current user, a member, leaves the item.
+     */
+    public function leave(Request $request, GroupCollection $groupCollection): Response
+    {
+        return $this->leaveResponse($groupCollection, $request->user());
+    }
+
     protected function sharePathPrefix(): string
     {
         return '/share/collections';

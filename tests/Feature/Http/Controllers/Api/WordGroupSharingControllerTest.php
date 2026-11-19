@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\WordGroup;
 use App\Models\WordGroupAccessRequest;
@@ -86,5 +87,45 @@ class WordGroupSharingControllerTest extends TestCase
 
         $this->assertFalse($wordGroup->fresh()->isVisibleTo($member));
         $this->assertDatabaseMissing('word_group_access_requests', ['word_group_id' => $wordGroup->id, 'user_id' => $member->id]);
+    }
+
+    public function test_member_leaves_the_group_and_can_ask_again(): void
+    {
+        $member = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup->members()->attach($member);
+        WordGroupAccessRequest::factory()->for($wordGroup, 'item')->by($member)->create(['status' => 'accepted']);
+
+        $this->actingAs($member)->getJson("/api/word-groups/{$wordGroup->id}")->assertJsonPath('data.can.leave', true);
+        $this->actingAs($member)->deleteJson("/api/word-groups/{$wordGroup->id}/membership")->assertNoContent();
+
+        $this->assertFalse($wordGroup->fresh()->isVisibleTo($member));
+        $this->assertSame('none', $wordGroup->fresh()->accessRequestStatusOf($member));
+    }
+
+    public function test_leaving_returns_404_for_private_group_of_another_user(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+
+        $this->actingAs(User::factory()->create())->deleteJson("/api/word-groups/{$wordGroup->id}/membership")->assertNotFound();
+    }
+
+    public function test_leaving_a_private_group_removes_it_from_favorites_unless_still_visible(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $leftGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $stillVisibleGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        GroupCollection::factory()->private()->createdBy($creator)->hasAttached($stillVisibleGroup)->create()->members()->attach($member);
+        foreach ([$leftGroup, $stillVisibleGroup] as $wordGroup) {
+            $wordGroup->members()->attach($member);
+            $member->favoriteWordGroups()->attach($wordGroup);
+        }
+
+        $this->actingAs($member)->deleteJson("/api/word-groups/{$leftGroup->id}/membership")->assertNoContent();
+        $this->actingAs($member)->deleteJson("/api/word-groups/{$stillVisibleGroup->id}/membership")->assertNoContent();
+
+        $this->assertDatabaseMissing('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $leftGroup->id]);
+        $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $stillVisibleGroup->id]);
     }
 }

@@ -108,4 +108,17 @@ class GroupCollectionPolicy
     {
         return $groupCollection->isCreatedBy($user);
     }
+
+    /**
+     * A member (accepted through the share link) can leave the item, giving up the access it gave them. A
+     * private item the user cannot see answers 404.
+     */
+    public function leave(User $user, GroupCollection $groupCollection): Response
+    {
+        if (! $groupCollection->isVisibleTo($user)) {
+            return Response::denyAsNotFound();
+        }
+
+        return $groupCollection->isMember($user) ? Response::allow() : Response::deny('Vous n’êtes pas membre de cette collection.');
+    }
 }

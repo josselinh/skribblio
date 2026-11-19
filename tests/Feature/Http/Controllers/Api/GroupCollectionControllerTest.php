@@ -41,7 +41,7 @@ class GroupCollectionControllerTest extends TestCase
                 'is_favorite' => false,
                 'created_at' => $newerCollection->created_at->toIso8601String(),
                 'updated_at' => $newerCollection->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'add_word_group' => true, 'duplicate' => true],
+                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'leave' => false, 'add_word_group' => true, 'duplicate' => true],
             ]);
     }
 

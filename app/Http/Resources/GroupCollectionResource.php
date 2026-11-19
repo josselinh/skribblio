@@ -45,6 +45,7 @@ class GroupCollectionResource extends JsonResource
                 'delete' => $request->user()->can('delete', $this->resource),
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
+                'leave' => $request->user()->can('leave', $this->resource),
                 'add_word_group' => $request->user()->can('addWordGroup', $this->resource),
                 'duplicate' => $request->user()->can('duplicate', $this->resource),
             ],

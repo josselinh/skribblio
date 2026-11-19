@@ -34,6 +34,8 @@ export interface WordGroup {
         delete: boolean;
         share: boolean;
         manage_access: boolean;
+        /** Whether the user is a member (accepted through the share link) who can give up their access. */
+        leave: boolean;
         add_word: boolean;
         duplicate: boolean;
         /** Only when listed through a collection: whether the user can remove it from that collection. */
@@ -94,6 +96,8 @@ export interface GroupCollection {
         delete: boolean;
         share: boolean;
         manage_access: boolean;
+        /** Whether the user is a member (accepted through the share link) who can give up their access. */
+        leave: boolean;
         add_word_group: boolean;
         duplicate: boolean;
     };

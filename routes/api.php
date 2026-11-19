@@ -34,18 +34,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('group-collections/{group_collection}/favorite', [FavoriteGroupCollectionController::class, 'update'])->name('group-collections.favorite.update');
         Route::delete('group-collections/{group_collection}/favorite', [FavoriteGroupCollectionController::class, 'destroy'])->name('group-collections.favorite.destroy');
 
-        // Sharing, for the creator of a private group or collection.
+        // Sharing, for the creator of a private group or collection; leaving, for its members.
         Route::controller(WordGroupSharingController::class)->prefix('word-groups/{word_group}')->name('word-groups.')->group(function () {
             Route::get('share-link', 'shareLink')->name('share-link.show');
             Route::post('share-link', 'regenerateShareLink')->name('share-link.regenerate');
             Route::get('access', 'access')->name('access.show');
             Route::delete('members/{user}', 'revoke')->name('members.destroy');
+            Route::delete('membership', 'leave')->name('membership.destroy');
         });
         Route::controller(GroupCollectionSharingController::class)->prefix('group-collections/{group_collection}')->name('group-collections.')->group(function () {
             Route::get('share-link', 'shareLink')->name('share-link.show');
             Route::post('share-link', 'regenerateShareLink')->name('share-link.regenerate');
             Route::get('access', 'access')->name('access.show');
             Route::delete('members/{user}', 'revoke')->name('members.destroy');
+            Route::delete('membership', 'leave')->name('membership.destroy');
             Route::post('hidden-word-groups/access-requests', 'requestHiddenWordGroups')->name('hidden-word-groups.access-requests.store');
         });
 

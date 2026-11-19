@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Policies;
 
+use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -92,5 +93,23 @@ class WordGroupPolicyTest extends TestCase
         $this->assertTrue(User::factory()->create()->can('addWord', $openToEveryone));
         $this->assertFalse($creator->can('share', $openToEveryone));
         $this->assertFalse($creator->can('share', $closed));
+    }
+
+    public function test_only_direct_members_can_leave_a_group(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $collectionMember = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup->members()->attach($member);
+        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->create();
+        $groupCollection->wordGroups()->attach($wordGroup);
+        $groupCollection->members()->attach($collectionMember);
+
+        $this->assertTrue($member->can('leave', $wordGroup));
+        $this->assertFalse($creator->can('leave', $wordGroup));
+        $this->assertTrue($collectionMember->can('view', $wordGroup));
+        $this->assertFalse($collectionMember->can('leave', $wordGroup));
+        $this->assertFalse(User::factory()->create()->can('leave', WordGroup::factory()->public()->create()));
     }
 }
