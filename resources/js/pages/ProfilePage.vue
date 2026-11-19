@@ -72,7 +72,7 @@ async function deleteAccount(): Promise<void> {
 }
 
 const buttonClass =
-    'rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60';
+    'rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60';
 </script>
 
 <template>
@@ -80,7 +80,7 @@ const buttonClass =
         <div class="mx-auto max-w-lg">
             <h1 class="text-2xl font-semibold">Mon profil</h1>
 
-            <section class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm" aria-labelledby="profile-title">
+            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="profile-title">
                 <h2 id="profile-title" class="text-lg font-semibold">Informations</h2>
                 <StatusMessage class="mt-4" :message="profileStatus" />
                 <form class="mt-4 space-y-4" novalidate @submit.prevent="saveProfile">
@@ -102,7 +102,7 @@ const buttonClass =
                             :error="profileForm.errors.value.email"
                             required
                         />
-                        <p class="mt-1 text-sm text-zinc-500">
+                        <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                             Si vous la modifiez, vous devrez confirmer la nouvelle adresse avant de continuer.
                         </p>
                     </div>
@@ -112,7 +112,7 @@ const buttonClass =
                 </form>
             </section>
 
-            <section class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm" aria-labelledby="password-title">
+            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="password-title">
                 <h2 id="password-title" class="text-lg font-semibold">Mot de passe</h2>
                 <StatusMessage class="mt-4" :message="passwordStatus" />
                 <form class="mt-4 space-y-4" novalidate @submit.prevent="savePassword">
@@ -151,16 +151,16 @@ const buttonClass =
                 </form>
             </section>
 
-            <section class="mt-6 rounded-xl border border-red-200 bg-white p-6 shadow-sm" aria-labelledby="delete-account-title">
+            <section class="mt-6 rounded-xl border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="delete-account-title">
                 <h2 id="delete-account-title" class="text-lg font-semibold">Supprimer mon compte</h2>
-                <p class="mt-2 text-sm text-zinc-600">
+                <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     Vos groupes, leurs mots, vos collections et vos favoris seront supprimés définitivement. Les mots que vous avez
                     ajoutés aux groupes d’autres personnes y resteront, sans votre nom.
                 </p>
                 <div class="mt-4 flex justify-end">
                     <button
                         type="button"
-                        class="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                        class="rounded-lg border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
                         @click="askDeletionConfirmation"
                     >
                         Supprimer mon compte
@@ -190,13 +190,13 @@ const buttonClass =
                     required
                 />
             </form>
-            <p v-if="deletionError" role="alert" class="mt-3 text-red-600">{{ deletionError }}</p>
+            <p v-if="deletionError" role="alert" class="mt-3 text-red-600 dark:text-red-400">{{ deletionError }}</p>
 
             <template #actions>
                 <button
                     type="button"
                     :disabled="deletionForm.isProcessing.value"
-                    class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60 sm:w-auto sm:py-2"
+                    class="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60 sm:w-auto sm:py-2"
                     @click="isConfirmingDeletion = false"
                 >
                     Annuler

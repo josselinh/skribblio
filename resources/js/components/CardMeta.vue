@@ -18,7 +18,7 @@ const countLabel = computed(() =>
 
 <template>
     <!-- Above the card's stretched link so that the creator's name stays clickable. -->
-    <p v-if="creator || countLabel" class="relative z-10 text-sm text-zinc-600">
+    <p v-if="creator || countLabel" class="relative z-10 text-sm text-zinc-600 dark:text-zinc-400">
         <template v-if="creator">par <UserLink :user="creator" self-label="vous" /></template>
         <template v-if="creator && countLabel"> · </template>
         <template v-if="countLabel">{{ countLabel }}</template>

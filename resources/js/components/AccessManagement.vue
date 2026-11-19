@@ -79,7 +79,7 @@ watch(() => props.id, load, { immediate: true });
 
 <template>
     <section class="space-y-6" aria-label="Accès">
-        <p v-if="hasFailed" class="text-sm text-red-600">
+        <p v-if="hasFailed" class="text-sm text-red-600 dark:text-red-400">
             Impossible de charger les accès.
             <button type="button" class="underline" @click="load">Réessayer</button>
         </p>
@@ -88,9 +88,9 @@ watch(() => props.id, load, { immediate: true });
             <div v-if="access.pending_requests.length > 0">
                 <h2 class="text-lg font-semibold">
                     {{ purpose === 'contribution' ? 'Demandes de contribution' : "Demandes d'accès" }}
-                    <span class="font-normal text-zinc-500">({{ access.pending_requests.length }})</span>
+                    <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ access.pending_requests.length }})</span>
                 </h2>
-                <ul class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
+                <ul class="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
                     <AccessRequestItem
                         v-for="accessRequest in access.pending_requests"
                         :key="accessRequest.id"
@@ -103,22 +103,22 @@ watch(() => props.id, load, { immediate: true });
             <div>
                 <h2 class="text-lg font-semibold">
                     {{ purpose === 'contribution' ? 'Personnes autorisées à contribuer' : 'Personnes ayant accès' }}
-                    <span class="font-normal text-zinc-500">({{ access.members.length }})</span>
+                    <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ access.members.length }})</span>
                 </h2>
-                <p v-if="access.members.length === 0" class="mt-2 text-sm text-zinc-500">
+                <p v-if="access.members.length === 0" class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
                     Personne d'autre que vous pour l'instant. Envoyez le lien d'invitation pour recevoir des demandes.
                 </p>
-                <ul v-else class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
+                <ul v-else class="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
                     <li v-for="member in access.members" :key="member.id" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                         <div>
                             <p class="font-medium">{{ member.name }}</p>
-                            <p v-if="member.granted_at" class="text-zinc-500">
+                            <p v-if="member.granted_at" class="text-zinc-500 dark:text-zinc-400">
                                 Depuis le <time :datetime="member.granted_at">{{ formatDateTime(member.granted_at) }}</time>
                             </p>
                         </div>
                         <button
                             type="button"
-                            class="text-red-600 hover:text-red-800"
+                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                             aria-haspopup="dialog"
                             @click="confirmRevocation(member)"
                         >

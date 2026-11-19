@@ -76,46 +76,46 @@ watch([kind, token], load, { immediate: true });
 <template>
     <AppLayout>
         <div class="mx-auto max-w-lg">
-            <p v-if="status === 'loading'" class="text-zinc-500">Chargement…</p>
+            <p v-if="status === 'loading'" class="text-zinc-500 dark:text-zinc-400">Chargement…</p>
 
-            <div v-else-if="status === 'not-found'" class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div v-else-if="status === 'not-found'" class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
                 <h1 class="text-xl font-semibold">Lien invalide</h1>
-                <p class="mt-2 text-zinc-500">Ce lien de partage n'existe pas ou n'est plus valable. Demandez-en un nouveau.</p>
+                <p class="mt-2 text-zinc-500 dark:text-zinc-400">Ce lien de partage n'existe pas ou n'est plus valable. Demandez-en un nouveau.</p>
             </div>
 
-            <p v-else-if="status === 'failed'" class="text-red-600">
+            <p v-else-if="status === 'failed'" class="text-red-600 dark:text-red-400">
                 Impossible de charger le partage.
                 <button type="button" class="underline" @click="load">Réessayer</button>
             </p>
 
-            <div v-else-if="invitation" class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-                <p class="text-sm text-zinc-500">{{ invitation.creator.name }} partage {{ itemLabel }}</p>
+            <div v-else-if="invitation" class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ invitation.creator.name }} partage {{ itemLabel }}</p>
                 <h1 class="mt-1 text-2xl font-semibold">{{ invitation.name }}</h1>
-                <p v-if="isContribution" class="mt-2 text-sm text-zinc-600">
+                <p v-if="isContribution" class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     Tout le monde peut le consulter, mais seules les personnes autorisées par
                     {{ invitation.creator.name }} peuvent y contribuer.
-                    <RouterLink v-if="itemRoute" :to="itemRoute" class="font-medium underline">Voir le contenu</RouterLink>
+                    <RouterLink v-if="itemRoute" :to="itemRoute" class="font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">Voir le contenu</RouterLink>
                 </p>
 
                 <div class="mt-6">
                     <template v-if="invitation.status === 'pending'">
-                        <p role="status" class="rounded-lg bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                        <p role="status" class="rounded-lg bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300">
                             {{ isContribution ? 'Demande de contribution envoyée.' : "Demande d'accès envoyée." }} Vous recevrez un email dès que {{ invitation.creator.name }} l'aura traitée.
                         </p>
                     </template>
                     <template v-else-if="invitation.status !== 'accessible'">
-                        <p v-if="invitation.status === 'refused'" class="mb-4 text-sm text-zinc-600">
+                        <p v-if="invitation.status === 'refused'" class="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
                             Votre précédente demande a été refusée. Vous pouvez en envoyer une nouvelle.
                         </p>
                         <button
                             type="button"
                             :disabled="isRequesting"
-                            class="w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                            class="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                             @click="sendRequest"
                         >
                             {{ isContribution ? 'Demander à contribuer' : "Envoyer une demande d'accès" }}
                         </button>
-                        <p v-if="requestFailed" role="alert" class="mt-2 text-sm text-red-600">
+                        <p v-if="requestFailed" role="alert" class="mt-2 text-sm text-red-600 dark:text-red-400">
                             Une erreur est survenue, veuillez réessayer.
                         </p>
                     </template>

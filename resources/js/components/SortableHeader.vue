@@ -38,8 +38,8 @@ function onClick(): void {
     >
         <button
             type="button"
-            class="inline-flex items-center gap-1 tracking-wide uppercase hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-zinc-900"
-            :class="{ 'text-zinc-900': isActive }"
+            class="inline-flex items-center gap-1 tracking-wide uppercase hover:text-brand-700 dark:hover:text-brand-300 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+            :class="{ 'text-brand-700 dark:text-brand-300': isActive }"
             @click="onClick"
         >
             {{ label }}

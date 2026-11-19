@@ -10,7 +10,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts'])
     </head>
-    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased">
+    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
         <div id="app"></div>
     </body>
 </html>

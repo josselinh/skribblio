@@ -136,14 +136,14 @@ watch(
     <AppLayout>
         <StatusMessage :message="flashStatus" />
 
-        <p v-if="status === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
+        <p v-if="status === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
 
         <div v-else-if="status === 'not-found'" class="mt-4">
             <h1 class="text-2xl font-semibold">Collection introuvable</h1>
-            <p class="mt-2 text-zinc-500">Cette collection n'existe pas ou vous n'y avez pas accès.</p>
+            <p class="mt-2 text-zinc-500 dark:text-zinc-400">Cette collection n'existe pas ou vous n'y avez pas accès.</p>
         </div>
 
-        <p v-else-if="status === 'failed'" class="mt-4 text-red-600">
+        <p v-else-if="status === 'failed'" class="mt-4 text-red-600 dark:text-red-400">
             Impossible de charger la collection.
             <button type="button" class="underline" @click="loadGroupCollection">Réessayer</button>
         </p>
@@ -191,20 +191,20 @@ watch(
             <div
                 v-if="hiddenGroupsMessage"
                 role="note"
-                class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+                class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
             >
                 <p>{{ hiddenGroupsMessage }}</p>
                 <button
                     v-if="canRequestHiddenGroups"
                     type="button"
                     :disabled="isRequestingHiddenGroups"
-                    class="rounded-lg border border-amber-300 bg-white px-3 py-1.5 font-medium hover:bg-amber-100 disabled:opacity-60"
+                    class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-60"
                     @click="requestHiddenGroups"
                 >
                     Demander l'accès aux groupes privés
                 </button>
                 <p v-else class="font-medium">Demande d'accès envoyée.</p>
-                <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600">
+                <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600 dark:text-red-400">
                     Une erreur est survenue, veuillez réessayer.
                 </p>
             </div>
@@ -219,7 +219,7 @@ watch(
 
             <section class="mt-8" aria-labelledby="collection-groups-title">
                 <h2 id="collection-groups-title" class="text-lg font-semibold">
-                    Groupes <span class="font-normal text-zinc-500">({{ totalWordGroupsCount }})</span>
+                    Groupes <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ totalWordGroupsCount }})</span>
                 </h2>
 
                 <div v-if="groupCollection.can.add_word_group" class="mt-3">
@@ -232,19 +232,19 @@ watch(
                     />
                 </div>
 
-                <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500">
+                <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                     Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes.
                     Demandez-lui son lien de partage pour lui proposer de contribuer.
                 </p>
-                <p v-else class="mt-3 text-sm text-zinc-500">
+                <p v-else class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                     Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.
                 </p>
 
-                <p v-if="groupsError" role="alert" class="mt-3 text-sm text-red-600">{{ groupsError }}</p>
+                <p v-if="groupsError" role="alert" class="mt-3 text-sm text-red-600 dark:text-red-400">{{ groupsError }}</p>
 
                 <p
                     v-if="groupCollection.word_groups.length === 0"
-                    class="mt-4 rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500"
+                    class="mt-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400"
                 >
                     {{
                         totalWordGroupsCount === 0
@@ -263,7 +263,7 @@ watch(
                         <button
                             v-if="wordGroup.can.remove_from_collection"
                             type="button"
-                            class="absolute right-3 bottom-3 rounded-md px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-500"
+                            class="absolute right-3 bottom-3 rounded-md px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-500 dark:disabled:hover:text-zinc-400"
                             :disabled="isUpdatingGroups || totalWordGroupsCount === 1"
                             :title="totalWordGroupsCount === 1 ? 'Une collection doit contenir au moins un groupe.' : undefined"
                             :aria-label="`Retirer ${wordGroup.name} de la collection`"

@@ -42,30 +42,30 @@ const choices = computed(() => [
 <template>
     <div>
         <label
-            class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-white p-3 has-checked:border-zinc-900 has-checked:bg-zinc-50"
+            class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
         >
             <input v-model="model" type="checkbox" class="mt-1" />
             <span>
                 <span class="block text-sm font-medium">Ouvert aux contributions</span>
-                <span class="block text-sm text-zinc-500">{{ description }}</span>
+                <span class="block text-sm text-zinc-500 dark:text-zinc-400">{{ description }}</span>
             </span>
         </label>
-        <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
 
         <fieldset v-if="model && visibility === 'public'" class="mt-2 space-y-2 pl-6">
             <legend class="mb-2 text-sm font-medium">Qui peut contribuer ?</legend>
             <label
                 v-for="choice in choices"
                 :key="String(choice.value)"
-                class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-white p-3 has-checked:border-zinc-900 has-checked:bg-zinc-50"
+                class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
             >
                 <input v-model="membersOnly" type="radio" :value="choice.value" class="mt-1" />
                 <span>
                     <span class="block text-sm font-medium">{{ choice.label }}</span>
-                    <span class="block text-sm text-zinc-500">{{ choice.description }}</span>
+                    <span class="block text-sm text-zinc-500 dark:text-zinc-400">{{ choice.description }}</span>
                 </span>
             </label>
-            <p v-if="membersOnlyError" class="text-sm text-red-600">{{ membersOnlyError }}</p>
+            <p v-if="membersOnlyError" class="text-sm text-red-600 dark:text-red-400">{{ membersOnlyError }}</p>
         </fieldset>
     </div>
 </template>

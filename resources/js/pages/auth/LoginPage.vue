@@ -62,10 +62,10 @@ async function submit(): Promise<void> {
             />
             <div class="flex items-center justify-between text-sm">
                 <label class="flex items-center gap-2">
-                    <input v-model="form.data.remember" type="checkbox" class="rounded border-zinc-300" />
+                    <input v-model="form.data.remember" type="checkbox" class="rounded border-zinc-300 dark:border-zinc-700" />
                     Se souvenir de moi
                 </label>
-                <RouterLink :to="{ name: 'forgot-password' }" class="text-zinc-600 underline hover:text-zinc-900">
+                <RouterLink :to="{ name: 'forgot-password' }" class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100">
                     Mot de passe oublié ?
                 </RouterLink>
             </div>
@@ -74,7 +74,7 @@ async function submit(): Promise<void> {
 
         <template #footer>
             Pas encore de compte ?
-            <RouterLink :to="{ name: 'register' }" class="font-medium text-zinc-900 underline">Créer un compte</RouterLink>
+            <RouterLink :to="{ name: 'register' }" class="font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">Créer un compte</RouterLink>
         </template>
     </AuthCard>
 </template>

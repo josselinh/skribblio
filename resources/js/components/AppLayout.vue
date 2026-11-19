@@ -11,7 +11,7 @@ const searchQuery = ref('');
 
 /** Navigation link style, darker for the current page's section. */
 const navLinkClass = (routeName: string) =>
-    route.name === routeName ? 'text-sm font-medium text-zinc-900' : 'text-sm text-zinc-600 hover:text-zinc-900';
+    route.name === routeName ? 'text-sm font-medium text-brand-700 dark:text-brand-300' : 'text-sm text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300';
 
 async function search(): Promise<void> {
     await router.push({ name: 'search', query: { q: searchQuery.value.trim() || undefined } });
@@ -21,10 +21,10 @@ async function search(): Promise<void> {
 
 <template>
     <div class="flex min-h-screen flex-col">
-        <header class="border-b border-zinc-200 bg-white">
+        <header class="border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" aria-label="Navigation principale">
-                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight">Skribblio Tools</RouterLink>
+                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">Skribblio Tools</RouterLink>
                     <RouterLink :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">Tableau de bord</RouterLink>
                     <RouterLink :to="{ name: 'search' }" :class="navLinkClass('search')">Explorer</RouterLink>
                 </nav>
@@ -41,7 +41,7 @@ async function search(): Promise<void> {
                         v-model="searchQuery"
                         type="search"
                         placeholder="Rechercher un groupe ou une collection…"
-                        class="block w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-none"
+                        class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                     />
                 </form>
                 <UserMenu />

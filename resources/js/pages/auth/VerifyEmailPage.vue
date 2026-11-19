@@ -37,7 +37,7 @@ async function logout(): Promise<void> {
         <PrimaryButton type="button" :is-loading="isSending" @click="resend">Renvoyer le lien</PrimaryButton>
 
         <template #footer>
-            <button type="button" class="underline hover:text-zinc-900" @click="logout">Se déconnecter</button>
+            <button type="button" class="underline hover:text-zinc-900 dark:hover:text-zinc-100" @click="logout">Se déconnecter</button>
         </template>
     </AuthCard>
 </template>

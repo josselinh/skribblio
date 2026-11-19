@@ -79,40 +79,40 @@ async function confirmDelete(): Promise<void> {
                     :maxlength="SKRIBBL_MAX_WORD_LENGTH"
                     autocomplete="off"
                     :aria-invalid="form.errors.value.name ? true : undefined"
-                    class="block w-full min-w-32 rounded-md border border-zinc-300 px-2 py-1 text-sm focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none aria-invalid:border-red-500"
+                    class="block w-full min-w-32 rounded-md border border-zinc-300 dark:border-zinc-700 px-2 py-1 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none aria-invalid:border-red-500"
                 />
-                <p v-if="form.errors.value.name" class="mt-1 text-xs font-normal text-red-600">{{ form.errors.value.name }}</p>
+                <p v-if="form.errors.value.name" class="mt-1 text-xs font-normal text-red-600 dark:text-red-400">{{ form.errors.value.name }}</p>
             </form>
             <template v-else>{{ word.name }}</template>
         </td>
         <td v-if="showVotes" class="px-4 py-2">
             <WordVoteButtons :word="word" @updated="emit('updated', $event)" />
         </td>
-        <td class="px-4 py-2.5 text-zinc-600">
+        <td class="px-4 py-2.5 text-zinc-600 dark:text-zinc-400">
             <UserLink v-if="word.creator" :user="word.creator" />
-            <span v-else class="text-zinc-400 italic">Compte supprimé</span>
+            <span v-else class="text-zinc-400 dark:text-zinc-500 italic">Compte supprimé</span>
         </td>
-        <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600">
+        <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
             <time v-if="word.created_at" :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
         </td>
-        <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600">
+        <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
             <time v-if="word.updated_at" :datetime="word.updated_at">{{ formatDateTime(word.updated_at) }}</time>
         </td>
         <td class="px-4 py-2.5 text-right whitespace-nowrap">
             <div v-if="mode === 'edit'" class="flex justify-end gap-3">
-                <button type="button" class="text-zinc-500 hover:text-zinc-900" @click="mode = 'view'">Annuler</button>
-                <button type="button" :disabled="form.isProcessing.value" class="font-medium hover:underline" @click="save">
+                <button type="button" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100" @click="mode = 'view'">Annuler</button>
+                <button type="button" :disabled="form.isProcessing.value" class="font-medium text-brand-700 dark:text-brand-300 hover:underline" @click="save">
                     Enregistrer
                 </button>
             </div>
             <div v-else class="flex justify-end gap-3">
-                <button v-if="word.can.update" type="button" class="text-zinc-600 hover:text-zinc-900" @click="startEditing">
+                <button v-if="word.can.update" type="button" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100" @click="startEditing">
                     Modifier
                 </button>
                 <button
                     v-if="word.can.delete"
                     type="button"
-                    class="text-red-600 hover:text-red-800"
+                    class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                     @click="askDeleteConfirmation"
                 >
                     Supprimer

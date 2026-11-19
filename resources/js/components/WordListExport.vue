@@ -72,33 +72,33 @@ async function copy(): Promise<void> {
     }
 }
 
-const checkboxClass = 'size-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900';
+const checkboxClass = 'size-4 rounded border-zinc-300 dark:border-zinc-700';
 const secondaryButtonClass =
-    'rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-60';
+    'rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60';
 </script>
 
 <template>
     <div>
         <label for="export-list" class="block text-sm font-medium">Mots personnalisés</label>
-        <p class="text-sm text-zinc-500">
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">
             Copiez cette liste dans le champ « Custom words » d'un salon privé Skribbl.io.
         </p>
-        <p v-if="note" class="mt-1 text-sm text-amber-700">{{ note }}</p>
+        <p v-if="note" class="mt-1 text-sm text-amber-700 dark:text-amber-400">{{ note }}</p>
 
         <textarea
             id="export-list"
             readonly
             rows="6"
             :value="exportedList"
-            class="mt-2 block w-full rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 font-mono text-sm"
+            class="mt-2 block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 font-mono text-sm"
             :class="{ 'opacity-60': isLoading }"
             @focus="($event.target as HTMLTextAreaElement).select()"
         ></textarea>
 
         <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
-            <p class="text-sm text-zinc-500">
+            <p class="text-sm text-zinc-500 dark:text-zinc-400">
                 {{ numberFormat.format(exportedWords.length) }} mot{{ exportedWords.length > 1 ? 's' : '' }} ·
-                <span :class="{ 'font-medium text-red-600': isOverCharacterLimit }">
+                <span :class="{ 'font-medium text-red-600 dark:text-red-400': isOverCharacterLimit }">
                     {{ numberFormat.format(exportedList.length) }} / {{ numberFormat.format(SKRIBBL_MAX_CHARACTERS) }}
                     caractères
                 </span>
@@ -106,22 +106,22 @@ const secondaryButtonClass =
             <button
                 type="button"
                 :disabled="isLoading"
-                class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                 @click="copy"
             >
                 Copier
             </button>
         </div>
-        <p v-if="copyStatus" role="status" class="mt-2 text-sm text-green-700">{{ copyStatus }}</p>
+        <p v-if="copyStatus" role="status" class="mt-2 text-sm text-green-700 dark:text-green-400">{{ copyStatus }}</p>
 
-        <div v-if="hasTooFewWords" role="note" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <div v-if="hasTooFewWords" role="note" class="mt-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
             Skribbl.io demande au moins {{ SKRIBBL_MIN_WORDS }} mots personnalisés.
         </div>
 
         <div
             v-if="isOverCharacterLimit"
             role="note"
-            class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+            class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
         >
             <p>
                 La liste dépasse la limite de {{ numberFormat.format(SKRIBBL_MAX_CHARACTERS) }} caractères de
@@ -129,7 +129,7 @@ const secondaryButtonClass =
             </p>
             <button
                 type="button"
-                class="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-amber-100"
+                class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40"
                 @click="draw"
             >
                 Tirer au hasard une sélection qui tient dans la limite
@@ -138,7 +138,7 @@ const secondaryButtonClass =
 
         <div
             v-if="drawnWords"
-            class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm"
+            class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm"
         >
             <p>
                 Sélection aléatoire de {{ numberFormat.format(drawnWords.length) }} mots sur
@@ -157,7 +157,7 @@ const secondaryButtonClass =
             <label class="inline-flex items-center gap-2">
                 <input v-model="shouldDeduplicate" type="checkbox" :class="checkboxClass" />
                 Retirer les doublons
-                <span v-if="duplicatesCount > 0" class="text-zinc-500">({{ duplicatesCount }})</span>
+                <span v-if="duplicatesCount > 0" class="text-zinc-500 dark:text-zinc-400">({{ duplicatesCount }})</span>
             </label>
             <label class="inline-flex items-center gap-2" :class="{ 'opacity-60': drawnWords }">
                 <input v-model="shouldShuffle" type="checkbox" :class="checkboxClass" :disabled="drawnWords !== null" />
@@ -166,7 +166,7 @@ const secondaryButtonClass =
             <button
                 v-if="shouldShuffle && !drawnWords"
                 type="button"
-                class="text-zinc-600 underline hover:text-zinc-900"
+                class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100"
                 @click="reshuffle"
             >
                 Remélanger
