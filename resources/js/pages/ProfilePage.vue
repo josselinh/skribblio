@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import AppLayout from '@/components/AppLayout.vue';
 import FormField from '@/components/FormField.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
@@ -78,10 +78,7 @@ const buttonClass =
 <template>
     <AppLayout>
         <div class="mx-auto max-w-lg">
-            <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-                ← Retour au tableau de bord
-            </RouterLink>
-            <h1 class="mt-2 text-2xl font-semibold">Mon profil</h1>
+            <h1 class="text-2xl font-semibold">Mon profil</h1>
 
             <section class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm" aria-labelledby="profile-title">
                 <h2 id="profile-title" class="text-lg font-semibold">Informations</h2>

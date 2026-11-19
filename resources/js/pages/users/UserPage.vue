@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { fetchUser, fetchUserGroupCollections, fetchUserWordGroups } from '@/api/users';
 import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
@@ -40,10 +40,6 @@ watch(userId, loadUser, { immediate: true });
 
 <template>
     <AppLayout>
-        <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-            ← Retour au tableau de bord
-        </RouterLink>
-
         <p v-if="status === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
 
         <div v-else-if="status === 'not-found'" class="mt-4">

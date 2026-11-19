@@ -120,10 +120,6 @@ watch([kind, token], load, { immediate: true });
                         </p>
                     </template>
                 </div>
-
-                <RouterLink :to="{ name: 'dashboard' }" class="mt-6 inline-block text-sm text-zinc-500 hover:text-zinc-900">
-                    ← Retour au tableau de bord
-                </RouterLink>
             </div>
         </div>
     </AppLayout>

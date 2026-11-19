@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
@@ -134,10 +134,7 @@ watch(
 
 <template>
     <AppLayout>
-        <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-            ← Retour au tableau de bord
-        </RouterLink>
-        <StatusMessage class="mt-4" :message="flashStatus" />
+        <StatusMessage :message="flashStatus" />
 
         <p v-if="status === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
 

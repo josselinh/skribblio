@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { RouterLink, useRoute, useRouter, type LocationQueryRaw } from 'vue-router';
+import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router';
 import { fetchGroupCollectionSearchResults, fetchWordGroupSearchResults } from '@/api/search';
 import AppLayout from '@/components/AppLayout.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
@@ -131,11 +131,7 @@ const pillClass = (isActive: boolean) =>
 
 <template>
     <AppLayout>
-        <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-            ← Retour au tableau de bord
-        </RouterLink>
-
-        <h1 class="mt-2 text-2xl font-semibold">
+        <h1 class="text-2xl font-semibold">
             <template v-if="q">Résultats pour « {{ q }} »</template>
             <template v-else>Explorer</template>
         </h1>
