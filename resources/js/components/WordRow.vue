@@ -3,6 +3,7 @@ import { nextTick, ref, useTemplateRef } from 'vue';
 import { deleteWord, updateWord } from '@/api/words';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserLink from '@/components/UserLink.vue';
+import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import { useForm } from '@/composables/useForm';
 import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
 import { formatDateTime } from '@/lib/format';
@@ -10,6 +11,8 @@ import type { Word } from '@/types/models';
 
 const props = defineProps<{
     word: Word;
+    /** Shows the votes column. */
+    showVotes: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -81,6 +84,9 @@ async function confirmDelete(): Promise<void> {
                 <p v-if="form.errors.value.name" class="mt-1 text-xs font-normal text-red-600">{{ form.errors.value.name }}</p>
             </form>
             <template v-else>{{ word.name }}</template>
+        </td>
+        <td v-if="showVotes" class="px-4 py-2">
+            <WordVoteButtons :word="word" @updated="emit('updated', $event)" />
         </td>
         <td class="px-4 py-2.5 text-zinc-600">
             <UserLink v-if="word.creator" :user="word.creator" />

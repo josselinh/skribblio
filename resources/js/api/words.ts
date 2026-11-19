@@ -1,15 +1,20 @@
 import { http } from '@/lib/http';
-import type { CreateWordsResponse, PaginatedResponse, ResourceResponse } from '@/types/api';
-import type { Word } from '@/types/models';
+import type { CreateWordsResponse, ResourceResponse, WordsResponse } from '@/types/api';
+import type { SortDirection, Word, WordSort, WordVote } from '@/types/models';
 
 export interface WordPayload {
     name: string;
 }
 
-/** Words of a group, most recently added first. */
-export async function fetchWords(wordGroupId: string, page = 1): Promise<PaginatedResponse<Word>> {
-    const { data } = await http.get<PaginatedResponse<Word>>(`/api/word-groups/${wordGroupId}/words`, {
-        params: { page },
+export interface WordOrder {
+    sort: WordSort;
+    direction: SortDirection;
+}
+
+/** Words of a group with their votes, in the given order (most recently added first by default). */
+export async function fetchWords(wordGroupId: string, page = 1, order?: WordOrder): Promise<WordsResponse> {
+    const { data } = await http.get<WordsResponse>(`/api/word-groups/${wordGroupId}/words`, {
+        params: { page, ...order },
     });
 
     return data;
@@ -33,4 +38,14 @@ export async function updateWord(id: string, payload: WordPayload): Promise<Word
 
 export async function deleteWord(id: string): Promise<void> {
     await http.delete(`/api/words/${id}`);
+}
+
+/** Records the current user's vote (null removes it) and returns the word with its updated counts. */
+export async function voteForWord(id: string, vote: WordVote | null): Promise<Word> {
+    const { data } =
+        vote === null
+            ? await http.delete<ResourceResponse<Word>>(`/api/words/${id}/vote`)
+            : await http.put<ResourceResponse<Word>>(`/api/words/${id}/vote`, { vote });
+
+    return data.data;
 }

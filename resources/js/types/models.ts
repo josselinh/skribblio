@@ -44,14 +44,27 @@ export interface Word {
     name: string;
     /** Null once the author deleted their account. */
     creator: Pick<User, 'id' | 'name'> | null;
+    upvotes_count: number;
+    downvotes_count: number;
+    /** The current user's vote, null when they did not vote. */
+    my_vote: WordVote | null;
     created_at: string | null;
     updated_at: string | null;
     /** Actions the current user may perform on the word. */
     can: {
         update: boolean;
         delete: boolean;
+        /** Open group, visible to the user, and the word is not theirs. */
+        vote: boolean;
     };
 }
+
+export type WordVote = 'up' | 'down';
+
+/** Column by which the words of a group are listed (`App\Enums\WordSort`). */
+export type WordSort = 'name' | 'author' | 'created' | 'updated' | 'score';
+
+export type SortDirection = 'asc' | 'desc';
 
 export interface GroupCollection {
     id: string;

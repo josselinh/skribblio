@@ -149,6 +149,18 @@ La règle « une collection contient au moins un groupe » est appliquée par l'
 | `word_group_id` / `group_collection_id`  | UUID → `word_groups` / `group_collections` | Élément mis en favori                             |
 | `created_at`                             | date                                       | Date de mise en favori (tri des listes de favoris) |
 
+#### Votes
+
+**`word_votes`** : les pouces 👍 / 👎 donnés aux mots d'un groupe ouvert aux contributions, avec une clé primaire composée (un vote par mot et par utilisateur). Ils servent d'indicateur aux contributeurs et n'ont pas d'effet sur l'export.
+
+| Champ        | Type           | Description                                   |
+| ------------ | -------------- | --------------------------------------------- |
+| `word_id`    | UUID → `words` | Mot noté (supprimé avec le mot)               |
+| `user_id`    | UUID → `users` | Votant (supprimé avec son compte)             |
+| `value`      | entier         | `1` pour 👍, `-1` pour 👎 (le score est la somme) |
+| `created_at` | date           | Date du vote                                  |
+| `updated_at` | date           | Date du dernier changement de vote            |
+
 Supprimer l'utilisateur ou l'élément supprime le favori.
 
 #### Partage des éléments privés
@@ -194,6 +206,7 @@ User n ──── n WordGroup              favoris : favorite_word_groups
 User n ──── n GroupCollection        favoris : favorite_group_collections
 User n ──── n WordGroup              membres : word_group_members
 User n ──── n GroupCollection        membres : group_collection_members
+User n ──── n Word                   votes : word_votes
 ```
 
 - **Mot** (`words`) : un nom, unique dans son groupe (sans tenir compte des majuscules ni des accents), de 32 caractères au plus et sans virgule (règles de Skribbl.io). Un mot n'a pas de visibilité propre : il est visible par ceux qui voient son groupe.
