@@ -42,5 +42,7 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         $testUser->favoriteWordGroups()->attach($otherUserGroups->first());
+
+        $this->call(CommunitySeeder::class);
     }
 }
