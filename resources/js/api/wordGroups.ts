@@ -5,6 +5,7 @@ import type { Visibility, WordGroup } from '@/types/models';
 export interface WordGroupPayload {
     name: string;
     visibility: Visibility;
+    accepts_contributions: boolean;
 }
 
 /** Groups created by the current user, most recently updated first. */

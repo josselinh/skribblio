@@ -40,6 +40,20 @@ class WordGroupFactory extends Factory
         ]);
     }
 
+    public function openToContributions(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'accepts_contributions' => true,
+        ]);
+    }
+
+    public function closedToContributions(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'accepts_contributions' => false,
+        ]);
+    }
+
     public function createdBy(User $user): static
     {
         return $this->state(fn (array $attributes) => [

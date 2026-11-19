@@ -34,12 +34,44 @@ class GroupCollectionPolicy
     }
 
     /**
-     * The creator of the collection can add any group they can see, including
-     * public groups created by other users.
+     * The creator can always add groups; the users who can see the collection too, while it is open to
+     * contributions.
+     */
+    public function addWordGroup(User $user, GroupCollection $groupCollection): Response
+    {
+        if (! $groupCollection->isVisibleTo($user)) {
+            return Response::denyAsNotFound();
+        }
+
+        return $groupCollection->acceptsContributionFrom($user)
+            ? Response::allow()
+            : Response::deny('Cette collection n’est pas ouverte aux contributions.');
+    }
+
+    /**
+     * A user who can add groups to the collection can add any group they can see, including public groups
+     * of other users and their own private groups (hidden from the other viewers, who can request access).
      */
     public function attachWordGroup(User $user, GroupCollection $groupCollection, WordGroup $wordGroup): bool
     {
-        return $groupCollection->isCreatedBy($user) && $wordGroup->isVisibleTo($user);
+        return $groupCollection->acceptsContributionFrom($user) && $wordGroup->isVisibleTo($user);
+    }
+
+    /**
+     * The creator can remove any group; a contributor only the groups they added, while the collection
+     * is open to contributions. Uses the group's pivot when it was loaded through the collection.
+     */
+    public function detachWordGroup(User $user, GroupCollection $groupCollection, WordGroup $wordGroup): bool
+    {
+        if ($groupCollection->isCreatedBy($user)) {
+            return true;
+        }
+
+        $pivot = $wordGroup->relationLoaded('pivot') && $wordGroup->pivot->group_collection_id === $groupCollection->getKey()
+            ? $wordGroup->pivot
+            : $groupCollection->wordGroups()->whereKey($wordGroup->getKey())->first()?->pivot;
+
+        return $pivot !== null && $groupCollection->allowsChangingContributionOf($user, $pivot->added_by);
     }
 
     /**

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
+import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { formatDateTime } from '@/lib/format';
 import type { Visibility } from '@/types/models';
@@ -14,6 +15,7 @@ defineProps<{
     to: RouteLocationRaw;
     name: string;
     visibility: Visibility;
+    acceptsContributions: boolean;
     updatedAt: string | null;
     updatedLabel: string;
     isAccessible: boolean;
@@ -47,6 +49,9 @@ defineProps<{
                 <VisibilityBadge :visibility="visibility" />
             </div>
             <slot name="meta" />
+            <div v-if="acceptsContributions && isAccessible">
+                <ContributionsBadge />
+            </div>
             <p v-if="!isAccessible" class="text-sm text-zinc-600">{{ inaccessibleMessage }}</p>
             <p v-else-if="updatedAt" class="text-sm text-zinc-500">
                 {{ updatedLabel }} <time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time>

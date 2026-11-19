@@ -16,13 +16,12 @@ class WordPolicy
     }
 
     /**
-     * The author of the word and the creator of its group can edit it,
-     * as long as they can still see the group.
+     * The creator of the group can edit any word; the author of the word too, while the group is open to
+     * contributions and they can still see it.
      */
     public function update(User $user, Word $word): bool
     {
-        return $word->wordGroup->isVisibleTo($user)
-            && ($word->isCreatedBy($user) || $word->wordGroup->isCreatedBy($user));
+        return $word->wordGroup->allowsChangingContributionOf($user, $word->created_by);
     }
 
     /**

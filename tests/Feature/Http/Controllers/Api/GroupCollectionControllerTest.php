@@ -36,10 +36,11 @@ class GroupCollectionControllerTest extends TestCase
                 'id' => $newerCollection->id,
                 'name' => $newerCollection->name,
                 'visibility' => 'public',
+                'accepts_contributions' => false,
                 'is_favorite' => false,
                 'created_at' => $newerCollection->created_at->toIso8601String(),
                 'updated_at' => $newerCollection->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'share' => false, 'manage_access' => true],
+                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word_group' => true],
             ]);
     }
 
@@ -67,9 +68,12 @@ class GroupCollectionControllerTest extends TestCase
             'word_group_ids' => [$ownPrivateGroup->id, $publicGroupOfOtherUser->id],
         ]);
 
-        $response->assertCreated()->assertJsonPath('data.name', 'Soirée jeux');
+        $response->assertCreated()
+            ->assertJsonPath('data.name', 'Soirée jeux')
+            ->assertJsonPath('data.accepts_contributions', false);
         $groupCollection = GroupCollection::findOrFail($response->json('data.id'));
         $this->assertTrue($groupCollection->isCreatedBy($user));
+        $this->assertSame([$user->id, $user->id], $groupCollection->wordGroups()->pluck('groups_collections.added_by')->all());
         $this->assertEqualsCanonicalizing(
             [$ownPrivateGroup->id, $publicGroupOfOtherUser->id],
             $groupCollection->wordGroups()->pluck('word_groups.id')->all(),
@@ -205,5 +209,44 @@ class GroupCollectionControllerTest extends TestCase
             ->patchJson("/api/group-collections/{$groupCollection->id}", [])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['name', 'visibility']);
+    }
+
+    public function test_store_and_update_set_whether_the_collection_accepts_contributions(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/group-collections', [
+            'name' => 'Soirée jeux',
+            'visibility' => 'public',
+            'accepts_contributions' => true,
+            'word_group_ids' => [WordGroup::factory()->createdBy($user)->create()->id],
+        ]);
+
+        $response->assertCreated()->assertJsonPath('data.accepts_contributions', true);
+        $groupCollection = GroupCollection::findOrFail($response->json('data.id'));
+
+        $this->actingAs($user)
+            ->patchJson("/api/group-collections/{$groupCollection->id}", ['name' => 'Soirée jeux', 'visibility' => 'public', 'accepts_contributions' => false])
+            ->assertOk()
+            ->assertJsonPath('data.accepts_contributions', false);
+        $this->assertFalse($groupCollection->fresh()->accepts_contributions);
+    }
+
+    public function test_show_tells_a_contributor_which_groups_they_can_remove(): void
+    {
+        $creator = User::factory()->create();
+        $contributor = User::factory()->create();
+        $creatorsGroup = WordGroup::factory()->public()->createdBy($creator)->create(['name' => 'A']);
+        $contributorsGroup = WordGroup::factory()->public()->createdBy($contributor)->create(['name' => 'B']);
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()->createdBy($creator)
+            ->hasAttached($creatorsGroup, ['added_by' => $creator->id])
+            ->hasAttached($contributorsGroup, ['added_by' => $contributor->id])
+            ->create();
+
+        $this->actingAs($contributor)
+            ->getJson("/api/group-collections/{$groupCollection->id}")
+            ->assertOk()
+            ->assertJsonPath('data.can.add_word_group', true)
+            ->assertJsonPath('data.word_groups.*.can.remove_from_collection', [false, true]);
     }
 }

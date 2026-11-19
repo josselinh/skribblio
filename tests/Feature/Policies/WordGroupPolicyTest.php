@@ -44,4 +44,27 @@ class WordGroupPolicyTest extends TestCase
         $this->assertTrue($creator->can($ability, $wordGroup));
         $this->assertFalse(User::factory()->create()->can($ability, $wordGroup));
     }
+
+    public function test_closed_group_lets_only_its_creator_add_words(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $publicGroup = WordGroup::factory()->public()->closedToContributions()->createdBy($creator)->create();
+        $privateGroup = WordGroup::factory()->private()->closedToContributions()->createdBy($creator)->create();
+        $privateGroup->members()->attach($member);
+
+        $this->assertTrue($creator->can('addWord', $publicGroup));
+        $this->assertFalse(User::factory()->create()->can('addWord', $publicGroup));
+        $this->assertTrue($member->can('view', $privateGroup));
+        $this->assertFalse($member->can('addWord', $privateGroup));
+    }
+
+    public function test_open_private_group_lets_its_members_add_words(): void
+    {
+        $member = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
+        $wordGroup->members()->attach($member);
+
+        $this->assertTrue($member->can('addWord', $wordGroup));
+    }
 }

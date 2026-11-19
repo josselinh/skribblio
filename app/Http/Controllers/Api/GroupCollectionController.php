@@ -43,8 +43,10 @@ class GroupCollectionController extends Controller
     public function store(StoreGroupCollectionRequest $request): JsonResponse
     {
         $groupCollection = DB::transaction(function () use ($request) {
-            $groupCollection = $request->user()->groupCollections()->create($request->safe()->only(['name', 'visibility']));
-            $groupCollection->wordGroups()->attach($request->wordGroups());
+            $groupCollection = $request->user()->groupCollections()->create(
+                $request->safe()->only(['name', 'visibility', 'accepts_contributions']),
+            );
+            $groupCollection->wordGroups()->attach($request->wordGroups(), ['added_by' => $request->user()->getKey()]);
 
             return $groupCollection->setAttribute('is_favorite', false);
         });

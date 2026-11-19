@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
@@ -15,11 +16,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'visibility'])]
+#[Fillable(['name', 'visibility', 'accepts_contributions'])]
 class WordGroup extends Model
 {
     /** @use HasFactory<WordGroupFactory> */
-    use Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+
+    /**
+     * Default values, matching the database defaults: groups are open to contributions.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'accepts_contributions' => true,
+    ];
 
     /**
      * @return HasMany<Word, $this>
@@ -34,7 +44,7 @@ class WordGroup extends Model
      */
     public function groupCollections(): BelongsToMany
     {
-        return $this->belongsToMany(GroupCollection::class, 'groups_collections')->withTimestamps();
+        return $this->belongsToMany(GroupCollection::class, 'groups_collections')->withPivot('added_by')->withTimestamps();
     }
 
     /**

@@ -2,6 +2,7 @@
 import { RouterLink, useRouter } from 'vue-router';
 import { createWordGroup } from '@/api/wordGroups';
 import AppLayout from '@/components/AppLayout.vue';
+import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
@@ -10,7 +11,7 @@ import type { Visibility } from '@/types/models';
 
 const router = useRouter();
 
-const form = useForm({ name: '', visibility: 'private' as Visibility });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: true });
 
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
@@ -35,6 +36,11 @@ async function submit(): Promise<void> {
             >
                 <FormField id="name" v-model="form.data.name" label="Nom du groupe" :error="form.errors.value.name" required />
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
+                <ContributionsField
+                    v-model="form.data.accepts_contributions"
+                    kind="word-groups"
+                    :error="form.errors.value.accepts_contributions"
+                />
                 <PrimaryButton :is-loading="form.isProcessing.value">Créer le groupe</PrimaryButton>
             </form>
         </div>

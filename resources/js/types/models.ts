@@ -12,6 +12,8 @@ export interface WordGroup {
     id: string;
     name: string;
     visibility: Visibility;
+    /** Whether the users who can see it can add words (and manage theirs). */
+    accepts_contributions: boolean;
     /** Only present in search results. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
@@ -30,6 +32,8 @@ export interface WordGroup {
         share: boolean;
         manage_access: boolean;
         add_word: boolean;
+        /** Only when listed through a collection: whether the user can remove it from that collection. */
+        remove_from_collection?: boolean;
     };
 }
 
@@ -50,6 +54,8 @@ export interface GroupCollection {
     id: string;
     name: string;
     visibility: Visibility;
+    /** Whether the users who can see it can add groups (and remove the ones they added). */
+    accepts_contributions: boolean;
     /** Only present in search results. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
@@ -67,6 +73,7 @@ export interface GroupCollection {
         update: boolean;
         share: boolean;
         manage_access: boolean;
+        add_word_group: boolean;
     };
 }
 

@@ -5,6 +5,7 @@ import type { GroupCollection, GroupCollectionDetail, Visibility } from '@/types
 export interface GroupCollectionPayload {
     name: string;
     visibility: Visibility;
+    accepts_contributions: boolean;
 }
 
 export interface CreateGroupCollectionPayload extends GroupCollectionPayload {

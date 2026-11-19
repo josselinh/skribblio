@@ -14,7 +14,8 @@ class WordGroupResource extends JsonResource
     /**
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
      * `creator`, `words_count` and `is_favorite` are only included when loaded; `is_accessible` only in the
-     * favorites list, where groups that became private are flagged with `false`.
+     * favorites list, where groups that became private are flagged with `false`; `can.remove_from_collection`
+     * only when listed through a collection.
      *
      * @return array<string, mixed>
      */
@@ -24,6 +25,7 @@ class WordGroupResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'visibility' => $this->visibility->value,
+            'accepts_contributions' => $this->accepts_contributions,
             'creator' => $this->whenLoaded('creator', fn (): array => [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
@@ -39,6 +41,8 @@ class WordGroupResource extends JsonResource
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
                 'add_word' => $request->user()->can('addWord', $this->resource),
+                'remove_from_collection' => $this->whenPivotLoaded('groups_collections', fn (): bool => $request->user()
+                    ->can('detachWordGroup', [$this->pivot->pivotParent, $this->resource])),
             ],
         ];
     }

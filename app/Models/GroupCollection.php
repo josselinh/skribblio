@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
@@ -19,18 +20,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * the groups it contains may have any visibility, including private groups
  * that other viewers of the collection cannot see.
  */
-#[Fillable(['name', 'visibility'])]
+#[Fillable(['name', 'visibility', 'accepts_contributions'])]
 class GroupCollection extends Model
 {
     /** @use HasFactory<GroupCollectionFactory> */
-    use Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
+     * Default values, matching the database defaults: collections are closed to contributions.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'accepts_contributions' => false,
+    ];
+
+    /**
+     * The pivot's `added_by` is the user who added the group (null when that user was deleted).
+     *
      * @return BelongsToMany<WordGroup, $this>
      */
     public function wordGroups(): BelongsToMany
     {
-        return $this->belongsToMany(WordGroup::class, 'groups_collections')->withTimestamps();
+        return $this->belongsToMany(WordGroup::class, 'groups_collections')->withPivot('added_by')->withTimestamps();
     }
 
     /**

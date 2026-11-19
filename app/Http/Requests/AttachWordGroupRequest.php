@@ -4,18 +4,21 @@ namespace App\Http\Requests;
 
 use App\Models\GroupCollection;
 use App\Models\WordGroup;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Validator;
 
 class AttachWordGroupRequest extends FormRequest
 {
     /**
-     * Only the creator of the collection can add groups to it.
+     * The creator can add groups, and so can the users who see the collection while it is open to
+     * contributions. The policy response is returned as is so that a hidden collection yields a 404.
      */
-    public function authorize(): bool
+    public function authorize(): Response
     {
-        return $this->user()->can('update', $this->groupCollection());
+        return Gate::inspect('addWordGroup', $this->groupCollection());
     }
 
     /**
@@ -31,7 +34,7 @@ class AttachWordGroupRequest extends FormRequest
     }
 
     /**
-     * The group must exist and be attachable by the user (their own or a public one). A private
+     * The group must exist and be attachable by the user (any group they can see). A private
      * group of another user is reported as not found, without revealing that it exists.
      *
      * @return array<int, callable>

@@ -28,6 +28,7 @@ class StoreWordGroupRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'visibility' => ['required', Rule::enum(Visibility::class)],
+            'accepts_contributions' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -40,6 +41,7 @@ class StoreWordGroupRequest extends FormRequest
     {
         return [
             'visibility' => 'visibilité',
+            'accepts_contributions' => 'ouvert aux contributions',
         ];
     }
 }

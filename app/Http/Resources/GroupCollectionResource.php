@@ -25,6 +25,7 @@ class GroupCollectionResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'visibility' => $this->visibility->value,
+            'accepts_contributions' => $this->accepts_contributions,
             'creator' => $this->whenLoaded('creator', fn (): array => [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
@@ -42,6 +43,7 @@ class GroupCollectionResource extends JsonResource
                 'update' => $request->user()->can('update', $this->resource),
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
+                'add_word_group' => $request->user()->can('addWordGroup', $this->resource),
             ],
         ];
     }
