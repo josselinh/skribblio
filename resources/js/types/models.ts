@@ -29,6 +29,7 @@ export interface WordGroup {
     /** Actions the current user may perform on the group. */
     can: {
         update: boolean;
+        delete: boolean;
         share: boolean;
         manage_access: boolean;
         add_word: boolean;
@@ -72,6 +73,7 @@ export interface GroupCollection {
     /** Actions the current user may perform on the collection. */
     can: {
         update: boolean;
+        delete: boolean;
         share: boolean;
         manage_access: boolean;
         add_word_group: boolean;

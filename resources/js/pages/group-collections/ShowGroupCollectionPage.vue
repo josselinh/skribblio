@@ -6,9 +6,10 @@ import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupColl
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
+import DeleteButton from '@/components/DeleteButton.vue';
 import DuplicateButton from '@/components/DuplicateButton.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
-import SharePanel from '@/components/SharePanel.vue';
+import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
@@ -164,19 +165,19 @@ watch(
                             :name="groupCollection.name"
                         />
                     </template>
+                    <template #actions>
+                        <DuplicateButton
+                            v-if="groupCollection.can.duplicate && groupCollection.word_groups.length > 0"
+                            kind="group-collections"
+                            :id="groupCollection.id"
+                        />
+                        <ShareButton v-if="groupCollection.can.share" kind="group-collections" :id="groupCollection.id" />
+                        <DeleteButton v-if="groupCollection.can.delete" kind="group-collections" :id="groupCollection.id" />
+                    </template>
                 </EditableNameVisibility>
             </div>
 
             <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" />
-            <DuplicateButton
-                v-if="groupCollection.can.duplicate && groupCollection.word_groups.length > 0"
-                class="mt-4"
-                kind="group-collections"
-                :id="groupCollection.id"
-            />
-            <div v-if="groupCollection.can.share" class="mt-4">
-                <SharePanel kind="group-collections" :id="groupCollection.id" />
-            </div>
 
             <div
                 v-if="hiddenGroupsMessage"
@@ -231,7 +232,11 @@ watch(
                     v-if="groupCollection.word_groups.length === 0"
                     class="mt-4 rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500"
                 >
-                    Aucun groupe visible dans cette collection.
+                    {{
+                        totalWordGroupsCount === 0
+                            ? 'Cette collection ne contient plus aucun groupe : ceux qu’elle contenait ont été supprimés.'
+                            : 'Aucun groupe visible dans cette collection.'
+                    }}
                 </p>
 
                 <ul

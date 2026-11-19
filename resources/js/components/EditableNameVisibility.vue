@@ -16,7 +16,8 @@ export interface NameVisibilityPayload {
 
 /**
  * Page title showing a name, a visibility badge and whether contributions are open, with a "Modifier"
- * button that turns it into an inline form. Used by the group and collection pages.
+ * button that turns it into an inline form, followed by the `actions` slot (e.g. deletion). Used by the group and
+ * collection pages.
  */
 const props = defineProps<{
     name: string;
@@ -92,13 +93,16 @@ async function submit(): Promise<void> {
             <ContributionsBadge v-if="acceptsContributions" />
             <slot name="after-title" />
         </div>
-        <button
-            v-if="canEdit"
-            type="button"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50"
-            @click="startEditing"
-        >
-            Modifier
-        </button>
+        <div class="flex flex-wrap items-center justify-end gap-2">
+            <button
+                v-if="canEdit"
+                type="button"
+                class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50"
+                @click="startEditing"
+            >
+                Modifier
+            </button>
+            <slot name="actions" />
+        </div>
     </div>
 </template>

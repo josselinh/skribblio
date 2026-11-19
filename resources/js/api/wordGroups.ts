@@ -46,3 +46,8 @@ export async function duplicateWordGroup(id: string): Promise<WordGroup> {
 
     return data.data;
 }
+
+/** Deletes a group with its words; collections containing it lose it. */
+export async function deleteWordGroup(id: string): Promise<void> {
+    await http.delete(`/api/word-groups/${id}`);
+}

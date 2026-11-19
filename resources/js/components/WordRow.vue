@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue';
 import { deleteWord, updateWord } from '@/api/words';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserLink from '@/components/UserLink.vue';
 import { useForm } from '@/composables/useForm';
 import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
@@ -16,9 +17,11 @@ const emit = defineEmits<{
     deleted: [word: Word];
 }>();
 
-type Mode = 'view' | 'edit' | 'confirm-delete';
+type Mode = 'view' | 'edit';
 const mode = ref<Mode>('view');
+const isConfirmingDelete = ref(false);
 const isDeleting = ref(false);
+const deleteError = ref<string | null>(null);
 const input = useTemplateRef<HTMLInputElement>('input');
 const form = useForm({ name: props.word.name });
 
@@ -40,11 +43,20 @@ async function save(): Promise<void> {
     }
 }
 
+function askDeleteConfirmation(): void {
+    deleteError.value = null;
+    isConfirmingDelete.value = true;
+}
+
 async function confirmDelete(): Promise<void> {
     isDeleting.value = true;
+    deleteError.value = null;
     try {
         await deleteWord(props.word.id);
+        isConfirmingDelete.value = false;
         emit('deleted', props.word);
+    } catch {
+        deleteError.value = 'Impossible de supprimer ce mot. Réessayez.';
     } finally {
         isDeleting.value = false;
     }
@@ -84,18 +96,6 @@ async function confirmDelete(): Promise<void> {
                     Enregistrer
                 </button>
             </div>
-            <div v-else-if="mode === 'confirm-delete'" class="flex justify-end gap-3">
-                <span class="text-zinc-500">Supprimer ?</span>
-                <button type="button" class="text-zinc-500 hover:text-zinc-900" @click="mode = 'view'">Non</button>
-                <button
-                    type="button"
-                    :disabled="isDeleting"
-                    class="font-medium text-red-600 hover:underline"
-                    @click="confirmDelete"
-                >
-                    Oui
-                </button>
-            </div>
             <div v-else class="flex justify-end gap-3">
                 <button v-if="word.can.update" type="button" class="text-zinc-600 hover:text-zinc-900" @click="startEditing">
                     Modifier
@@ -104,11 +104,21 @@ async function confirmDelete(): Promise<void> {
                     v-if="word.can.delete"
                     type="button"
                     class="text-red-600 hover:text-red-800"
-                    @click="mode = 'confirm-delete'"
+                    @click="askDeleteConfirmation"
                 >
                     Supprimer
                 </button>
             </div>
+            <ConfirmDialog
+                v-model:open="isConfirmingDelete"
+                :title="`Supprimer « ${word.name} » ?`"
+                message="Ce mot sera retiré du groupe. Cette action est irréversible."
+                confirm-label="Supprimer"
+                processing-label="Suppression…"
+                :is-processing="isDeleting"
+                :error="deleteError"
+                @confirm="confirmDelete"
+            />
         </td>
     </tr>
 </template>
