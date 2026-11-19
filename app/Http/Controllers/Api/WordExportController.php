@@ -8,13 +8,14 @@ use App\Models\GroupCollection;
 use App\Models\Word;
 use App\Models\WordGroup;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
  * Every word of a group or a collection, unpaginated, for the Skribbl.io export. The SPA
- * deduplicates, shuffles and formats the list.
+ * deduplicates, shuffles and formats the list (and, for a collection, combines the chosen groups).
  */
 class WordExportController extends Controller
 {
@@ -26,22 +27,26 @@ class WordExportController extends Controller
     }
 
     /**
-     * Words of the groups of the collection that the current user can see; hidden groups are left out.
+     * The groups of the collection that the current user can see, sorted by name, each with its words
+     * sorted by name; hidden groups are left out. The SPA lets the user pick which groups to export.
      */
     public function groupCollection(Request $request, GroupCollection $groupCollection): JsonResponse
     {
         Gate::authorize('view', $groupCollection);
 
-        $visibleWordGroupIds = $groupCollection->wordGroups()
+        $wordGroups = $groupCollection->wordGroups()
             ->visibleTo($request->user())
-            ->select('word_groups.id');
-
-        $names = Word::query()
-            ->whereIn('word_group_id', $visibleWordGroupIds)
+            ->with(['words' => fn (HasMany $query) => $query->select(['id', 'word_group_id', 'name'])->orderBy('name')])
             ->orderBy('name')
-            ->pluck('name');
+            ->get(['word_groups.id', 'word_groups.name']);
 
-        return response()->json(['data' => $names]);
+        return response()->json(['data' => [
+            'word_groups' => $wordGroups->map(fn (WordGroup $wordGroup): array => [
+                'id' => $wordGroup->id,
+                'name' => $wordGroup->name,
+                'words' => $wordGroup->words->pluck('name'),
+            ]),
+        ]]);
     }
 
     /**
