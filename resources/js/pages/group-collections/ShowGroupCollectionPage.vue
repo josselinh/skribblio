@@ -6,12 +6,15 @@ import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupColl
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
+import DuplicateButton from '@/components/DuplicateButton.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import SharePanel from '@/components/SharePanel.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
+import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
+import { consumeHistoryStatus } from '@/lib/historyStatus';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { GroupCollectionDetail, WordGroup } from '@/types/models';
 
@@ -23,6 +26,9 @@ const groupCollection = ref<GroupCollectionDetail | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isUpdatingGroups = ref(false);
 const groupsError = ref<string | null>(null);
+
+/** Message sent by the previous page (e.g. after a duplication), read again on each collection since the page is reused. */
+const flashStatus = ref<string | null>(null);
 
 const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((wordGroup) => wordGroup.id) ?? []);
 
@@ -112,6 +118,7 @@ function removeWordGroup(wordGroup: WordGroup): Promise<void> {
 watch(
     groupCollectionId,
     () => {
+        flashStatus.value = consumeHistoryStatus();
         status.value = 'loading';
         void loadGroupCollection();
     },
@@ -124,6 +131,7 @@ watch(
         <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
             ← Retour au tableau de bord
         </RouterLink>
+        <StatusMessage class="mt-4" :message="flashStatus" />
 
         <p v-if="status === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
 
@@ -160,6 +168,12 @@ watch(
             </div>
 
             <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" />
+            <DuplicateButton
+                v-if="groupCollection.can.duplicate && groupCollection.word_groups.length > 0"
+                class="mt-4"
+                kind="group-collections"
+                :id="groupCollection.id"
+            />
             <div v-if="groupCollection.can.share" class="mt-4">
                 <SharePanel kind="group-collections" :id="groupCollection.id" />
             </div>

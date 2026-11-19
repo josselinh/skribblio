@@ -2,11 +2,12 @@
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { duplicateWordGroup, fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
+import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
+import DuplicateButton from '@/components/DuplicateButton.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import SharePanel from '@/components/SharePanel.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
@@ -37,27 +38,6 @@ const haveWordsFailed = ref(false);
 
 /** Message sent by the previous page (e.g. after a duplication), read again on each group since the page is reused. */
 const flashStatus = ref<string | null>(null);
-
-const isDuplicating = ref(false);
-const hasDuplicationFailed = ref(false);
-
-/** Copies the group into a group of the current user and opens the copy. */
-async function duplicate(): Promise<void> {
-    isDuplicating.value = true;
-    hasDuplicationFailed.value = false;
-    try {
-        const copy = await duplicateWordGroup(wordGroupId.value);
-        await router.push({
-            name: 'word-groups.show',
-            params: { id: copy.id },
-            state: { status: 'Groupe dupliqué. Il est privé et fermé aux contributions.' },
-        });
-    } catch {
-        hasDuplicationFailed.value = true;
-    } finally {
-        isDuplicating.value = false;
-    }
-}
 
 async function loadWordGroup(): Promise<void> {
     flashStatus.value = consumeHistoryStatus();
@@ -158,22 +138,7 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
             </div>
 
             <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
-            <div v-if="wordGroup.can.duplicate" class="mt-4">
-                <button
-                    type="button"
-                    :disabled="isDuplicating"
-                    class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-xs hover:bg-zinc-50 disabled:opacity-60"
-                    @click="duplicate"
-                >
-                    {{ isDuplicating ? 'Duplication…' : 'Dupliquer' }}
-                </button>
-                <p class="mt-1 text-xs text-zinc-500">
-                    Crée une copie privée de ce groupe et de ses mots, dont vous êtes l’auteur.
-                </p>
-                <p v-if="hasDuplicationFailed" role="alert" class="mt-1 text-sm text-red-600">
-                    Impossible de dupliquer le groupe. Réessayez.
-                </p>
-            </div>
+            <DuplicateButton v-if="wordGroup.can.duplicate" class="mt-4" kind="word-groups" :id="wordGroup.id" />
             <div v-if="wordGroup.can.share" class="mt-4">
                 <SharePanel kind="word-groups" :id="wordGroup.id" />
             </div>

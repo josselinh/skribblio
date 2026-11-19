@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\Visibility;
 use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
+use App\Models\Concerns\HasCopyName;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use App\Models\Concerns\Shareable;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * A named set of word groups. A collection must contain at least one group;
@@ -24,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class GroupCollection extends Model
 {
     /** @use HasFactory<GroupCollectionFactory> */
-    use AcceptsContributions, Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
      * Default values, matching the database defaults: collections are closed to contributions.
@@ -34,6 +37,31 @@ class GroupCollection extends Model
     protected $attributes = [
         'accepts_contributions' => false,
     ];
+
+    /**
+     * Copy this collection into a new collection of the user: private, closed to contributions,
+     * containing a copy (see `WordGroup::duplicateFor()`) of each group the user can see, except
+     * their own groups, which are kept as they are. Hidden groups are not copied, and neither are
+     * favorites, members or the share link. The caller makes sure that at least one group is visible.
+     */
+    public function duplicateFor(User $user): self
+    {
+        return DB::transaction(function () use ($user): self {
+            $copy = $user->groupCollections()->create([
+                'name' => $this->copyName(),
+                'visibility' => Visibility::Private,
+                'accepts_contributions' => false,
+            ]);
+
+            $wordGroupIds = $this->wordGroups()->visibleTo($user)->get()
+                ->map(fn (WordGroup $wordGroup): string => $wordGroup->isCreatedBy($user)
+                    ? $wordGroup->getKey()
+                    : $wordGroup->duplicateFor($user)->getKey());
+            $copy->wordGroups()->attach($wordGroupIds, ['added_by' => $user->getKey()]);
+
+            return $copy;
+        });
+    }
 
     /**
      * The pivot's `added_by` is the user who added the group (null when that user was deleted).

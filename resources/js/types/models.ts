@@ -75,7 +75,14 @@ export interface GroupCollection {
         share: boolean;
         manage_access: boolean;
         add_word_group: boolean;
+        duplicate: boolean;
     };
+}
+
+/** A collection as returned by the duplication endpoint. */
+export interface DuplicatedGroupCollection extends GroupCollection {
+    /** Groups of the original hidden from the current user, and therefore not copied. */
+    hidden_word_groups_count: number;
 }
 
 /** A collection as returned by its detail endpoint. */
