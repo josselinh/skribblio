@@ -55,7 +55,107 @@ Tout est privé : pour voir quoi que ce soit, il faut être **inscrit, connecté
 
 ### Base de données
 
-Toutes les clés primaires sont des **UUID** (v7, triables) plutôt que des entiers auto-incrémentés : trait `HasUuids` sur les modèles, `uuid('id')->primary()` et `foreignUuid()` dans les migrations.
+Toutes les clés primaires sont des **UUID** (v7, triables) plutôt que des entiers auto-incrémentés : trait `HasUuids` sur les modèles, `uuid('id')->primary()` et `foreignUuid()` dans les migrations. Seules les tables techniques de Laravel `jobs`, `failed_jobs` et `personal_access_tokens` gardent un identifiant entier.
+
+Les colonnes `created_at` et `updated_at` (dates de création et de dernière modification) sont présentes sur toutes les tables métier et ne sont pas répétées ci-dessous.
+
+#### Tables métier
+
+**`users`** : les comptes utilisateurs.
+
+| Champ               | Type            | Description                                                                  |
+| ------------------- | --------------- | ---------------------------------------------------------------------------- |
+| `id`                | UUID            | Identifiant                                                                  |
+| `name`              | chaîne          | Nom affiché (cartes « par X », auteur des mots, demandes d'accès)            |
+| `email`             | chaîne, unique  | Adresse e-mail, utilisée pour la connexion et les notifications ; jamais exposée aux autres utilisateurs |
+| `email_verified_at` | date, nullable  | Date de validation de l'adresse ; `null` tant qu'elle n'est pas validée (ou après un changement d'adresse) |
+| `password`          | chaîne          | Mot de passe haché                                                           |
+| `remember_token`    | chaîne, nullable| Jeton de la case « Se souvenir de moi »                                      |
+
+**`word_groups`** : les groupes de mots.
+
+| Champ                   | Type                  | Description                                                                      |
+| ----------------------- | --------------------- | -------------------------------------------------------------------------------- |
+| `id`                    | UUID                  | Identifiant                                                                      |
+| `name`                  | chaîne                | Nom du groupe                                                                    |
+| `visibility`            | chaîne                | `public` (visible par tous les utilisateurs connectés) ou `private` (créateur et membres) ; enum `App\Enums\Visibility` |
+| `accepts_contributions` | booléen (`false`)     | Ouvert aux contributions : ceux qui voient le groupe peuvent y ajouter des mots et modifier les leurs |
+| `share_token`           | chaîne(64), nullable, unique | Jeton secret du lien de partage (`/share/groups/{token}`), généré à la demande ; le régénérer invalide l'ancien lien. Jamais renvoyé par l'API en dehors du lien lui-même |
+| `created_by`            | UUID → `users`        | Créateur ; le supprimer supprime le groupe                                       |
+
+**`words`** : les mots, chacun dans un seul groupe.
+
+| Champ           | Type                      | Description                                                                 |
+| --------------- | ------------------------- | --------------------------------------------------------------------------- |
+| `id`            | UUID                      | Identifiant                                                                 |
+| `name`          | chaîne                    | Le mot : 32 caractères au plus, sans virgule ; unique dans son groupe (index unique `word_group_id` + `name`, qui ignore la casse et les accents) |
+| `word_group_id` | UUID → `word_groups`      | Groupe du mot ; supprimer le groupe supprime ses mots                        |
+| `created_by`    | UUID → `users`, nullable  | Auteur du mot ; passe à `null` (« Compte supprimé ») quand l'auteur supprime son compte, pour garder les mots ajoutés aux groupes des autres |
+
+**`group_collections`** : les collections de groupes (modèle `GroupCollection`).
+
+| Champ                   | Type                         | Description                                                             |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------------- |
+| `id`                    | UUID                         | Identifiant                                                             |
+| `name`                  | chaîne                       | Nom de la collection                                                    |
+| `visibility`            | chaîne                       | `public` ou `private`, comme pour les groupes                           |
+| `accepts_contributions` | booléen (`false`)            | Ouverte aux contributions : ceux qui voient la collection peuvent y ajouter des groupes et retirer ceux qu'ils ont ajoutés |
+| `share_token`           | chaîne(64), nullable, unique | Jeton secret du lien de partage (`/share/collections/{token}`)         |
+| `created_by`            | UUID → `users`               | Créateur ; le supprimer supprime la collection                          |
+
+**`groups_collections`** : table pivot entre collections et groupes (clé primaire composée `group_collection_id` + `word_group_id`).
+
+| Champ                 | Type                       | Description                                                                 |
+| --------------------- | -------------------------- | --------------------------------------------------------------------------- |
+| `group_collection_id` | UUID → `group_collections` | Collection ; la supprimer retire la ligne mais pas le groupe                |
+| `word_group_id`       | UUID → `word_groups`       | Groupe ; le supprimer le retire de toutes ses collections                   |
+| `added_by`            | UUID → `users`, nullable   | Qui a ajouté le groupe à la collection (un contributeur peut retirer les groupes qu'il a ajoutés) ; `null` une fois ce compte supprimé |
+
+La règle « une collection contient au moins un groupe » est appliquée par l'application, pas par la base.
+
+#### Favoris
+
+**`favorite_word_groups`** et **`favorite_group_collections`** : les groupes et collections mis en favori, avec une clé primaire composée (un même élément ne peut être favori qu'une fois par utilisateur).
+
+| Champ                                    | Type                                       | Description                                       |
+| ---------------------------------------- | ------------------------------------------ | ------------------------------------------------- |
+| `user_id`                                | UUID → `users`                             | Utilisateur qui a mis l'élément en favori         |
+| `word_group_id` / `group_collection_id`  | UUID → `word_groups` / `group_collections` | Élément mis en favori                             |
+| `created_at`                             | date                                       | Date de mise en favori (tri des listes de favoris) |
+
+Supprimer l'utilisateur ou l'élément supprime le favori.
+
+#### Partage des éléments privés
+
+**`word_group_access_requests`** et **`group_collection_access_requests`** : les demandes d'accès envoyées depuis un lien de partage. Une seule ligne par élément et par demandeur (index unique) : redemander après un refus rouvre la même demande.
+
+| Champ                                   | Type                                       | Description                                                                 |
+| --------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
+| `id`                                    | UUID                                       | Identifiant                                                                 |
+| `word_group_id` / `group_collection_id` | UUID → `word_groups` / `group_collections` | Élément demandé                                                             |
+| `user_id`                               | UUID → `users`                             | Demandeur                                                                   |
+| `status`                                | chaîne                                     | `pending` (en attente), `accepted` ou `refused` ; enum `App\Enums\AccessRequestStatus` |
+| `decided_at`                            | date, nullable                             | Date à laquelle le créateur a accepté ou refusé                             |
+| `via_group_collection_id`               | UUID → `group_collections`, nullable       | Groupes uniquement : collection depuis laquelle la demande a été faite (« demander l'accès aux groupes masqués »). Le demandeur ne connaît pas le nom du groupe, qui ne doit pas lui être révélé ; passe à `null` si la collection est supprimée |
+
+**`word_group_members`** et **`group_collection_members`** : les personnes dont la demande a été acceptée (clé primaire composée élément + utilisateur). Un membre voit l'élément privé ; le créateur peut lui retirer l'accès en supprimant la ligne.
+
+| Champ                                   | Type                                       | Description                    |
+| --------------------------------------- | ------------------------------------------ | ------------------------------ |
+| `word_group_id` / `group_collection_id` | UUID → `word_groups` / `group_collections` | Élément partagé                |
+| `user_id`                               | UUID → `users`                             | Membre                         |
+| `created_at`                            | date                                       | Date à laquelle l'accès a été accordé |
+
+#### Tables techniques de Laravel
+
+| Table                    | Rôle                                                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| `sessions`               | Sessions des utilisateurs (`SESSION_DRIVER=database`), sur lesquelles repose l'authentification Sanctum : `id`, `user_id` (nullable), `ip_address`, `user_agent`, `payload` (données sérialisées), `last_activity` (timestamp Unix) |
+| `password_reset_tokens`  | Jetons de « mot de passe oublié » : `email` (clé primaire), `token` (haché), `created_at`     |
+| `personal_access_tokens` | Tokens d'API Sanctum (`tokenable_type` / `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`). Non utilisés par la SPA, qui s'authentifie par cookie ; vidés à la suppression d'un compte |
+| `cache`, `cache_locks`   | Cache et verrous en base (`key`, `value` / `owner`, `expiration`), inutilisés tant que `CACHE_STORE=redis` |
+| `jobs`, `job_batches`    | File d'attente en base, inutilisée tant que `QUEUE_CONNECTION=redis`                         |
+| `failed_jobs`            | Jobs en échec (`uuid`, `connection`, `queue`, `payload`, `exception`, `failed_at`), à relancer avec `artisan queue:retry` |
 
 ### Modèle de données
 
@@ -66,22 +166,25 @@ WordGroup 1 ──── n Word              un mot appartient à un seul groupe
 GroupCollection n ──── n WordGroup   table pivot groups_collections
 User n ──── n WordGroup              favoris : favorite_word_groups
 User n ──── n GroupCollection        favoris : favorite_group_collections
+User n ──── n WordGroup              membres : word_group_members
+User n ──── n GroupCollection        membres : group_collection_members
 ```
 
-- **Mot** (`words`) : un nom, unique dans son groupe, de 32 caractères au plus et sans virgule (règles de Skribbl.io). Un mot n'a pas de visibilité propre : il est visible par ceux qui voient son groupe.
-- **Groupe** (`word_groups`) et **collection** (`group_collections`, modèle `GroupCollection`) : un nom et une visibilité, `public` (visible par tous les utilisateurs connectés) ou `private` (visible par son créateur uniquement).
-- Une collection contient **au moins un groupe**. Un groupe peut appartenir à plusieurs collections.
+- **Mot** (`words`) : un nom, unique dans son groupe (sans tenir compte des majuscules ni des accents), de 32 caractères au plus et sans virgule (règles de Skribbl.io). Un mot n'a pas de visibilité propre : il est visible par ceux qui voient son groupe.
+- **Groupe** (`word_groups`) et **collection** (`group_collections`, modèle `GroupCollection`) : un nom, une visibilité, `public` (visible par tous les utilisateurs connectés) ou `private` (visible par son créateur et les personnes à qui il a donné accès), et l'option « Ouvert aux contributions » (désactivée par défaut).
+- Une collection contient **au moins un groupe**. Un groupe peut appartenir à plusieurs collections. Seule exception : supprimer un groupe le retire de toutes ses collections, même s'il en était le dernier ; la page de la collection indique alors qu'elle est vide.
 
 Règles d'accès (définies dans `app/Policies`) :
 
-- Seul le créateur peut modifier ou supprimer un groupe ou une collection.
-- Tout le monde peut ajouter des mots à un groupe public. Un mot peut être modifié ou supprimé par son auteur ou par le créateur du groupe. Ajouter, renommer ou supprimer un mot met à jour la date de modification du groupe.
-- Un groupe privé auquel on n'a pas accès répond « introuvable » (404), pour ne pas révéler son existence.
-- Le créateur d'une collection peut y ajouter ses groupes et les groupes publics des autres utilisateurs. On ne peut pas retirer le dernier groupe d'une collection. Ajouter ou retirer un groupe met à jour la date de modification de la collection.
-- Une collection privée, comme un groupe privé, répond « introuvable » (404) aux autres utilisateurs.
-- Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués.
-- On peut mettre en favori tout groupe ou toute collection que l'on peut voir. Les favoris sont listés sur le tableau de bord. Si un favori devient privé, il y reste affiché mais grisé et non cliquable ; on peut toujours le retirer des favoris.
-- Supprimer un utilisateur supprime tout ce qu'il a créé. Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.
+- Seul le créateur peut renommer un groupe ou une collection, changer sa visibilité, ouvrir ou fermer les contributions, et le supprimer.
+- **Contributions** : le créateur gère toujours le contenu. Tant qu'un groupe est ouvert aux contributions, tous ceux qui le voient peuvent y ajouter des mots et modifier ou supprimer les leurs. Tant qu'une collection est ouverte, tous ceux qui la voient peuvent y ajouter des groupes et retirer ceux qu'ils ont ajoutés. Une fois fermé, seul le créateur modifie le contenu ; les contributions déjà faites sont conservées, et rouvrir rend leurs droits aux contributeurs.
+- Ajouter, renommer ou supprimer un mot met à jour la date de modification du groupe ; ajouter ou retirer un groupe met à jour celle de la collection.
+- Un groupe ou une collection privé auquel on n'a pas accès répond « introuvable » (404), pour ne pas révéler son existence.
+- Qui peut ajouter des groupes à une collection peut y ajouter tout groupe qu'il voit : ses propres groupes (même privés) et les groupes publics des autres. On ne peut pas retirer le dernier groupe d'une collection.
+- Une collection publique peut contenir des groupes privés. Les autres utilisateurs ne les voient pas, mais un message leur indique que certains groupes leur sont masqués, et ils peuvent en demander l'accès.
+- Tous ceux qui voient un groupe ou une collection peuvent le **dupliquer** : la copie (« … (copie) ») leur appartient, est privée, fermée aux contributions et sans lien avec l'original. Pour une collection, chaque groupe visible est copié, sauf les groupes de l'utilisateur, repris tels quels ; les groupes masqués ne sont pas copiés.
+- On peut mettre en favori tout groupe ou toute collection que l'on peut voir. Les favoris sont listés sur le tableau de bord. Si un favori devient inaccessible, il y reste affiché mais grisé et non cliquable ; on peut toujours le retirer des favoris.
+- Supprimer son compte supprime tout ce qu'on a créé, sauf les mots ajoutés aux groupes des autres, qui restent sans auteur (« Compte supprimé »). Supprimer un groupe supprime ses mots et le retire des collections. Supprimer une collection ne supprime pas ses groupes.
 
 ### Export pour Skribbl.io
 
@@ -89,8 +192,9 @@ Sur la page d'un groupe ou d'une collection, le bouton « Exporter pour Skribbl.
 
 - Skribbl.io demande au moins 10 mots, de 32 caractères au plus, pour 20 000 caractères au total : le panneau compte les mots et les caractères et avertit quand une limite n'est pas respectée.
 - Options : retirer les doublons (activé par défaut, sans tenir compte des majuscules), mélanger l'ordre, et tirer au hasard une sélection qui tient dans la limite de caractères.
-- Depuis le tableau de bord, « Créer un export » permet de choisir plusieurs groupes et collections : leurs mots sont réunis dans une seule liste. La sélection peut ensuite être enregistrée comme nouvelle collection, qui reprend les groupes des collections choisies (elle ne suit pas leurs changements ultérieurs). Rien n'est enregistré tant qu'on ne crée pas la collection.
-- L'API (`GET /api/word-groups/{id}/export`, `GET /api/group-collections/{id}/export`, et `GET /api/exports/composition` pour une sélection) renvoie la liste brute des mots ; le dédoublonnage, le mélange et la mise en forme se font dans le front (`resources/js/lib/skribbl.ts`).
+- Sur une collection, on peut décocher certains de ses groupes avant l'export (tous sont cochés par défaut).
+- Depuis le tableau de bord, « Créer un export » permet de constituer une sélection de groupes : on les ajoute un par un, ou tous les groupes visibles d'une collection d'un coup, et on peut en retirer. Leurs mots sont réunis dans une seule liste. La sélection peut ensuite être enregistrée comme nouvelle collection, qui ne suit pas les changements ultérieurs. Rien n'est enregistré tant qu'on ne crée pas la collection.
+- L'API (`GET /api/word-groups/{id}/export` et `GET /api/group-collections/{id}/export`, qui renvoie les mots groupe par groupe) fournit la liste brute des mots ; la combinaison des groupes, le dédoublonnage, le mélange et la mise en forme se font dans le front (`resources/js/lib/skribbl.ts`).
 
 ### Partage des groupes et collections privés
 
