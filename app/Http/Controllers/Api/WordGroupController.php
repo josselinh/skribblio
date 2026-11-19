@@ -50,14 +50,14 @@ class WordGroupController extends Controller
     {
         Gate::authorize('view', $wordGroup);
 
-        return new WordGroupResource($wordGroup->loadIsFavorite($request->user()));
+        return new WordGroupResource($wordGroup->load('creator')->loadIsFavorite($request->user()));
     }
 
     public function update(UpdateWordGroupRequest $request, WordGroup $wordGroup): WordGroupResource
     {
         $wordGroup->update($request->validated());
 
-        return new WordGroupResource($wordGroup->loadIsFavorite($request->user()));
+        return new WordGroupResource($wordGroup->load('creator')->loadIsFavorite($request->user()));
     }
 
     /**

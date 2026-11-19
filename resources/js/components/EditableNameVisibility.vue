@@ -3,10 +3,11 @@ import { ref } from 'vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
+import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
-import type { FavoriteKind, Visibility } from '@/types/models';
+import type { FavoriteKind, User, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
     name: string;
@@ -16,7 +17,7 @@ export interface NameVisibilityPayload {
 }
 
 /**
- * Page title showing a name, a visibility badge and whether contributions are open, with a "Modifier"
+ * Page title showing a name, a visibility badge, whether contributions are open and the creator, with a "Modifier"
  * button that turns it into an inline form, followed by the `actions` slot (e.g. deletion). Used by the group and
  * collection pages.
  */
@@ -26,6 +27,8 @@ const props = defineProps<{
     acceptsContributions: boolean;
     contributionsMembersOnly: boolean;
     kind: FavoriteKind;
+    /** Shown as "par X" under the title, "vous" for the current user. */
+    creator?: Pick<User, 'id' | 'name'>;
     canEdit: boolean;
     /** Label of the name field, e.g. "Nom du groupe". */
     nameLabel: string;
@@ -94,14 +97,19 @@ async function submit(): Promise<void> {
     </form>
 
     <div v-else class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex min-w-0 flex-wrap items-center gap-3">
-            <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
-            <VisibilityBadge :visibility="visibility" />
-            <ContributionsBadge
-                v-if="acceptsContributions"
-                :members-only="contributionsMembersOnly && visibility === 'public'"
-            />
-            <slot name="after-title" />
+        <div class="min-w-0">
+            <div class="flex min-w-0 flex-wrap items-center gap-3">
+                <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
+                <VisibilityBadge :visibility="visibility" />
+                <ContributionsBadge
+                    v-if="acceptsContributions"
+                    :members-only="contributionsMembersOnly && visibility === 'public'"
+                />
+                <slot name="after-title" />
+            </div>
+            <p v-if="creator" class="mt-1 text-sm text-zinc-600">
+                par <UserLink :user="creator" self-label="vous" />
+            </p>
         </div>
         <div class="flex flex-wrap items-center justify-end gap-2">
             <button
