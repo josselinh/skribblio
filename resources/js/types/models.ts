@@ -32,6 +32,7 @@ export interface WordGroup {
         share: boolean;
         manage_access: boolean;
         add_word: boolean;
+        duplicate: boolean;
         /** Only when listed through a collection: whether the user can remove it from that collection. */
         remove_from_collection?: boolean;
     };

@@ -15,7 +15,7 @@ class SharingVisibilityTest extends TestCase
     public function test_member_sees_private_group_and_can_add_words_but_not_manage_it(): void
     {
         $member = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
         $wordGroup->members()->attach($member);
 
         $this->assertTrue($wordGroup->fresh()->isVisibleTo($member));

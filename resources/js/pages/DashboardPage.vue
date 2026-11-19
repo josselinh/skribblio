@@ -12,6 +12,7 @@ import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
+import { consumeHistoryStatus } from '@/lib/historyStatus';
 import type { AccessRequest, FavoriteKind } from '@/types/models';
 
 const route = useRoute();
@@ -53,20 +54,6 @@ async function onFavoriteSaved(kind: FavoriteKind, id: string, isFavorite: boole
         list.result.value?.data.filter((item) => item.id === id).forEach((item) => (item.is_favorite = isFavorite));
     }
     await (kind === 'word-groups' ? favoriteWordGroups : favoriteGroupCollections).reload();
-}
-
-/**
- * Status sent by the previous page through the history state, read once then removed
- * so that it does not show up again on reload.
- */
-function consumeHistoryStatus(): string | null {
-    const { status: historyStatus, ...state } = (window.history.state ?? {}) as Record<string, unknown>;
-    if (typeof historyStatus !== 'string') {
-        return null;
-    }
-    window.history.replaceState(state, '');
-
-    return historyStatus;
 }
 
 const flashStatus = consumeHistoryStatus();
