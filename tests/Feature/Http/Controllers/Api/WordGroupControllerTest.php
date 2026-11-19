@@ -44,11 +44,11 @@ class WordGroupControllerTest extends TestCase
                 'id' => $newerGroup->id,
                 'name' => $newerGroup->name,
                 'visibility' => 'public',
-                'accepts_contributions' => true,
+                'accepts_contributions' => false,
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word' => true],
+                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word' => true, 'duplicate' => true],
             ]);
     }
 
@@ -78,7 +78,7 @@ class WordGroupControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonPath('data.name', 'Animaux')
             ->assertJsonPath('data.visibility', 'private')
-            ->assertJsonPath('data.accepts_contributions', true);
+            ->assertJsonPath('data.accepts_contributions', false);
         $this->assertDatabaseHas('word_groups', [
             'id' => $response->json('data.id'),
             'name' => 'Animaux',
@@ -110,13 +110,13 @@ class WordGroupControllerTest extends TestCase
 
     public function test_show_returns_public_group_of_another_user_with_restricted_abilities(): void
     {
-        $wordGroup = WordGroup::factory()->public()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
 
         $response = $this->actingAs(User::factory()->create())->getJson("/api/word-groups/{$wordGroup->id}");
 
         $response->assertOk()
             ->assertJsonPath('data.id', $wordGroup->id)
-            ->assertJsonPath('data.can', ['update' => false, 'share' => false, 'manage_access' => false, 'add_word' => true]);
+            ->assertJsonPath('data.can', ['update' => false, 'share' => false, 'manage_access' => false, 'add_word' => true, 'duplicate' => true]);
     }
 
     public function test_show_returns_404_for_private_group_of_another_user(): void

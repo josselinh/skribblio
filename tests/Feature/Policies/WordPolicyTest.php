@@ -29,7 +29,7 @@ class WordPolicyTest extends TestCase
         $groupCreator = User::factory()->create();
         $author = User::factory()->create();
         $word = Word::factory()
-            ->for(WordGroup::factory()->public()->createdBy($groupCreator))
+            ->for(WordGroup::factory()->public()->openToContributions()->createdBy($groupCreator))
             ->createdBy($author)
             ->create();
 

@@ -2,7 +2,7 @@
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
+import { duplicateWordGroup, fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
@@ -12,7 +12,9 @@ import SharePanel from '@/components/SharePanel.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
+import StatusMessage from '@/components/StatusMessage.vue';
 import WordRow from '@/components/WordRow.vue';
+import { consumeHistoryStatus } from '@/lib/historyStatus';
 import type { PaginatedResponse } from '@/types/api';
 import type { Word, WordGroup } from '@/types/models';
 
@@ -33,7 +35,32 @@ const words = ref<PaginatedResponse<Word> | null>(null);
 const areWordsLoading = ref(false);
 const haveWordsFailed = ref(false);
 
+/** Message sent by the previous page (e.g. after a duplication), read again on each group since the page is reused. */
+const flashStatus = ref<string | null>(null);
+
+const isDuplicating = ref(false);
+const hasDuplicationFailed = ref(false);
+
+/** Copies the group into a group of the current user and opens the copy. */
+async function duplicate(): Promise<void> {
+    isDuplicating.value = true;
+    hasDuplicationFailed.value = false;
+    try {
+        const copy = await duplicateWordGroup(wordGroupId.value);
+        await router.push({
+            name: 'word-groups.show',
+            params: { id: copy.id },
+            state: { status: 'Groupe dupliqué. Il est privé et fermé aux contributions.' },
+        });
+    } catch {
+        hasDuplicationFailed.value = true;
+    } finally {
+        isDuplicating.value = false;
+    }
+}
+
 async function loadWordGroup(): Promise<void> {
+    flashStatus.value = consumeHistoryStatus();
     groupStatus.value = 'loading';
     try {
         wordGroup.value = await fetchWordGroup(wordGroupId.value);
@@ -94,6 +121,7 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
         <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
             ← Retour à mes groupes
         </RouterLink>
+        <StatusMessage class="mt-4" :message="flashStatus" />
 
         <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
 
@@ -130,6 +158,22 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
             </div>
 
             <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
+            <div v-if="wordGroup.can.duplicate" class="mt-4">
+                <button
+                    type="button"
+                    :disabled="isDuplicating"
+                    class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-xs hover:bg-zinc-50 disabled:opacity-60"
+                    @click="duplicate"
+                >
+                    {{ isDuplicating ? 'Duplication…' : 'Dupliquer' }}
+                </button>
+                <p class="mt-1 text-xs text-zinc-500">
+                    Crée une copie privée de ce groupe et de ses mots, dont vous êtes l’auteur.
+                </p>
+                <p v-if="hasDuplicationFailed" role="alert" class="mt-1 text-sm text-red-600">
+                    Impossible de dupliquer le groupe. Réessayez.
+                </p>
+            </div>
             <div v-if="wordGroup.can.share" class="mt-4">
                 <SharePanel kind="word-groups" :id="wordGroup.id" />
             </div>

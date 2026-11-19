@@ -55,6 +55,15 @@ class WordGroupPolicy
     }
 
     /**
+     * Anyone who can see a group can copy it into a group of their own. A member of a private group
+     * can too: they can already export all its words.
+     */
+    public function duplicate(User $user, WordGroup $wordGroup): Response
+    {
+        return $this->view($user, $wordGroup);
+    }
+
+    /**
      * Only the creator can share a private item (get or regenerate its access request link).
      */
     public function share(User $user, WordGroup $wordGroup): bool

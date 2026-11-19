@@ -60,7 +60,7 @@ class WordControllerTest extends TestCase
     public function test_store_lets_any_user_add_several_words_to_a_public_group_and_touches_the_group(): void
     {
         $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->public()->create(['updated_at' => now()->subWeek()]);
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create(['updated_at' => now()->subWeek()]);
 
         $response = $this->actingAs($user)->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat', 'chien']]);
 
@@ -169,7 +169,7 @@ class WordControllerTest extends TestCase
     public function test_update_renames_word_for_its_author(): void
     {
         $author = User::factory()->create();
-        $word = Word::factory()->for(WordGroup::factory()->public())->createdBy($author)->create(['name' => 'chta']);
+        $word = Word::factory()->for(WordGroup::factory()->public()->openToContributions())->createdBy($author)->create(['name' => 'chta']);
 
         $this->actingAs($author)
             ->patchJson("/api/words/{$word->id}", ['name' => 'chat'])

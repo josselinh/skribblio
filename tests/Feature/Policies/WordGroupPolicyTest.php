@@ -17,7 +17,7 @@ class WordGroupPolicyTest extends TestCase
     #[TestWith(['favorite'])]
     public function test_public_group_allows_any_user(string $ability): void
     {
-        $wordGroup = WordGroup::factory()->public()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
 
         $this->assertTrue(User::factory()->create()->can($ability, $wordGroup));
     }

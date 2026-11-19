@@ -39,3 +39,10 @@ export async function updateWordGroup(id: string, payload: WordGroupPayload): Pr
 
     return data.data;
 }
+
+/** Copies a group into a new private group of the current user, closed to contributions. */
+export async function duplicateWordGroup(id: string): Promise<WordGroup> {
+    const { data } = await http.post<ResourceResponse<WordGroup>>(`/api/word-groups/${id}/duplicate`);
+
+    return data.data;
+}

@@ -23,12 +23,12 @@ class WordGroup extends Model
     use AcceptsContributions, Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
-     * Default values, matching the database defaults: groups are open to contributions.
+     * Default values, matching the database defaults: groups are closed to contributions.
      *
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'accepts_contributions' => true,
+        'accepts_contributions' => false,
     ];
 
     /**

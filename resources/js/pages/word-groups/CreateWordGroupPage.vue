@@ -11,7 +11,7 @@ import type { Visibility } from '@/types/models';
 
 const router = useRouter();
 
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: true });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
 
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
