@@ -3,12 +3,13 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { leaveItem } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { useToasts } from '@/composables/useToasts';
 import type { FavoriteKind, Visibility } from '@/types/models';
 
 /**
  * "Quitter" button of a group or collection page, for its members, confirmed in a modal (`ConfirmDialog`). Leaving a
- * private item goes back to the dashboard with a status message; leaving a public one (whose contributions are
- * restricted to its members) keeps the page, which reloads it on `left`.
+ * private item goes back to the dashboard; leaving a public one (whose contributions are restricted to its members)
+ * keeps the page, which reloads it on `left`. Both are confirmed in a notification.
  */
 const props = defineProps<{
     kind: FavoriteKind;
@@ -17,10 +18,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    left: [status: string];
+    left: [];
 }>();
 
 const router = useRouter();
+const { showToast } = useToasts();
 const isConfirming = ref(false);
 const isLeaving = ref(false);
 const error = ref<string | null>(null);
@@ -48,12 +50,12 @@ async function confirmLeave(): Promise<void> {
     try {
         await leaveItem(props.kind, props.id);
         isConfirming.value = false;
-        const status = isGroup.value ? 'Vous avez quitté le groupe.' : 'Vous avez quitté la collection.';
         if (props.visibility === 'private') {
-            await router.push({ name: 'dashboard', state: { status } });
+            await router.push({ name: 'dashboard' });
         } else {
-            emit('left', status);
+            emit('left');
         }
+        showToast(isGroup.value ? 'Vous avez quitté le groupe.' : 'Vous avez quitté la collection.');
     } catch {
         error.value = 'Impossible de quitter. Réessayez.';
     } finally {

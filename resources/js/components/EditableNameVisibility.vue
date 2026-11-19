@@ -7,6 +7,7 @@ import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
+import { useToasts } from '@/composables/useToasts';
 import type { FavoriteKind, User, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
@@ -18,7 +19,7 @@ export interface NameVisibilityPayload {
 
 /**
  * Page title showing a name, a visibility badge, whether contributions are open and the creator, with a "Modifier"
- * button that turns it into an inline form, followed by the `actions` slot (e.g. deletion). Used by the group and
+ * button that turns it into an inline form (saving is confirmed in a notification), followed by the `actions` slot (e.g. deletion). Used by the group and
  * collection pages.
  */
 const props = defineProps<{
@@ -35,6 +36,8 @@ const props = defineProps<{
     /** Saves the changes; validation errors (422) are shown in the form. */
     save: (payload: NameVisibilityPayload) => Promise<void>;
 }>();
+
+const { showToast } = useToasts();
 
 const isEditing = ref(false);
 const form = useForm<NameVisibilityPayload>({
@@ -56,6 +59,7 @@ function startEditing(): void {
 async function submit(): Promise<void> {
     if (await form.submit((data) => props.save({ ...data }))) {
         isEditing.value = false;
+        showToast(props.kind === 'word-groups' ? 'Groupe modifié.' : 'Collection modifiée.');
     }
 }
 </script>

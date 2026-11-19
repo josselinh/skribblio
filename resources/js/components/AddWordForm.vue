@@ -2,6 +2,7 @@
 import { nextTick, ref, useTemplateRef } from 'vue';
 import { createWords } from '@/api/words';
 import { useForm } from '@/composables/useForm';
+import { useToasts } from '@/composables/useToasts';
 import { parseWordList, SKRIBBL_SEPARATOR } from '@/lib/skribbl';
 import type { CreateWordsResponse } from '@/types/api';
 import type { Word } from '@/types/models';
@@ -17,6 +18,7 @@ const emit = defineEmits<{
 const textarea = useTemplateRef<HTMLTextAreaElement>('textarea');
 const form = useForm({ names: '' });
 const result = ref<CreateWordsResponse | null>(null);
+const { showToast } = useToasts();
 
 function plural(count: number, singular: string, pluralForm: string): string {
     return `${count} ${count > 1 ? pluralForm : singular}`;
@@ -49,6 +51,9 @@ async function submit(): Promise<void> {
         form.data.names = response.invalid.map((invalidName) => invalidName.name).join(SKRIBBL_SEPARATOR);
         if (response.data.length > 0) {
             emit('added', response.data);
+        }
+        if (response.data.length > 0 || response.skipped.length > 0) {
+            showToast(summary(response));
         }
     });
 
@@ -89,7 +94,6 @@ async function submit(): Promise<void> {
                 {{ form.errors.value.names }}
             </p>
             <template v-else-if="result">
-                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ summary(result) }}</p>
                 <div v-if="result.invalid.length > 0" class="mt-1 text-sm text-red-600 dark:text-red-400">
                     <p>
                         {{ plural(result.invalid.length, 'mot n’a pas pu être ajouté', 'mots n’ont pas pu être ajoutés') }}

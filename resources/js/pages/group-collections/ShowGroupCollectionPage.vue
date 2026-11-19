@@ -13,10 +13,9 @@ import LeaveButton from '@/components/LeaveButton.vue';
 import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
-import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
-import { consumeHistoryStatus } from '@/lib/historyStatus';
+import { useToasts } from '@/composables/useToasts';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
@@ -29,9 +28,6 @@ const groupCollection = ref<GroupCollectionDetail | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isUpdatingGroups = ref(false);
 const groupsError = ref<string | null>(null);
-
-/** Message sent by the previous page (e.g. after a duplication), read again on each collection since the page is reused. */
-const flashStatus = ref<string | null>(null);
 
 const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((wordGroup) => wordGroup.id) ?? []);
 
@@ -82,9 +78,8 @@ async function requestHiddenGroups(): Promise<void> {
 }
 
 /** After leaving a public collection, which stays visible: reloads it, as the user's rights changed. */
-async function onLeft(status: string): Promise<void> {
+async function onLeft(): Promise<void> {
     await loadGroupCollection();
-    flashStatus.value = status;
 }
 
 async function loadGroupCollection(): Promise<void> {
@@ -102,13 +97,16 @@ async function saveGroupCollection(payload: NameVisibilityPayload): Promise<void
     await loadGroupCollection();
 }
 
-/** Runs a change on the groups of the collection, then reloads it; shows validation errors (422). */
-async function changeGroups(change: () => Promise<void>): Promise<void> {
+const { showToast } = useToasts();
+
+/** Runs a change on the groups of the collection, then reloads it and confirms it; shows validation errors (422). */
+async function changeGroups(change: () => Promise<void>, successMessage: string): Promise<void> {
     isUpdatingGroups.value = true;
     groupsError.value = null;
     try {
         await change();
         await loadGroupCollection();
+        showToast(successMessage);
     } catch (error) {
         if (isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422) {
             groupsError.value = error.response.data.message;
@@ -121,17 +119,22 @@ async function changeGroups(change: () => Promise<void>): Promise<void> {
 }
 
 function addWordGroup(wordGroup: WordGroup): Promise<void> {
-    return changeGroups(() => attachWordGroup(groupCollectionId.value, wordGroup.id));
+    return changeGroups(
+        () => attachWordGroup(groupCollectionId.value, wordGroup.id),
+        `Groupe « ${wordGroup.name} » ajouté à la collection.`,
+    );
 }
 
 function removeWordGroup(wordGroup: WordGroup): Promise<void> {
-    return changeGroups(() => detachWordGroup(groupCollectionId.value, wordGroup.id));
+    return changeGroups(
+        () => detachWordGroup(groupCollectionId.value, wordGroup.id),
+        `Groupe « ${wordGroup.name} » retiré de la collection.`,
+    );
 }
 
 watch(
     groupCollectionId,
     () => {
-        flashStatus.value = consumeHistoryStatus();
         status.value = 'loading';
         void loadGroupCollection();
     },
@@ -141,7 +144,6 @@ watch(
 
 <template>
     <AppLayout>
-        <StatusMessage :message="flashStatus" />
 
         <p v-if="status === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
 

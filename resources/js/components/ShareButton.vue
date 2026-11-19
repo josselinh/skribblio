@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
 import ModalDialog from '@/components/ModalDialog.vue';
+import { useToasts } from '@/composables/useToasts';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
 
 /**
@@ -15,9 +16,10 @@ const props = defineProps<{
     purpose: AccessPurpose;
 }>();
 
+const { showToast } = useToasts();
+
 const isOpen = ref(false);
 const url = ref<string | null>(null);
-const status = ref<string | null>(null);
 const hasFailed = ref(false);
 const isConfirmingRegeneration = ref(false);
 const isBusy = ref(false);
@@ -35,7 +37,6 @@ async function run(action: () => Promise<void>): Promise<void> {
 }
 
 async function open(): Promise<void> {
-    status.value = null;
     isConfirmingRegeneration.value = false;
     isOpen.value = true;
     if (url.value === null) {
@@ -51,9 +52,9 @@ async function copy(): Promise<void> {
     }
     try {
         await navigator.clipboard.writeText(url.value);
-        status.value = 'Lien copié.';
+        showToast('Lien copié.');
     } catch {
-        status.value = 'Copie impossible : sélectionnez le lien et copiez-le.';
+        showToast('Copie impossible : sélectionnez le lien et copiez-le.', 'error', 6000);
     }
 }
 
@@ -61,7 +62,7 @@ async function regenerate(): Promise<void> {
     isConfirmingRegeneration.value = false;
     await run(async () => {
         url.value = await regenerateShareLink(props.kind, props.id);
-        status.value = 'Nouveau lien créé. L’ancien ne fonctionne plus.';
+        showToast('Nouveau lien créé. L’ancien ne fonctionne plus.');
     });
 }
 </script>
@@ -111,7 +112,6 @@ async function regenerate(): Promise<void> {
                 Copier
             </button>
         </div>
-        <p v-if="status" role="status" class="mt-2 text-green-700 dark:text-green-400">{{ status }}</p>
 
         <div
             v-if="isConfirmingRegeneration"

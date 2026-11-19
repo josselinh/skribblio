@@ -13,6 +13,7 @@ import VisibilityField from '@/components/VisibilityField.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import WordListExport from '@/components/WordListExport.vue';
 import { useForm } from '@/composables/useForm';
+import { useToasts } from '@/composables/useToasts';
 import type { GroupCollection, Visibility, WordGroup } from '@/types/models';
 
 /**
@@ -21,6 +22,7 @@ import type { GroupCollection, Visibility, WordGroup } from '@/types/models';
  * added; the list is then computed here. Nothing is saved until the user creates the collection.
  */
 const router = useRouter();
+const { showToast } = useToasts();
 
 const selectedWordGroups = ref<ExportedWordGroup[]>([]);
 const selectedWordGroupIds = computed(() => selectedWordGroups.value.map((wordGroup) => wordGroup.id));
@@ -129,6 +131,7 @@ async function saveAsGroupCollection(): Promise<void> {
     await form.submit(async (data) => {
         const groupCollection = await createGroupCollection({ ...data, word_group_ids: wordGroupIds });
         await router.push({ name: 'group-collections.show', params: { id: groupCollection.id } });
+        showToast('Collection créée.');
     });
 }
 
