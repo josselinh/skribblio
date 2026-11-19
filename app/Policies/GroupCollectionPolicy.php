@@ -18,6 +18,14 @@ class GroupCollectionPolicy
         return $groupCollection->isVisibleTo($user) ? Response::allow() : Response::denyAsNotFound();
     }
 
+    /**
+     * Anyone who can see a collection can copy it, with the groups they can see, into a collection of their own.
+     */
+    public function duplicate(User $user, GroupCollection $groupCollection): Response
+    {
+        return $this->view($user, $groupCollection);
+    }
+
     public function create(User $user): bool
     {
         return true;

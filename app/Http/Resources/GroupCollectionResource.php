@@ -44,6 +44,7 @@ class GroupCollectionResource extends JsonResource
                 'share' => $request->user()->can('share', $this->resource),
                 'manage_access' => $request->user()->can('manageAccess', $this->resource),
                 'add_word_group' => $request->user()->can('addWordGroup', $this->resource),
+                'duplicate' => $request->user()->can('duplicate', $this->resource),
             ],
         ];
     }

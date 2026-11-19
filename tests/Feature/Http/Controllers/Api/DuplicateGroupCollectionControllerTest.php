@@ -1,0 +1,130 @@
+<?php
+
+namespace Tests\Feature\Http\Controllers\Api;
+
+use App\Models\GroupCollection;
+use App\Models\User;
+use App\Models\Word;
+use App\Models\WordGroup;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class DuplicateGroupCollectionControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_returns_401_for_guest(): void
+    {
+        $groupCollection = GroupCollection::factory()->public()->create();
+
+        $this->postJson("/api/group-collections/{$groupCollection->id}/duplicate")->assertUnauthorized();
+    }
+
+    public function test_copies_the_collection_and_the_groups_of_others_with_their_words_and_keeps_own_groups(): void
+    {
+        $user = User::factory()->create();
+        $othersGroup = WordGroup::factory()->public()->openToContributions()->create(['name' => 'Animaux']);
+        Word::factory()->for($othersGroup)->create(['name' => 'chat']);
+        $ownGroup = WordGroup::factory()->private()->createdBy($user)->create();
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()
+            ->hasAttached($othersGroup, ['added_by' => $othersGroup->created_by])
+            ->hasAttached($ownGroup, ['added_by' => $user->id])
+            ->create(['name' => 'Jeux']);
+
+        $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
+
+        $response->assertCreated()
+            ->assertJsonPath('data.name', 'Jeux (copie)')
+            ->assertJsonPath('data.visibility', 'private')
+            ->assertJsonPath('data.accepts_contributions', false)
+            ->assertJsonPath('data.hidden_word_groups_count', 0);
+        $copy = GroupCollection::findOrFail($response->json('data.id'));
+        $this->assertTrue($copy->isCreatedBy($user));
+        $copiedGroups = $copy->wordGroups()->get();
+        $this->assertCount(2, $copiedGroups);
+        $this->assertTrue($copiedGroups->contains($ownGroup));
+        $this->assertFalse($copiedGroups->contains($othersGroup));
+        $this->assertSame([$user->id], $copiedGroups->pluck('pivot.added_by')->unique()->values()->all());
+        $copiedGroup = $copiedGroups->firstWhere('name', 'Animaux (copie)');
+        $this->assertTrue($copiedGroup->isCreatedBy($user));
+        $this->assertTrue($copiedGroup->isPrivate());
+        $this->assertFalse($copiedGroup->accepts_contributions);
+        $this->assertSame(['chat'], $copiedGroup->words()->pluck('name')->all());
+        $this->assertSame([$user->id], $copiedGroup->words()->pluck('created_by')->all());
+        $this->assertSame(1, WordGroup::where('created_by', $user->id)->where('name', 'like', '%(copie)')->count());
+    }
+
+    public function test_does_not_copy_hidden_groups_and_reports_how_many_they_are(): void
+    {
+        $user = User::factory()->create();
+        $publicGroup = WordGroup::factory()->public()->create();
+        $groupCollection = GroupCollection::factory()->public()
+            ->hasAttached($publicGroup)
+            ->hasAttached(WordGroup::factory()->private())
+            ->create();
+
+        $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
+
+        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $this->assertSame(1, GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->count());
+    }
+
+    public function test_copies_the_private_groups_of_the_creator_seen_by_a_member_of_the_collection(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        Word::factory()->for($privateGroup)->create(['name' => 'secret']);
+        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached($privateGroup)->create();
+        $groupCollection->members()->attach($member);
+
+        $response = $this->actingAs($member)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
+
+        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 0);
+        $copiedGroup = GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->sole();
+        $this->assertTrue($copiedGroup->isCreatedBy($member));
+        $this->assertSame(['secret'], $copiedGroup->words()->pluck('name')->all());
+    }
+
+    public function test_does_not_copy_members_favorites_or_share_link(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)
+            ->hasAttached(WordGroup::factory()->public())
+            ->create();
+        $groupCollection->members()->attach($member);
+        $groupCollection->favoritedBy()->attach($member);
+        $groupCollection->regenerateShareToken();
+
+        $response = $this->actingAs($member)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
+
+        $response->assertCreated()->assertJsonPath('data.is_favorite', false);
+        $copy = GroupCollection::findOrFail($response->json('data.id'));
+        $this->assertSame(0, $copy->members()->count());
+        $this->assertSame(0, $copy->favoritedBy()->count());
+        $this->assertNull($copy->share_token);
+    }
+
+    public function test_returns_422_when_no_group_is_visible(): void
+    {
+        $groupCollection = GroupCollection::factory()->public()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->postJson("/api/group-collections/{$groupCollection->id}/duplicate")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['word_groups' => 'Aucun groupe de cette collection ne vous est visible : il n’y a rien à copier.']);
+        $this->assertDatabaseCount('group_collections', 1);
+    }
+
+    public function test_returns_404_for_private_collection_of_another_user(): void
+    {
+        $groupCollection = GroupCollection::factory()->private()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->postJson("/api/group-collections/{$groupCollection->id}/duplicate")
+            ->assertNotFound();
+
+        $this->assertDatabaseCount('group_collections', 1);
+    }
+}

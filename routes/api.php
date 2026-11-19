@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccessRequestController;
+use App\Http\Controllers\Api\DuplicateGroupCollectionController;
 use App\Http\Controllers\Api\DuplicateWordGroupController;
 use App\Http\Controllers\Api\FavoriteGroupCollectionController;
 use App\Http\Controllers\Api\FavoriteWordGroupController;
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Skribbl.io export: every word, unpaginated.
         Route::get('word-groups/{word_group}/export', [WordExportController::class, 'wordGroup'])->name('word-groups.export');
         Route::post('word-groups/{word_group}/duplicate', DuplicateWordGroupController::class)->name('word-groups.duplicate');
+        Route::post('group-collections/{group_collection}/duplicate', DuplicateGroupCollectionController::class)->name('group-collections.duplicate');
         Route::get('group-collections/{group_collection}/export', [WordExportController::class, 'groupCollection'])->name('group-collections.export');
 
         Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');

@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\Visibility;
 use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
+use App\Models\Concerns\HasCopyName;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use App\Models\Concerns\Shareable;
@@ -15,12 +17,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 #[Fillable(['name', 'visibility', 'accepts_contributions'])]
 class WordGroup extends Model
 {
     /** @use HasFactory<WordGroupFactory> */
-    use AcceptsContributions, Favoritable, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
      * Default values, matching the database defaults: groups are closed to contributions.
@@ -30,6 +33,41 @@ class WordGroup extends Model
     protected $attributes = [
         'accepts_contributions' => false,
     ];
+
+    /**
+     * Number of words inserted per query when copying a group.
+     */
+    private const int COPY_INSERT_CHUNK_SIZE = 500;
+
+    /**
+     * Copy this group into a new group of the user: private, closed to contributions, with every
+     * word written by them (so that the copy does not depend on the original authors). Nothing else
+     * is copied (favorites, members, share link, collections) and the copy keeps no link to the original.
+     */
+    public function duplicateFor(User $user): self
+    {
+        return DB::transaction(function () use ($user): self {
+            $copy = $user->wordGroups()->create([
+                'name' => $this->copyName(),
+                'visibility' => Visibility::Private,
+                'accepts_contributions' => false,
+            ]);
+
+            $now = now();
+            $this->words()->select('name')->orderBy('id')->chunk(self::COPY_INSERT_CHUNK_SIZE, function ($words) use ($copy, $user, $now): void {
+                Word::insert($words->map(fn (Word $word): array => [
+                    'id' => $word->newUniqueId(),
+                    'name' => $word->name,
+                    'word_group_id' => $copy->getKey(),
+                    'created_by' => $user->getKey(),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->all());
+            });
+
+            return $copy;
+        });
+    }
 
     /**
      * @return HasMany<Word, $this>
