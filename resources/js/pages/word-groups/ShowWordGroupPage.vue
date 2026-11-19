@@ -240,7 +240,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             <template v-else-if="words">
                 <p class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
                 <div
-                    class="mt-2 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
+                    class="relative mt-2 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
                     :class="{ 'opacity-60': areWordsLoading }"
                 >
                     <table class="w-full text-left text-sm">
