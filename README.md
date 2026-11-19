@@ -138,8 +138,8 @@ PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : to
 1. Cloner le dépôt :
 
    ```sh
-   git clone git@github.com:josselinh/skribblio2.git
-   cd skribblio2
+   git clone git@github.com:josselinh/skribblio.git
+   cd skribblio
    ```
 
 2. Créer le fichier d'environnement :
@@ -155,9 +155,11 @@ PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : to
        -u "$(id -u):$(id -g)" \
        -v "$(pwd):/var/www/html" \
        -w /var/www/html \
-       laravelsail/php85-composer:latest \
+       laravelsail/php84-composer:latest \
        composer install --ignore-platform-reqs
    ```
+
+   Il n'existe pas encore d'image `laravelsail/php85-composer` : celle de PHP 8.4 suffit pour installer les dépendances. L'application tourne bien en PHP 8.5 dans le conteneur Sail.
 
 4. Démarrer les conteneurs :
 
