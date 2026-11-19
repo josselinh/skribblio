@@ -3,7 +3,9 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import AuthCard from '@/components/AuthCard.vue';
 import FormField from '@/components/FormField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import StatusMessage from '@/components/StatusMessage.vue';
 import { useForm } from '@/composables/useForm';
+import { consumeHistoryStatus } from '@/lib/historyStatus';
 import { consumePendingRedirect } from '@/lib/pendingRedirect';
 import { useAuthStore } from '@/stores/auth';
 
@@ -12,6 +14,8 @@ const route = useRoute();
 const router = useRouter();
 
 const form = useForm({ email: '', password: '', remember: false });
+/** E.g. the confirmation that the account was deleted. */
+const status = consumeHistoryStatus();
 
 /** Only follows internal paths, to avoid open redirects. */
 function redirectTarget(): string | { name: string } {
@@ -36,6 +40,7 @@ async function submit(): Promise<void> {
 
 <template>
     <AuthCard title="Connexion" description="Connectez-vous pour accéder à vos listes de mots.">
+        <StatusMessage :message="status" />
         <form class="space-y-4" novalidate @submit.prevent="submit">
             <FormField
                 id="email"

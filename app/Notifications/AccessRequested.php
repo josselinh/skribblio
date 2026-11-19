@@ -8,10 +8,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 
 /**
  * Tells the creator of a private group or collection that someone asked to access it.
+ *
+ * Dropped when the request or the user was deleted (e.g. an account deleted) before it was sent.
  */
+#[DeleteWhenMissingModels]
 class AccessRequested extends Notification implements ShouldQueue
 {
     use Queueable;

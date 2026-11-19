@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * A word belongs to exactly one group and has no visibility of its own:
  * it is visible to whoever can see its group. Adding, renaming or deleting
- * a word updates the group's `updated_at`.
+ * a word updates the group's `updated_at`. Its author (`created_by`) becomes null
+ * when they delete their account: the word stays in the group.
  */
 #[Fillable(['name'])]
 #[Touches(['wordGroup'])]
@@ -36,6 +37,8 @@ class Word extends Model
     }
 
     /**
+     * The author of the word, null once they deleted their account.
+     *
      * @return BelongsTo<User, $this>
      */
     public function creator(): BelongsTo

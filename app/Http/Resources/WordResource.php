@@ -13,19 +13,20 @@ class WordResource extends JsonResource
 {
     /**
      * Transform the resource into an array. Expects `creator` and `wordGroup` to be loaded.
-     * `can` tells the SPA which actions the current user may perform.
+     * `creator` is null once the author deleted their account. `can` tells the SPA which actions
+     * the current user may perform.
      *
-     * @return array{id: string, name: string, creator: array{id: string, name: string}, created_at: ?string, updated_at: ?string, can: array{update: bool, delete: bool}}
+     * @return array{id: string, name: string, creator: array{id: string, name: string}|null, created_at: ?string, updated_at: ?string, can: array{update: bool, delete: bool}}
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'creator' => [
+            'creator' => $this->creator ? [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
-            ],
+            ] : null,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [
