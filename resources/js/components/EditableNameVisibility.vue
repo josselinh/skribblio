@@ -63,7 +63,7 @@ async function submit(): Promise<void> {
 <template>
     <form
         v-if="isEditing"
-        class="space-y-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"
+        class="space-y-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm"
         novalidate
         @submit.prevent="submit"
         @keydown.esc="isEditing = false"
@@ -81,7 +81,7 @@ async function submit(): Promise<void> {
         <div class="flex justify-end gap-2">
             <button
                 type="button"
-                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium hover:bg-zinc-50"
+                class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 @click="isEditing = false"
             >
                 Annuler
@@ -89,7 +89,7 @@ async function submit(): Promise<void> {
             <button
                 type="submit"
                 :disabled="form.isProcessing.value"
-                class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
             >
                 Enregistrer
             </button>
@@ -107,7 +107,7 @@ async function submit(): Promise<void> {
                 />
                 <slot name="after-title" />
             </div>
-            <p v-if="creator" class="mt-1 text-sm text-zinc-600">
+            <p v-if="creator" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                 par <UserLink :user="creator" self-label="vous" />
             </p>
         </div>
@@ -115,7 +115,7 @@ async function submit(): Promise<void> {
             <button
                 v-if="canEdit"
                 type="button"
-                class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50"
+                class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 @click="startEditing"
             >
                 Modifier

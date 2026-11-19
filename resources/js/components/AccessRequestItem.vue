@@ -72,7 +72,7 @@ async function decide(accept: boolean): Promise<void> {
                 </template>
                 <template v-else>{{ requestLabel }}</template>
             </p>
-            <p class="text-zinc-500">
+            <p class="text-zinc-500 dark:text-zinc-400">
                 <template v-if="accessRequest.via_group_collection">
                     Depuis la collection « {{ accessRequest.via_group_collection.name }} » ·
                 </template>
@@ -80,13 +80,13 @@ async function decide(accept: boolean): Promise<void> {
                     {{ formatDateTime(accessRequest.created_at) }}
                 </time>
             </p>
-            <p v-if="hasFailed" role="alert" class="text-red-600">Une erreur est survenue, veuillez réessayer.</p>
+            <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">Une erreur est survenue, veuillez réessayer.</p>
         </div>
         <div class="flex gap-2">
             <button
                 type="button"
                 :disabled="isDeciding"
-                class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-60"
+                class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60"
                 @click="decide(false)"
             >
                 Refuser
@@ -94,7 +94,7 @@ async function decide(accept: boolean): Promise<void> {
             <button
                 type="button"
                 :disabled="isDeciding"
-                class="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                 aria-haspopup="dialog"
                 @click="isConfirmingAcceptance = true"
             >

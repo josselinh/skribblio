@@ -20,7 +20,7 @@ const isCurrentUser = computed(() => props.user.id === auth.user?.id);
 
 <template>
     <span v-if="isCurrentUser">{{ selfLabel ?? user.name }}</span>
-    <RouterLink v-else :to="{ name: 'users.show', params: { id: user.id } }" class="underline-offset-2 hover:underline">
+    <RouterLink v-else :to="{ name: 'users.show', params: { id: user.id } }" class="underline-offset-2 hover:text-brand-700 dark:hover:text-brand-300 hover:underline">
         {{ user.name }}
     </RouterLink>
 </template>

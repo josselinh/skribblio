@@ -158,14 +158,14 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
     <AppLayout>
         <StatusMessage :message="flashStatus" />
 
-        <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
+        <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
 
         <div v-else-if="groupStatus === 'not-found'" class="mt-4">
             <h1 class="text-2xl font-semibold">Groupe introuvable</h1>
-            <p class="mt-2 text-zinc-500">Ce groupe n'existe pas ou vous n'y avez pas accès.</p>
+            <p class="mt-2 text-zinc-500 dark:text-zinc-400">Ce groupe n'existe pas ou vous n'y avez pas accès.</p>
         </div>
 
-        <p v-else-if="groupStatus === 'failed'" class="mt-4 text-red-600">
+        <p v-else-if="groupStatus === 'failed'" class="mt-4 text-red-600 dark:text-red-400">
             Impossible de charger le groupe.
             <button type="button" class="underline" @click="loadWordGroup">Réessayer</button>
         </p>
@@ -214,31 +214,31 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             />
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
-            <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500">
+            <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
                 Seules les personnes autorisées par le créateur de ce groupe peuvent y ajouter des mots. Demandez-lui
                 son lien de partage pour lui proposer de contribuer.
             </p>
-            <p v-else class="mt-6 text-sm text-zinc-500">
+            <p v-else class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
                 Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.
             </p>
 
-            <p v-if="haveWordsFailed" class="mt-6 text-red-600">
+            <p v-if="haveWordsFailed" class="mt-6 text-red-600 dark:text-red-400">
                 Impossible de charger les mots.
                 <button type="button" class="underline" @click="loadWords">Réessayer</button>
             </p>
 
-            <p v-else-if="words && words.meta.total === 0" class="mt-6 rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500">
+            <p v-else-if="words && words.meta.total === 0" class="mt-6 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400">
                 Ce groupe ne contient encore aucun mot.
             </p>
 
             <template v-else-if="words">
-                <p class="mt-6 text-sm text-zinc-500">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
+                <p class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
                 <div
-                    class="mt-2 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-xs"
+                    class="mt-2 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
                     :class="{ 'opacity-60': areWordsLoading }"
                 >
                     <table class="w-full text-left text-sm">
-                        <thead class="border-b border-zinc-200 bg-zinc-50 text-xs font-medium tracking-wide text-zinc-500 uppercase">
+                        <thead class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400 uppercase">
                             <tr>
                                 <SortableHeader
                                     v-for="column in columns"
@@ -253,7 +253,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                                 <th scope="col" class="px-4 py-2.5"><span class="sr-only">Actions</span></th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-zinc-100">
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             <WordRow
                                 v-for="word in words.data"
                                 :key="word.id"

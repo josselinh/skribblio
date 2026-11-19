@@ -78,7 +78,7 @@ Skribblio Tools lets users build custom word lists (alone or collaboratively) an
 - Every API payload has a TypeScript interface in `resources/js/types` that mirrors its API Resource (`models.ts` for resources, `api.ts` for response envelopes such as `ResourceResponse<T>`).
 - Use the `useForm` composable for forms: it exposes `data`, `errors` (first Laravel validation message per field), `isProcessing`, `submit()` and `reset()`.
 - Protect routes with `meta` in `router/index.ts`: `requiresVerified` (default for app pages), `requiresAuth` (logged in, verified or not), `guestOnly`.
-- The UI is written in French. Styling uses Tailwind CSS v4 utility classes.
+- The UI is written in French. Styling uses Tailwind CSS v4 utility classes: neutral `zinc` tones, and the `brand` accent colour (a muted slate blue, defined in `@theme` in `resources/css/app.css`) for primary buttons, links, focus rings, selections and the current navigation item; never hard-code its values. Badges carry meaning: public in emerald, open contributions in sky, members only in violet. The UI follows the system theme: every colour class has its `dark:` counterpart next to it (`bg-white dark:bg-zinc-900`, `text-zinc-500 dark:text-zinc-400`, `text-brand-700 dark:text-brand-300`, `bg-brand-50 dark:bg-brand-950`; see existing components).
 - Use `<script setup lang="ts">` with typed `defineProps<…>()` and `defineModel()`.
 
 ## Verification

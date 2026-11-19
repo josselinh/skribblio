@@ -80,14 +80,14 @@ async function toggle(): Promise<void> {
 }
 
 const linkButtonClass =
-    'text-sm text-zinc-600 underline hover:text-zinc-900 disabled:cursor-default disabled:no-underline disabled:opacity-50';
+    'text-sm text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100 disabled:cursor-default disabled:no-underline disabled:opacity-50';
 </script>
 
 <template>
     <div>
         <button
             type="button"
-            class="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+            class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
             :aria-expanded="isOpen"
             aria-controls="export-panel"
             @click="toggle"
@@ -95,19 +95,19 @@ const linkButtonClass =
             Exporter pour Skribbl.io
         </button>
 
-        <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-            <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500">Chargement…</p>
+        <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
+            <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">Chargement…</p>
 
-            <p v-else-if="hasFailed" role="alert" class="text-sm text-red-600">
+            <p v-else-if="hasFailed" role="alert" class="text-sm text-red-600 dark:text-red-400">
                 Impossible de charger les mots.
                 <button type="button" class="underline" @click="load">Réessayer</button>
             </p>
 
             <template v-else>
-                <fieldset v-if="showsSelection" class="mb-4 border-b border-zinc-100 pb-4">
+                <fieldset v-if="showsSelection" class="mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
                     <legend class="text-sm font-medium">
                         Groupes à exporter
-                        <span class="font-normal text-zinc-500">({{ selectedWordGroups.length }} sur {{ wordGroups.length }})</span>
+                        <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ selectedWordGroups.length }} sur {{ wordGroups.length }})</span>
                     </legend>
                     <div class="mt-1 flex gap-3">
                         <button type="button" :class="linkButtonClass" :disabled="isEverythingSelected" @click="selectAll(true)">
@@ -121,7 +121,7 @@ const linkButtonClass =
                         <label
                             v-for="wordGroup in wordGroups"
                             :key="wordGroup.id"
-                            class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-300 bg-white px-3 py-1 text-sm has-checked:border-zinc-900 has-checked:bg-zinc-50"
+                            class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
                         >
                             <input
                                 type="checkbox"
@@ -129,16 +129,16 @@ const linkButtonClass =
                                 @change="toggleWordGroup(wordGroup.id, ($event.target as HTMLInputElement).checked)"
                             />
                             {{ wordGroup.name }}
-                            <span class="text-zinc-500">
+                            <span class="text-zinc-500 dark:text-zinc-400">
                                 · {{ wordGroup.words.length }} mot{{ wordGroup.words.length > 1 ? 's' : '' }}
                             </span>
                         </label>
                     </div>
                 </fieldset>
 
-                <p v-if="isNothingSelected" class="text-sm text-zinc-500">Choisissez au moins un groupe à exporter.</p>
+                <p v-if="isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">Choisissez au moins un groupe à exporter.</p>
 
-                <p v-else-if="words.length === 0" class="text-sm text-zinc-500">Aucun mot à exporter.</p>
+                <p v-else-if="words.length === 0" class="text-sm text-zinc-500 dark:text-zinc-400">Aucun mot à exporter.</p>
 
                 <WordListExport v-else :words="words" :note="note" :is-loading="isLoading" />
             </template>

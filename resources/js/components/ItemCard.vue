@@ -28,10 +28,10 @@ defineProps<{
 <template>
     <div class="relative h-full">
         <article
-            class="relative flex h-full flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 pr-12 shadow-xs"
+            class="relative flex h-full flex-col gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 pr-12 shadow-xs"
             :class="
                 isAccessible
-                    ? 'transition hover:border-zinc-400 hover:shadow-sm has-[h3_a:focus-visible]:outline-2 has-[h3_a:focus-visible]:outline-zinc-900'
+                    ? 'transition hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm has-[h3_a:focus-visible]:outline-2 has-[h3_a:focus-visible]:outline-brand-600 dark:has-[h3_a:focus-visible]:outline-brand-400'
                     : 'opacity-50 grayscale'
             "
             :aria-disabled="isAccessible ? undefined : 'true'"
@@ -54,8 +54,8 @@ defineProps<{
             <div v-if="acceptsContributions && isAccessible">
                 <ContributionsBadge :members-only="contributionsMembersOnly" />
             </div>
-            <p v-if="!isAccessible" class="text-sm text-zinc-600">{{ inaccessibleMessage }}</p>
-            <p v-else-if="updatedAt" class="text-sm text-zinc-500">
+            <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
+            <p v-else-if="updatedAt" class="text-sm text-zinc-500 dark:text-zinc-400">
                 {{ updatedLabel }} <time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time>
             </p>
         </article>

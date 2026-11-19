@@ -138,21 +138,21 @@ const saveError = computed(
         Object.entries(form.errors.value).find(([field]) => field.startsWith('word_group_ids.'))?.[1],
 );
 
-const tagClass = 'inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 py-1 pr-1 pl-3 text-sm';
-const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900';
+const tagClass = 'inline-flex items-center gap-1 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 py-1 pr-1 pl-3 text-sm';
+const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100';
 </script>
 
 <template>
     <AppLayout>
         <div class="mx-auto max-w-3xl">
             <h1 class="text-2xl font-semibold">Créer un export</h1>
-            <p class="mt-1 text-zinc-500">
+            <p class="mt-1 text-zinc-500 dark:text-zinc-400">
                 Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste
                 prête à coller dans Skribbl.io.
             </p>
 
             <section
-                class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+                class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                 aria-labelledby="export-selection-title"
             >
                 <h2 id="export-selection-title" class="text-lg font-semibold">Sélection</h2>
@@ -181,32 +181,32 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                             :disabled="isAdding"
                             @select="addGroupCollection"
                         />
-                        <p class="mt-1 text-xs text-zinc-500">
+                        <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                             Les groupes de la collection choisie sont ajoutés à la sélection : vous pourrez retirer ceux
                             que vous ne voulez pas.
                         </p>
                     </div>
                 </div>
 
-                <p v-if="isAdding" class="mt-4 text-sm text-zinc-500">Ajout en cours…</p>
-                <p v-else-if="addError" role="alert" class="mt-4 text-sm text-red-600">{{ addError }}</p>
-                <p v-else-if="addStatus" role="status" class="mt-4 text-sm text-zinc-700">{{ addStatus }}</p>
+                <p v-if="isAdding" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">Ajout en cours…</p>
+                <p v-else-if="addError" role="alert" class="mt-4 text-sm text-red-600 dark:text-red-400">{{ addError }}</p>
+                <p v-else-if="addStatus" role="status" class="mt-4 text-sm text-zinc-700 dark:text-zinc-300">{{ addStatus }}</p>
 
-                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500">Aucun groupe sélectionné.</p>
+                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">Aucun groupe sélectionné.</p>
 
                 <template v-else>
                     <div class="mt-4 flex items-center justify-between gap-2">
-                        <p class="text-sm text-zinc-500">
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400">
                             {{ plural(selectedWordGroups.length, 'groupe sélectionné', 'groupes sélectionnés') }}
                         </p>
-                        <button type="button" class="text-sm text-zinc-600 underline hover:text-zinc-900" @click="removeAll">
+                        <button type="button" class="text-sm text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100" @click="removeAll">
                             Tout retirer
                         </button>
                     </div>
                     <ul class="mt-2 flex flex-wrap gap-2" aria-label="Groupes sélectionnés">
                         <li v-for="wordGroup in selectedWordGroups" :key="wordGroup.id" :class="tagClass">
                             {{ wordGroup.name }}
-                            <span class="text-zinc-500">· {{ wordGroup.words.length }}</span>
+                            <span class="text-zinc-500 dark:text-zinc-400">· {{ wordGroup.words.length }}</span>
                             <button
                                 type="button"
                                 :class="removeButtonClass"
@@ -222,21 +222,21 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
 
             <template v-if="hasSelection">
                 <section
-                    class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+                    class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                     aria-labelledby="export-result-title"
                 >
                     <h2 id="export-result-title" class="text-lg font-semibold">Export</h2>
 
-                    <p v-if="words.length === 0" class="mt-2 text-sm text-zinc-500">Aucun mot à exporter.</p>
+                    <p v-if="words.length === 0" class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Aucun mot à exporter.</p>
                     <WordListExport v-else class="mt-2" :words="words" />
                 </section>
 
                 <section
-                    class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+                    class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                     aria-labelledby="export-save-title"
                 >
                     <h2 id="export-save-title" class="text-lg font-semibold">Enregistrer comme collection</h2>
-                    <p class="mt-1 text-sm text-zinc-500">
+                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                         La nouvelle collection contiendra les
                         {{ plural(selectedWordGroups.length, 'groupe', 'groupes') }} de cette sélection.
                     </p>
@@ -258,7 +258,7 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                             :error="form.errors.value.accepts_contributions"
                             :members-only-error="form.errors.value.contributions_members_only"
                         />
-                        <p v-if="saveError" role="alert" class="text-sm text-red-600">{{ saveError }}</p>
+                        <p v-if="saveError" role="alert" class="text-sm text-red-600 dark:text-red-400">{{ saveError }}</p>
                         <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
                     </form>
                 </section>

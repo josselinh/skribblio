@@ -107,7 +107,7 @@ function select(item: T): void {
             :aria-expanded="isOpen"
             :aria-invalid="invalid ? true : undefined"
             :disabled="disabled"
-            class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-xs focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none disabled:opacity-60 aria-invalid:border-red-500"
+            class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none disabled:opacity-60 aria-invalid:border-red-500"
             @focus="open"
             @keydown.esc="close"
         />
@@ -115,19 +115,19 @@ function select(item: T): void {
             v-if="isOpen"
             :id="`${inputId}-results`"
             role="listbox"
-            class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg"
+            class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 shadow-lg"
         >
-            <li v-if="isSearching && results.length === 0" class="px-3 py-2 text-sm text-zinc-500">Recherche…</li>
-            <li v-else-if="results.length === 0" class="px-3 py-2 text-sm text-zinc-500">{{ emptyMessage }}</li>
+            <li v-if="isSearching && results.length === 0" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">Recherche…</li>
+            <li v-else-if="results.length === 0" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">{{ emptyMessage }}</li>
             <li v-for="item in results" :key="item.id" role="option" :aria-selected="isExcluded(item)">
                 <button
                     type="button"
-                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-zinc-50 focus:bg-zinc-50 focus:outline-none disabled:cursor-default disabled:opacity-50"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none disabled:cursor-default disabled:opacity-50"
                     :disabled="isExcluded(item)"
                     @click="select(item)"
                 >
                     <span class="truncate">{{ item.name }}</span>
-                    <span class="flex shrink-0 items-center gap-2 text-xs text-zinc-500">
+                    <span class="flex shrink-0 items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                         <VisibilityBadge :visibility="item.visibility" />
                         {{ creatorLabel(item.creator, auth.user?.id) }}
                     </span>

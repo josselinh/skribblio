@@ -6,4 +6,28 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Accent colour of the interface (buttons, links, focus, selections): a muted slate blue. */
+    --color-brand-50: oklch(0.97 0.012 250);
+    --color-brand-100: oklch(0.94 0.022 250);
+    --color-brand-200: oklch(0.88 0.04 250);
+    --color-brand-300: oklch(0.8 0.055 250);
+    --color-brand-400: oklch(0.69 0.07 250);
+    --color-brand-500: oklch(0.58 0.08 250);
+    --color-brand-600: oklch(0.5 0.08 250);
+    --color-brand-700: oklch(0.43 0.07 250);
+    --color-brand-800: oklch(0.36 0.06 250);
+    --color-brand-900: oklch(0.3 0.05 250);
+    --color-brand-950: oklch(0.24 0.04 250);
+}
+
+@layer base {
+    /*
+     * Follows the system theme (dark variants use `prefers-color-scheme`). The colour scheme gives native
+     * controls and scrollbars the right theme, the accent colour tints checkboxes and radio buttons.
+     */
+    :root {
+        color-scheme: light dark;
+        accent-color: var(--color-brand-600);
+    }
 }

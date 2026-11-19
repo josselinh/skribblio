@@ -34,7 +34,7 @@ async function submit(): Promise<void> {
     <AuthCard title="Nouveau mot de passe">
         <template v-if="status">
             <StatusMessage :message="status" />
-            <RouterLink :to="{ name: 'login' }" class="text-sm font-medium text-zinc-900 underline">Se connecter</RouterLink>
+            <RouterLink :to="{ name: 'login' }" class="text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">Se connecter</RouterLink>
         </template>
 
         <form v-else class="space-y-4" novalidate @submit.prevent="submit">

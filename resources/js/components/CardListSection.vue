@@ -42,19 +42,19 @@ defineSlots<{
         <div class="flex flex-wrap items-center justify-between gap-4">
             <h2 :id="`${sectionId}-title`" class="text-lg font-semibold">
                 {{ title }}
-                <span v-if="result" class="font-normal text-zinc-500">({{ result.meta.total }})</span>
+                <span v-if="result" class="font-normal text-zinc-500 dark:text-zinc-400">({{ result.meta.total }})</span>
             </h2>
             <slot name="actions" />
         </div>
 
-        <p v-if="isLoading && !result" class="mt-4 text-zinc-500">Chargement…</p>
-        <p v-else-if="hasFailed" class="mt-4 text-red-600">
+        <p v-if="isLoading && !result" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
+        <p v-else-if="hasFailed" class="mt-4 text-red-600 dark:text-red-400">
             Impossible de charger la liste.
             <button type="button" class="underline" @click="$emit('retry')">Réessayer</button>
         </p>
         <div v-else-if="result?.data.length === 0" class="mt-4">
             <slot name="empty">
-                <p class="text-zinc-500">{{ emptyMessage }}</p>
+                <p class="text-zinc-500 dark:text-zinc-400">{{ emptyMessage }}</p>
             </slot>
         </div>
         <template v-else-if="result">
@@ -63,7 +63,7 @@ defineSlots<{
                     <slot name="item" :item="item" />
                 </li>
             </ul>
-            <RouterLink v-if="seeAll" :to="seeAll.to" class="mt-4 inline-block text-sm font-medium underline">
+            <RouterLink v-if="seeAll" :to="seeAll.to" class="mt-4 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">
                 {{ seeAll.label }}
             </RouterLink>
             <PaginationNav

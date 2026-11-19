@@ -26,7 +26,7 @@ function remove(wordGroup: WordGroup): void {
 <template>
     <div>
         <label for="word-group-search" class="block text-sm font-medium">Groupes</label>
-        <p class="text-sm text-zinc-500">Vos groupes et les groupes publics des autres utilisateurs. Au moins un.</p>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">Vos groupes et les groupes publics des autres utilisateurs. Au moins un.</p>
 
         <WordGroupSearch
             class="mt-2"
@@ -40,12 +40,12 @@ function remove(wordGroup: WordGroup): void {
             <li
                 v-for="wordGroup in selected"
                 :key="wordGroup.id"
-                class="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 py-1 pr-1 pl-3 text-sm"
+                class="inline-flex items-center gap-1 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 py-1 pr-1 pl-3 text-sm"
             >
                 {{ wordGroup.name }}
                 <button
                     type="button"
-                    class="rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900"
+                    class="rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100"
                     :aria-label="`Retirer ${wordGroup.name}`"
                     @click="remove(wordGroup)"
                 >
@@ -54,6 +54,6 @@ function remove(wordGroup: WordGroup): void {
             </li>
         </ul>
 
-        <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
     </div>
 </template>

@@ -40,20 +40,20 @@ watch(userId, loadUser, { immediate: true });
 
 <template>
     <AppLayout>
-        <p v-if="status === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
+        <p v-if="status === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
 
         <div v-else-if="status === 'not-found'" class="mt-4">
             <h1 class="text-2xl font-semibold">Utilisateur introuvable</h1>
         </div>
 
-        <p v-else-if="status === 'failed'" class="mt-4 text-red-600">
+        <p v-else-if="status === 'failed'" class="mt-4 text-red-600 dark:text-red-400">
             Impossible de charger cet utilisateur.
             <button type="button" class="underline" @click="loadUser">Réessayer</button>
         </p>
 
         <template v-else-if="user">
             <h1 class="mt-2 text-2xl font-semibold">{{ user.name }}</h1>
-            <p class="mt-1 text-sm text-zinc-500">Ses groupes et collections publics, et ceux qu'il ou elle partage avec vous.</p>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Ses groupes et collections publics, et ceux qu'il ou elle partage avec vous.</p>
 
             <div class="mt-8 space-y-12">
                 <CardListSection

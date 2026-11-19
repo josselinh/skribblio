@@ -40,7 +40,7 @@ async function submit(): Promise<void> {
             <h1 class="text-2xl font-semibold">Nouvelle collection</h1>
 
             <form
-                class="mt-6 space-y-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+                class="mt-6 space-y-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                 novalidate
                 @submit.prevent="submit"
             >

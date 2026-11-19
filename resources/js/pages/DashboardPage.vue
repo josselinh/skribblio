@@ -76,7 +76,7 @@ const isNewcomer = computed(() =>
 );
 
 const buttonClass =
-    'inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700';
+    'inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700';
 </script>
 
 <template>
@@ -87,26 +87,26 @@ const buttonClass =
         <div class="space-y-12">
             <div
                 v-if="isNewcomer"
-                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 p-5"
+                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-5"
             >
                 <div>
                     <p class="font-semibold">Nouveau sur Skribblio Tools ?</p>
-                    <p class="text-sm text-zinc-500">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">
                         Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés
                         en favoris avec l’étoile ☆.
                     </p>
                 </div>
-                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium underline">
+                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">
                     Découvrir les groupes de la communauté →
                 </RouterLink>
             </div>
 
             <div
-                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs"
+                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-5 shadow-xs"
             >
                 <div>
-                    <p class="font-semibold">Exporter pour Skribbl.io</p>
-                    <p class="text-sm text-zinc-500">
+                    <p class="font-semibold text-brand-800 dark:text-brand-200">Exporter pour Skribbl.io</p>
+                    <p class="text-sm text-zinc-600 dark:text-zinc-400">
                         Réunissez les mots de plusieurs groupes et collections en une liste prête à coller.
                     </p>
                 </div>
@@ -116,9 +116,9 @@ const buttonClass =
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
                 <h2 id="received-access-requests-title" class="text-lg font-semibold">
                     Demandes d'accès reçues
-                    <span class="font-normal text-zinc-500">({{ receivedAccessRequests.length }})</span>
+                    <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ receivedAccessRequests.length }})</span>
                 </h2>
-                <ul class="mt-4 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
+                <ul class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
                     <AccessRequestItem
                         v-for="accessRequest in receivedAccessRequests"
                         :key="accessRequest.id"
@@ -143,11 +143,11 @@ const buttonClass =
                     <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">+ Nouveau groupe</RouterLink>
                 </template>
                 <template #empty>
-                    <div class="rounded-xl border border-dashed border-zinc-300 p-8 text-center">
-                        <p class="text-zinc-500">Vous n'avez encore créé aucun groupe.</p>
+                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                        <p class="text-zinc-500 dark:text-zinc-400">Vous n'avez encore créé aucun groupe.</p>
                         <RouterLink
                             :to="{ name: 'word-groups.create' }"
-                            class="mt-2 inline-block text-sm font-medium underline"
+                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
                         >
                             Créer mon premier groupe
                         </RouterLink>
@@ -174,11 +174,11 @@ const buttonClass =
                     </RouterLink>
                 </template>
                 <template #empty>
-                    <div class="rounded-xl border border-dashed border-zinc-300 p-8 text-center">
-                        <p class="text-zinc-500">Vous n'avez encore créé aucune collection.</p>
+                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                        <p class="text-zinc-500 dark:text-zinc-400">Vous n'avez encore créé aucune collection.</p>
                         <RouterLink
                             :to="{ name: 'group-collections.create' }"
-                            class="mt-2 inline-block text-sm font-medium underline"
+                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
                         >
                             Créer ma première collection
                         </RouterLink>

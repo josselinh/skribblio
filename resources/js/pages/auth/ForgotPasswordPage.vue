@@ -41,7 +41,7 @@ async function submit(): Promise<void> {
         </form>
 
         <template #footer>
-            <RouterLink :to="{ name: 'login' }" class="font-medium text-zinc-900 underline">Retour à la connexion</RouterLink>
+            <RouterLink :to="{ name: 'login' }" class="font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">Retour à la connexion</RouterLink>
         </template>
     </AuthCard>
 </template>

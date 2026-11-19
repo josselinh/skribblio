@@ -68,13 +68,13 @@ function onClick(event: MouseEvent): void {
         ref="dialog"
         :role="role"
         :aria-labelledby="titleId"
-        class="mx-0 mt-auto mb-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-2xl bg-white p-0 text-left font-normal whitespace-normal text-zinc-900 shadow-xl backdrop:bg-zinc-950/40 sm:m-auto sm:max-w-md sm:rounded-2xl"
+        class="mx-0 mt-auto mb-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-2xl bg-white dark:bg-zinc-900 p-0 text-left font-normal whitespace-normal text-zinc-900 dark:text-zinc-100 shadow-xl backdrop:bg-zinc-950/40 dark:backdrop:bg-black/60 sm:m-auto sm:max-w-md sm:rounded-2xl"
         @cancel="onCancel"
         @click="onClick"
     >
         <div class="px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6">
             <h2 :id="titleId" class="text-lg font-semibold">{{ title }}</h2>
-            <div class="mt-2 text-sm text-zinc-600">
+            <div class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                 <slot />
             </div>
             <div v-if="$slots.actions" class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

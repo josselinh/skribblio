@@ -52,8 +52,8 @@ async function toggle(vote: WordVote): Promise<void> {
 }
 
 const buttons: { vote: WordVote; emoji: string; label: string; activeClass: string }[] = [
-    { vote: 'up', emoji: '👍', label: 'J’aime', activeClass: 'bg-blue-50 text-blue-700 ring-blue-300' },
-    { vote: 'down', emoji: '👎', label: 'Je n’aime pas', activeClass: 'bg-red-50 text-red-700 ring-red-300' },
+    { vote: 'up', emoji: '👍', label: 'J’aime', activeClass: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 ring-emerald-300 dark:ring-emerald-800' },
+    { vote: 'down', emoji: '👎', label: 'Je n’aime pas', activeClass: 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 ring-red-300 dark:ring-red-800' },
 ];
 
 function countOf(vote: WordVote): number {
@@ -67,8 +67,8 @@ function countOf(vote: WordVote): number {
             <button
                 v-if="word.can.vote"
                 type="button"
-                class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-zinc-900"
-                :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-600 ring-zinc-200 hover:bg-zinc-100'"
+                class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+                :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-600 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'"
                 :aria-pressed="word.my_vote === button.vote"
                 :aria-label="`${button.label} « ${word.name} » (${countOf(button.vote)})`"
                 :title="hasFailed ? 'Impossible d’enregistrer le vote, veuillez réessayer.' : button.label"
@@ -79,7 +79,7 @@ function countOf(vote: WordVote): number {
             </button>
             <span
                 v-else
-                class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-zinc-500 tabular-nums"
+                class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 tabular-nums"
                 :title="button.label"
             >
                 <span aria-hidden="true">{{ button.emoji }}</span>

@@ -125,7 +125,7 @@ function seeAll(listType: Exclude<TypeFilter, 'all'>, total: number | undefined,
 const pillClass = (isActive: boolean) =>
     [
         'cursor-pointer rounded-full border px-3 py-1 text-sm transition',
-        isActive ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-300 bg-white hover:bg-zinc-50',
+        isActive ? 'border-brand-600 bg-brand-600 text-white' : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800',
     ].join(' ');
 </script>
 
@@ -135,7 +135,7 @@ const pillClass = (isActive: boolean) =>
             <template v-if="q">Résultats pour « {{ q }} »</template>
             <template v-else>Explorer</template>
         </h1>
-        <p v-if="isCatalogue" class="mt-1 text-sm text-zinc-500">
+        <p v-if="isCatalogue" class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Découvrez les groupes et collections partagés par les autres utilisateurs, ou cherchez-en un par son nom.
         </p>
 
@@ -147,11 +147,11 @@ const pillClass = (isActive: boolean) =>
                     v-model="searchInput"
                     type="search"
                     placeholder="Nom d'un groupe ou d'une collection…"
-                    class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-xs focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none"
+                    class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                 />
                 <button
                     type="submit"
-                    class="shrink-0 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+                    class="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
                 >
                     Rechercher
                 </button>
@@ -161,7 +161,7 @@ const pillClass = (isActive: boolean) =>
         <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8">
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">Type</legend>
-                <span class="text-sm text-zinc-500" aria-hidden="true">Type :</span>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Type :</span>
                 <label v-for="option in typeOptions" :key="option.value" :class="pillClass(type === option.value)">
                     <input
                         type="radio"
@@ -175,7 +175,7 @@ const pillClass = (isActive: boolean) =>
             </fieldset>
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">Créés par</legend>
-                <span class="text-sm text-zinc-500" aria-hidden="true">Créés par :</span>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Créés par :</span>
                 <label v-for="option in authorOptions" :key="option.value" :class="pillClass(author === option.value)">
                     <input
                         type="radio"
@@ -189,7 +189,7 @@ const pillClass = (isActive: boolean) =>
             </fieldset>
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">Trier par</legend>
-                <span class="text-sm text-zinc-500" aria-hidden="true">Tri :</span>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Tri :</span>
                 <label v-for="option in sortOptions" :key="option.value" :class="pillClass(sort === option.value)">
                     <input
                         type="radio"

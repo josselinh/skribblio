@@ -79,7 +79,7 @@ async function duplicate(): Promise<void> {
 <template>
     <button
         type="button"
-        class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50"
+        class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
         aria-haspopup="dialog"
         @click="askConfirmation"
     >
@@ -88,13 +88,13 @@ async function duplicate(): Promise<void> {
 
     <ModalDialog v-model:open="isConfirming" :title="title" :is-dismissible="!isDuplicating">
         <p>{{ description }}</p>
-        <p v-if="error" role="alert" class="mt-3 text-red-600">{{ error }}</p>
+        <p v-if="error" role="alert" class="mt-3 text-red-600 dark:text-red-400">{{ error }}</p>
 
         <template #actions>
             <button
                 type="button"
                 :disabled="isDuplicating"
-                class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60 sm:w-auto sm:py-2"
+                class="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60 sm:w-auto sm:py-2"
                 @click="isConfirming = false"
             >
                 Annuler
@@ -103,7 +103,7 @@ async function duplicate(): Promise<void> {
                 type="button"
                 autofocus
                 :disabled="isDuplicating"
-                class="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60 sm:w-auto sm:py-2"
+                class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:w-auto sm:py-2"
                 @click="duplicate"
             >
                 {{ isDuplicating ? 'Duplication…' : 'Dupliquer' }}
