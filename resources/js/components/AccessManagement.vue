@@ -106,7 +106,7 @@ watch(() => props.id, load, { immediate: true });
                     <span class="font-normal text-zinc-500">({{ access.members.length }})</span>
                 </h2>
                 <p v-if="access.members.length === 0" class="mt-2 text-sm text-zinc-500">
-                    Personne d'autre que vous pour l'instant. Partagez le lien pour recevoir des demandes.
+                    Personne d'autre que vous pour l'instant. Envoyez le lien d'invitation pour recevoir des demandes.
                 </p>
                 <ul v-else class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white shadow-xs">
                     <li v-for="member in access.members" :key="member.id" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">

@@ -240,7 +240,7 @@ Sur la page d'un groupe ou d'une collection, le bouton « Exporter pour Skribbl.
 
 ### Partage des groupes et collections privés
 
-1. Sur un groupe ou une collection **privé** (ou public avec contributions sur autorisation : le lien sert alors à demander à contribuer), le créateur clique sur « Partager » et copie le lien (`/share/…`). Il peut régénérer ce lien : l'ancien ne fonctionne alors plus.
+1. Sur un groupe ou une collection **privé** (ou public avec contributions sur autorisation : le lien sert alors à demander à contribuer), le créateur clique sur « Inviter » et copie le lien (`/share/…`). Il peut régénérer ce lien : l'ancien ne fonctionne alors plus.
 2. La personne qui ouvre le lien (après connexion ou inscription) envoie une demande d'accès. Le créateur est prévenu par e-mail.
 3. Le créateur accepte (après confirmation) ou refuse la demande depuis la page de l'élément ou son tableau de bord. Le demandeur est prévenu par e-mail. Le créateur peut retirer un accès à tout moment.
 
