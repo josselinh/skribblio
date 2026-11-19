@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import ContributionsBadge from '@/components/ContributionsBadge.vue';
+import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
-import type { Visibility } from '@/types/models';
+import type { FavoriteKind, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
     name: string;
     visibility: Visibility;
+    accepts_contributions: boolean;
 }
 
 /**
- * Page title showing a name and a visibility badge, with a "Modifier" button that turns it
- * into an inline form. Used by the group and collection pages.
+ * Page title showing a name, a visibility badge and whether contributions are open, with a "Modifier"
+ * button that turns it into an inline form. Used by the group and collection pages.
  */
 const props = defineProps<{
     name: string;
     visibility: Visibility;
+    acceptsContributions: boolean;
+    kind: FavoriteKind;
     canEdit: boolean;
     /** Label of the name field, e.g. "Nom du groupe". */
     nameLabel: string;
@@ -26,11 +31,16 @@ const props = defineProps<{
 }>();
 
 const isEditing = ref(false);
-const form = useForm<NameVisibilityPayload>({ name: props.name, visibility: props.visibility });
+const form = useForm<NameVisibilityPayload>({
+    name: props.name,
+    visibility: props.visibility,
+    accepts_contributions: props.acceptsContributions,
+});
 
 function startEditing(): void {
     form.data.name = props.name;
     form.data.visibility = props.visibility;
+    form.data.accepts_contributions = props.acceptsContributions;
     form.errors.value = {};
     isEditing.value = true;
 }
@@ -52,6 +62,11 @@ async function submit(): Promise<void> {
     >
         <FormField id="edit-name" v-model="form.data.name" :label="nameLabel" :error="form.errors.value.name" required />
         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
+        <ContributionsField
+            v-model="form.data.accepts_contributions"
+            :kind="kind"
+            :error="form.errors.value.accepts_contributions"
+        />
         <div class="flex justify-end gap-2">
             <button
                 type="button"
@@ -71,9 +86,10 @@ async function submit(): Promise<void> {
     </form>
 
     <div v-else class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex min-w-0 items-center gap-3">
+        <div class="flex min-w-0 flex-wrap items-center gap-3">
             <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
             <VisibilityBadge :visibility="visibility" />
+            <ContributionsBadge v-if="acceptsContributions" />
             <slot name="after-title" />
         </div>
         <button

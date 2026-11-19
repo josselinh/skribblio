@@ -37,4 +37,19 @@ class WordPolicyTest extends TestCase
         $this->assertTrue($groupCreator->can($ability, $word));
         $this->assertFalse(User::factory()->create()->can($ability, $word));
     }
+
+    #[TestWith(['update'])]
+    #[TestWith(['delete'])]
+    public function test_word_author_can_no_longer_manage_word_once_the_group_is_closed(string $ability): void
+    {
+        $groupCreator = User::factory()->create();
+        $author = User::factory()->create();
+        $word = Word::factory()
+            ->for(WordGroup::factory()->public()->closedToContributions()->createdBy($groupCreator))
+            ->createdBy($author)
+            ->create();
+
+        $this->assertFalse($author->can($ability, $word));
+        $this->assertTrue($groupCreator->can($ability, $word));
+    }
 }

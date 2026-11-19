@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { createGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
+import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
@@ -13,7 +14,7 @@ import type { Visibility, WordGroup } from '@/types/models';
 const router = useRouter();
 
 const selectedWordGroups = ref<WordGroup[]>([]);
-const form = useForm({ name: '', visibility: 'private' as Visibility });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
 
 /** Errors on the list itself or on one of its items (`word_group_ids.0`…). */
 const wordGroupsError = computed(
@@ -54,6 +55,11 @@ async function submit(): Promise<void> {
                     required
                 />
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
+                <ContributionsField
+                    v-model="form.data.accepts_contributions"
+                    kind="group-collections"
+                    :error="form.errors.value.accepts_contributions"
+                />
                 <WordGroupPicker v-model="selectedWordGroups" :error="wordGroupsError" />
                 <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
             </form>

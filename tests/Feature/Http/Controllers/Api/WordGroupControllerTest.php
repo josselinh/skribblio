@@ -44,6 +44,7 @@ class WordGroupControllerTest extends TestCase
                 'id' => $newerGroup->id,
                 'name' => $newerGroup->name,
                 'visibility' => 'public',
+                'accepts_contributions' => true,
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
@@ -76,7 +77,8 @@ class WordGroupControllerTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('data.name', 'Animaux')
-            ->assertJsonPath('data.visibility', 'private');
+            ->assertJsonPath('data.visibility', 'private')
+            ->assertJsonPath('data.accepts_contributions', true);
         $this->assertDatabaseHas('word_groups', [
             'id' => $response->json('data.id'),
             'name' => 'Animaux',
@@ -167,5 +169,26 @@ class WordGroupControllerTest extends TestCase
             ->patchJson("/api/word-groups/{$wordGroup->id}", [])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['name', 'visibility']);
+    }
+
+    public function test_store_and_update_set_whether_the_group_accepts_contributions(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/word-groups', [
+            'name' => 'Animaux',
+            'visibility' => 'public',
+            'accepts_contributions' => false,
+        ]);
+
+        $response->assertCreated()->assertJsonPath('data.accepts_contributions', false);
+        $wordGroup = WordGroup::findOrFail($response->json('data.id'));
+        $this->assertFalse($wordGroup->accepts_contributions);
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => 'Animaux', 'visibility' => 'public', 'accepts_contributions' => true])
+            ->assertOk()
+            ->assertJsonPath('data.accepts_contributions', true);
+        $this->assertTrue($wordGroup->fresh()->accepts_contributions);
     }
 }

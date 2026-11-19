@@ -24,6 +24,7 @@ function updateFavorite(isFavorite: boolean): void {
         :to="{ name: 'group-collections.show', params: { id: groupCollection.id } }"
         :name="groupCollection.name"
         :visibility="groupCollection.visibility"
+        :accepts-contributions="groupCollection.accepts_contributions"
         :updated-at="groupCollection.updated_at"
         updated-label="Modifiée le"
         :is-accessible="groupCollection.is_accessible !== false"

@@ -35,7 +35,10 @@ class GroupCollectionFactory extends Factory
     {
         return $this->afterCreating(function (GroupCollection $groupCollection): void {
             if (! $groupCollection->wordGroups()->exists()) {
-                $groupCollection->wordGroups()->attach(WordGroup::factory()->createdBy($groupCollection->creator)->create());
+                $groupCollection->wordGroups()->attach(
+                    WordGroup::factory()->createdBy($groupCollection->creator)->create(),
+                    ['added_by' => $groupCollection->created_by],
+                );
             }
         });
     }
@@ -51,6 +54,20 @@ class GroupCollectionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'visibility' => Visibility::Private,
+        ]);
+    }
+
+    public function openToContributions(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'accepts_contributions' => true,
+        ]);
+    }
+
+    public function closedToContributions(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'accepts_contributions' => false,
         ]);
     }
 

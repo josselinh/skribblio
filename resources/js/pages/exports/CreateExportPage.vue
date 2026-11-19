@@ -7,6 +7,7 @@ import { createGroupCollection } from '@/api/groupCollections';
 import { fetchGroupCollectionSearchResults } from '@/api/search';
 import FormField from '@/components/FormField.vue';
 import AppLayout from '@/components/AppLayout.vue';
+import ContributionsField from '@/components/ContributionsField.vue';
 import ItemSearch from '@/components/ItemSearch.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
@@ -105,7 +106,7 @@ const hiddenGroupsNote = computed(() => {
 
 const wordGroupsCount = computed(() => composition.value?.word_group_ids.length ?? 0);
 
-const form = useForm({ name: '', visibility: 'private' as Visibility });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
 
 /** Saves the groups of the composition (collections flattened into their groups) as a new collection. */
 async function saveAsGroupCollection(): Promise<void> {
@@ -246,6 +247,11 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                             required
                         />
                         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
+                        <ContributionsField
+                            v-model="form.data.accepts_contributions"
+                            kind="group-collections"
+                            :error="form.errors.value.accepts_contributions"
+                        />
                         <p v-if="saveError" role="alert" class="text-sm text-red-600">{{ saveError }}</p>
                         <PrimaryButton :is-loading="form.isProcessing.value || isComposing">
                             Créer la collection

@@ -33,11 +33,17 @@ class WordGroupPolicy
     }
 
     /**
-     * Anyone can add words to a public group; only the creator to a private one.
+     * The creator can always add words; the users who can see the group too, while it is open to contributions.
      */
     public function addWord(User $user, WordGroup $wordGroup): Response
     {
-        return $this->view($user, $wordGroup);
+        if (! $wordGroup->isVisibleTo($user)) {
+            return Response::denyAsNotFound();
+        }
+
+        return $wordGroup->acceptsContributionFrom($user)
+            ? Response::allow()
+            : Response::deny('Ce groupe n’est pas ouvert aux contributions.');
     }
 
     /**

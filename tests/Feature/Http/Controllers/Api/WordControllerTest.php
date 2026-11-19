@@ -212,4 +212,27 @@ class WordControllerTest extends TestCase
 
         $this->assertModelExists($word);
     }
+
+    public function test_store_returns_403_for_another_user_on_a_group_closed_to_contributions(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->closedToContributions()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat'])
+            ->assertForbidden();
+
+        $this->assertSame(0, $wordGroup->words()->count());
+    }
+
+    public function test_author_can_no_longer_rename_their_word_once_the_group_is_closed_but_the_word_is_kept(): void
+    {
+        $author = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->closedToContributions()->create();
+        $word = Word::factory()->for($wordGroup)->createdBy($author)->create(['name' => 'chat']);
+
+        $this->actingAs($author)->patchJson("/api/words/{$word->id}", ['name' => 'chien'])->assertForbidden();
+        $this->actingAs($author)->deleteJson("/api/words/{$word->id}")->assertForbidden();
+
+        $this->assertSame('chat', $word->fresh()->name);
+    }
 }

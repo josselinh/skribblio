@@ -68,4 +68,22 @@ class GroupCollectionPolicyTest extends TestCase
 
         $this->assertFalse($otherUser->can('attachWordGroup', [$groupCollection, WordGroup::factory()->public()->createdBy($otherUser)->create()]));
     }
+
+    public function test_open_collection_lets_its_viewers_add_groups_they_can_see_including_their_private_ones(): void
+    {
+        $contributor = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()->create();
+        $ownPrivateGroup = WordGroup::factory()->private()->createdBy($contributor)->create();
+
+        $this->assertTrue($contributor->can('addWordGroup', $groupCollection));
+        $this->assertTrue($contributor->can('attachWordGroup', [$groupCollection, $ownPrivateGroup]));
+        $this->assertFalse($contributor->can('attachWordGroup', [$groupCollection, WordGroup::factory()->private()->create()]));
+    }
+
+    public function test_open_private_collection_does_not_let_users_who_cannot_see_it_add_groups(): void
+    {
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->create();
+
+        $this->assertFalse(User::factory()->create()->can('addWordGroup', $groupCollection));
+    }
 }

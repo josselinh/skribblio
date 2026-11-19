@@ -16,25 +16,32 @@ use Illuminate\Validation\ValidationException;
 class GroupCollectionWordGroupController extends Controller
 {
     /**
-     * Add a group to the collection. Adding a group already in it does nothing.
+     * Add a group to the collection, recording who added it. Adding a group already in it does nothing
+     * (and keeps who added it first).
      */
     public function store(AttachWordGroupRequest $request, GroupCollection $groupCollection): Response
     {
-        $groupCollection->wordGroups()->syncWithoutDetaching([$request->wordGroup()->getKey()]);
-        $groupCollection->touch();
+        $wordGroup = $request->wordGroup();
+        if (! $groupCollection->wordGroups()->whereKey($wordGroup->getKey())->exists()) {
+            $groupCollection->wordGroups()->attach($wordGroup, ['added_by' => $request->user()->getKey()]);
+            $groupCollection->touch();
+        }
 
         return response()->noContent();
     }
 
     /**
-     * Remove a group from the collection, which must keep at least one group.
+     * Remove a group from the collection, which must keep at least one group. The creator can remove any
+     * group, a contributor the groups they added while the collection is open to contributions.
      *
      * @throws ValidationException
      */
     public function destroy(GroupCollection $groupCollection, WordGroup $wordGroup): Response
     {
-        Gate::authorize('update', $groupCollection);
-        abort_unless($groupCollection->wordGroups()->whereKey($wordGroup->getKey())->exists(), 404);
+        Gate::authorize('view', $groupCollection);
+        $attachedWordGroup = $groupCollection->wordGroups()->whereKey($wordGroup->getKey())->first();
+        abort_if($attachedWordGroup === null, 404);
+        Gate::authorize('detachWordGroup', [$groupCollection, $attachedWordGroup]);
 
         if ($groupCollection->wordGroups()->count() === 1) {
             throw ValidationException::withMessages([

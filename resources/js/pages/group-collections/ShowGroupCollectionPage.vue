@@ -77,11 +77,10 @@ async function loadGroupCollection(): Promise<void> {
     }
 }
 
+/** Reloads the collection: opening or closing contributions changes which groups the user can remove. */
 async function saveGroupCollection(payload: NameVisibilityPayload): Promise<void> {
-    const updated = await updateGroupCollection(groupCollectionId.value, payload);
-    if (groupCollection.value) {
-        groupCollection.value = { ...groupCollection.value, ...updated };
-    }
+    await updateGroupCollection(groupCollectionId.value, payload);
+    await loadGroupCollection();
 }
 
 /** Runs a change on the groups of the collection, then reloads it; shows validation errors (422). */
@@ -143,6 +142,8 @@ watch(
                 <EditableNameVisibility
                     :name="groupCollection.name"
                     :visibility="groupCollection.visibility"
+                    :accepts-contributions="groupCollection.accepts_contributions"
+                    kind="group-collections"
                     :can-edit="groupCollection.can.update"
                     name-label="Nom de la collection"
                     :save="saveGroupCollection"
@@ -196,7 +197,7 @@ watch(
                     Groupes <span class="font-normal text-zinc-500">({{ totalWordGroupsCount }})</span>
                 </h2>
 
-                <div v-if="groupCollection.can.update" class="mt-3">
+                <div v-if="groupCollection.can.add_word_group" class="mt-3">
                     <label for="add-word-group" class="sr-only">Ajouter un groupe</label>
                     <WordGroupSearch
                         input-id="add-word-group"
@@ -205,6 +206,10 @@ watch(
                         @select="addWordGroup"
                     />
                 </div>
+
+                <p v-else class="mt-3 text-sm text-zinc-500">
+                    Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.
+                </p>
 
                 <p v-if="groupsError" role="alert" class="mt-3 text-sm text-red-600">{{ groupsError }}</p>
 
@@ -223,7 +228,7 @@ watch(
                     <li v-for="wordGroup in groupCollection.word_groups" :key="wordGroup.id" class="relative">
                         <WordGroupCard :word-group="wordGroup" />
                         <button
-                            v-if="groupCollection.can.update"
+                            v-if="wordGroup.can.remove_from_collection"
                             type="button"
                             class="absolute right-3 bottom-3 rounded-md px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-500"
                             :disabled="isUpdatingGroups || totalWordGroupsCount === 1"

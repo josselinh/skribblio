@@ -55,8 +55,10 @@ async function loadWords(): Promise<void> {
     }
 }
 
+/** Reloads the words too: opening or closing contributions changes what the user can do with them. */
 async function saveWordGroup(payload: NameVisibilityPayload): Promise<void> {
     wordGroup.value = await updateWordGroup(wordGroupId.value, payload);
+    await loadWords();
 }
 
 /** A new word is listed first: show page 1 so that it is visible. */
@@ -110,6 +112,8 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                 <EditableNameVisibility
                     :name="wordGroup.name"
                     :visibility="wordGroup.visibility"
+                    :accepts-contributions="wordGroup.accepts_contributions"
+                    kind="word-groups"
                     :can-edit="wordGroup.can.update"
                     name-label="Nom du groupe"
                     :save="saveWordGroup"
@@ -137,6 +141,9 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
             />
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
+            <p v-else class="mt-6 text-sm text-zinc-500">
+                Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.
+            </p>
 
             <p v-if="haveWordsFailed" class="mt-6 text-red-600">
                 Impossible de charger les mots.

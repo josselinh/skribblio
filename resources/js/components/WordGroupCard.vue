@@ -24,6 +24,7 @@ function updateFavorite(isFavorite: boolean): void {
         :to="{ name: 'word-groups.show', params: { id: wordGroup.id } }"
         :name="wordGroup.name"
         :visibility="wordGroup.visibility"
+        :accepts-contributions="wordGroup.accepts_contributions"
         :updated-at="wordGroup.updated_at"
         updated-label="Modifié le"
         :is-accessible="wordGroup.is_accessible !== false"
