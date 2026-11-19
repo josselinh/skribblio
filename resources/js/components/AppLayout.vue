@@ -18,7 +18,10 @@ async function search(): Promise<void> {
     <div class="min-h-screen">
         <header class="border-b border-zinc-200 bg-white">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
-                <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight">Skribblio Tools</RouterLink>
+                <nav class="flex items-center gap-x-5" aria-label="Navigation principale">
+                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight">Skribblio Tools</RouterLink>
+                    <RouterLink :to="{ name: 'search' }" class="text-sm text-zinc-600 hover:text-zinc-900">Explorer</RouterLink>
+                </nav>
                 <!-- The search page has its own, larger search field. -->
                 <form
                     v-if="route.name !== 'search'"

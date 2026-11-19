@@ -7,13 +7,14 @@ import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
-import type { AuthorFilter } from '@/types/models';
+import type { AuthorFilter, SearchSort } from '@/types/models';
 
 type TypeFilter = 'all' | 'word-groups' | 'group-collections';
 
 /** With "Tout", each section shows a preview; filtering on a type shows a full paginated list. */
 const PREVIEW_SIZE = 6;
 const PAGE_SIZE = 12;
+const DEFAULT_SORT: SearchSort = 'recent';
 
 const typeOptions: { value: TypeFilter; label: string }[] = [
     { value: 'all', label: 'Tout' },
@@ -25,6 +26,20 @@ const authorOptions: { value: AuthorFilter; label: string }[] = [
     { value: 'me', label: 'Moi' },
     { value: 'others', label: 'Les autres' },
 ];
+const sortOptions: { value: SearchSort; label: string }[] = [
+    { value: 'recent', label: 'Récents' },
+    { value: 'popular', label: 'Populaires' },
+    { value: 'largest', label: 'Les plus fournis' },
+    { value: 'name', label: 'A → Z' },
+];
+
+/**
+ * Without a search, the page is a catalogue to discover what other users share,
+ * so it shows their groups and collections by default.
+ */
+function defaultAuthor(search: string): AuthorFilter {
+    return search ? 'all' : 'others';
+}
 
 const route = useRoute();
 const router = useRouter();
@@ -37,19 +52,34 @@ function queryValue<T extends string>(key: string, allowed: readonly T[], fallba
 
 const q = computed(() => (typeof route.query.q === 'string' ? route.query.q : ''));
 const type = computed(() => queryValue<TypeFilter>('type', ['all', 'word-groups', 'group-collections'], 'all'));
-const author = computed(() => queryValue<AuthorFilter>('author', ['all', 'me', 'others'], 'all'));
+const isCatalogue = computed(() => q.value === '');
+const author = computed(() => queryValue<AuthorFilter>('author', ['all', 'me', 'others'], defaultAuthor(q.value)));
+const sort = computed(() => queryValue<SearchSort>('sort', ['recent', 'popular', 'largest', 'name'], DEFAULT_SORT));
 
 const searchInput = ref(q.value);
 watch(q, (value) => (searchInput.value = value));
 
-/** Updates the filters in the URL, which reloads the results; always goes back to the first page. */
+/**
+ * Updates the filters in the URL, which reloads the results; always goes back to the first page.
+ * Default values are left out of the URL (the default author depends on whether there is a search).
+ */
 function updateQuery(changes: LocationQueryRaw): Promise<unknown> {
-    const query: LocationQueryRaw = { q: q.value || undefined, type: type.value, author: author.value, ...changes, page: undefined };
+    const query: LocationQueryRaw = {
+        q: q.value || undefined,
+        type: type.value,
+        author: author.value,
+        sort: sort.value,
+        ...changes,
+        page: undefined,
+    };
     if (query.type === 'all') {
         query.type = undefined;
     }
-    if (query.author === 'all') {
+    if (query.author === defaultAuthor(typeof query.q === 'string' ? query.q : '')) {
         query.author = undefined;
+    }
+    if (query.sort === DEFAULT_SORT) {
+        query.sort = undefined;
     }
 
     return router.push({ query });
@@ -62,11 +92,12 @@ const wordGroups = usePaginatedList(
             : fetchWordGroupSearchResults({
                   q: q.value,
                   author: author.value,
+                  sort: sort.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, author],
+    [q, type, author, sort],
 );
 
 const groupCollections = usePaginatedList(
@@ -76,11 +107,12 @@ const groupCollections = usePaginatedList(
             : fetchGroupCollectionSearchResults({
                   q: q.value,
                   author: author.value,
+                  sort: sort.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, author],
+    [q, type, author, sort],
 );
 
 /** In preview mode ("Tout"), link to the full list of one type when there are more results. */
@@ -105,8 +137,11 @@ const pillClass = (isActive: boolean) =>
 
         <h1 class="mt-2 text-2xl font-semibold">
             <template v-if="q">Résultats pour « {{ q }} »</template>
-            <template v-else>Rechercher</template>
+            <template v-else>Explorer</template>
         </h1>
+        <p v-if="isCatalogue" class="mt-1 text-sm text-zinc-500">
+            Découvrez les groupes et collections partagés par les autres utilisateurs, ou cherchez-en un par son nom.
+        </p>
 
         <form role="search" class="mt-4" @submit.prevent="updateQuery({ q: searchInput.trim() || undefined })">
             <label for="search" class="sr-only">Rechercher un groupe ou une collection</label>
@@ -127,7 +162,7 @@ const pillClass = (isActive: boolean) =>
             </div>
         </form>
 
-        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-8">
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8">
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">Type</legend>
                 <span class="text-sm text-zinc-500" aria-hidden="true">Type :</span>
@@ -152,6 +187,20 @@ const pillClass = (isActive: boolean) =>
                         class="sr-only"
                         :checked="author === option.value"
                         @change="updateQuery({ author: option.value })"
+                    />
+                    {{ option.label }}
+                </label>
+            </fieldset>
+            <fieldset class="flex flex-wrap items-center gap-2">
+                <legend class="sr-only">Trier par</legend>
+                <span class="text-sm text-zinc-500" aria-hidden="true">Tri :</span>
+                <label v-for="option in sortOptions" :key="option.value" :class="pillClass(sort === option.value)">
+                    <input
+                        type="radio"
+                        name="sort"
+                        class="sr-only"
+                        :checked="sort === option.value"
+                        @change="updateQuery({ sort: option.value })"
                     />
                     {{ option.label }}
                 </label>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AuthorFilter;
+use App\Enums\SearchSort;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,6 +35,7 @@ class SearchRequest extends FormRequest
         return [
             'q' => ['nullable', 'string', 'max:255'],
             'author' => ['nullable', Rule::enum(AuthorFilter::class)],
+            'sort' => ['nullable', Rule::enum(SearchSort::class)],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
         ];
     }
@@ -46,6 +48,11 @@ class SearchRequest extends FormRequest
     public function author(): AuthorFilter
     {
         return AuthorFilter::tryFrom((string) $this->validated('author')) ?? AuthorFilter::All;
+    }
+
+    public function sort(): SearchSort
+    {
+        return SearchSort::tryFrom((string) $this->validated('sort')) ?? SearchSort::Recent;
     }
 
     public function perPage(): int

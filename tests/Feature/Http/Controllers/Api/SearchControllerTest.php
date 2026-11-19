@@ -69,6 +69,62 @@ class SearchControllerTest extends TestCase
         $this->actingAs($user)->getJson('/api/search/word-groups?author=others')->assertJsonPath('data.*.id', [$otherUsersGroup->id]);
     }
 
+    public function test_word_groups_sort_by_popularity_then_most_recently_updated(): void
+    {
+        $user = User::factory()->create();
+        $unfavoritedRecent = WordGroup::factory()->public()->create(['updated_at' => now()]);
+        $favoritedOnce = WordGroup::factory()->public()->create(['updated_at' => now()->subWeek()]);
+        $favoritedTwice = WordGroup::factory()->public()->create(['updated_at' => now()->subMonth()]);
+        $favoritedOnce->favoritedBy()->attach(User::factory()->create());
+        $favoritedTwice->favoritedBy()->attach(User::factory()->count(2)->create());
+
+        $this->actingAs($user)
+            ->getJson('/api/search/word-groups?sort=popular')
+            ->assertJsonPath('data.*.id', [$favoritedTwice->id, $favoritedOnce->id, $unfavoritedRecent->id]);
+    }
+
+    public function test_word_groups_sort_by_words_count(): void
+    {
+        $user = User::factory()->create();
+        $smallGroup = WordGroup::factory()->public()->create(['updated_at' => now()]);
+        $largeGroup = WordGroup::factory()->public()->create(['updated_at' => now()->subWeek()]);
+        Word::factory()->count(3)->for($largeGroup)->create();
+        Word::factory()->for($smallGroup)->create();
+
+        $this->actingAs($user)
+            ->getJson('/api/search/word-groups?sort=largest')
+            ->assertJsonPath('data.*.id', [$largeGroup->id, $smallGroup->id]);
+    }
+
+    public function test_word_groups_sort_by_name_after_the_name_relevance(): void
+    {
+        $user = User::factory()->create();
+        $containsA = WordGroup::factory()->public()->create(['name' => 'Animaux du chat']);
+        $startsZ = WordGroup::factory()->public()->create(['name' => 'Chats zen']);
+        $startsA = WordGroup::factory()->public()->create(['name' => 'Chats agiles']);
+
+        $this->actingAs($user)
+            ->getJson('/api/search/word-groups?q=chat&sort=name')
+            ->assertJsonPath('data.*.id', [$startsA->id, $startsZ->id, $containsA->id]);
+    }
+
+    public function test_group_collections_sort_by_popularity_and_by_groups_count(): void
+    {
+        $user = User::factory()->create();
+        $popularCollection = GroupCollection::factory()->public()->create(['updated_at' => now()->subWeek()]);
+        $largeCollection = GroupCollection::factory()->public()
+            ->hasAttached(WordGroup::factory()->count(3)->public()->create())
+            ->create(['updated_at' => now()->subMonth()]);
+        $popularCollection->favoritedBy()->attach(User::factory()->create());
+
+        $this->actingAs($user)
+            ->getJson('/api/search/group-collections?sort=popular')
+            ->assertJsonPath('data.*.id', [$popularCollection->id, $largeCollection->id]);
+        $this->actingAs($user)
+            ->getJson('/api/search/group-collections?sort=largest')
+            ->assertJsonPath('data.*.id', [$largeCollection->id, $popularCollection->id]);
+    }
+
     public function test_treats_like_wildcards_as_literal_characters(): void
     {
         $user = User::factory()->create();
@@ -90,6 +146,7 @@ class SearchControllerTest extends TestCase
 
     #[TestWith(['author=friends', 'author'])]
     #[TestWith(['per_page=100', 'per_page'])]
+    #[TestWith(['sort=random', 'sort'])]
     public function test_rejects_invalid_filters_with_422(string $query, string $field): void
     {
         $this->actingAs(User::factory()->create())

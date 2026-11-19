@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Enums\AuthorFilter;
+use App\Enums\SearchSort;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +40,26 @@ trait HasSearchableName
         if ($search !== '') {
             $query->orderByRaw($this->qualifyColumn('name').' like ? desc', [self::escapeLike($search).'%']);
         }
+    }
+
+    /**
+     * Orders by the chosen sort, then by most recently updated.
+     * Sorting by popularity requires a `favoritedBy()` relation; sorting by size requires the given count
+     * column to be loaded (e.g. `withCount('words')` for `words_count`).
+     *
+     * @param  Builder<static>  $query
+     */
+    #[Scope]
+    protected function orderBySearchSort(Builder $query, SearchSort $sort, string $sizeCountColumn): void
+    {
+        match ($sort) {
+            SearchSort::Recent => null,
+            SearchSort::Popular => $query->withCount('favoritedBy')->orderByDesc('favorited_by_count'),
+            SearchSort::Largest => $query->orderByDesc($sizeCountColumn),
+            SearchSort::Name => $query->orderBy($this->qualifyColumn('name')),
+        };
+
+        $query->latest($this->qualifyColumn('updated_at'))->latest($this->qualifyColumn('id'));
     }
 
     /**

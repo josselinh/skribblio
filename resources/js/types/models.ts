@@ -83,6 +83,9 @@ export interface GroupCollectionDetail extends GroupCollection {
 /** Who created the groups or collections returned by a search. */
 export type AuthorFilter = 'all' | 'me' | 'others';
 
+/** Order of search results after the name relevance: recently updated, most favorited, largest, alphabetical. */
+export type SearchSort = 'recent' | 'popular' | 'largest' | 'name';
+
 export type FavoriteKind = 'word-groups' | 'group-collections';
 
 export type AccessStatus = 'granted' | 'pending';
