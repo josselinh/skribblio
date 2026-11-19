@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useToasts } from '@/composables/useToasts';
 import {
     SKRIBBL_MAX_CHARACTERS,
     SKRIBBL_MIN_WORDS,
@@ -24,7 +25,7 @@ const props = withDefaults(
     { note: null, isLoading: false },
 );
 
-const copyStatus = ref<string | null>(null);
+const { showToast } = useToasts();
 
 const shouldDeduplicate = ref(true);
 const shouldShuffle = ref(false);
@@ -61,14 +62,13 @@ watch(
     },
     { immediate: true },
 );
-watch(exportedList, () => (copyStatus.value = null));
 
 async function copy(): Promise<void> {
     try {
         await navigator.clipboard.writeText(exportedList.value);
-        copyStatus.value = 'Liste copiée. Collez-la dans le champ « Custom words » de votre salon Skribbl.io.';
+        showToast('Liste copiée. Collez-la dans le champ « Custom words » de votre salon Skribbl.io.');
     } catch {
-        copyStatus.value = 'Copie impossible : sélectionnez la liste et copiez-la.';
+        showToast('Copie impossible : sélectionnez la liste et copiez-la.', 'error', 6000);
     }
 }
 
@@ -112,7 +112,6 @@ const secondaryButtonClass =
                 Copier
             </button>
         </div>
-        <p v-if="copyStatus" role="status" class="mt-2 text-sm text-green-700 dark:text-green-400">{{ copyStatus }}</p>
 
         <div v-if="hasTooFewWords" role="note" class="mt-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
             Skribbl.io demande au moins {{ SKRIBBL_MIN_WORDS }} mots personnalisés.

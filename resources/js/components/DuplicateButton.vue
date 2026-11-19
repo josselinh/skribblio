@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { duplicateGroupCollection } from '@/api/groupCollections';
 import { duplicateWordGroup } from '@/api/wordGroups';
 import ModalDialog from '@/components/ModalDialog.vue';
+import { useToasts } from '@/composables/useToasts';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
 
@@ -18,6 +19,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const { showToast } = useToasts();
 const isConfirming = ref(false);
 const isDuplicating = ref(false);
 const error = ref<string | null>(null);
@@ -41,7 +43,7 @@ function askConfirmation(): void {
     isConfirming.value = true;
 }
 
-/** Copies the item into an item of the current user and opens the copy with a status message. */
+/** Copies the item into an item of the current user, opens the copy and confirms it in a notification. */
 async function duplicate(): Promise<void> {
     isDuplicating.value = true;
     error.value = null;
@@ -49,21 +51,15 @@ async function duplicate(): Promise<void> {
         if (props.kind === 'word-groups') {
             const copy = await duplicateWordGroup(props.id);
             isConfirming.value = false;
-            await router.push({
-                name: 'word-groups.show',
-                params: { id: copy.id },
-                state: { status: 'Groupe dupliqué. Il est privé et fermé aux contributions.' },
-            });
+            await router.push({ name: 'word-groups.show', params: { id: copy.id } });
+            showToast('Groupe dupliqué. Il est privé et fermé aux contributions.');
         } else {
             const copy = await duplicateGroupCollection(props.id);
             isConfirming.value = false;
-            await router.push({
-                name: 'group-collections.show',
-                params: { id: copy.id },
-                state: {
-                    status: `Collection dupliquée. Elle et ses groupes copiés sont privés et fermés aux contributions.${hiddenGroupsNote(copy.hidden_word_groups_count)}`,
-                },
-            });
+            await router.push({ name: 'group-collections.show', params: { id: copy.id } });
+            showToast(
+                `Collection dupliquée. Elle et ses groupes copiés sont privés et fermés aux contributions.${hiddenGroupsNote(copy.hidden_word_groups_count)}`,
+            );
         }
     } catch (caughtError) {
         error.value =

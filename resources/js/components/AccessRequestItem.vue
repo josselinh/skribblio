@@ -4,10 +4,11 @@ import { RouterLink } from 'vue-router';
 import { decideAccessRequest } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserLink from '@/components/UserLink.vue';
+import { useToasts } from '@/composables/useToasts';
 import { formatDateTime } from '@/lib/format';
 import type { AccessRequest } from '@/types/models';
 
-/** One pending access (or contribution) request with its Accept and Refuse buttons. */
+/** One pending access (or contribution) request with its Accept and Refuse buttons; the decision is confirmed in a notification. */
 const props = withDefaults(
     defineProps<{
         accessRequest: AccessRequest;
@@ -24,6 +25,8 @@ const emit = defineEmits<{
 const requestLabel = computed(() =>
     props.accessRequest.purpose === 'contribution' ? 'demande à contribuer' : "demande l'accès",
 );
+
+const { showToast } = useToasts();
 
 const isDeciding = ref(false);
 const hasFailed = ref(false);
@@ -45,6 +48,7 @@ async function decide(accept: boolean): Promise<void> {
         await decideAccessRequest(props.accessRequest, accept);
         isConfirmingAcceptance.value = false;
         emit('decided', props.accessRequest, accept);
+        showToast(`Demande de ${props.accessRequest.requester.name} ${accept ? 'acceptée' : 'refusée'}.`);
     } catch {
         hasFailed.value = true;
     } finally {

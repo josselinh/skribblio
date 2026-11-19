@@ -4,22 +4,20 @@ import { useRouter } from 'vue-router';
 import AppLayout from '@/components/AppLayout.vue';
 import FormField from '@/components/FormField.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
-import StatusMessage from '@/components/StatusMessage.vue';
 import { useForm } from '@/composables/useForm';
+import { useToasts } from '@/composables/useToasts';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore();
 const router = useRouter();
+const { showToast } = useToasts();
 
 const profileForm = useForm({ name: auth.user?.name ?? '', email: auth.user?.email ?? '' });
-const profileStatus = ref<string | null>(null);
 
 const passwordForm = useForm({ current_password: '', password: '', password_confirmation: '' });
-const passwordStatus = ref<string | null>(null);
 
 /** A new email address must be verified: the user is then sent to the verification page. */
 async function saveProfile(): Promise<void> {
-    profileStatus.value = null;
     const isSuccessful = await profileForm.submit((data) => auth.updateProfileInformation({ ...data }));
 
     if (!isSuccessful) {
@@ -30,16 +28,15 @@ async function saveProfile(): Promise<void> {
 
         return;
     }
-    profileStatus.value = 'Votre profil a été mis à jour.';
+    showToast('Votre profil a été mis à jour.');
 }
 
 async function savePassword(): Promise<void> {
-    passwordStatus.value = null;
     const isSuccessful = await passwordForm.submit((data) => auth.updatePassword({ ...data }));
     passwordForm.reset();
 
     if (isSuccessful) {
-        passwordStatus.value = 'Votre mot de passe a été modifié.';
+        showToast('Votre mot de passe a été modifié.');
     }
 }
 
@@ -82,7 +79,6 @@ const buttonClass =
 
             <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="profile-title">
                 <h2 id="profile-title" class="text-lg font-semibold">Informations</h2>
-                <StatusMessage class="mt-4" :message="profileStatus" />
                 <form class="mt-4 space-y-4" novalidate @submit.prevent="saveProfile">
                     <FormField
                         id="profile-name"
@@ -114,7 +110,6 @@ const buttonClass =
 
             <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="password-title">
                 <h2 id="password-title" class="text-lg font-semibold">Mot de passe</h2>
-                <StatusMessage class="mt-4" :message="passwordStatus" />
                 <form class="mt-4 space-y-4" novalidate @submit.prevent="savePassword">
                     <FormField
                         id="current-password"

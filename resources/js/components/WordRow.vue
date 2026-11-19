@@ -5,6 +5,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserLink from '@/components/UserLink.vue';
 import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import { useForm } from '@/composables/useForm';
+import { useToasts } from '@/composables/useToasts';
 import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
 import { formatDateTime } from '@/lib/format';
 import type { Word } from '@/types/models';
@@ -14,6 +15,8 @@ const props = defineProps<{
     /** Shows the votes column. */
     showVotes: boolean;
 }>();
+
+const { showToast } = useToasts();
 
 const emit = defineEmits<{
     updated: [word: Word];
@@ -38,7 +41,9 @@ async function startEditing(): Promise<void> {
 
 async function save(): Promise<void> {
     const isSuccessful = await form.submit(async (data) => {
-        emit('updated', await updateWord(props.word.id, data));
+        const word = await updateWord(props.word.id, data);
+        emit('updated', word);
+        showToast(`Mot renommé en « ${word.name} ».`);
     });
 
     if (isSuccessful) {
@@ -58,6 +63,7 @@ async function confirmDelete(): Promise<void> {
         await deleteWord(props.word.id);
         isConfirmingDelete.value = false;
         emit('deleted', props.word);
+        showToast(`Mot « ${props.word.name} » supprimé.`);
     } catch {
         deleteError.value = 'Impossible de supprimer ce mot. Réessayez.';
     } finally {

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { fetchItemAccess, revokeAccess } from '@/api/sharing';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { useToasts } from '@/composables/useToasts';
 import { formatDateTime } from '@/lib/format';
 import type { AccessPurpose, FavoriteKind, ItemAccess } from '@/types/models';
 
@@ -22,6 +23,7 @@ type Member = ItemAccess['members'][number];
 
 /** Member whose access is being confirmed for removal, in `ConfirmDialog`. */
 const memberBeingRevoked = ref<Member | null>(null);
+const { showToast } = useToasts();
 const isRevoking = ref(false);
 const revokeError = ref<string | null>(null);
 
@@ -64,8 +66,14 @@ async function revoke(): Promise<void> {
     isRevoking.value = true;
     revokeError.value = null;
     try {
-        await revokeAccess(props.kind, props.id, memberBeingRevoked.value.id);
+        const member = memberBeingRevoked.value;
+        await revokeAccess(props.kind, props.id, member.id);
         memberBeingRevoked.value = null;
+        showToast(
+            props.purpose === 'contribution'
+                ? `${member.name} ne peut plus contribuer.`
+                : `${member.name} n’a plus accès.`,
+        );
         await load();
     } catch {
         revokeError.value = 'Une erreur est survenue, veuillez réessayer.';

@@ -16,9 +16,7 @@ import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
 import SortableHeader from '@/components/SortableHeader.vue';
-import StatusMessage from '@/components/StatusMessage.vue';
 import WordRow from '@/components/WordRow.vue';
-import { consumeHistoryStatus } from '@/lib/historyStatus';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { WordsResponse } from '@/types/api';
 import type { AccessPurpose, SortDirection, Word, WordGroup, WordSort } from '@/types/models';
@@ -77,11 +75,7 @@ const words = ref<WordsResponse | null>(null);
 const areWordsLoading = ref(false);
 const haveWordsFailed = ref(false);
 
-/** Message sent by the previous page (e.g. after a duplication), read again on each group since the page is reused. */
-const flashStatus = ref<string | null>(null);
-
 async function loadWordGroup(): Promise<void> {
-    flashStatus.value = consumeHistoryStatus();
     groupStatus.value = 'loading';
     try {
         wordGroup.value = await fetchWordGroup(wordGroupId.value);
@@ -92,9 +86,8 @@ async function loadWordGroup(): Promise<void> {
 }
 
 /** After leaving a public group, which stays visible: reloads it and its words, as the user's rights changed. */
-async function onLeft(status: string): Promise<void> {
+async function onLeft(): Promise<void> {
     await Promise.all([loadWordGroup(), loadWords()]);
-    flashStatus.value = status;
 }
 
 async function loadWords(): Promise<void> {
@@ -163,7 +156,6 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 
 <template>
     <AppLayout>
-        <StatusMessage :message="flashStatus" />
 
         <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
 

@@ -4,11 +4,12 @@ import { useRouter } from 'vue-router';
 import { deleteGroupCollection } from '@/api/groupCollections';
 import { deleteWordGroup } from '@/api/wordGroups';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { useToasts } from '@/composables/useToasts';
 import type { FavoriteKind } from '@/types/models';
 
 /**
  * "Supprimer" button of a group or collection page, confirmed in a modal (`ConfirmDialog`); once deleted, goes back to the
- * dashboard with a status message.
+ * dashboard and confirms it in a notification.
  */
 const props = defineProps<{
     kind: FavoriteKind;
@@ -16,6 +17,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const { showToast } = useToasts();
 const isConfirming = ref(false);
 const isDeleting = ref(false);
 const error = ref<string | null>(null);
@@ -41,10 +43,8 @@ async function confirmDelete(): Promise<void> {
             await deleteGroupCollection(props.id);
         }
         isConfirming.value = false;
-        await router.push({
-            name: 'dashboard',
-            state: { status: props.kind === 'word-groups' ? 'Groupe supprimé.' : 'Collection supprimée.' },
-        });
+        await router.push({ name: 'dashboard' });
+        showToast(props.kind === 'word-groups' ? 'Groupe supprimé.' : 'Collection supprimée.');
     } catch {
         error.value = 'Impossible de supprimer. Réessayez.';
     } finally {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { fetchFavoriteGroupCollections, fetchFavoriteWordGroups } from '@/api/favorites';
 import { fetchMyGroupCollections } from '@/api/groupCollections';
 import { fetchReceivedAccessRequests, fetchSharedGroupCollections, fetchSharedWordGroups } from '@/api/sharing';
@@ -9,13 +9,14 @@ import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
-import StatusMessage from '@/components/StatusMessage.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
-import { consumeHistoryStatus } from '@/lib/historyStatus';
+import { useToasts } from '@/composables/useToasts';
 import type { AccessRequest, FavoriteKind } from '@/types/models';
 
 const route = useRoute();
+const router = useRouter();
+const { showToast } = useToasts();
 
 const favoriteWordGroups = usePaginatedList(fetchFavoriteWordGroups, 'favorite_groups_page');
 const favoriteGroupCollections = usePaginatedList(fetchFavoriteGroupCollections, 'favorite_collections_page');
@@ -56,11 +57,15 @@ async function onFavoriteSaved(kind: FavoriteKind, id: string, isFavorite: boole
     await (kind === 'word-groups' ? favoriteWordGroups : favoriteGroupCollections).reload();
 }
 
-const flashStatus = consumeHistoryStatus();
-
-const status = computed<string | null>(() =>
-    route.query.verified === '1' ? 'Votre adresse email est confirmée, bienvenue !' : flashStatus,
-);
+/** Back from the email verification link: welcomes the user once, then drops the flag so a reload does not repeat it. */
+onMounted(() => {
+    if (route.query.verified !== '1') {
+        return;
+    }
+    showToast('Votre adresse email est confirmée, bienvenue !');
+    const { verified: _verified, ...query } = route.query;
+    void router.replace({ query });
+});
 
 /**
  * Favorites and shared lists only show once loaded with at least one item (or to offer a retry); they come after
@@ -82,7 +87,6 @@ const buttonClass =
 <template>
     <AppLayout>
         <h1 class="sr-only">Tableau de bord</h1>
-        <StatusMessage :message="status" />
 
         <div class="space-y-12">
             <div
