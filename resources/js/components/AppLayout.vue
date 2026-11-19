@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
+import AppFooter from '@/components/AppFooter.vue';
 import UserMenu from '@/components/UserMenu.vue';
 
 const route = useRoute();
@@ -15,7 +16,7 @@ async function search(): Promise<void> {
 </script>
 
 <template>
-    <div class="min-h-screen">
+    <div class="flex min-h-screen flex-col">
         <header class="border-b border-zinc-200 bg-white">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" aria-label="Navigation principale">
@@ -41,8 +42,9 @@ async function search(): Promise<void> {
                 <UserMenu />
             </div>
         </header>
-        <main class="mx-auto max-w-5xl px-4 py-8">
+        <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
             <slot />
         </main>
+        <AppFooter />
     </div>
 </template>
