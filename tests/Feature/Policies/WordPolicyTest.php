@@ -96,4 +96,13 @@ class WordPolicyTest extends TestCase
 
         $this->assertTrue(User::factory()->create()->can('vote', $word));
     }
+
+    public function test_anyone_who_sees_a_group_open_to_members_only_can_vote(): void
+    {
+        $wordGroup = WordGroup::factory()->openToMembersOnly()->create();
+        $word = Word::factory()->for($wordGroup)->createdBy(User::factory()->create())->create();
+
+        $this->assertTrue(User::factory()->create()->can('vote', $word));
+        $this->assertTrue($wordGroup->creator->can('vote', $word));
+    }
 }

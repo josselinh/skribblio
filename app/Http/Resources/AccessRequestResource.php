@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * An access request as seen by the creator of the requested item. Expects `item` and `requester` loaded.
+ * `purpose` is `contribution` when the item is public and open to its members only, `access` otherwise.
  *
  * @mixin WordGroupAccessRequest|GroupCollectionAccessRequest
  */
@@ -34,6 +35,7 @@ class AccessRequestResource extends JsonResource
                 'id' => $this->requester->id,
                 'name' => $this->requester->name,
             ],
+            'purpose' => $this->isForContribution() ? 'contribution' : 'access',
             'via_group_collection' => $isWordGroupRequest && $this->via_group_collection_id !== null
                 ? $this->whenLoaded('viaGroupCollection', fn (): ?array => $this->viaGroupCollection ? [
                     'id' => $this->viaGroupCollection->id,

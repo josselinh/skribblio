@@ -2,6 +2,7 @@
 import CardMeta from '@/components/CardMeta.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { GroupCollection } from '@/types/models';
 
 const props = defineProps<{
@@ -25,6 +26,7 @@ function updateFavorite(isFavorite: boolean): void {
         :name="groupCollection.name"
         :visibility="groupCollection.visibility"
         :accepts-contributions="groupCollection.accepts_contributions"
+        :contributions-members-only="restrictsContributionsToMembers(groupCollection)"
         :updated-at="groupCollection.updated_at"
         updated-label="Modifiée le"
         :is-accessible="groupCollection.is_accessible !== false"

@@ -14,7 +14,7 @@ import type { Visibility, WordGroup } from '@/types/models';
 const router = useRouter();
 
 const selectedWordGroups = ref<WordGroup[]>([]);
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false, contributions_members_only: false });
 
 /** Errors on the list itself or on one of its items (`word_group_ids.0`…). */
 const wordGroupsError = computed(
@@ -57,8 +57,11 @@ async function submit(): Promise<void> {
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                 <ContributionsField
                     v-model="form.data.accepts_contributions"
+                    v-model:members-only="form.data.contributions_members_only"
+                    :visibility="form.data.visibility"
                     kind="group-collections"
                     :error="form.errors.value.accepts_contributions"
+                    :members-only-error="form.errors.value.contributions_members_only"
                 />
                 <WordGroupPicker v-model="selectedWordGroups" :error="wordGroupsError" />
                 <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>

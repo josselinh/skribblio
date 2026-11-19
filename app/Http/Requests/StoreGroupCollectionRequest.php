@@ -32,6 +32,7 @@ class StoreGroupCollectionRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'visibility' => ['required', Rule::enum(Visibility::class)],
             'accepts_contributions' => ['sometimes', 'boolean'],
+            'contributions_members_only' => ['sometimes', 'boolean'],
             'word_group_ids' => ['required', 'array', 'min:1'],
             'word_group_ids.*' => ['required', 'uuid', 'distinct'],
         ];
@@ -66,6 +67,7 @@ class StoreGroupCollectionRequest extends FormRequest
         return [
             'visibility' => 'visibilité',
             'accepts_contributions' => 'ouvert aux contributions',
+            'contributions_members_only' => 'contributions des membres uniquement',
             'word_group_ids' => 'groupes',
         ];
     }

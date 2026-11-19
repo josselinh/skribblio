@@ -37,6 +37,7 @@ class GroupCollectionControllerTest extends TestCase
                 'name' => $newerCollection->name,
                 'visibility' => 'public',
                 'accepts_contributions' => false,
+                'contributions_members_only' => false,
                 'is_favorite' => false,
                 'created_at' => $newerCollection->created_at->toIso8601String(),
                 'updated_at' => $newerCollection->updated_at->toIso8601String(),

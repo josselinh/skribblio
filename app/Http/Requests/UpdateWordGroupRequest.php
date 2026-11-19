@@ -28,6 +28,7 @@ class UpdateWordGroupRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'visibility' => ['required', Rule::enum(Visibility::class)],
             'accepts_contributions' => ['sometimes', 'boolean'],
+            'contributions_members_only' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -41,6 +42,7 @@ class UpdateWordGroupRequest extends FormRequest
         return [
             'visibility' => 'visibilité',
             'accepts_contributions' => 'ouvert aux contributions',
+            'contributions_members_only' => 'contributions des membres uniquement',
         ];
     }
 }

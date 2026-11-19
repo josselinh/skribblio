@@ -6,6 +6,7 @@ export interface WordGroupPayload {
     name: string;
     visibility: Visibility;
     accepts_contributions: boolean;
+    contributions_members_only: boolean;
 }
 
 /** Groups created by the current user, most recently updated first. */

@@ -33,7 +33,8 @@ class WordGroupPolicy
     }
 
     /**
-     * The creator can always add words; the users who can see the group too, while it is open to contributions.
+     * The creator can always add words; the users who can see the group too, while it is open to contributions
+     * (only its members when it is public and open to its members only).
      */
     public function addWord(User $user, WordGroup $wordGroup): Response
     {
@@ -43,7 +44,9 @@ class WordGroupPolicy
 
         return $wordGroup->acceptsContributionFrom($user)
             ? Response::allow()
-            : Response::deny('Ce groupe n’est pas ouvert aux contributions.');
+            : Response::deny($wordGroup->restrictsContributionsToMembers()
+                ? 'Seuls les membres autorisés par le créateur peuvent contribuer à ce groupe.'
+                : 'Ce groupe n’est pas ouvert aux contributions.');
     }
 
     /**
@@ -64,11 +67,12 @@ class WordGroupPolicy
     }
 
     /**
-     * Only the creator can share a private item (get or regenerate its access request link).
+     * Only the creator can share a private item, or a public item open to its members only (get or
+     * regenerate its access request link).
      */
     public function share(User $user, WordGroup $wordGroup): bool
     {
-        return $wordGroup->isCreatedBy($user) && $wordGroup->isPrivate();
+        return $wordGroup->isCreatedBy($user) && ($wordGroup->isPrivate() || $wordGroup->restrictsContributionsToMembers());
     }
 
     /**

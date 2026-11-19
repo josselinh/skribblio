@@ -43,7 +43,7 @@ class GroupCollectionPolicy
 
     /**
      * The creator can always add groups; the users who can see the collection too, while it is open to
-     * contributions.
+     * contributions (only its members when it is public and open to its members only).
      */
     public function addWordGroup(User $user, GroupCollection $groupCollection): Response
     {
@@ -53,7 +53,9 @@ class GroupCollectionPolicy
 
         return $groupCollection->acceptsContributionFrom($user)
             ? Response::allow()
-            : Response::deny('Cette collection n’est pas ouverte aux contributions.');
+            : Response::deny($groupCollection->restrictsContributionsToMembers()
+                ? 'Seuls les membres autorisés par le créateur peuvent contribuer à cette collection.'
+                : 'Cette collection n’est pas ouverte aux contributions.');
     }
 
     /**
@@ -91,11 +93,12 @@ class GroupCollectionPolicy
     }
 
     /**
-     * Only the creator can share a private item (get or regenerate its access request link).
+     * Only the creator can share a private item, or a public item open to its members only (get or
+     * regenerate its access request link).
      */
     public function share(User $user, GroupCollection $groupCollection): bool
     {
-        return $groupCollection->isCreatedBy($user) && $groupCollection->isPrivate();
+        return $groupCollection->isCreatedBy($user) && ($groupCollection->isPrivate() || $groupCollection->restrictsContributionsToMembers());
     }
 
     /**

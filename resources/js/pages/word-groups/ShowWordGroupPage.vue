@@ -18,8 +18,9 @@ import SortableHeader from '@/components/SortableHeader.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
 import WordRow from '@/components/WordRow.vue';
 import { consumeHistoryStatus } from '@/lib/historyStatus';
+import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { WordsResponse } from '@/types/api';
-import type { SortDirection, Word, WordGroup, WordSort } from '@/types/models';
+import type { AccessPurpose, SortDirection, Word, WordGroup, WordSort } from '@/types/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -120,6 +121,9 @@ const columns = computed(() =>
 );
 
 /** Votes are shown while the group is open, and afterwards when some words received votes. */
+const accessPurpose = computed<AccessPurpose>(() =>
+    wordGroup.value && restrictsContributionsToMembers(wordGroup.value) ? 'contribution' : 'access',
+);
 const showVotes = computed(() => Boolean(wordGroup.value?.accepts_contributions || words.value?.has_votes));
 
 /** A new word is listed first: show page 1 so that it is visible. */
@@ -175,6 +179,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     :name="wordGroup.name"
                     :visibility="wordGroup.visibility"
                     :accepts-contributions="wordGroup.accepts_contributions"
+                    :contributions-members-only="wordGroup.contributions_members_only"
                     kind="word-groups"
                     :can-edit="wordGroup.can.update"
                     name-label="Nom du groupe"
@@ -190,7 +195,12 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     </template>
                     <template #actions>
                         <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" />
-                        <ShareButton v-if="wordGroup.can.share" kind="word-groups" :id="wordGroup.id" />
+                        <ShareButton
+                            v-if="wordGroup.can.share"
+                            kind="word-groups"
+                            :id="wordGroup.id"
+                            :purpose="accessPurpose"
+                        />
                         <DeleteButton v-if="wordGroup.can.delete" kind="word-groups" :id="wordGroup.id" />
                     </template>
                 </EditableNameVisibility>
@@ -198,13 +208,18 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 
             <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
             <AccessManagement
-                v-if="wordGroup.can.manage_access && wordGroup.visibility === 'private'"
+                v-if="wordGroup.can.share"
                 class="mt-8"
                 kind="word-groups"
                 :id="wordGroup.id"
+                :purpose="accessPurpose"
             />
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
+            <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500">
+                Seules les personnes autorisées par le créateur de ce groupe peuvent y ajouter des mots. Demandez-lui
+                son lien de partage pour lui proposer de contribuer.
+            </p>
             <p v-else class="mt-6 text-sm text-zinc-500">
                 Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.
             </p>

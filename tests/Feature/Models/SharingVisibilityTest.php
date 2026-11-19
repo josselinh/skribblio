@@ -63,4 +63,16 @@ class SharingVisibilityTest extends TestCase
 
         $this->assertFalse($privateGroup->fresh()->isVisibleTo($member));
     }
+
+    public function test_members_of_a_public_collection_do_not_see_its_private_groups(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->createdBy($creator)->hasAttached($privateGroup)->create();
+        $groupCollection->members()->attach($member);
+
+        $this->assertFalse($privateGroup->fresh()->isVisibleTo($member));
+        $this->assertFalse(WordGroup::visibleTo($member)->whereKey($privateGroup->id)->exists());
+    }
 }

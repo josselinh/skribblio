@@ -33,9 +33,9 @@ class WordPolicy
     }
 
     /**
-     * While the group is open to contributions, whoever can see it votes for or against the words
-     * (and changes or removes their vote), except the author of the word. Once the group is closed,
-     * the votes are kept but nobody can vote any more.
+     * While the group is open to contributions, whoever can see it votes for or against the words (and
+     * changes or removes their vote), except the author of the word, even when only its members can add
+     * words. Once the group is closed, the votes are kept but nobody can vote any more.
      */
     public function vote(User $user, Word $word): bool
     {

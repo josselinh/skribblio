@@ -11,7 +11,7 @@ import type { Visibility } from '@/types/models';
 
 const router = useRouter();
 
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
+const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false, contributions_members_only: false });
 
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
@@ -38,8 +38,11 @@ async function submit(): Promise<void> {
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                 <ContributionsField
                     v-model="form.data.accepts_contributions"
+                    v-model:members-only="form.data.contributions_members_only"
+                    :visibility="form.data.visibility"
                     kind="word-groups"
                     :error="form.errors.value.accepts_contributions"
+                    :members-only-error="form.errors.value.contributions_members_only"
                 />
                 <PrimaryButton :is-loading="form.isProcessing.value">Créer le groupe</PrimaryButton>
             </form>

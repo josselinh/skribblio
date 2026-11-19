@@ -6,6 +6,7 @@ export interface GroupCollectionPayload {
     name: string;
     visibility: Visibility;
     accepts_contributions: boolean;
+    contributions_members_only: boolean;
 }
 
 export interface CreateGroupCollectionPayload extends GroupCollectionPayload {

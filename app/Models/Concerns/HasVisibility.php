@@ -28,6 +28,13 @@ trait HasVisibility
     private array $sharedWithCache = [];
 
     /**
+     * Per-instance cache of isMember(), by user id.
+     *
+     * @var array<string, bool>
+     */
+    private array $memberCache = [];
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function creator(): BelongsTo
@@ -60,11 +67,20 @@ trait HasVisibility
     }
 
     /**
+     * Whether the creator accepted the user's access request (directly on this item, not through a
+     * collection containing it).
+     */
+    public function isMember(User $user): bool
+    {
+        return $this->memberCache[$user->getKey()] ??= $this->members()->whereKey($user->getKey())->exists();
+    }
+
+    /**
      * Whether the user was granted access to this private item.
      */
     protected function isSharedWith(User $user): bool
     {
-        return $this->members()->whereKey($user->getKey())->exists();
+        return $this->isMember($user);
     }
 
     /**

@@ -47,6 +47,7 @@ class WordGroupControllerTest extends TestCase
                 'name' => $newerGroup->name,
                 'visibility' => 'public',
                 'accepts_contributions' => false,
+                'contributions_members_only' => false,
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
@@ -192,6 +193,13 @@ class WordGroupControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.accepts_contributions', true);
         $this->assertTrue($wordGroup->fresh()->accepts_contributions);
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => 'Animaux', 'visibility' => 'public', 'contributions_members_only' => true])
+            ->assertOk()
+            ->assertJsonPath('data.contributions_members_only', true)
+            ->assertJsonPath('data.can.share', true);
+        $this->assertTrue($wordGroup->fresh()->contributions_members_only);
     }
 
     public function test_destroy_deletes_group_with_its_words_and_may_leave_a_collection_empty(): void

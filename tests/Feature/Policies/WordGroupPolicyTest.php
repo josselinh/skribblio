@@ -67,4 +67,30 @@ class WordGroupPolicyTest extends TestCase
 
         $this->assertTrue($member->can('addWord', $wordGroup));
     }
+
+    public function test_group_open_to_members_only_lets_only_its_creator_and_members_add_words_and_be_shared(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $wordGroup = WordGroup::factory()->openToMembersOnly()->createdBy($creator)->create();
+        $wordGroup->members()->attach($member);
+        $otherUser = User::factory()->create();
+
+        $this->assertTrue($otherUser->can('view', $wordGroup));
+        $this->assertFalse($otherUser->can('addWord', $wordGroup));
+        $this->assertTrue($member->can('addWord', $wordGroup));
+        $this->assertTrue($creator->can('addWord', $wordGroup));
+        $this->assertTrue($creator->can('share', $wordGroup));
+    }
+
+    public function test_members_only_option_has_no_effect_once_the_group_is_open_to_everyone_or_closed(): void
+    {
+        $creator = User::factory()->create();
+        $openToEveryone = WordGroup::factory()->public()->openToContributions()->createdBy($creator)->create(['contributions_members_only' => false]);
+        $closed = WordGroup::factory()->public()->closedToContributions()->createdBy($creator)->create(['contributions_members_only' => true]);
+
+        $this->assertTrue(User::factory()->create()->can('addWord', $openToEveryone));
+        $this->assertFalse($creator->can('share', $openToEveryone));
+        $this->assertFalse($creator->can('share', $closed));
+    }
 }

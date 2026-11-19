@@ -86,4 +86,33 @@ class GroupCollectionPolicyTest extends TestCase
 
         $this->assertFalse(User::factory()->create()->can('addWordGroup', $groupCollection));
     }
+
+    public function test_collection_open_to_members_only_lets_only_its_creator_and_members_add_groups(): void
+    {
+        $creator = User::factory()->create();
+        $member = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->createdBy($creator)->create();
+        $groupCollection->members()->attach($member);
+        $otherUser = User::factory()->create();
+
+        $this->assertTrue($otherUser->can('view', $groupCollection));
+        $this->assertFalse($otherUser->can('addWordGroup', $groupCollection));
+        $this->assertTrue($member->can('addWordGroup', $groupCollection));
+        $this->assertTrue($creator->can('share', $groupCollection));
+    }
+
+    public function test_revoked_member_can_no_longer_remove_the_groups_they_added(): void
+    {
+        $member = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->create();
+        $groupCollection->members()->attach($member);
+        $wordGroup = WordGroup::factory()->public()->create();
+        $groupCollection->wordGroups()->attach($wordGroup, ['added_by' => $member->id]);
+
+        $this->assertTrue($member->can('detachWordGroup', [$groupCollection, $wordGroup]));
+
+        $groupCollection->revokeAccess($member);
+
+        $this->assertFalse($member->can('detachWordGroup', [$groupCollection->fresh(), $wordGroup]));
+    }
 }

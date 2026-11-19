@@ -45,7 +45,7 @@ class GroupCollectionController extends Controller
     {
         $groupCollection = DB::transaction(function () use ($request) {
             $groupCollection = $request->user()->groupCollections()->create(
-                $request->safe()->only(['name', 'visibility', 'accepts_contributions']),
+                $request->safe()->only(['name', 'visibility', 'accepts_contributions', 'contributions_members_only']),
             );
             $groupCollection->wordGroups()->attach($request->wordGroups(), ['added_by' => $request->user()->getKey()]);
 

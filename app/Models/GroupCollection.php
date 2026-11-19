@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\DB;
  * the groups it contains may have any visibility, including private groups
  * that other viewers of the collection cannot see.
  */
-#[Fillable(['name', 'visibility', 'accepts_contributions'])]
+#[Fillable(['name', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
 class GroupCollection extends Model
 {
     /** @use HasFactory<GroupCollectionFactory> */
@@ -36,6 +36,7 @@ class GroupCollection extends Model
      */
     protected $attributes = [
         'accepts_contributions' => false,
+        'contributions_members_only' => false,
     ];
 
     /**
@@ -51,6 +52,7 @@ class GroupCollection extends Model
                 'name' => $this->copyName(),
                 'visibility' => Visibility::Private,
                 'accepts_contributions' => false,
+                'contributions_members_only' => false,
             ]);
 
             $wordGroupIds = $this->wordGroups()->visibleTo($user)->get()
@@ -84,8 +86,9 @@ class GroupCollection extends Model
     }
 
     /**
-     * Users granted access to this private collection. They also see the private groups of the
-     * collection's creator that it contains.
+     * Users granted access to this collection: to see it while private (they also see the private groups
+     * of the collection's creator that it contains), to contribute to it while public and open to its
+     * members only.
      *
      * @return BelongsToMany<User, $this>
      */

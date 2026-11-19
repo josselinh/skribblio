@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\AccessRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ShareInvitationResource;
 use App\Models\GroupCollection;
@@ -11,7 +10,8 @@ use App\Models\WordGroup;
 use Illuminate\Http\Request;
 
 /**
- * Share links, as opened by the people they were sent to: they see what is shared and can request access.
+ * Share links, as opened by the people they were sent to: they see what is shared and can request access
+ * (to see a private item, or to contribute to a public item open to its members only).
  * An unknown or regenerated token answers 404.
  */
 class ShareInvitationController extends Controller
@@ -42,15 +42,11 @@ class ShareInvitationController extends Controller
 
     private function invitation(WordGroup|GroupCollection $item, User $user): ShareInvitationResource
     {
-        $status = match (true) {
-            $item->isVisibleTo($user) => 'accessible',
-            default => match ($item->accessRequests()->where('user_id', $user->getKey())->first()?->status) {
-                AccessRequestStatus::Pending => 'pending',
-                AccessRequestStatus::Refused => 'refused',
-                default => 'none',
-            },
-        };
+        $status = $item->hasAccess($user) ? 'accessible' : $item->accessRequestStatusOf($user);
 
-        return new ShareInvitationResource($item->load('creator')->setAttribute('access_status', $status));
+        return new ShareInvitationResource($item->load('creator')->forceFill([
+            'access_status' => $status,
+            'is_visible' => $item->isVisibleTo($user),
+        ]));
     }
 }
