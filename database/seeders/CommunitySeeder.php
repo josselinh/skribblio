@@ -13,9 +13,11 @@ use Illuminate\Support\Collection;
 /**
  * Seeds a small community of users sharing themed groups and collections, so that the "Explorer"
  * page has something to discover: groups of various sizes, update dates spread over a few months,
- * and favorites unevenly spread so that the popularity sort is meaningful.
+ * favorites unevenly spread so that the popularity sort is meaningful, and contributions: words and
+ * groups added by other users, including to items closed since (the contributions are kept).
  *
- * Only adds data (it can run on top of existing accounts); every community user's password is "password".
+ * It can run on top of existing accounts, and again: it first deletes the community users, which deletes
+ * everything they created. Every community user's password is "password".
  */
 class CommunitySeeder extends Seeder
 {
@@ -63,6 +65,27 @@ class CommunitySeeder extends Seeder
     ];
 
     /**
+     * Groups closed to contributions (the others are open).
+     *
+     * @var list<string>
+     */
+    private const array CLOSED_GROUPS = ['Desserts', 'Instruments de musique', 'Expressions françaises', 'Mes idées en vrac'];
+
+    /**
+     * Words added by other users, by group then contributor key. Some groups were closed since.
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const array WORD_CONTRIBUTIONS = [
+        'Animaux sauvages' => ['hugo' => ['paresseux', 'lama'], 'theo' => ['ornithorynque']],
+        'Métiers' => ['camille' => ['boucher', 'fleuriste'], 'ines' => ['sage-femme']],
+        'Contes et légendes' => ['lea' => ['centaure', 'gargouille']],
+        'Jeux vidéo' => ['nathan' => ['manette sans fil', 'speedrun']],
+        'Desserts' => ['lea' => ['île flottante']],
+        'Expressions françaises' => ['ines' => ['avoir la tête dans les nuages', 'se faire rouler dans la farine']],
+    ];
+
+    /**
      * Collections: author key, visibility, days since last update, number of users who favorited it, group names.
      *
      * @var array<string, array{author: string, visibility: Visibility, days_ago: int, favorites: int, groups: list<string>}>
@@ -76,8 +99,29 @@ class CommunitySeeder extends Seeder
         'Brouillons' => ['author' => 'nathan', 'visibility' => Visibility::Private, 'days_ago' => 1, 'favorites' => 0, 'groups' => ['Mes idées en vrac', 'Objets de la maison']],
     ];
 
+    /**
+     * Collections open to contributions (the others are closed).
+     *
+     * @var list<string>
+     */
+    private const array OPEN_COLLECTIONS = ['Partie en famille', 'Grande soirée'];
+
+    /**
+     * Groups added by other users, by collection then contributor key. "Mes idées en vrac" is private: the
+     * other viewers of the collection are told a group is hidden. "Imaginaire" was closed since.
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const array GROUP_CONTRIBUTIONS = [
+        'Partie en famille' => ['lea' => ['Sports'], 'ines' => ['Super-pouvoirs']],
+        'Grande soirée' => ['nathan' => ['Mes idées en vrac', 'Pays et monuments']],
+        'Imaginaire' => ['camille' => ['Animaux sauvages']],
+    ];
+
     public function run(): void
     {
+        User::query()->whereIn('email', array_map(fn (string $key): string => "{$key}@example.com", array_keys(self::USERS)))->delete();
+
         $users = collect(self::USERS)->map(fn (string $name, string $key): User => User::factory()->create([
             'name' => $name,
             'email' => "{$key}@example.com",
@@ -85,9 +129,18 @@ class CommunitySeeder extends Seeder
 
         $wordGroups = collect(self::GROUPS)->map(function (array $group, string $name) use ($users): WordGroup {
             $author = $users[$group['author']];
-            $wordGroup = WordGroup::factory()->createdBy($author)->create(['name' => $name, 'visibility' => $group['visibility']]);
+            $wordGroup = WordGroup::factory()->createdBy($author)->create([
+                'name' => $name,
+                'visibility' => $group['visibility'],
+                'accepts_contributions' => ! in_array($name, self::CLOSED_GROUPS, true),
+            ]);
             foreach ($group['words'] as $word) {
                 $wordGroup->words()->make(['name' => $word])->creator()->associate($author)->save();
+            }
+            foreach (self::WORD_CONTRIBUTIONS[$name] ?? [] as $contributorKey => $words) {
+                foreach ($words as $word) {
+                    $wordGroup->words()->make(['name' => $word])->creator()->associate($users[$contributorKey])->save();
+                }
             }
             $this->favoriteBy($wordGroup, $users, $author, $group['favorites']);
             $wordGroup->newQuery()->whereKey($wordGroup->getKey())->update(['updated_at' => now()->subDays($group['days_ago'])]);
@@ -98,8 +151,18 @@ class CommunitySeeder extends Seeder
         foreach (self::COLLECTIONS as $name => $collection) {
             $author = $users[$collection['author']];
             $groupCollection = GroupCollection::factory()->createdBy($author)
-                ->hasAttached($wordGroups->only($collection['groups'])->values())
-                ->create(['name' => $name, 'visibility' => $collection['visibility']]);
+                ->hasAttached($wordGroups->only($collection['groups'])->values(), ['added_by' => $author->id])
+                ->create([
+                    'name' => $name,
+                    'visibility' => $collection['visibility'],
+                    'accepts_contributions' => in_array($name, self::OPEN_COLLECTIONS, true),
+                ]);
+            foreach (self::GROUP_CONTRIBUTIONS[$name] ?? [] as $contributorKey => $groupNames) {
+                $groupCollection->wordGroups()->attach(
+                    $wordGroups->only($groupNames)->values(),
+                    ['added_by' => $users[$contributorKey]->id],
+                );
+            }
             $this->favoriteBy($groupCollection, $users, $author, $collection['favorites']);
             $groupCollection->newQuery()->whereKey($groupCollection->getKey())->update(['updated_at' => now()->subDays($collection['days_ago'])]);
         }
