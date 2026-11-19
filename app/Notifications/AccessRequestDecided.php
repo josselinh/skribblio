@@ -8,11 +8,15 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 
 /**
  * Tells the requester that the creator accepted or refused their access request. When the request
  * was sent from a collection, the group's name is not disclosed if it was refused.
+ *
+ * Dropped when the request or the user was deleted (e.g. an account deleted) before it was sent.
  */
+#[DeleteWhenMissingModels]
 class AccessRequestDecided extends Notification implements ShouldQueue
 {
     use Queueable;

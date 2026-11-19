@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccessRequestController;
+use App\Http\Controllers\Api\CurrentUserController;
 use App\Http\Controllers\Api\DuplicateGroupCollectionController;
 use App\Http\Controllers\Api\DuplicateWordGroupController;
 use App\Http\Controllers\Api\FavoriteGroupCollectionController;
@@ -17,12 +18,12 @@ use App\Http\Controllers\Api\WordController;
 use App\Http\Controllers\Api\WordExportController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
-use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', fn (Request $request) => new UserResource($request->user()))->name('api.user');
+    // Reachable unverified: the SPA needs the user to redirect, and anyone may delete their account.
+    Route::get('/user', [CurrentUserController::class, 'show'])->name('api.user');
+    Route::delete('/user', [CurrentUserController::class, 'destroy'])->name('api.user.destroy');
 
     Route::middleware('verified')->group(function () {
         Route::get('favorites/word-groups', [FavoriteWordGroupController::class, 'index'])->name('favorites.word-groups.index');

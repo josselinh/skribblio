@@ -114,6 +114,15 @@ export const useAuthStore = defineStore('auth', () => {
         await http.put('/user/password', payload);
     }
 
+    /**
+     * Deletes the account (requires the current password) and everything the user created; the server
+     * closes the session.
+     */
+    async function deleteAccount(password: string): Promise<void> {
+        await http.delete('/api/user', { data: { password } });
+        user.value = null;
+    }
+
     /** Forgets the current user locally, e.g. after the session expired server-side. */
     function clear(): void {
         user.value = null;
@@ -133,6 +142,7 @@ export const useAuthStore = defineStore('auth', () => {
         resetPassword,
         updateProfileInformation,
         updatePassword,
+        deleteAccount,
         clear,
     };
 });

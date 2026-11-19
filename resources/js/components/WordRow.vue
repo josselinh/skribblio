@@ -82,7 +82,10 @@ async function confirmDelete(): Promise<void> {
             </form>
             <template v-else>{{ word.name }}</template>
         </td>
-        <td class="px-4 py-2.5 text-zinc-600"><UserLink :user="word.creator" /></td>
+        <td class="px-4 py-2.5 text-zinc-600">
+            <UserLink v-if="word.creator" :user="word.creator" />
+            <span v-else class="text-zinc-400 italic">Compte supprimé</span>
+        </td>
         <td class="px-4 py-2.5 whitespace-nowrap text-zinc-600">
             <time v-if="word.created_at" :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
         </td>
