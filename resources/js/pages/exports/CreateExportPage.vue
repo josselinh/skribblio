@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
 import { createGroupCollection } from '@/api/groupCollections';
 import { fetchGroupCollectionSearchResults } from '@/api/search';
@@ -145,10 +145,7 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
 <template>
     <AppLayout>
         <div class="mx-auto max-w-3xl">
-            <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-                ← Retour au tableau de bord
-            </RouterLink>
-            <h1 class="mt-2 text-2xl font-semibold">Créer un export</h1>
+            <h1 class="text-2xl font-semibold">Créer un export</h1>
             <p class="mt-1 text-zinc-500">
                 Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste
                 prête à coller dans Skribbl.io.

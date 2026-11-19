@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { createGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
@@ -37,10 +37,7 @@ async function submit(): Promise<void> {
 <template>
     <AppLayout>
         <div class="mx-auto max-w-lg">
-            <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-                ← Retour au tableau de bord
-            </RouterLink>
-            <h1 class="mt-2 text-2xl font-semibold">Nouvelle collection</h1>
+            <h1 class="text-2xl font-semibold">Nouvelle collection</h1>
 
             <form
                 class="mt-6 space-y-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"

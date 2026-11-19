@@ -9,6 +9,10 @@ const router = useRouter();
 
 const searchQuery = ref('');
 
+/** Navigation link style, darker for the current page's section. */
+const navLinkClass = (routeName: string) =>
+    route.name === routeName ? 'text-sm font-medium text-zinc-900' : 'text-sm text-zinc-600 hover:text-zinc-900';
+
 async function search(): Promise<void> {
     await router.push({ name: 'search', query: { q: searchQuery.value.trim() || undefined } });
     searchQuery.value = '';
@@ -21,7 +25,8 @@ async function search(): Promise<void> {
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" aria-label="Navigation principale">
                     <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight">Skribblio Tools</RouterLink>
-                    <RouterLink :to="{ name: 'search' }" class="text-sm text-zinc-600 hover:text-zinc-900">Explorer</RouterLink>
+                    <RouterLink :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">Tableau de bord</RouterLink>
+                    <RouterLink :to="{ name: 'search' }" :class="navLinkClass('search')">Explorer</RouterLink>
                 </nav>
                 <!-- The search page has its own, larger search field. -->
                 <form

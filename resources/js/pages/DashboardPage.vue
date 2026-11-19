@@ -62,6 +62,14 @@ const status = computed<string | null>(() =>
     route.query.verified === '1' ? 'Votre adresse email est confirmée, bienvenue !' : flashStatus,
 );
 
+/**
+ * Favorites and shared lists only show once loaded with at least one item (or to offer a retry); they come after
+ * the user's own lists so that their appearance does not push the rest of the page down.
+ */
+function isShown(list: ReturnType<typeof usePaginatedList>): boolean {
+    return list.hasFailed.value || (list.result.value?.meta.total ?? 0) > 0;
+}
+
 /** A user with no group and no favorite yet is invited to explore what others share. */
 const isNewcomer = computed(() =>
     [wordGroups, favoriteWordGroups, favoriteGroupCollections].every((list) => list.result.value?.meta.total === 0),
@@ -69,7 +77,6 @@ const isNewcomer = computed(() =>
 
 const buttonClass =
     'inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700';
-const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouver ici.';
 </script>
 
 <template>
@@ -78,6 +85,22 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
         <StatusMessage :message="status" />
 
         <div class="space-y-12">
+            <div
+                v-if="isNewcomer"
+                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 p-5"
+            >
+                <div>
+                    <p class="font-semibold">Nouveau sur Skribblio Tools ?</p>
+                    <p class="text-sm text-zinc-500">
+                        Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés
+                        en favoris avec l’étoile ☆.
+                    </p>
+                </div>
+                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium underline">
+                    Découvrir les groupes de la communauté →
+                </RouterLink>
+            </div>
+
             <div
                 class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs"
             >
@@ -88,22 +111,6 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
                     </p>
                 </div>
                 <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">Créer un export</RouterLink>
-            </div>
-
-            <div
-                v-if="isNewcomer"
-                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 p-5"
-            >
-                <div>
-                    <p class="font-semibold">Nouveau sur Skribblio Tools ?</p>
-                    <p class="text-sm text-zinc-500">
-                        Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés
-                        en favoris.
-                    </p>
-                </div>
-                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium underline">
-                    Découvrir les groupes de la communauté →
-                </RouterLink>
             </div>
 
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
@@ -121,41 +128,6 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
                     />
                 </ul>
             </section>
-
-            <CardListSection
-                section-id="favorite-word-groups"
-                title="Mes groupes favoris"
-                :result="favoriteWordGroups.result.value"
-                :is-loading="favoriteWordGroups.isLoading.value"
-                :has-failed="favoriteWordGroups.hasFailed.value"
-                :empty-message="`Aucun groupe favori. ${emptyFavoritesMessage}`"
-                paginated
-                page-param="favorite_groups_page"
-                @retry="favoriteWordGroups.reload"
-            >
-                <template #item="{ item }">
-                    <WordGroupCard :word-group="item" @favorite-saved="onFavoriteSaved('word-groups', item.id, $event)" />
-                </template>
-            </CardListSection>
-
-            <CardListSection
-                section-id="favorite-group-collections"
-                title="Mes collections favorites"
-                :result="favoriteGroupCollections.result.value"
-                :is-loading="favoriteGroupCollections.isLoading.value"
-                :has-failed="favoriteGroupCollections.hasFailed.value"
-                :empty-message="`Aucune collection favorite. ${emptyFavoritesMessage}`"
-                paginated
-                page-param="favorite_collections_page"
-                @retry="favoriteGroupCollections.reload"
-            >
-                <template #item="{ item }">
-                    <GroupCollectionCard
-                        :group-collection="item"
-                        @favorite-saved="onFavoriteSaved('group-collections', item.id, $event)"
-                    />
-                </template>
-            </CardListSection>
 
             <CardListSection
                 section-id="word-groups"
@@ -221,12 +193,47 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
             </CardListSection>
 
             <CardListSection
+                v-if="isShown(favoriteWordGroups)"
+                section-id="favorite-word-groups"
+                title="Mes groupes favoris"
+                :result="favoriteWordGroups.result.value"
+                :is-loading="favoriteWordGroups.isLoading.value"
+                :has-failed="favoriteWordGroups.hasFailed.value"
+                paginated
+                page-param="favorite_groups_page"
+                @retry="favoriteWordGroups.reload"
+            >
+                <template #item="{ item }">
+                    <WordGroupCard :word-group="item" @favorite-saved="onFavoriteSaved('word-groups', item.id, $event)" />
+                </template>
+            </CardListSection>
+
+            <CardListSection
+                v-if="isShown(favoriteGroupCollections)"
+                section-id="favorite-group-collections"
+                title="Mes collections favorites"
+                :result="favoriteGroupCollections.result.value"
+                :is-loading="favoriteGroupCollections.isLoading.value"
+                :has-failed="favoriteGroupCollections.hasFailed.value"
+                paginated
+                page-param="favorite_collections_page"
+                @retry="favoriteGroupCollections.reload"
+            >
+                <template #item="{ item }">
+                    <GroupCollectionCard
+                        :group-collection="item"
+                        @favorite-saved="onFavoriteSaved('group-collections', item.id, $event)"
+                    />
+                </template>
+            </CardListSection>
+
+            <CardListSection
+                v-if="isShown(sharedWordGroups)"
                 section-id="shared-word-groups"
                 title="Groupes partagés avec moi"
                 :result="sharedWordGroups.result.value"
                 :is-loading="sharedWordGroups.isLoading.value"
                 :has-failed="sharedWordGroups.hasFailed.value"
-                empty-message="Aucun groupe privé partagé avec vous. Ouvrez un lien de partage pour demander l’accès."
                 paginated
                 page-param="shared_groups_page"
                 @retry="sharedWordGroups.reload"
@@ -237,12 +244,12 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
             </CardListSection>
 
             <CardListSection
+                v-if="isShown(sharedGroupCollections)"
                 section-id="shared-group-collections"
                 title="Collections partagées avec moi"
                 :result="sharedGroupCollections.result.value"
                 :is-loading="sharedGroupCollections.isLoading.value"
                 :has-failed="sharedGroupCollections.hasFailed.value"
-                empty-message="Aucune collection privée partagée avec vous. Ouvrez un lien de partage pour demander l’accès."
                 paginated
                 page-param="shared_collections_page"
                 @retry="sharedGroupCollections.reload"

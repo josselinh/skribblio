@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords, type WordOrder } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
@@ -156,10 +156,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 
 <template>
     <AppLayout>
-        <RouterLink :to="{ name: 'dashboard' }" class="text-sm text-zinc-500 hover:text-zinc-900">
-            ← Retour à mes groupes
-        </RouterLink>
-        <StatusMessage class="mt-4" :message="flashStatus" />
+        <StatusMessage :message="flashStatus" />
 
         <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500">Chargement…</p>
 
