@@ -16,7 +16,7 @@ export interface WordGroup {
     accepts_contributions: boolean;
     /** While public and open: only its members (accepted through the share link) contribute. */
     contributions_members_only: boolean;
-    /** Only present in search results. */
+    /** Present in search results and on the detail endpoint. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
     words_count?: number;
@@ -76,7 +76,7 @@ export interface GroupCollection {
     accepts_contributions: boolean;
     /** While public and open: only its members (accepted through the share link) contribute. */
     contributions_members_only: boolean;
-    /** Only present in search results. */
+    /** Present in search results and on the detail endpoint. */
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
     word_groups_count?: number;

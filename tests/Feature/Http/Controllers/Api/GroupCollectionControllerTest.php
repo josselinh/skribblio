@@ -165,6 +165,7 @@ class GroupCollectionControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.word_groups.*.id', [$publicGroup->id])
             ->assertJsonPath('data.hidden_word_groups_count', 1)
+            ->assertJsonPath('data.creator', ['id' => $creator->id, 'name' => $creator->name])
             ->assertJsonPath('data.can.update', false);
     }
 

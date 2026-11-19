@@ -119,6 +119,7 @@ class WordGroupControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.id', $wordGroup->id)
+            ->assertJsonPath('data.creator', ['id' => $wordGroup->creator->id, 'name' => $wordGroup->creator->name])
             ->assertJsonPath('data.can', ['update' => false, 'delete' => false, 'share' => false, 'manage_access' => false, 'add_word' => true, 'duplicate' => true]);
     }
 

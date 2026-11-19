@@ -159,6 +159,7 @@ watch(
                     :accepts-contributions="groupCollection.accepts_contributions"
                     :contributions-members-only="groupCollection.contributions_members_only"
                     kind="group-collections"
+                    :creator="groupCollection.creator"
                     :can-edit="groupCollection.can.update"
                     name-label="Nom de la collection"
                     :save="saveGroupCollection"

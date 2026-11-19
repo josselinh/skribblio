@@ -181,6 +181,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     :accepts-contributions="wordGroup.accepts_contributions"
                     :contributions-members-only="wordGroup.contributions_members_only"
                     kind="word-groups"
+                    :creator="wordGroup.creator"
                     :can-edit="wordGroup.can.update"
                     name-label="Nom du groupe"
                     :save="saveWordGroup"

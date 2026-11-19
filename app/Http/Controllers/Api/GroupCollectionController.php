@@ -80,14 +80,14 @@ class GroupCollectionController extends Controller
                 ->where('status', AccessRequestStatus::Pending))->count(),
         );
 
-        return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));
+        return new GroupCollectionResource($groupCollection->load('creator')->loadIsFavorite($request->user()));
     }
 
     public function update(UpdateGroupCollectionRequest $request, GroupCollection $groupCollection): GroupCollectionResource
     {
         $groupCollection->update($request->validated());
 
-        return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));
+        return new GroupCollectionResource($groupCollection->load('creator')->loadIsFavorite($request->user()));
     }
 
     /**
