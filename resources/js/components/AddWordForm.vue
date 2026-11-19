@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { nextTick, useTemplateRef } from 'vue';
-import { createWord } from '@/api/words';
+import { nextTick, ref, useTemplateRef } from 'vue';
+import { createWords } from '@/api/words';
 import { useForm } from '@/composables/useForm';
-import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
+import { parseWordList, SKRIBBL_SEPARATOR } from '@/lib/skribbl';
+import type { CreateWordsResponse } from '@/types/api';
 import type { Word } from '@/types/models';
 
 const props = defineProps<{
@@ -10,42 +11,71 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    added: [word: Word];
+    added: [words: Word[]];
 }>();
 
-const input = useTemplateRef<HTMLInputElement>('input');
-const form = useForm({ name: '' });
+const textarea = useTemplateRef<HTMLTextAreaElement>('textarea');
+const form = useForm({ names: '' });
+const result = ref<CreateWordsResponse | null>(null);
 
-/** Keeps the focus in the field so that words can be added one after another with Enter. */
+function plural(count: number, singular: string, pluralForm: string): string {
+    return `${count} ${count > 1 ? pluralForm : singular}`;
+}
+
+/** Summary of the last submission: how many words were added and skipped. */
+function summary(response: CreateWordsResponse): string {
+    const parts = [`${plural(response.data.length, 'mot ajouté', 'mots ajoutés')}`];
+    if (response.skipped.length > 0) {
+        parts.push(`${plural(response.skipped.length, 'déjà présent ignoré', 'déjà présents ignorés')}`);
+    }
+
+    return parts.join(' · ');
+}
+
+/**
+ * Adds the valid words and leaves the invalid ones in the field, so that the user only fixes
+ * those. Keeps the focus in the field so that lists can be added one after another.
+ */
 async function submit(): Promise<void> {
-    const isSuccessful = await form.submit(async (data) => {
-        emit('added', await createWord(props.wordGroupId, data));
+    const names = parseWordList(form.data.names);
+    if (names.length === 0) {
+        return;
+    }
+
+    result.value = null;
+    await form.submit(async () => {
+        const response = await createWords(props.wordGroupId, names);
+        result.value = response;
+        form.data.names = response.invalid.map((invalidName) => invalidName.name).join(SKRIBBL_SEPARATOR);
+        if (response.data.length > 0) {
+            emit('added', response.data);
+        }
     });
 
-    if (isSuccessful) {
-        form.reset();
-    }
     await nextTick();
-    input.value?.focus();
+    textarea.value?.focus();
 }
 </script>
 
 <template>
     <form novalidate @submit.prevent="submit">
-        <label for="new-word" class="sr-only">Nouveau mot</label>
-        <div class="flex gap-2">
-            <input
-                id="new-word"
-                ref="input"
-                v-model="form.data.name"
-                type="text"
-                :maxlength="SKRIBBL_MAX_WORD_LENGTH"
-                placeholder="Nouveau mot…"
+        <label for="new-words" class="block text-sm font-medium text-zinc-700">Ajouter des mots</label>
+        <p id="new-words-help" class="mt-0.5 text-xs text-zinc-500">
+            Séparez les mots par des virgules ou des retours à la ligne. Entrée pour ajouter, Maj+Entrée pour aller à la ligne.
+        </p>
+        <div class="mt-2 flex items-start gap-2">
+            <textarea
+                id="new-words"
+                ref="textarea"
+                v-model="form.data.names"
+                rows="3"
+                placeholder="chat, chien, girafe…"
                 autocomplete="off"
-                :aria-invalid="form.errors.value.name ? true : undefined"
-                aria-describedby="new-word-error"
-                class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-xs focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none aria-invalid:border-red-500"
-            />
+                :aria-invalid="form.errors.value.names || result?.invalid.length ? true : undefined"
+                aria-describedby="new-words-help new-words-feedback"
+                class="block w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm shadow-xs focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none aria-invalid:border-red-500"
+                @keydown.enter.exact.prevent="submit"
+            ></textarea>
             <button
                 type="submit"
                 :disabled="form.isProcessing.value"
@@ -54,8 +84,24 @@ async function submit(): Promise<void> {
                 Ajouter
             </button>
         </div>
-        <p v-if="form.errors.value.name" id="new-word-error" class="mt-1 text-sm text-red-600">
-            {{ form.errors.value.name }}
-        </p>
+        <div id="new-words-feedback" aria-live="polite">
+            <p v-if="form.errors.value.names" class="mt-1 text-sm text-red-600">
+                {{ form.errors.value.names }}
+            </p>
+            <template v-else-if="result">
+                <p class="mt-1 text-sm text-zinc-600">{{ summary(result) }}</p>
+                <div v-if="result.invalid.length > 0" class="mt-1 text-sm text-red-600">
+                    <p>
+                        {{ plural(result.invalid.length, 'mot n’a pas pu être ajouté', 'mots n’ont pas pu être ajoutés') }}
+                        (laissé{{ result.invalid.length > 1 ? 's' : '' }} dans le champ pour correction) :
+                    </p>
+                    <ul class="mt-0.5 list-disc pl-5">
+                        <li v-for="invalidName in result.invalid" :key="invalidName.name">
+                            <span class="font-medium">{{ invalidName.name }}</span> : {{ invalidName.message }}
+                        </li>
+                    </ul>
+                </div>
+            </template>
+        </div>
     </form>
 </template>

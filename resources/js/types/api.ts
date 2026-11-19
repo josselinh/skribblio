@@ -1,3 +1,5 @@
+import type { Word } from '@/types/models';
+
 /** Shape of a Laravel API Resource response. */
 export interface ResourceResponse<T> {
     data: T;
@@ -20,6 +22,16 @@ export interface PaginatedResponse<T> {
         from: number | null;
         to: number | null;
     };
+}
+
+/** Response of `POST /api/word-groups/{id}/words`. */
+export interface CreateWordsResponse {
+    /** Added words, in the order they were submitted. */
+    data: Word[];
+    /** Names already in the group (or repeated in the submission), not added. */
+    skipped: string[];
+    /** Names that cannot be words, with the reason. */
+    invalid: { name: string; message: string }[];
 }
 
 /** Shape of a Laravel validation error response (HTTP 422). */

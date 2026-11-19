@@ -1,5 +1,5 @@
 import { http } from '@/lib/http';
-import type { PaginatedResponse, ResourceResponse } from '@/types/api';
+import type { CreateWordsResponse, PaginatedResponse, ResourceResponse } from '@/types/api';
 import type { Word } from '@/types/models';
 
 export interface WordPayload {
@@ -15,10 +15,14 @@ export async function fetchWords(wordGroupId: string, page = 1): Promise<Paginat
     return data;
 }
 
-export async function createWord(wordGroupId: string, payload: WordPayload): Promise<Word> {
-    const { data } = await http.post<ResourceResponse<Word>>(`/api/word-groups/${wordGroupId}/words`, payload);
+/**
+ * Adds several words at once. Words already in the group are skipped and invalid ones are
+ * reported, without preventing the others from being added.
+ */
+export async function createWords(wordGroupId: string, names: string[]): Promise<CreateWordsResponse> {
+    const { data } = await http.post<CreateWordsResponse>(`/api/word-groups/${wordGroupId}/words`, { names });
 
-    return data.data;
+    return data;
 }
 
 export async function updateWord(id: string, payload: WordPayload): Promise<Word> {
