@@ -56,3 +56,8 @@ export async function duplicateGroupCollection(id: string): Promise<DuplicatedGr
 
     return data.data;
 }
+
+/** Deletes a collection; its groups are kept. */
+export async function deleteGroupCollection(id: string): Promise<void> {
+    await http.delete(`/api/group-collections/${id}`);
+}

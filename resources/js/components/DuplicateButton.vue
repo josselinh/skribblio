@@ -4,18 +4,25 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { duplicateGroupCollection } from '@/api/groupCollections';
 import { duplicateWordGroup } from '@/api/wordGroups';
+import ModalDialog from '@/components/ModalDialog.vue';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
 
+/**
+ * "Dupliquer" button of a group or collection page, confirmed in a modal explaining what is copied; opens the copy
+ * with a status message.
+ */
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
 }>();
 
 const router = useRouter();
+const isConfirming = ref(false);
 const isDuplicating = ref(false);
 const error = ref<string | null>(null);
 
+const title = props.kind === 'word-groups' ? 'Dupliquer ce groupe ?' : 'Dupliquer cette collection ?';
 const description =
     props.kind === 'word-groups'
         ? 'Crée une copie privée de ce groupe et de ses mots, dont vous êtes l’auteur.'
@@ -29,6 +36,11 @@ function hiddenGroupsNote(count: number): string {
     return count === 1 ? ' 1 groupe masqué n’a pas été copié.' : ` ${count} groupes masqués n’ont pas été copiés.`;
 }
 
+function askConfirmation(): void {
+    error.value = null;
+    isConfirming.value = true;
+}
+
 /** Copies the item into an item of the current user and opens the copy with a status message. */
 async function duplicate(): Promise<void> {
     isDuplicating.value = true;
@@ -36,6 +48,7 @@ async function duplicate(): Promise<void> {
     try {
         if (props.kind === 'word-groups') {
             const copy = await duplicateWordGroup(props.id);
+            isConfirming.value = false;
             await router.push({
                 name: 'word-groups.show',
                 params: { id: copy.id },
@@ -43,6 +56,7 @@ async function duplicate(): Promise<void> {
             });
         } else {
             const copy = await duplicateGroupCollection(props.id);
+            isConfirming.value = false;
             await router.push({
                 name: 'group-collections.show',
                 params: { id: copy.id },
@@ -63,16 +77,37 @@ async function duplicate(): Promise<void> {
 </script>
 
 <template>
-    <div>
-        <button
-            type="button"
-            :disabled="isDuplicating"
-            class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-xs hover:bg-zinc-50 disabled:opacity-60"
-            @click="duplicate"
-        >
-            {{ isDuplicating ? 'Duplication…' : 'Dupliquer' }}
-        </button>
-        <p class="mt-1 text-xs text-zinc-500">{{ description }}</p>
-        <p v-if="error" role="alert" class="mt-1 text-sm text-red-600">{{ error }}</p>
-    </div>
+    <button
+        type="button"
+        class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50"
+        aria-haspopup="dialog"
+        @click="askConfirmation"
+    >
+        Dupliquer
+    </button>
+
+    <ModalDialog v-model:open="isConfirming" :title="title" :is-dismissible="!isDuplicating">
+        <p>{{ description }}</p>
+        <p v-if="error" role="alert" class="mt-3 text-red-600">{{ error }}</p>
+
+        <template #actions>
+            <button
+                type="button"
+                :disabled="isDuplicating"
+                class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-60 sm:w-auto sm:py-2"
+                @click="isConfirming = false"
+            >
+                Annuler
+            </button>
+            <button
+                type="button"
+                autofocus
+                :disabled="isDuplicating"
+                class="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60 sm:w-auto sm:py-2"
+                @click="duplicate"
+            >
+                {{ isDuplicating ? 'Duplication…' : 'Dupliquer' }}
+            </button>
+        </template>
+    </ModalDialog>
 </template>
