@@ -58,23 +58,27 @@ class WordExportControllerTest extends TestCase
             ->assertExactJson(['data' => ['chat']]);
     }
 
-    public function test_group_collection_export_returns_words_of_visible_groups_only(): void
+    public function test_group_collection_export_returns_visible_groups_only_with_their_words_sorted_by_name(): void
     {
         $user = User::factory()->create();
-        $firstGroup = WordGroup::factory()->public()->create();
-        $secondGroup = WordGroup::factory()->createdBy($user)->private()->create();
+        $firstGroup = WordGroup::factory()->public()->create(['name' => 'Bêtes']);
+        $secondGroup = WordGroup::factory()->createdBy($user)->private()->create(['name' => 'Arbres']);
         $hiddenGroup = WordGroup::factory()->private()->create();
         Word::factory()->for($firstGroup)->create(['name' => 'chat']);
         Word::factory()->for($secondGroup)->create(['name' => 'arbre']);
         Word::factory()->for($secondGroup)->create(['name' => 'chat']);
         Word::factory()->for($hiddenGroup)->create(['name' => 'secret']);
-        $groupCollection = GroupCollection::factory()->public()->create();
-        $groupCollection->wordGroups()->attach([$firstGroup->id, $secondGroup->id, $hiddenGroup->id]);
+        $groupCollection = GroupCollection::factory()->public()
+            ->hasAttached([$firstGroup, $secondGroup, $hiddenGroup])
+            ->create();
 
         $this->actingAs($user)
             ->getJson("/api/group-collections/{$groupCollection->id}/export")
             ->assertOk()
-            ->assertExactJson(['data' => ['arbre', 'chat', 'chat']]);
+            ->assertExactJson(['data' => ['word_groups' => [
+                ['id' => $secondGroup->id, 'name' => 'Arbres', 'words' => ['arbre', 'chat']],
+                ['id' => $firstGroup->id, 'name' => 'Bêtes', 'words' => ['chat']],
+            ]]]);
     }
 
     public function test_group_collection_export_returns_404_for_private_collection_of_another_user(): void
