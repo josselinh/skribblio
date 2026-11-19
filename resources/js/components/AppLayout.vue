@@ -44,7 +44,8 @@ async function search(): Promise<void> {
                         class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                     />
                 </form>
-                <UserMenu />
+                <!-- Kept on the right when the header wraps on phones, so that its menu, aligned on its right edge, stays on screen. -->
+                <UserMenu class="ml-auto" />
             </div>
         </header>
         <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">

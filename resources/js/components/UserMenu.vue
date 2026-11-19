@@ -61,7 +61,7 @@ async function logout(): Promise<void> {
             v-if="isOpen"
             id="user-menu"
             role="menu"
-            class="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 shadow-lg"
+            class="absolute right-0 z-20 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 shadow-lg"
         >
             <p class="truncate border-b border-zinc-100 dark:border-zinc-800 px-4 py-2 text-xs text-zinc-500 dark:text-zinc-400">{{ auth.user?.email }}</p>
             <RouterLink
