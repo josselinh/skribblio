@@ -75,7 +75,7 @@ class WordExportControllerTest extends TestCase
         $this->actingAs($user)
             ->getJson("/api/group-collections/{$groupCollection->id}/export")
             ->assertOk()
-            ->assertExactJson(['data' => ['word_groups' => [
+            ->assertExactJson(['data' => ['hidden_word_groups_count' => 1, 'word_groups' => [
                 ['id' => $secondGroup->id, 'name' => 'Arbres', 'words' => ['arbre', 'chat']],
                 ['id' => $firstGroup->id, 'name' => 'Bêtes', 'words' => ['chat']],
             ]]]);
@@ -88,49 +88,5 @@ class WordExportControllerTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->getJson("/api/group-collections/{$groupCollection->id}/export")
             ->assertNotFound();
-    }
-
-    public function test_composition_combines_selected_groups_and_groups_of_selected_collections(): void
-    {
-        $user = User::factory()->create();
-        $selectedGroup = WordGroup::factory()->public()->create(['name' => 'Animaux']);
-        $sharedGroup = WordGroup::factory()->createdBy($user)->create(['name' => 'Fruits']);
-        $otherCollectionGroup = WordGroup::factory()->public()->create(['name' => 'Pays']);
-        $hiddenGroup = WordGroup::factory()->private()->create();
-        Word::factory()->for($selectedGroup)->create(['name' => 'chat']);
-        Word::factory()->for($sharedGroup)->create(['name' => 'pomme']);
-        Word::factory()->for($otherCollectionGroup)->create(['name' => 'France']);
-        Word::factory()->for($hiddenGroup)->create(['name' => 'secret']);
-        Word::factory()->create(['name' => 'ailleurs']);
-        $firstCollection = GroupCollection::factory()->public()->hasAttached([$sharedGroup, $hiddenGroup])->create();
-        $secondCollection = GroupCollection::factory()->createdBy($user)->hasAttached([$sharedGroup, $otherCollectionGroup])->create();
-
-        $response = $this->actingAs($user)->getJson('/api/exports/composition?'.http_build_query([
-            'word_group_ids' => [$selectedGroup->id, $sharedGroup->id],
-            'group_collection_ids' => [$firstCollection->id, $secondCollection->id],
-        ]));
-
-        $response->assertOk()
-            ->assertJsonPath('data.word_group_ids', [$selectedGroup->id, $sharedGroup->id, $otherCollectionGroup->id])
-            ->assertJsonPath('data.hidden_word_groups_count', 1);
-        $this->assertEqualsCanonicalizing(['chat', 'pomme', 'France'], $response->json('data.words'));
-    }
-
-    public function test_composition_requires_a_group_or_a_collection(): void
-    {
-        $this->actingAs(User::factory()->create())
-            ->getJson('/api/exports/composition')
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids' => 'Choisissez au moins un groupe ou une collection.']);
-    }
-
-    public function test_composition_rejects_items_hidden_from_the_user(): void
-    {
-        $privateCollection = GroupCollection::factory()->private()->create();
-
-        $this->actingAs(User::factory()->create())
-            ->getJson('/api/exports/composition?'.http_build_query(['group_collection_ids' => [$privateCollection->id]]))
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['items' => 'Un ou plusieurs éléments sélectionnés sont introuvables.']);
     }
 }

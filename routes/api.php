@@ -73,7 +73,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Skribbl.io export: every word, unpaginated.
         Route::get('word-groups/{word_group}/export', [WordExportController::class, 'wordGroup'])->name('word-groups.export');
-        Route::get('exports/composition', [WordExportController::class, 'composition'])->name('exports.composition');
         Route::get('group-collections/{group_collection}/export', [WordExportController::class, 'groupCollection'])->name('group-collections.export');
 
         Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
