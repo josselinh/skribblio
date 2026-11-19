@@ -30,4 +30,14 @@
         color-scheme: light dark;
         accent-color: var(--color-brand-600);
     }
+
+    /* Tailwind v4 no longer shows the pointer on buttons: every clickable control gets it back. */
+    button:not(:disabled),
+    [role='button']:not(:disabled),
+    summary,
+    select:not(:disabled),
+    input:is([type='checkbox'], [type='radio'], [type='file'], [type='color'], [type='submit'], [type='button'], [type='reset']):not(:disabled),
+    label:has(> input:is([type='checkbox'], [type='radio']):not(:disabled)) {
+        cursor: pointer;
+    }
 }
