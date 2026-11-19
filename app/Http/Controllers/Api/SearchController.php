@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * Searches, by name, the groups and collections the current user can see (their own and public ones).
- * Names starting with the search come first, then the most recently updated.
+ * Names starting with the search come first, then the chosen sort (most recently updated by default).
  */
 class SearchController extends Controller
 {
@@ -25,8 +25,7 @@ class SearchController extends Controller
             ->withCount('words')
             ->withIsFavorite($request->user())
             ->orderByNameRelevance($request->search())
-            ->latest('updated_at')
-            ->latest('id')
+            ->orderBySearchSort($request->sort(), 'words_count')
             ->paginate($request->perPage())
             ->withQueryString();
 
@@ -42,8 +41,7 @@ class SearchController extends Controller
             ->withCount('wordGroups')
             ->withIsFavorite($request->user())
             ->orderByNameRelevance($request->search())
-            ->latest('updated_at')
-            ->latest('id')
+            ->orderBySearchSort($request->sort(), 'word_groups_count')
             ->paginate($request->perPage())
             ->withQueryString();
 

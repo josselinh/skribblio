@@ -75,6 +75,11 @@ const status = computed<string | null>(() =>
     route.query.verified === '1' ? 'Votre adresse email est confirmée, bienvenue !' : flashStatus,
 );
 
+/** A user with no group and no favorite yet is invited to explore what others share. */
+const isNewcomer = computed(() =>
+    [wordGroups, favoriteWordGroups, favoriteGroupCollections].every((list) => list.result.value?.meta.total === 0),
+);
+
 const buttonClass =
     'inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700';
 const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouver ici.';
@@ -96,6 +101,22 @@ const emptyFavoritesMessage = 'Ajoutez-en avec l’étoile ☆ pour les retrouve
                     </p>
                 </div>
                 <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">Créer un export</RouterLink>
+            </div>
+
+            <div
+                v-if="isNewcomer"
+                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 p-5"
+            >
+                <div>
+                    <p class="font-semibold">Nouveau sur Skribblio Tools ?</p>
+                    <p class="text-sm text-zinc-500">
+                        Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés
+                        en favoris.
+                    </p>
+                </div>
+                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium underline">
+                    Découvrir les groupes de la communauté →
+                </RouterLink>
             </div>
 
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
