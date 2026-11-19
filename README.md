@@ -220,3 +220,7 @@ Astuce : ajoutez un alias pour taper simplement `sail` au lieu de `./vendor/bin/
 ```sh
 alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
 ```
+
+## Licence
+
+Skribblio Tools est un logiciel libre distribué sous [licence MIT](LICENSE). Projet indépendant, non affilié à Skribbl.io.
