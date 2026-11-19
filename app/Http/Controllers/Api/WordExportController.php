@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ComposeExportRequest;
 use App\Models\GroupCollection;
-use App\Models\Word;
 use App\Models\WordGroup;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,7 +25,8 @@ class WordExportController extends Controller
 
     /**
      * The groups of the collection that the current user can see, sorted by name, each with its words
-     * sorted by name; hidden groups are left out. The SPA lets the user pick which groups to export.
+     * sorted by name, and how many groups are hidden from them (never which ones). The SPA lets the user
+     * pick which groups to export, and adds them to the export composer.
      */
     public function groupCollection(Request $request, GroupCollection $groupCollection): JsonResponse
     {
@@ -41,45 +39,12 @@ class WordExportController extends Controller
             ->get(['word_groups.id', 'word_groups.name']);
 
         return response()->json(['data' => [
+            'hidden_word_groups_count' => $groupCollection->wordGroups()->count() - $wordGroups->count(),
             'word_groups' => $wordGroups->map(fn (WordGroup $wordGroup): array => [
                 'id' => $wordGroup->id,
                 'name' => $wordGroup->name,
                 'words' => $wordGroup->words->pluck('name'),
             ]),
-        ]]);
-    }
-
-    /**
-     * Words of a composition of groups and collections: the selected groups plus the groups of the
-     * selected collections, without duplicates. Groups of those collections hidden from the user
-     * are left out and only counted. The resolved group ids let the SPA save the composition as a
-     * new collection.
-     */
-    public function composition(ComposeExportRequest $request): JsonResponse
-    {
-        $inSelectedGroupCollections = fn (Builder $query) => $query->whereKey($request->groupCollectionIds());
-
-        $wordGroupIds = WordGroup::visibleTo($request->user())
-            ->where(fn (Builder $query) => $query
-                ->whereKey($request->wordGroupIds())
-                ->orWhereHas('groupCollections', $inSelectedGroupCollections))
-            ->orderBy('name')
-            ->pluck('id');
-
-        $hiddenWordGroupsCount = WordGroup::query()
-            ->whereHas('groupCollections', $inSelectedGroupCollections)
-            ->whereKeyNot($wordGroupIds)
-            ->count();
-
-        $names = Word::query()
-            ->whereIn('word_group_id', $wordGroupIds)
-            ->orderBy('name')
-            ->pluck('name');
-
-        return response()->json(['data' => [
-            'words' => $names,
-            'word_group_ids' => $wordGroupIds,
-            'hidden_word_groups_count' => $hiddenWordGroupsCount,
         ]]);
     }
 }

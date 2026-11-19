@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { isAxiosError } from 'axios';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
-import { fetchExportComposition, type ExportComposition } from '@/api/exports';
+import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
 import { createGroupCollection } from '@/api/groupCollections';
 import { fetchGroupCollectionSearchResults } from '@/api/search';
 import FormField from '@/components/FormField.vue';
@@ -14,58 +13,107 @@ import VisibilityField from '@/components/VisibilityField.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import WordListExport from '@/components/WordListExport.vue';
 import { useForm } from '@/composables/useForm';
-import type { ValidationErrorResponse } from '@/types/api';
 import type { GroupCollection, Visibility, WordGroup } from '@/types/models';
 
 /**
- * Composes an export from groups and collections, then lets the user save the composition as a
- * new collection. Nothing is saved until then.
+ * Composes an export from groups, then lets the user save the selection as a new collection. Choosing a
+ * collection adds its visible groups to the selection. Each group's words are loaded once, when it is
+ * added; the list is then computed here. Nothing is saved until the user creates the collection.
  */
 const router = useRouter();
 
-const selectedWordGroups = ref<WordGroup[]>([]);
-const selectedGroupCollections = ref<GroupCollection[]>([]);
-
+const selectedWordGroups = ref<ExportedWordGroup[]>([]);
 const selectedWordGroupIds = computed(() => selectedWordGroups.value.map((wordGroup) => wordGroup.id));
-const selectedGroupCollectionIds = computed(() => selectedGroupCollections.value.map((collection) => collection.id));
-const hasSelection = computed(() => selectedWordGroupIds.value.length + selectedGroupCollectionIds.value.length > 0);
+const hasSelection = computed(() => selectedWordGroups.value.length > 0);
 
-const composition = ref<ExportComposition | null>(null);
-const isComposing = ref(false);
-const compositionError = ref<string | null>(null);
-let latestComposition = 0;
+/** Words of the selected groups, sorted by name, duplicates kept (the export options deal with them). */
+const words = computed(() =>
+    selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, 'fr')),
+);
 
-/** Recomputes the words of the selection, ignoring outdated responses. */
-async function compose(): Promise<void> {
-    if (!hasSelection.value) {
-        composition.value = null;
-        compositionError.value = null;
+const isAdding = ref(false);
+const addError = ref<string | null>(null);
+/** Outcome of the last collection added: how many groups were added, already there, or hidden. */
+const addStatus = ref<string | null>(null);
 
-        return;
-    }
-    const compositionId = ++latestComposition;
-    isComposing.value = true;
-    compositionError.value = null;
+/** Adds the groups that are not selected yet; returns how many were added. */
+function appendWordGroups(wordGroups: ExportedWordGroup[]): number {
+    const newWordGroups = wordGroups.filter((wordGroup) => !selectedWordGroupIds.value.includes(wordGroup.id));
+    selectedWordGroups.value = [...selectedWordGroups.value, ...newWordGroups];
+
+    return newWordGroups.length;
+}
+
+/** Loads something to add, showing a single error message when it fails. */
+async function add(load: () => Promise<void>): Promise<void> {
+    isAdding.value = true;
+    addError.value = null;
+    addStatus.value = null;
     try {
-        const result = await fetchExportComposition(selectedWordGroupIds.value, selectedGroupCollectionIds.value);
-        if (compositionId === latestComposition) {
-            composition.value = result;
-        }
-    } catch (error) {
-        if (compositionId === latestComposition) {
-            compositionError.value =
-                isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
-                    ? error.response.data.message
-                    : 'Impossible de charger les mots.';
-        }
+        await load();
+    } catch {
+        addError.value = 'Impossible d’ajouter cet élément, veuillez réessayer.';
     } finally {
-        if (compositionId === latestComposition) {
-            isComposing.value = false;
-        }
+        isAdding.value = false;
     }
 }
 
-watch([selectedWordGroupIds, selectedGroupCollectionIds], compose);
+function addWordGroup(wordGroup: WordGroup): Promise<void> {
+    return add(async () => {
+        const groupWords = await fetchWordGroupExport(wordGroup.id);
+        appendWordGroups([{ id: wordGroup.id, name: wordGroup.name, words: groupWords }]);
+    });
+}
+
+function addGroupCollection(groupCollection: GroupCollection): Promise<void> {
+    return add(async () => {
+        const collectionExport = await fetchGroupCollectionExport(groupCollection.id);
+        const addedCount = appendWordGroups(collectionExport.word_groups);
+        addStatus.value = collectionAddedMessage(
+            groupCollection.name,
+            addedCount,
+            collectionExport.word_groups.length - addedCount,
+            collectionExport.hidden_word_groups_count,
+        );
+    });
+}
+
+function plural(count: number, singular: string, pluralForm: string): string {
+    return `${count} ${count > 1 ? pluralForm : singular}`;
+}
+
+function collectionAddedMessage(name: string, addedCount: number, alreadySelectedCount: number, hiddenCount: number): string {
+    const parts = [
+        addedCount === 0
+            ? `Aucun nouveau groupe ajouté depuis « ${name} ».`
+            : `${plural(addedCount, 'groupe', 'groupes')} de « ${name} » ${addedCount > 1 ? 'ajoutés' : 'ajouté'}.`,
+    ];
+    if (alreadySelectedCount > 0) {
+        parts.push(
+            alreadySelectedCount === 1
+                ? '1 groupe était déjà dans la sélection.'
+                : `${alreadySelectedCount} groupes étaient déjà dans la sélection.`,
+        );
+    }
+    if (hiddenCount > 0) {
+        parts.push(
+            hiddenCount === 1
+                ? '1 groupe privé de cette collection ne vous est pas visible et n’a pas été ajouté.'
+                : `${hiddenCount} groupes privés de cette collection ne vous sont pas visibles et n’ont pas été ajoutés.`,
+        );
+    }
+
+    return parts.join(' ');
+}
+
+function removeWordGroup(id: string): void {
+    selectedWordGroups.value = selectedWordGroups.value.filter((wordGroup) => wordGroup.id !== id);
+}
+
+function removeAll(): void {
+    selectedWordGroups.value = [];
+    addStatus.value = null;
+}
 
 function searchGroupCollections(query: string): Promise<GroupCollection[]> {
     return fetchGroupCollectionSearchResults({ q: query, author: 'all', page: 1, perPage: 10 }).then(
@@ -73,47 +121,11 @@ function searchGroupCollections(query: string): Promise<GroupCollection[]> {
     );
 }
 
-function addWordGroup(wordGroup: WordGroup): void {
-    if (!selectedWordGroupIds.value.includes(wordGroup.id)) {
-        selectedWordGroups.value = [...selectedWordGroups.value, wordGroup];
-    }
-}
-
-function addGroupCollection(groupCollection: GroupCollection): void {
-    if (!selectedGroupCollectionIds.value.includes(groupCollection.id)) {
-        selectedGroupCollections.value = [...selectedGroupCollections.value, groupCollection];
-    }
-}
-
-function removeWordGroup(id: string): void {
-    selectedWordGroups.value = selectedWordGroups.value.filter((wordGroup) => wordGroup.id !== id);
-}
-
-function removeGroupCollection(id: string): void {
-    selectedGroupCollections.value = selectedGroupCollections.value.filter((collection) => collection.id !== id);
-}
-
-const hiddenGroupsNote = computed(() => {
-    const count = composition.value?.hidden_word_groups_count ?? 0;
-    if (count === 0) {
-        return null;
-    }
-
-    return count === 1
-        ? '1 groupe des collections choisies vous est masqué : ses mots ne sont pas exportés.'
-        : `${count} groupes des collections choisies vous sont masqués : leurs mots ne sont pas exportés.`;
-});
-
-const wordGroupsCount = computed(() => composition.value?.word_group_ids.length ?? 0);
-
 const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false });
 
-/** Saves the groups of the composition (collections flattened into their groups) as a new collection. */
+/** Saves the selected groups as a new collection. */
 async function saveAsGroupCollection(): Promise<void> {
-    if (!composition.value) {
-        return;
-    }
-    const wordGroupIds = composition.value.word_group_ids;
+    const wordGroupIds = selectedWordGroupIds.value;
     await form.submit(async (data) => {
         const groupCollection = await createGroupCollection({ ...data, word_group_ids: wordGroupIds });
         await router.push({ name: 'group-collections.show', params: { id: groupCollection.id } });
@@ -138,8 +150,8 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
             </RouterLink>
             <h1 class="mt-2 text-2xl font-semibold">Créer un export</h1>
             <p class="mt-1 text-zinc-500">
-                Choisissez des groupes et des collections : leurs mots sont réunis dans une liste prête à coller dans
-                Skribbl.io.
+                Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste
+                prête à coller dans Skribbl.io.
             </p>
 
             <section
@@ -150,56 +162,65 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
 
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="export-word-group-search" class="block text-sm font-medium">Groupes</label>
+                        <label for="export-word-group-search" class="block text-sm font-medium">Ajouter un groupe</label>
                         <WordGroupSearch
                             class="mt-1"
                             input-id="export-word-group-search"
                             :excluded-ids="selectedWordGroupIds"
+                            :disabled="isAdding"
                             @select="addWordGroup"
                         />
                     </div>
                     <div>
-                        <label for="export-group-collection-search" class="block text-sm font-medium">Collections</label>
+                        <label for="export-group-collection-search" class="block text-sm font-medium">
+                            Ajouter les groupes d’une collection
+                        </label>
                         <ItemSearch
                             class="mt-1"
                             input-id="export-group-collection-search"
                             :search="searchGroupCollections"
                             placeholder="Rechercher une collection…"
                             empty-message="Aucune collection trouvée."
-                            :excluded-ids="selectedGroupCollectionIds"
+                            :disabled="isAdding"
                             @select="addGroupCollection"
                         />
+                        <p class="mt-1 text-xs text-zinc-500">
+                            Les groupes de la collection choisie sont ajoutés à la sélection : vous pourrez retirer ceux
+                            que vous ne voulez pas.
+                        </p>
                     </div>
                 </div>
 
-                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500">Aucun groupe ni collection sélectionné.</p>
+                <p v-if="isAdding" class="mt-4 text-sm text-zinc-500">Ajout en cours…</p>
+                <p v-else-if="addError" role="alert" class="mt-4 text-sm text-red-600">{{ addError }}</p>
+                <p v-else-if="addStatus" role="status" class="mt-4 text-sm text-zinc-700">{{ addStatus }}</p>
 
-                <ul v-else class="mt-4 flex flex-wrap gap-2" aria-label="Éléments sélectionnés">
-                    <li v-for="groupCollection in selectedGroupCollections" :key="groupCollection.id" :class="tagClass">
-                        <span class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Collection</span>
-                        {{ groupCollection.name }}
-                        <button
-                            type="button"
-                            :class="removeButtonClass"
-                            :aria-label="`Retirer la collection ${groupCollection.name}`"
-                            @click="removeGroupCollection(groupCollection.id)"
-                        >
-                            ×
+                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500">Aucun groupe sélectionné.</p>
+
+                <template v-else>
+                    <div class="mt-4 flex items-center justify-between gap-2">
+                        <p class="text-sm text-zinc-500">
+                            {{ plural(selectedWordGroups.length, 'groupe sélectionné', 'groupes sélectionnés') }}
+                        </p>
+                        <button type="button" class="text-sm text-zinc-600 underline hover:text-zinc-900" @click="removeAll">
+                            Tout retirer
                         </button>
-                    </li>
-                    <li v-for="wordGroup in selectedWordGroups" :key="wordGroup.id" :class="tagClass">
-                        <span class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Groupe</span>
-                        {{ wordGroup.name }}
-                        <button
-                            type="button"
-                            :class="removeButtonClass"
-                            :aria-label="`Retirer le groupe ${wordGroup.name}`"
-                            @click="removeWordGroup(wordGroup.id)"
-                        >
-                            ×
-                        </button>
-                    </li>
-                </ul>
+                    </div>
+                    <ul class="mt-2 flex flex-wrap gap-2" aria-label="Groupes sélectionnés">
+                        <li v-for="wordGroup in selectedWordGroups" :key="wordGroup.id" :class="tagClass">
+                            {{ wordGroup.name }}
+                            <span class="text-zinc-500">· {{ wordGroup.words.length }}</span>
+                            <button
+                                type="button"
+                                :class="removeButtonClass"
+                                :aria-label="`Retirer le groupe ${wordGroup.name}`"
+                                @click="removeWordGroup(wordGroup.id)"
+                            >
+                                ×
+                            </button>
+                        </li>
+                    </ul>
+                </template>
             </section>
 
             <template v-if="hasSelection">
@@ -209,33 +230,18 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                 >
                     <h2 id="export-result-title" class="text-lg font-semibold">Export</h2>
 
-                    <p v-if="compositionError" role="alert" class="mt-2 text-sm text-red-600">
-                        {{ compositionError }}
-                        <button type="button" class="underline" @click="compose">Réessayer</button>
-                    </p>
-                    <p v-else-if="!composition" class="mt-2 text-sm text-zinc-500">Chargement…</p>
-                    <p v-else-if="composition.words.length === 0" class="mt-2 text-sm text-zinc-500">
-                        Aucun mot à exporter.
-                        <template v-if="hiddenGroupsNote">{{ hiddenGroupsNote }}</template>
-                    </p>
-                    <WordListExport
-                        v-else
-                        class="mt-2"
-                        :words="composition.words"
-                        :note="hiddenGroupsNote"
-                        :is-loading="isComposing"
-                    />
+                    <p v-if="words.length === 0" class="mt-2 text-sm text-zinc-500">Aucun mot à exporter.</p>
+                    <WordListExport v-else class="mt-2" :words="words" />
                 </section>
 
                 <section
-                    v-if="composition && wordGroupsCount > 0"
                     class="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
                     aria-labelledby="export-save-title"
                 >
                     <h2 id="export-save-title" class="text-lg font-semibold">Enregistrer comme collection</h2>
                     <p class="mt-1 text-sm text-zinc-500">
-                        La nouvelle collection contiendra les {{ wordGroupsCount }} groupe{{ wordGroupsCount > 1 ? 's' : '' }}
-                        de cette sélection. Elle ne suivra pas les changements des collections choisies.
+                        La nouvelle collection contiendra les
+                        {{ plural(selectedWordGroups.length, 'groupe', 'groupes') }} de cette sélection.
                     </p>
 
                     <form class="mt-4 space-y-6" novalidate @submit.prevent="saveAsGroupCollection">
@@ -253,9 +259,7 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 hover:bg-zinc-200 h
                             :error="form.errors.value.accepts_contributions"
                         />
                         <p v-if="saveError" role="alert" class="text-sm text-red-600">{{ saveError }}</p>
-                        <PrimaryButton :is-loading="form.isProcessing.value || isComposing">
-                            Créer la collection
-                        </PrimaryButton>
+                        <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
                     </form>
                 </section>
             </template>
