@@ -8,9 +8,12 @@ use App\Http\Requests\UpdateWordRequest;
 use App\Http\Resources\WordResource;
 use App\Models\Word;
 use App\Models\WordGroup;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WordController extends Controller
@@ -38,15 +41,41 @@ class WordController extends Controller
     }
 
     /**
-     * Add a word to a group, written by the current user.
+     * Add several words to a group, written by the current user. Words already in the group
+     * (as the database compares them: regardless of case and accents) are skipped, invalid
+     * ones are reported; the others are added and the group is touched once.
      */
     public function store(StoreWordRequest $request, WordGroup $wordGroup): JsonResponse
     {
-        $word = $wordGroup->words()->make($request->validated());
-        $word->creator()->associate($request->user());
-        $word->save();
+        $createdWords = new Collection;
+        $skippedNames = [];
 
-        return (new WordResource($word->setRelation('wordGroup', $wordGroup)))->response()->setStatusCode(201);
+        DB::transaction(function () use ($request, $wordGroup, $createdWords, &$skippedNames): void {
+            Word::withoutTouching(function () use ($request, $wordGroup, $createdWords, &$skippedNames): void {
+                foreach ($request->validNames() as $name) {
+                    try {
+                        $createdWords->push(DB::transaction(function () use ($request, $wordGroup, $name): Word {
+                            $word = $wordGroup->words()->make(['name' => $name]);
+                            $word->creator()->associate($request->user());
+                            $word->save();
+
+                            return $word->setRelation('wordGroup', $wordGroup);
+                        }));
+                    } catch (UniqueConstraintViolationException) {
+                        $skippedNames[] = $name;
+                    }
+                }
+            });
+
+            if ($createdWords->isNotEmpty()) {
+                $wordGroup->touch();
+            }
+        });
+
+        return WordResource::collection($createdWords)
+            ->additional(['skipped' => $skippedNames, 'invalid' => $request->invalidNames()])
+            ->response()
+            ->setStatusCode($createdWords->isNotEmpty() ? 201 : 200);
     }
 
     public function update(UpdateWordRequest $request, Word $word): WordResource

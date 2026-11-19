@@ -57,18 +57,21 @@ class WordControllerTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_store_lets_any_user_add_a_word_to_a_public_group_and_touches_the_group(): void
+    public function test_store_lets_any_user_add_several_words_to_a_public_group_and_touches_the_group(): void
     {
         $user = User::factory()->create();
         $wordGroup = WordGroup::factory()->public()->create(['updated_at' => now()->subWeek()]);
 
-        $response = $this->actingAs($user)->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat']);
+        $response = $this->actingAs($user)->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat', 'chien']]);
 
         $response->assertCreated()
-            ->assertJsonPath('data.name', 'chat')
-            ->assertJsonPath('data.creator.id', $user->id)
-            ->assertJsonPath('data.can', ['update' => true, 'delete' => true]);
+            ->assertJsonPath('data.*.name', ['chat', 'chien'])
+            ->assertJsonPath('data.0.creator.id', $user->id)
+            ->assertJsonPath('data.0.can', ['update' => true, 'delete' => true])
+            ->assertJsonPath('skipped', [])
+            ->assertJsonPath('invalid', []);
         $this->assertDatabaseHas('words', ['word_group_id' => $wordGroup->id, 'name' => 'chat', 'created_by' => $user->id]);
+        $this->assertDatabaseHas('words', ['word_group_id' => $wordGroup->id, 'name' => 'chien', 'created_by' => $user->id]);
         $this->assertTrue($wordGroup->fresh()->updated_at->isToday());
     }
 
@@ -77,65 +80,90 @@ class WordControllerTest extends TestCase
         $wordGroup = WordGroup::factory()->private()->create();
 
         $this->actingAs(User::factory()->create())
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat'])
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat']])
             ->assertNotFound();
 
         $this->assertDatabaseCount('words', 0);
     }
 
-    public function test_store_rejects_word_already_in_the_group_regardless_of_case_with_422(): void
+    public function test_store_returns_403_for_another_user_on_a_group_closed_to_contributions(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->closedToContributions()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat']])
+            ->assertForbidden();
+
+        $this->assertSame(0, $wordGroup->words()->count());
+    }
+
+    public function test_store_skips_words_already_in_the_group_or_repeated_regardless_of_case_and_adds_the_others(): void
     {
         $user = User::factory()->create();
         $wordGroup = WordGroup::factory()->createdBy($user)->create();
         Word::factory()->for($wordGroup)->create(['name' => 'chat']);
 
-        $this->actingAs($user)
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'Chat'])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'Ce mot est déjà dans le groupe.']);
+        $response = $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['Chat', 'chien', 'CHIEN', 'chien']]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.*.name', ['chien'])
+            ->assertJsonPath('skipped', ['Chat', 'CHIEN']);
+        $this->assertSame(2, $wordGroup->words()->count());
     }
 
-    public function test_store_with_empty_name_returns_422(): void
+    public function test_store_reports_invalid_words_and_adds_the_valid_ones(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $tooLongName = str_repeat('a', 33);
+
+        $response = $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat', $tooLongName, 'souris, chien', 'tour '.str_repeat('e', 27)]]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.*.name', ['chat', 'tour '.str_repeat('e', 27)])
+            ->assertJsonPath('invalid', [
+                ['name' => $tooLongName, 'message' => 'Un mot ne peut pas dépasser 32 caractères.'],
+                ['name' => 'souris, chien', 'message' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.'],
+            ]);
+    }
+
+    public function test_store_without_any_added_word_returns_200_and_does_not_touch_the_group(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        Word::factory()->for($wordGroup)->create(['name' => 'chat']);
+        $wordGroup->forceFill(['updated_at' => now()->subWeek()])->saveQuietly();
+
+        $this->actingAs($user)
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat', str_repeat('a', 33)]])
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+        $this->assertFalse($wordGroup->fresh()->updated_at->isToday());
+    }
+
+    public function test_store_with_only_empty_names_returns_422(): void
     {
         $user = User::factory()->create();
         $wordGroup = WordGroup::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => '  '])
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['  ', '']])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'Le champ nom est obligatoire.']);
+            ->assertJsonValidationErrors(['names' => 'Saisissez au moins un mot.']);
     }
 
-    public function test_store_accepts_a_word_of_32_characters_with_spaces(): void
+    public function test_store_rejects_more_than_500_names_with_422(): void
     {
         $user = User::factory()->create();
         $wordGroup = WordGroup::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'tour '.str_repeat('e', 27)])
-            ->assertCreated();
-    }
-
-    public function test_store_rejects_word_longer_than_32_characters_with_422(): void
-    {
-        $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->createdBy($user)->create();
-
-        $this->actingAs($user)
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => str_repeat('a', 33)])
+            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => array_map(fn (int $index): string => "mot {$index}", range(1, 501))])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('name');
-    }
-
-    public function test_store_rejects_word_containing_a_comma_with_422(): void
-    {
-        $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->createdBy($user)->create();
-
-        $this->actingAs($user)
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat, chien'])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.']);
+            ->assertJsonValidationErrors(['names' => 'Vous pouvez ajouter au plus 500 mots à la fois.']);
+        $this->assertSame(0, $wordGroup->words()->count());
     }
 
     public function test_update_renames_word_for_its_author(): void
@@ -211,17 +239,6 @@ class WordControllerTest extends TestCase
         $this->actingAs(User::factory()->create())->deleteJson("/api/words/{$word->id}")->assertForbidden();
 
         $this->assertModelExists($word);
-    }
-
-    public function test_store_returns_403_for_another_user_on_a_group_closed_to_contributions(): void
-    {
-        $wordGroup = WordGroup::factory()->public()->closedToContributions()->create();
-
-        $this->actingAs(User::factory()->create())
-            ->postJson("/api/word-groups/{$wordGroup->id}/words", ['name' => 'chat'])
-            ->assertForbidden();
-
-        $this->assertSame(0, $wordGroup->words()->count());
     }
 
     public function test_author_can_no_longer_rename_their_word_once_the_group_is_closed_but_the_word_is_kept(): void

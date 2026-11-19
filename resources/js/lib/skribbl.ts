@@ -11,6 +11,14 @@ export function formatSkribblList(words: readonly string[]): string {
     return words.join(SKRIBBL_SEPARATOR);
 }
 
+/** Splits a typed or pasted list into words: separated by commas or line breaks, trimmed, empty ones dropped. */
+export function parseWordList(text: string): string[] {
+    return text
+        .split(/[,\n]/)
+        .map((word) => word.trim())
+        .filter((word) => word !== '');
+}
+
 /** Keeps the first occurrence of each word, ignoring case. */
 export function deduplicateWords(words: readonly string[]): string[] {
     const seen = new Set<string>();
