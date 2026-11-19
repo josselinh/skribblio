@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\WordController;
 use App\Http\Controllers\Api\WordExportController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
+use App\Http\Controllers\Api\WordVoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -85,6 +86,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
         Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['index', 'store', 'update', 'destroy']);
+        Route::put('words/{word}/vote', [WordVoteController::class, 'update'])->name('words.vote.update');
+        Route::delete('words/{word}/vote', [WordVoteController::class, 'destroy'])->name('words.vote.destroy');
         Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::post('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'store'])
             ->name('group-collections.word-groups.store');

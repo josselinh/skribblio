@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
-import { fetchWords } from '@/api/words';
+import { fetchWords, type WordOrder } from '@/api/words';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
@@ -14,11 +14,12 @@ import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
+import SortableHeader from '@/components/SortableHeader.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
 import WordRow from '@/components/WordRow.vue';
 import { consumeHistoryStatus } from '@/lib/historyStatus';
-import type { PaginatedResponse } from '@/types/api';
-import type { Word, WordGroup } from '@/types/models';
+import type { WordsResponse } from '@/types/api';
+import type { SortDirection, Word, WordGroup, WordSort } from '@/types/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -30,10 +31,47 @@ const currentPage = computed(() => {
     return Number.isInteger(page) && page > 0 ? page : 1;
 });
 
+/** Direction of the first click on each column: alphabetical for text, most recent or best first otherwise. */
+const defaultDirections: Record<WordSort, SortDirection> = {
+    name: 'asc',
+    author: 'asc',
+    created: 'desc',
+    updated: 'desc',
+    score: 'desc',
+};
+const DEFAULT_ORDER: WordOrder = { sort: 'created', direction: 'desc' };
+
+/** Order of the words, kept in the URL (`?sort=…&direction=…`) except the default one. */
+const order = computed<WordOrder>(() => {
+    const sort = route.query.sort;
+    if (typeof sort !== 'string' || !(sort in defaultDirections)) {
+        return DEFAULT_ORDER;
+    }
+    const direction = route.query.direction;
+
+    return {
+        sort: sort as WordSort,
+        direction: direction === 'asc' || direction === 'desc' ? direction : defaultDirections[sort as WordSort],
+    };
+});
+
+/** Changing the order goes back to the first page. */
+async function sortWords(sort: WordSort, direction: SortDirection): Promise<void> {
+    const isDefault = sort === DEFAULT_ORDER.sort && direction === DEFAULT_ORDER.direction;
+    await router.push({
+        query: {
+            ...route.query,
+            page: undefined,
+            sort: isDefault ? undefined : sort,
+            direction: isDefault || direction === defaultDirections[sort] ? undefined : direction,
+        },
+    });
+}
+
 const wordGroup = ref<WordGroup | null>(null);
 const groupStatus = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 
-const words = ref<PaginatedResponse<Word> | null>(null);
+const words = ref<WordsResponse | null>(null);
 const areWordsLoading = ref(false);
 const haveWordsFailed = ref(false);
 
@@ -55,7 +93,7 @@ async function loadWords(): Promise<void> {
     areWordsLoading.value = true;
     haveWordsFailed.value = false;
     try {
-        words.value = await fetchWords(wordGroupId.value, currentPage.value);
+        words.value = await fetchWords(wordGroupId.value, currentPage.value, order.value);
     } catch {
         haveWordsFailed.value = true;
     } finally {
@@ -68,6 +106,21 @@ async function saveWordGroup(payload: NameVisibilityPayload): Promise<void> {
     wordGroup.value = await updateWordGroup(wordGroupId.value, payload);
     await loadWords();
 }
+
+const columns = computed(() =>
+    (
+        [
+            { sort: 'name', label: 'Mot' },
+            { sort: 'score', label: 'Votes' },
+            { sort: 'author', label: 'Créé par' },
+            { sort: 'created', label: 'Créé le' },
+            { sort: 'updated', label: 'Modifié le' },
+        ] satisfies { sort: WordSort; label: string }[]
+    ).filter((column) => column.sort !== 'score' || showVotes.value),
+);
+
+/** Votes are shown while the group is open, and afterwards when some words received votes. */
+const showVotes = computed(() => Boolean(wordGroup.value?.accepts_contributions || words.value?.has_votes));
 
 /** A new word is listed first: show page 1 so that it is visible. */
 async function onWordAdded(): Promise<void> {
@@ -94,7 +147,7 @@ async function onWordDeleted(): Promise<void> {
 }
 
 watch(wordGroupId, loadWordGroup, { immediate: true });
-watch([wordGroupId, currentPage], loadWords, { immediate: true });
+watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 </script>
 
 <template>
@@ -174,10 +227,16 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                     <table class="w-full text-left text-sm">
                         <thead class="border-b border-zinc-200 bg-zinc-50 text-xs font-medium tracking-wide text-zinc-500 uppercase">
                             <tr>
-                                <th scope="col" class="px-4 py-2.5">Mot</th>
-                                <th scope="col" class="px-4 py-2.5">Créé par</th>
-                                <th scope="col" class="px-4 py-2.5">Créé le</th>
-                                <th scope="col" class="px-4 py-2.5">Modifié le</th>
+                                <SortableHeader
+                                    v-for="column in columns"
+                                    :key="column.sort"
+                                    :label="column.label"
+                                    :column="column.sort"
+                                    :sort="order.sort"
+                                    :direction="order.direction"
+                                    :default-direction="defaultDirections[column.sort]"
+                                    @sort="sortWords"
+                                />
                                 <th scope="col" class="px-4 py-2.5"><span class="sr-only">Actions</span></th>
                             </tr>
                         </thead>
@@ -186,6 +245,7 @@ watch([wordGroupId, currentPage], loadWords, { immediate: true });
                                 v-for="word in words.data"
                                 :key="word.id"
                                 :word="word"
+                                :show-votes="showVotes"
                                 @updated="onWordUpdated"
                                 @deleted="onWordDeleted"
                             />

@@ -25,6 +25,11 @@ export interface PaginatedResponse<T> {
 }
 
 /** Response of `POST /api/word-groups/{id}/words`. */
+/** Words of a group; `has_votes` tells whether any of its words received a vote. */
+export interface WordsResponse extends PaginatedResponse<Word> {
+    has_votes: boolean;
+}
+
 export interface CreateWordsResponse {
     /** Added words, in the order they were submitted. */
     data: Word[];

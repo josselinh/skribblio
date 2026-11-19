@@ -31,4 +31,16 @@ class WordPolicy
     {
         return $this->update($user, $word);
     }
+
+    /**
+     * While the group is open to contributions, whoever can see it votes for or against the words
+     * (and changes or removes their vote), except the author of the word. Once the group is closed,
+     * the votes are kept but nobody can vote any more.
+     */
+    public function vote(User $user, Word $word): bool
+    {
+        return $word->wordGroup->accepts_contributions
+            && $word->wordGroup->isVisibleTo($user)
+            && ! $word->isCreatedBy($user);
+    }
 }

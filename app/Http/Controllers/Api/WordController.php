@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ListWordsRequest;
 use App\Http\Requests\StoreWordRequest;
 use App\Http\Requests\UpdateWordRequest;
 use App\Http\Resources\WordResource;
@@ -24,20 +25,20 @@ class WordController extends Controller
     private const int PER_PAGE = 20;
 
     /**
-     * List the words of a group, most recently added first.
+     * List the words of a group with their votes, most recently added first unless another order is asked.
+     * `has_votes` tells whether any word of the group received a vote, so that the SPA shows the votes
+     * of a group closed to contributions.
      */
-    public function index(WordGroup $wordGroup): AnonymousResourceCollection
+    public function index(ListWordsRequest $request, WordGroup $wordGroup): AnonymousResourceCollection
     {
-        Gate::authorize('view', $wordGroup);
-
         $words = $wordGroup->words()
             ->with('creator')
-            ->latest()
-            ->latest('id')
+            ->withVotes($request->user())
+            ->orderBySort($request->sort(), $request->direction())
             ->paginate(self::PER_PAGE);
         $words->getCollection()->each->setRelation('wordGroup', $wordGroup);
 
-        return WordResource::collection($words);
+        return WordResource::collection($words)->additional(['has_votes' => $wordGroup->hasWordVotes()]);
     }
 
     /**
@@ -58,6 +59,7 @@ class WordController extends Controller
                             $word = $wordGroup->words()->make(['name' => $name]);
                             $word->creator()->associate($request->user());
                             $word->save();
+                            $word->forceFill(['upvotes_count' => 0, 'downvotes_count' => 0, 'my_vote' => null]);
 
                             return $word->setRelation('wordGroup', $wordGroup);
                         }));
@@ -82,7 +84,7 @@ class WordController extends Controller
     {
         $word->update($request->validated());
 
-        return new WordResource($word->load('creator'));
+        return new WordResource($word->load('creator')->loadVotes($request->user()));
     }
 
     public function destroy(Word $word): Response

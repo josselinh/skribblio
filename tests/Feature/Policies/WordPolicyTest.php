@@ -52,4 +52,48 @@ class WordPolicyTest extends TestCase
         $this->assertFalse($author->can($ability, $word));
         $this->assertTrue($groupCreator->can($ability, $word));
     }
+
+    public function test_whoever_can_see_an_open_group_can_vote_except_the_author_of_the_word(): void
+    {
+        $groupCreator = User::factory()->create();
+        $author = User::factory()->create();
+        $word = Word::factory()
+            ->for(WordGroup::factory()->public()->openToContributions()->createdBy($groupCreator))
+            ->createdBy($author)
+            ->create();
+
+        $this->assertTrue(User::factory()->create()->can('vote', $word));
+        $this->assertTrue($groupCreator->can('vote', $word));
+        $this->assertFalse($author->can('vote', $word));
+    }
+
+    public function test_nobody_can_vote_once_the_group_is_closed(): void
+    {
+        $groupCreator = User::factory()->create();
+        $word = Word::factory()
+            ->for(WordGroup::factory()->public()->closedToContributions()->createdBy($groupCreator))
+            ->createdBy(User::factory()->create())
+            ->create();
+
+        $this->assertFalse(User::factory()->create()->can('vote', $word));
+        $this->assertFalse($groupCreator->can('vote', $word));
+    }
+
+    public function test_only_members_can_vote_in_an_open_private_group(): void
+    {
+        $member = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
+        $wordGroup->members()->attach($member);
+        $word = Word::factory()->for($wordGroup)->create();
+
+        $this->assertTrue($member->can('vote', $word));
+        $this->assertFalse(User::factory()->create()->can('vote', $word));
+    }
+
+    public function test_anyone_can_vote_for_a_word_whose_author_deleted_their_account(): void
+    {
+        $word = Word::factory()->for(WordGroup::factory()->public()->openToContributions())->create(['created_by' => null]);
+
+        $this->assertTrue(User::factory()->create()->can('vote', $word));
+    }
 }

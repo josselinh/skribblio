@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\WordVote;
 use App\Models\User;
 use App\Models\Word;
 use App\Models\WordGroup;
@@ -32,7 +33,7 @@ class WordControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.*.id', [$newerWord->id, $olderWord->id])
             ->assertJsonPath('data.0.creator', ['id' => $author->id, 'name' => 'Alice'])
-            ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false]);
+            ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false, 'vote' => false]);
     }
 
     public function test_index_paginates_by_twenty(): void
@@ -46,6 +47,126 @@ class WordControllerTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('meta.total', 21);
+    }
+
+    public function test_index_returns_the_votes_of_each_word_and_the_vote_of_the_current_user(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $word = Word::factory()->for($wordGroup)->create();
+        $word->voteFor($user, WordVote::Down);
+        $word->voteFor(User::factory()->create(), WordVote::Up);
+        $word->voteFor(User::factory()->create(), WordVote::Up);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words")
+            ->assertOk()
+            ->assertJsonPath('data.0.upvotes_count', 2)
+            ->assertJsonPath('data.0.downvotes_count', 1)
+            ->assertJsonPath('data.0.my_vote', 'down')
+            ->assertJsonPath('data.0.can.vote', true)
+            ->assertJsonPath('has_votes', true);
+    }
+
+    public function test_index_says_when_no_word_of_the_group_received_a_vote(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        Word::factory()->for($wordGroup)->create();
+        Word::factory()->create()->voteFor($user, WordVote::Up);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words")
+            ->assertOk()
+            ->assertJsonPath('data.0.my_vote', null)
+            ->assertJsonPath('has_votes', false);
+    }
+
+    public function test_index_sorts_by_score_then_by_most_upvotes(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->public()->openToContributions()->create();
+        $disliked = Word::factory()->for($wordGroup)->create(['name' => 'disliked']);
+        $unvoted = Word::factory()->for($wordGroup)->create(['name' => 'unvoted']);
+        $liked = Word::factory()->for($wordGroup)->create(['name' => 'liked']);
+        $controversial = Word::factory()->for($wordGroup)->create(['name' => 'controversial']);
+        [$first, $second, $third] = User::factory()->count(3)->create();
+        $disliked->voteFor($first, WordVote::Down);
+        $liked->voteFor($first, WordVote::Up);
+        $controversial->voteFor($first, WordVote::Up);
+        $controversial->voteFor($second, WordVote::Up);
+        $controversial->voteFor($third, WordVote::Down);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=score")
+            ->assertOk()
+            ->assertJsonPath('data.*.name', ['controversial', 'liked', 'unvoted', 'disliked']);
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=score&direction=asc")
+            ->assertOk()
+            ->assertJsonPath('data.*.name', ['disliked', 'unvoted', 'liked', 'controversial']);
+    }
+
+    public function test_index_sorts_by_author_name_with_deleted_authors_last_in_both_directions(): void
+    {
+        $user = User::factory()->create(['name' => 'Mia']);
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        Word::factory()->for($wordGroup)->create(['name' => 'deleted', 'created_by' => null]);
+        Word::factory()->for($wordGroup)->createdBy($user)->create(['name' => 'by mia']);
+        Word::factory()->for($wordGroup)->createdBy(User::factory()->create(['name' => 'Zoé']))->create(['name' => 'by zoé']);
+        Word::factory()->for($wordGroup)->createdBy(User::factory()->create(['name' => 'Alice']))->create(['name' => 'by alice']);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=author")
+            ->assertOk()
+            ->assertJsonPath('data.*.name', ['by alice', 'by mia', 'by zoé', 'deleted']);
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=author&direction=desc")
+            ->assertOk()
+            ->assertJsonPath('data.*.name', ['by zoé', 'by mia', 'by alice', 'deleted']);
+    }
+
+    public function test_index_sorts_by_name_alphabetically_by_default_and_in_reverse_on_demand(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        foreach (['banane', 'abricot', 'cerise'] as $name) {
+            Word::factory()->for($wordGroup)->create(['name' => $name]);
+        }
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=name")
+            ->assertJsonPath('data.*.name', ['abricot', 'banane', 'cerise']);
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=name&direction=desc")
+            ->assertJsonPath('data.*.name', ['cerise', 'banane', 'abricot']);
+    }
+
+    public function test_index_sorts_by_last_update(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        Word::factory()->for($wordGroup)->create(['name' => 'old', 'updated_at' => now()->subDays(2)]);
+        Word::factory()->for($wordGroup)->create(['name' => 'recent', 'created_at' => now()->subWeek(), 'updated_at' => now()]);
+        Word::factory()->for($wordGroup)->create(['name' => 'middle', 'updated_at' => now()->subDay()]);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=updated")
+            ->assertJsonPath('data.*.name', ['recent', 'middle', 'old']);
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=updated&direction=asc")
+            ->assertJsonPath('data.*.name', ['old', 'middle', 'recent']);
+    }
+
+    public function test_index_rejects_an_unknown_sort_with_422(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?sort=random&direction=up")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['sort', 'direction']);
     }
 
     public function test_index_returns_404_for_private_group_of_another_user(): void
@@ -67,7 +188,7 @@ class WordControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonPath('data.*.name', ['chat', 'chien'])
             ->assertJsonPath('data.0.creator.id', $user->id)
-            ->assertJsonPath('data.0.can', ['update' => true, 'delete' => true])
+            ->assertJsonPath('data.0.can', ['update' => true, 'delete' => true, 'vote' => false])
             ->assertJsonPath('skipped', [])
             ->assertJsonPath('invalid', []);
         $this->assertDatabaseHas('words', ['word_group_id' => $wordGroup->id, 'name' => 'chat', 'created_by' => $user->id]);
