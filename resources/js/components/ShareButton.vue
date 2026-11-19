@@ -5,7 +5,7 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
 
 /**
- * "Partager" button of a private group or collection, or of a public one open to its members only, opening a
+ * "Inviter" button of a private group or collection, or of a public one open to its members only, opening a
  * modal with the access (or contribution) request link and its copy and regenerate actions. The link is
  * loaded on the first opening.
  */
@@ -73,10 +73,13 @@ async function regenerate(): Promise<void> {
         aria-haspopup="dialog"
         @click="open"
     >
-        Partager
+        Inviter
     </button>
 
-    <ModalDialog v-model:open="isOpen" title="Partager">
+    <ModalDialog
+        v-model:open="isOpen"
+        :title="purpose === 'contribution' ? 'Inviter des contributeurs' : 'Inviter des personnes'"
+    >
         <p>
             {{
                 purpose === 'contribution'
