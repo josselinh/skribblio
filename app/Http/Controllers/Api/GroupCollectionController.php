@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -87,5 +88,19 @@ class GroupCollectionController extends Controller
         $groupCollection->update($request->validated());
 
         return new GroupCollectionResource($groupCollection->loadIsFavorite($request->user()));
+    }
+
+    /**
+     * Delete a collection; its groups are kept.
+     * Users who cannot see the item get a 404, the others a 403.
+     */
+    public function destroy(GroupCollection $groupCollection): Response
+    {
+        Gate::authorize('view', $groupCollection);
+        Gate::authorize('delete', $groupCollection);
+
+        $groupCollection->delete();
+
+        return response()->noContent();
     }
 }

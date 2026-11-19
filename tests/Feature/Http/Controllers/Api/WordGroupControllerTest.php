@@ -3,7 +3,9 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Enums\Visibility;
+use App\Models\GroupCollection;
 use App\Models\User;
+use App\Models\Word;
 use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -48,7 +50,7 @@ class WordGroupControllerTest extends TestCase
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'share' => false, 'manage_access' => true, 'add_word' => true, 'duplicate' => true],
+                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'add_word' => true, 'duplicate' => true],
             ]);
     }
 
@@ -116,7 +118,7 @@ class WordGroupControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.id', $wordGroup->id)
-            ->assertJsonPath('data.can', ['update' => false, 'share' => false, 'manage_access' => false, 'add_word' => true, 'duplicate' => true]);
+            ->assertJsonPath('data.can', ['update' => false, 'delete' => false, 'share' => false, 'manage_access' => false, 'add_word' => true, 'duplicate' => true]);
     }
 
     public function test_show_returns_404_for_private_group_of_another_user(): void
@@ -190,5 +192,49 @@ class WordGroupControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.accepts_contributions', true);
         $this->assertTrue($wordGroup->fresh()->accepts_contributions);
+    }
+
+    public function test_destroy_deletes_group_with_its_words_and_may_leave_a_collection_empty(): void
+    {
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->createdBy($creator)->create();
+        $word = Word::factory()->for($wordGroup)->create();
+        $collectionOfAnotherUser = GroupCollection::factory()->hasAttached($wordGroup)->create();
+
+        $this->actingAs($creator)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}")
+            ->assertNoContent();
+
+        $this->assertModelMissing($wordGroup);
+        $this->assertModelMissing($word);
+        $this->assertModelExists($collectionOfAnotherUser);
+
+        $this->actingAs($collectionOfAnotherUser->creator)
+            ->getJson("/api/group-collections/{$collectionOfAnotherUser->id}")
+            ->assertOk()
+            ->assertJsonPath('data.word_groups', [])
+            ->assertJsonPath('data.hidden_word_groups_count', 0);
+    }
+
+    public function test_destroy_returns_403_for_another_user_on_public_group(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/word-groups/{$wordGroup->id}")
+            ->assertForbidden();
+
+        $this->assertModelExists($wordGroup);
+    }
+
+    public function test_destroy_returns_404_for_private_group_of_another_user(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/word-groups/{$wordGroup->id}")
+            ->assertNotFound();
+
+        $this->assertModelExists($wordGroup);
     }
 }

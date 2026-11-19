@@ -82,9 +82,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
         Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
-        Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update']);
+        Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['index', 'store', 'update', 'destroy']);
-        Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'show', 'update']);
+        Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::post('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'store'])
             ->name('group-collections.word-groups.store');
         Route::delete('group-collections/{group_collection}/word-groups/{word_group}', [GroupCollectionWordGroupController::class, 'destroy'])
