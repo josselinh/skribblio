@@ -15,8 +15,8 @@ import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
-import SortableHeader from '@/components/SortableHeader.vue';
-import WordRow from '@/components/WordRow.vue';
+import WordListItem from '@/components/WordListItem.vue';
+import WordSortControl from '@/components/WordSortControl.vue';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import type { WordsResponse } from '@/types/api';
 import type { AccessPurpose, SortDirection, Word, WordGroup, WordSort } from '@/types/models';
@@ -31,7 +31,7 @@ const currentPage = computed(() => {
     return Number.isInteger(page) && page > 0 ? page : 1;
 });
 
-/** Direction of the first click on each column: alphabetical for text, most recent or best first otherwise. */
+/** Direction applied when choosing each criterion: alphabetical for text, most recent or best first otherwise. */
 const defaultDirections: Record<WordSort, SortDirection> = {
     name: 'asc',
     author: 'asc',
@@ -107,18 +107,6 @@ async function saveWordGroup(payload: NameVisibilityPayload): Promise<void> {
     wordGroup.value = await updateWordGroup(wordGroupId.value, payload);
     await loadWords();
 }
-
-const columns = computed(() =>
-    (
-        [
-            { sort: 'name', label: 'Mot' },
-            { sort: 'score', label: 'Votes' },
-            { sort: 'author', label: 'Créé par' },
-            { sort: 'created', label: 'Créé le' },
-            { sort: 'updated', label: 'Modifié le' },
-        ] satisfies { sort: WordSort; label: string }[]
-    ).filter((column) => column.sort !== 'score' || showVotes.value),
-);
 
 /** Votes are shown while the group is open, and afterwards when some words received votes. */
 const accessPurpose = computed<AccessPurpose>(() =>
@@ -238,39 +226,29 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             </p>
 
             <template v-else-if="words">
-                <p class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
-                <div
-                    class="relative mt-2 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
+                <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
+                    <WordSortControl
+                        :sort="order.sort"
+                        :direction="order.direction"
+                        :default-directions="defaultDirections"
+                        :show-votes="showVotes"
+                        @sort="sortWords"
+                    />
+                </div>
+                <ul
+                    class="mt-2 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
                     :class="{ 'opacity-60': areWordsLoading }"
                 >
-                    <table class="w-full text-left text-sm">
-                        <thead class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400 uppercase">
-                            <tr>
-                                <SortableHeader
-                                    v-for="column in columns"
-                                    :key="column.sort"
-                                    :label="column.label"
-                                    :column="column.sort"
-                                    :sort="order.sort"
-                                    :direction="order.direction"
-                                    :default-direction="defaultDirections[column.sort]"
-                                    @sort="sortWords"
-                                />
-                                <th scope="col" class="px-4 py-2.5"><span class="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                            <WordRow
-                                v-for="word in words.data"
-                                :key="word.id"
-                                :word="word"
-                                :show-votes="showVotes"
-                                @updated="onWordUpdated"
-                                @deleted="onWordDeleted"
-                            />
-                        </tbody>
-                    </table>
-                </div>
+                    <WordListItem
+                        v-for="word in words.data"
+                        :key="word.id"
+                        :word="word"
+                        :show-votes="showVotes"
+                        @updated="onWordUpdated"
+                        @deleted="onWordDeleted"
+                    />
+                </ul>
                 <PaginationNav class="mt-4" :current-page="words.meta.current_page" :last-page="words.meta.last_page" />
             </template>
         </template>
