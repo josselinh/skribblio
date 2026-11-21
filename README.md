@@ -307,11 +307,14 @@ PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : to
 
    Il n'existe pas encore d'image `laravelsail/php85-composer` : celle de PHP 8.4 suffit pour installer les dépendances. L'application tourne bien en PHP 8.5 dans le conteneur Sail.
 
-4. Démarrer les conteneurs :
+4. Construire l'image de l'application, puis démarrer les conteneurs :
 
    ```sh
+   ./vendor/bin/sail build
    ./vendor/bin/sail up -d
    ```
+
+   L'image `sail-8.5/app` n'est publiée sur aucun registre : elle est construite localement à partir de `vendor/laravel/sail/runtimes/8.5`. Sans `sail build`, `sail up -d` tente d'abord de la télécharger et affiche `failed to resolve reference "sail-8.5/app:latest"`. Le premier build prend une dizaine de minutes. Relancez `./vendor/bin/sail build` après une mise à jour de `laravel/sail`.
 
 5. Générer la clé de l'application et créer les tables :
 
@@ -327,7 +330,36 @@ PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : to
    ./vendor/bin/sail npm run dev
    ```
 
+   `npm run dev` reste au premier plan : laissez ce terminal ouvert tant que vous travaillez sur l'application. Pour se passer du serveur Vite, compilez une fois le front-end avec `./vendor/bin/sail npm run build` (et supprimez `public/hot` s'il existe).
+
 L'application est alors accessible sur <http://localhost:8000>.
+
+### Dépannage
+
+#### Le build échoue sur `packages.sury.org`
+
+Si `./vendor/bin/sail build` s'arrête avec :
+
+```text
+E: Failed to fetch https://packages.sury.org/php/dists/noble/main/binary-amd64/Packages.gz  File has unexpected size (… != …). Mirror sync in progress?
+```
+
+le problème ne vient pas du projet : le dépôt PHP utilisé par le Dockerfile de Sail est en cours de mise à jour et son CDN sert un index et des fichiers de versions différentes. Relancez `./vendor/bin/sail build` plus tard.
+
+Si l'erreur persiste plusieurs heures, construisez l'image à partir d'une copie du runtime qui passe par le PPA Launchpad `ondrej/php` (même mainteneur, mêmes paquets), sans modifier `vendor/` :
+
+```sh
+cp -r vendor/laravel/sail/runtimes/8.5 /tmp/sail-runtime-8.5
+sed -i \
+    -e '/debsuryorg-archive-keyring.deb/d' \
+    -e 's#&& echo "deb \[signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg\] https://packages.sury.org/php/ noble main" > /etc/apt/sources.list.d/php.list#\&\& curl -sS "https://keyserver.ubuntu.com/pks/lookup?op=get\&search=0x14AA40EC0831756756D7F66C4F4EA0AAE5267A6C" | gpg --dearmor > /etc/apt/keyrings/ppa_ondrej_php.gpg \&\& echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ppa_ondrej_php.list#' \
+    /tmp/sail-runtime-8.5/Dockerfile
+docker build -t sail-8.5/app \
+    --build-arg WWWGROUP="$(id -g)" \
+    /tmp/sail-runtime-8.5
+```
+
+Puis reprenez à `./vendor/bin/sail up -d`.
 
 ### Traiter les jobs
 
