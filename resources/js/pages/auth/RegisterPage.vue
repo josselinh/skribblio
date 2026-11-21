@@ -39,6 +39,7 @@ async function submit(): Promise<void> {
                 label="Adresse email"
                 type="email"
                 autocomplete="email"
+                hint="Elle n’est jamais montrée aux autres utilisateurs : elle sert seulement à vous envoyer des notifications."
                 :error="form.errors.value.email"
                 required
             />
