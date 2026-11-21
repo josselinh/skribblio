@@ -6,6 +6,7 @@ import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupColl
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import DeleteButton from '@/components/DeleteButton.vue';
 import DuplicateButton from '@/components/DuplicateButton.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
@@ -27,7 +28,6 @@ const groupCollectionId = computed(() => String(route.params.id));
 const groupCollection = ref<GroupCollectionDetail | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isUpdatingGroups = ref(false);
-const groupsError = ref<string | null>(null);
 
 const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((wordGroup) => wordGroup.id) ?? []);
 
@@ -99,37 +99,67 @@ async function saveGroupCollection(payload: NameVisibilityPayload): Promise<void
 
 const { showToast } = useToasts();
 
-/** Runs a change on the groups of the collection, then reloads it and confirms it; shows validation errors (422). */
-async function changeGroups(change: () => Promise<void>, successMessage: string): Promise<void> {
-    isUpdatingGroups.value = true;
-    groupsError.value = null;
-    try {
-        await change();
-        await loadGroupCollection();
-        showToast(successMessage);
-    } catch (error) {
-        if (isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422) {
-            groupsError.value = error.response.data.message;
-        } else {
-            groupsError.value = 'Une erreur est survenue, veuillez réessayer.';
+/** Change to the groups of the collection being confirmed, in `ConfirmDialog`. */
+const pendingGroupChange = ref<{ action: 'add' | 'remove'; wordGroup: WordGroup } | null>(null);
+const groupChangeError = ref<string | null>(null);
+
+const isConfirmingGroupChange = computed({
+    get: () => pendingGroupChange.value !== null,
+    set: (isOpen: boolean) => {
+        if (!isOpen) {
+            pendingGroupChange.value = null;
         }
+    },
+});
+
+const groupChangeMessage = computed(() => {
+    if (!pendingGroupChange.value) {
+        return '';
+    }
+    const { action, wordGroup } = pendingGroupChange.value;
+    if (action === 'remove') {
+        return `Le groupe « ${wordGroup.name} » sera retiré de cette collection. Le groupe lui-même et ses mots sont conservés.`;
+    }
+
+    return wordGroup.visibility === 'private'
+        ? `Le groupe « ${wordGroup.name} » sera ajouté à cette collection. Il est privé : il restera masqué aux personnes qui n’y ont pas accès.`
+        : `Le groupe « ${wordGroup.name} » sera ajouté à cette collection.`;
+});
+
+function confirmGroupChange(action: 'add' | 'remove', wordGroup: WordGroup): void {
+    groupChangeError.value = null;
+    pendingGroupChange.value = { action, wordGroup };
+}
+
+/** Applies the confirmed change, then reloads the collection; errors (e.g. removing the last group) stay in the dialog. */
+async function applyGroupChange(): Promise<void> {
+    if (!pendingGroupChange.value) {
+        return;
+    }
+    const { action, wordGroup } = pendingGroupChange.value;
+    isUpdatingGroups.value = true;
+    groupChangeError.value = null;
+    try {
+        if (action === 'add') {
+            await attachWordGroup(groupCollectionId.value, wordGroup.id);
+        } else {
+            await detachWordGroup(groupCollectionId.value, wordGroup.id);
+        }
+        pendingGroupChange.value = null;
+        await loadGroupCollection();
+        showToast(
+            action === 'add'
+                ? `Groupe « ${wordGroup.name} » ajouté à la collection.`
+                : `Groupe « ${wordGroup.name} » retiré de la collection.`,
+        );
+    } catch (error) {
+        groupChangeError.value =
+            isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
+                ? error.response.data.message
+                : 'Une erreur est survenue, veuillez réessayer.';
     } finally {
         isUpdatingGroups.value = false;
     }
-}
-
-function addWordGroup(wordGroup: WordGroup): Promise<void> {
-    return changeGroups(
-        () => attachWordGroup(groupCollectionId.value, wordGroup.id),
-        `Groupe « ${wordGroup.name} » ajouté à la collection.`,
-    );
-}
-
-function removeWordGroup(wordGroup: WordGroup): Promise<void> {
-    return changeGroups(
-        () => detachWordGroup(groupCollectionId.value, wordGroup.id),
-        `Groupe « ${wordGroup.name} » retiré de la collection.`,
-    );
 }
 
 watch(
@@ -244,7 +274,7 @@ watch(
                         input-id="add-word-group"
                         :excluded-ids="wordGroupIds"
                         :disabled="isUpdatingGroups"
-                        @select="addWordGroup"
+                        @select="confirmGroupChange('add', $event)"
                     />
                 </div>
 
@@ -255,8 +285,6 @@ watch(
                 <p v-else class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                     Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.
                 </p>
-
-                <p v-if="groupsError" role="alert" class="mt-3 text-sm text-red-600 dark:text-red-400">{{ groupsError }}</p>
 
                 <p
                     v-if="groupCollection.word_groups.length === 0"
@@ -283,12 +311,25 @@ watch(
                             :disabled="isUpdatingGroups || totalWordGroupsCount === 1"
                             :title="totalWordGroupsCount === 1 ? 'Une collection doit contenir au moins un groupe.' : undefined"
                             :aria-label="`Retirer ${wordGroup.name} de la collection`"
-                            @click="removeWordGroup(wordGroup)"
+                            aria-haspopup="dialog"
+                            @click="confirmGroupChange('remove', wordGroup)"
                         >
                             Retirer
                         </button>
                     </li>
                 </ul>
+
+                <ConfirmDialog
+                    v-model:open="isConfirmingGroupChange"
+                    :title="pendingGroupChange?.action === 'add' ? 'Ajouter ce groupe à la collection ?' : 'Retirer ce groupe de la collection ?'"
+                    :message="groupChangeMessage"
+                    :confirm-label="pendingGroupChange?.action === 'add' ? 'Ajouter' : 'Retirer'"
+                    :processing-label="pendingGroupChange?.action === 'add' ? 'Ajout…' : 'Retrait…'"
+                    :tone="pendingGroupChange?.action === 'add' ? 'primary' : 'danger'"
+                    :is-processing="isUpdatingGroups"
+                    :error="groupChangeError"
+                    @confirm="applyGroupChange"
+                />
             </section>
         </template>
     </AppLayout>
