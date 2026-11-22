@@ -38,16 +38,16 @@ class AccessRequested extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $requesterName = $this->accessRequest->requester->name;
-        $request = $this->accessRequest->isForContribution()
-            ? "{$requesterName} demande à contribuer {$this->accessRequest->accessTarget()}"
-            : "{$requesterName} demande l'accès {$this->accessRequest->accessTarget()}";
+        $request = __(
+            $this->accessRequest->isForContribution() ? 'access_requests.mail.requested.contribution' : 'access_requests.mail.requested.access',
+            ['requester' => $this->accessRequest->requester->name, 'target' => $this->accessRequest->accessTarget()],
+        );
 
         return (new MailMessage)
             ->subject($request)
-            ->greeting("Bonjour {$notifiable->name},")
+            ->greeting(__('access_requests.mail.greeting', ['name' => $notifiable->name]))
             ->line("{$request}.")
-            ->action('Voir la demande', url($this->accessRequest->itemPath()))
-            ->line('Vous pouvez accepter ou refuser la demande depuis cette page ou depuis votre tableau de bord.');
+            ->action(__('access_requests.mail.requested.action'), url($this->accessRequest->itemPath()))
+            ->line(__('access_requests.mail.requested.outro'));
     }
 }

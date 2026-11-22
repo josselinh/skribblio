@@ -60,7 +60,7 @@ class DetachWordGroupsRequest extends FormRequest
             function (Validator $validator): void {
                 if ($validator->errors()->isEmpty()
                     && count($this->wordGroupIds()) >= $this->groupCollection()->wordGroups()->count()) {
-                    $validator->errors()->add('word_group_ids', 'Une collection doit contenir au moins un groupe.');
+                    $validator->errors()->add('word_group_ids', __('group_collections.remove_word_groups.last_word_group'));
                 }
             },
         ];
@@ -74,9 +74,9 @@ class DetachWordGroupsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'word_group_ids.required' => 'Sélectionnez au moins un groupe.',
-            'word_group_ids.max' => 'Vous pouvez retirer au plus '.self::MAX_WORD_GROUPS.' groupes à la fois.',
-            'word_group_ids.*.exists' => 'Un des groupes sélectionnés n’est plus dans la collection.',
+            'word_group_ids.required' => __('group_collections.remove_word_groups.required'),
+            'word_group_ids.max' => __('group_collections.remove_word_groups.max', ['max' => self::MAX_WORD_GROUPS]),
+            'word_group_ids.*.exists' => __('group_collections.remove_word_groups.no_longer_in_collection'),
         ];
     }
 

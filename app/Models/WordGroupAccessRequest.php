@@ -43,7 +43,7 @@ class WordGroupAccessRequest extends Model
      */
     public function accessTarget(): string
     {
-        return "au groupe « {$this->item->name} »";
+        return __('access_requests.target.word_group', ['name' => $this->item->name]);
     }
 
     /**

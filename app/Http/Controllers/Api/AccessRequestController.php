@@ -67,7 +67,7 @@ class AccessRequestController extends Controller
         Gate::authorize('manageAccess', $accessRequest->item);
 
         if (! $accessRequest->isPending()) {
-            throw ValidationException::withMessages(['status' => 'Cette demande a déjà été traitée.']);
+            throw ValidationException::withMessages(['status' => __('access_requests.already_decided')]);
         }
 
         $accept

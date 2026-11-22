@@ -54,9 +54,9 @@ class DestroyWordsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'word_ids.required' => 'Sélectionnez au moins un mot.',
-            'word_ids.max' => 'Vous pouvez supprimer au plus '.self::MAX_WORDS.' mots à la fois.',
-            'word_ids.*.exists' => 'Un des mots sélectionnés n’est plus dans le groupe.',
+            'word_ids.required' => __('words.delete.required'),
+            'word_ids.max' => __('words.delete.max', ['max' => self::MAX_WORDS]),
+            'word_ids.*.exists' => __('words.delete.no_longer_in_group'),
         ];
     }
 

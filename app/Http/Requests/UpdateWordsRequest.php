@@ -75,7 +75,7 @@ class UpdateWordsRequest extends FormRequest
             ->exists();
 
         if ($isTaken) {
-            $fail('Ce mot est déjà dans le groupe.');
+            $fail(__('words.name_taken'));
         }
     }
 
@@ -87,13 +87,13 @@ class UpdateWordsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'words.required' => 'Modifiez au moins un mot.',
-            'words.max' => 'Vous pouvez modifier au plus '.self::MAX_WORDS.' mots à la fois.',
-            'words.*.id.exists' => 'Ce mot n’est plus dans le groupe.',
-            'words.*.name.required' => 'Saisissez un mot.',
-            'words.*.name.max' => 'Un mot ne peut pas dépasser '.Word::NAME_MAX_LENGTH.' caractères.',
-            'words.*.name.not_regex' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
-            'words.*.name.distinct' => 'Vous avez saisi ce mot plusieurs fois.',
+            'words.required' => __('words.update.required'),
+            'words.max' => __('words.update.max', ['max' => self::MAX_WORDS]),
+            'words.*.id.exists' => __('words.no_longer_in_group'),
+            'words.*.name.required' => __('words.name_required'),
+            'words.*.name.max' => __('words.name_too_long', ['max' => Word::NAME_MAX_LENGTH]),
+            'words.*.name.not_regex' => __('words.name_contains_comma'),
+            'words.*.name.distinct' => __('words.name_repeated'),
         ];
     }
 

@@ -41,9 +41,9 @@ class StoreWordGroupRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'visibility' => 'visibilité',
-            'accepts_contributions' => 'ouvert aux contributions',
-            'contributions_members_only' => 'contributions des membres uniquement',
+            'visibility' => __('fields.visibility'),
+            'accepts_contributions' => __('fields.accepts_contributions'),
+            'contributions_members_only' => __('fields.contributions_members_only'),
         ];
     }
 }

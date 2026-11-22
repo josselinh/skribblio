@@ -26,7 +26,7 @@ class DuplicateGroupCollectionController extends Controller
         $visibleWordGroupsCount = $groupCollection->wordGroups()->visibleTo($user)->count();
         if ($visibleWordGroupsCount === 0) {
             throw ValidationException::withMessages([
-                'word_groups' => 'Aucun groupe de cette collection ne vous est visible : il n’y a rien à copier.',
+                'word_groups' => __('duplication.nothing_to_copy'),
             ]);
         }
         $hiddenWordGroupsCount = $groupCollection->wordGroups()->count() - $visibleWordGroupsCount;
