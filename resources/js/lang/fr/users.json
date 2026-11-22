@@ -1,0 +1,11 @@
+{
+    "notFound": "Utilisateur introuvable",
+    "loadFailed": "Impossible de charger cet utilisateur.",
+    "description": "Ses groupes et collections publics, et ceux qu'il ou elle partage avec vous.",
+    "wordGroups": {
+        "empty": "Aucun groupe visible."
+    },
+    "groupCollections": {
+        "empty": "Aucune collection visible."
+    }
+}

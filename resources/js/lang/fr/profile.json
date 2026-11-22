@@ -1,0 +1,23 @@
+{
+    "title": "Mon profil",
+    "information": {
+        "title": "Informations",
+        "emailHint": "Si vous la modifiez, vous devrez confirmer la nouvelle adresse avant de continuer.",
+        "saved": "Votre profil a été mis à jour."
+    },
+    "password": {
+        "current": "Mot de passe actuel",
+        "confirmation": "Confirmation du nouveau mot de passe",
+        "submit": "Modifier le mot de passe",
+        "saved": "Votre mot de passe a été modifié."
+    },
+    "deletion": {
+        "title": "Supprimer mon compte",
+        "description": "Vos groupes, leurs mots, vos collections et vos favoris seront supprimés définitivement. Les mots que vous avez ajoutés aux groupes d’autres personnes y resteront, sans votre nom.",
+        "confirmTitle": "Supprimer votre compte ?",
+        "confirmMessage": "Tout ce que vous avez créé sera supprimé et les personnes avec qui vous l’avez partagé n’y auront plus accès. Cette action est irréversible.",
+        "password": "Mot de passe, pour confirmer",
+        "failed": "Impossible de supprimer votre compte. Réessayez.",
+        "done": "Votre compte a été supprimé."
+    }
+}

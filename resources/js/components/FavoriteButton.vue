@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { setFavorite } from '@/api/favorites';
 import { useToasts } from '@/composables/useToasts';
+import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind } from '@/types/models';
 
 /**
@@ -22,14 +24,12 @@ const emit = defineEmits<{
 }>();
 
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const isSaving = ref(false);
 
 function savedMessage(isNowFavorite: boolean): string {
-    const item = props.kind === 'word-groups' ? `Groupe « ${props.name} »` : `Collection « ${props.name} »`;
-    const agreement = props.kind === 'word-groups' ? '' : 'e';
-
-    return isNowFavorite ? `${item} ajouté${agreement} aux favoris.` : `${item} retiré${agreement} des favoris.`;
+    return t(`favorites.${isNowFavorite ? 'added' : 'removed'}.${itemKey(props.kind)}`, { name: props.name });
 }
 
 async function toggle(): Promise<void> {
@@ -45,7 +45,7 @@ async function toggle(): Promise<void> {
         showToast(savedMessage(newValue));
     } catch {
         isFavorite.value = !newValue;
-        showToast('Impossible de modifier les favoris, veuillez réessayer.', 'error');
+        showToast(t('favorites.failed'), 'error');
     } finally {
         isSaving.value = false;
     }
@@ -58,8 +58,8 @@ async function toggle(): Promise<void> {
         class="rounded-md p-1 text-lg leading-none transition hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
         :class="isFavorite ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'"
         :aria-pressed="isFavorite"
-        :aria-label="isFavorite ? `Retirer ${name} des favoris` : `Ajouter ${name} aux favoris`"
-        :title="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        :aria-label="isFavorite ? $t('favorites.removeNamed', { name }) : $t('favorites.addNamed', { name })"
+        :title="isFavorite ? $t('favorites.remove') : $t('favorites.add')"
         @click="toggle"
     >
         <span aria-hidden="true">{{ isFavorite ? '★' : '☆' }}</span>

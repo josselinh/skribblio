@@ -39,13 +39,13 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-    <AuthCard title="Connexion" description="Connectez-vous pour accéder à vos listes de mots.">
+    <AuthCard :title="$t('auth.login.title')" :description="$t('auth.login.description')">
         <StatusMessage :message="status" />
         <form class="space-y-4" novalidate @submit.prevent="submit">
             <FormField
                 id="email"
                 v-model="form.data.email"
-                label="Adresse email"
+                :label="$t('auth.fields.email')"
                 type="email"
                 autocomplete="email"
                 :error="form.errors.value.email"
@@ -54,7 +54,7 @@ async function submit(): Promise<void> {
             <FormField
                 id="password"
                 v-model="form.data.password"
-                label="Mot de passe"
+                :label="$t('auth.fields.password')"
                 type="password"
                 autocomplete="current-password"
                 :error="form.errors.value.password"
@@ -63,18 +63,18 @@ async function submit(): Promise<void> {
             <div class="flex items-center justify-between text-sm">
                 <label class="flex items-center gap-2">
                     <input v-model="form.data.remember" type="checkbox" class="rounded border-zinc-300 dark:border-zinc-700" />
-                    Se souvenir de moi
+                    {{ $t('auth.login.remember') }}
                 </label>
                 <RouterLink :to="{ name: 'forgot-password' }" class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100">
-                    Mot de passe oublié ?
+                    {{ $t('auth.login.forgotPassword') }}
                 </RouterLink>
             </div>
-            <PrimaryButton :is-loading="form.isProcessing.value">Se connecter</PrimaryButton>
+            <PrimaryButton :is-loading="form.isProcessing.value">{{ $t('auth.login.submit') }}</PrimaryButton>
         </form>
 
         <template #footer>
-            Pas encore de compte ?
-            <RouterLink :to="{ name: 'register' }" class="font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">Créer un compte</RouterLink>
+            {{ $t('auth.login.noAccount') }}
+            <RouterLink :to="{ name: 'register' }" class="font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">{{ $t('auth.login.register') }}</RouterLink>
         </template>
     </AuthCard>
 </template>

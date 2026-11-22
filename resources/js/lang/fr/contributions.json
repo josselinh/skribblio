@@ -1,0 +1,25 @@
+{
+    "badge": {
+        "open": "Contributions ouvertes",
+        "membersOnly": "Contributions sur autorisation",
+        "openHint": "Les personnes qui y ont accès peuvent contribuer.",
+        "membersOnlyHint": "Seules les personnes autorisées par le créateur peuvent contribuer."
+    },
+    "field": {
+        "label": "Ouvert aux contributions",
+        "who": "Qui peut contribuer ?",
+        "description": {
+            "wordGroup": "Les personnes autorisées peuvent y ajouter des mots, et modifier ou supprimer les leurs. Fermé, seul vous pouvez modifier la liste ; les mots déjà ajoutés sont conservés.",
+            "groupCollection": "Les personnes autorisées peuvent y ajouter des groupes, et retirer ceux qu’elles ont ajoutés. Fermée, seul vous pouvez modifier ses groupes ; ceux déjà ajoutés sont conservés."
+        },
+        "everyone": {
+            "wordGroup": "Tous ceux qui voient le groupe",
+            "groupCollection": "Tous ceux qui voient la collection",
+            "description": "Chaque utilisateur connecté peut contribuer."
+        },
+        "membersOnly": {
+            "label": "Uniquement les personnes que j’autorise",
+            "description": "Tout le monde peut consulter, mais seules les personnes que vous acceptez via le lien de partage peuvent contribuer."
+        }
+    }
+}

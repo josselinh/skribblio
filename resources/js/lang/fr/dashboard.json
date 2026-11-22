@@ -1,0 +1,29 @@
+{
+    "emailVerified": "Votre adresse email est confirmée, bienvenue !",
+    "newcomer": {
+        "title": "Nouveau sur Skribblio Tools ?",
+        "description": "Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés en favoris avec l’étoile ☆.",
+        "explore": "Découvrir les groupes de la communauté →"
+    },
+    "export": {
+        "description": "Réunissez les mots de plusieurs groupes et collections en une liste prête à coller.",
+        "button": "Créer un export"
+    },
+    "receivedRequests": "Demandes d'accès reçues",
+    "wordGroups": {
+        "title": "Mes groupes",
+        "create": "+ Nouveau groupe",
+        "empty": "Vous n'avez encore créé aucun groupe.",
+        "createFirst": "Créer mon premier groupe"
+    },
+    "groupCollections": {
+        "title": "Mes collections",
+        "create": "+ Nouvelle collection",
+        "empty": "Vous n'avez encore créé aucune collection.",
+        "createFirst": "Créer ma première collection"
+    },
+    "favoriteWordGroups": "Mes groupes favoris",
+    "favoriteGroupCollections": "Mes collections favorites",
+    "sharedWordGroups": "Groupes partagés avec moi",
+    "sharedGroupCollections": "Collections partagées avec moi"
+}

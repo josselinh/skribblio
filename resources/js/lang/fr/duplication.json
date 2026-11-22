@@ -1,0 +1,17 @@
+{
+    "button": "Dupliquer",
+    "processing": "Duplication…",
+    "failed": "Impossible de dupliquer. Réessayez.",
+    "title": {
+        "wordGroup": "Dupliquer ce groupe ?",
+        "groupCollection": "Dupliquer cette collection ?"
+    },
+    "description": {
+        "wordGroup": "Crée une copie privée de ce groupe et de ses mots, dont vous êtes l’auteur.",
+        "groupCollection": "Crée une copie privée de cette collection et des groupes que vous voyez, avec leurs mots, dont vous êtes l’auteur. Vos propres groupes sont repris tels quels."
+    },
+    "done": {
+        "wordGroup": "Groupe dupliqué. Il est privé et fermé aux contributions.",
+        "groupCollection": "Collection dupliquée. Elle et ses groupes copiés sont privés et fermés aux contributions. | Collection dupliquée. Elle et ses groupes copiés sont privés et fermés aux contributions. 1 groupe masqué n’a pas été copié. | Collection dupliquée. Elle et ses groupes copiés sont privés et fermés aux contributions. {n} groupes masqués n’ont pas été copiés."
+    }
+}

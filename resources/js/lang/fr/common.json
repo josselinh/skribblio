@@ -1,0 +1,20 @@
+{
+    "appName": "Skribblio Tools",
+    "you": "vous",
+    "byUser": "par {user}",
+    "deletedAccount": "Compte supprimé",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "listLoadFailed": "Impossible de charger la liste.",
+    "retry": "Réessayer",
+    "unexpectedError": "Une erreur est survenue, veuillez réessayer.",
+    "copy": "Copier",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "searching": "Recherche…",
+    "selectAll": "Tout sélectionner",
+    "deleteSelection": "Supprimer la sélection",
+    "wordGroups": "Groupes",
+    "groupCollections": "Collections"
+}

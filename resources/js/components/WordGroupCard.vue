@@ -28,12 +28,12 @@ function updateFavorite(isFavorite: boolean): void {
         :accepts-contributions="wordGroup.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(wordGroup)"
         :updated-at="wordGroup.updated_at"
-        updated-label="Modifié le"
+        :updated-label="$t('wordGroups.card.updatedOn')"
         :is-accessible="wordGroup.is_accessible !== false"
-        :inaccessible-message="wordGroup.access_status === 'pending' ? 'Demande d’accès en attente.' : 'Ce groupe est devenu privé : vous n’y avez plus accès.'"
+        :inaccessible-message="wordGroup.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('wordGroups.card.becamePrivate')"
     >
         <template #meta>
-            <CardMeta :creator="wordGroup.creator" :count="wordGroup.words_count" :count-labels="['mot', 'mots']" />
+            <CardMeta :creator="wordGroup.creator" :count-label="wordGroup.words_count === undefined ? undefined : $t('words.count', wordGroup.words_count)" />
         </template>
         <template v-if="wordGroup.is_favorite !== undefined && wordGroup.access_status !== 'pending'" #favorite>
             <FavoriteButton

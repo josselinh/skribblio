@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { fetchFavoriteGroupCollections, fetchFavoriteWordGroups } from '@/api/favorites';
 import { fetchMyGroupCollections } from '@/api/groupCollections';
@@ -17,6 +18,7 @@ import type { AccessRequest, FavoriteKind } from '@/types/models';
 const route = useRoute();
 const router = useRouter();
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const favoriteWordGroups = usePaginatedList(fetchFavoriteWordGroups, 'favorite_groups_page');
 const favoriteGroupCollections = usePaginatedList(fetchFavoriteGroupCollections, 'favorite_collections_page');
@@ -62,7 +64,7 @@ onMounted(() => {
     if (route.query.verified !== '1') {
         return;
     }
-    showToast('Votre adresse email est confirmée, bienvenue !');
+    showToast(t('dashboard.emailVerified'));
     const { verified: _verified, ...query } = route.query;
     void router.replace({ query });
 });
@@ -86,7 +88,7 @@ const buttonClass =
 
 <template>
     <AppLayout>
-        <h1 class="sr-only">Tableau de bord</h1>
+        <h1 class="sr-only">{{ $t('layout.header.dashboard') }}</h1>
 
         <div class="space-y-12">
             <div
@@ -94,14 +96,13 @@ const buttonClass =
                 class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-5"
             >
                 <div>
-                    <p class="font-semibold">Nouveau sur Skribblio Tools ?</p>
+                    <p class="font-semibold">{{ $t('dashboard.newcomer.title') }}</p>
                     <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                        Parcourez les groupes et collections partagés par les autres utilisateurs et ajoutez vos préférés
-                        en favoris avec l’étoile ☆.
+                        {{ $t('dashboard.newcomer.description') }}
                     </p>
                 </div>
                 <RouterLink :to="{ name: 'search' }" class="text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">
-                    Découvrir les groupes de la communauté →
+                    {{ $t('dashboard.newcomer.explore') }}
                 </RouterLink>
             </div>
 
@@ -109,17 +110,17 @@ const buttonClass =
                 class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-5 shadow-xs"
             >
                 <div>
-                    <p class="font-semibold text-brand-800 dark:text-brand-200">Exporter pour Skribbl.io</p>
+                    <p class="font-semibold text-brand-800 dark:text-brand-200">{{ $t('exports.panel.button') }}</p>
                     <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        Réunissez les mots de plusieurs groupes et collections en une liste prête à coller.
+                        {{ $t('dashboard.export.description') }}
                     </p>
                 </div>
-                <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">Créer un export</RouterLink>
+                <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">{{ $t('dashboard.export.button') }}</RouterLink>
             </div>
 
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
                 <h2 id="received-access-requests-title" class="text-lg font-semibold">
-                    Demandes d'accès reçues
+                    {{ $t('dashboard.receivedRequests') }}
                     <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ receivedAccessRequests.length }})</span>
                 </h2>
                 <ul class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
@@ -135,7 +136,7 @@ const buttonClass =
 
             <CardListSection
                 section-id="word-groups"
-                title="Mes groupes"
+                :title="$t('dashboard.wordGroups.title')"
                 :result="wordGroups.result.value"
                 :is-loading="wordGroups.isLoading.value"
                 :has-failed="wordGroups.hasFailed.value"
@@ -144,16 +145,16 @@ const buttonClass =
                 @retry="wordGroups.reload"
             >
                 <template #actions>
-                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">+ Nouveau groupe</RouterLink>
+                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">{{ $t('dashboard.wordGroups.create') }}</RouterLink>
                 </template>
                 <template #empty>
                     <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                        <p class="text-zinc-500 dark:text-zinc-400">Vous n'avez encore créé aucun groupe.</p>
+                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.wordGroups.empty') }}</p>
                         <RouterLink
                             :to="{ name: 'word-groups.create' }"
                             class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
                         >
-                            Créer mon premier groupe
+                            {{ $t('dashboard.wordGroups.createFirst') }}
                         </RouterLink>
                     </div>
                 </template>
@@ -164,7 +165,7 @@ const buttonClass =
 
             <CardListSection
                 section-id="group-collections"
-                title="Mes collections"
+                :title="$t('dashboard.groupCollections.title')"
                 :result="groupCollections.result.value"
                 :is-loading="groupCollections.isLoading.value"
                 :has-failed="groupCollections.hasFailed.value"
@@ -174,17 +175,17 @@ const buttonClass =
             >
                 <template #actions>
                     <RouterLink :to="{ name: 'group-collections.create' }" :class="buttonClass">
-                        + Nouvelle collection
+                        {{ $t('dashboard.groupCollections.create') }}
                     </RouterLink>
                 </template>
                 <template #empty>
                     <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                        <p class="text-zinc-500 dark:text-zinc-400">Vous n'avez encore créé aucune collection.</p>
+                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.groupCollections.empty') }}</p>
                         <RouterLink
                             :to="{ name: 'group-collections.create' }"
                             class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
                         >
-                            Créer ma première collection
+                            {{ $t('dashboard.groupCollections.createFirst') }}
                         </RouterLink>
                     </div>
                 </template>
@@ -199,7 +200,7 @@ const buttonClass =
             <CardListSection
                 v-if="isShown(favoriteWordGroups)"
                 section-id="favorite-word-groups"
-                title="Mes groupes favoris"
+                :title="$t('dashboard.favoriteWordGroups')"
                 :result="favoriteWordGroups.result.value"
                 :is-loading="favoriteWordGroups.isLoading.value"
                 :has-failed="favoriteWordGroups.hasFailed.value"
@@ -215,7 +216,7 @@ const buttonClass =
             <CardListSection
                 v-if="isShown(favoriteGroupCollections)"
                 section-id="favorite-group-collections"
-                title="Mes collections favorites"
+                :title="$t('dashboard.favoriteGroupCollections')"
                 :result="favoriteGroupCollections.result.value"
                 :is-loading="favoriteGroupCollections.isLoading.value"
                 :has-failed="favoriteGroupCollections.hasFailed.value"
@@ -234,7 +235,7 @@ const buttonClass =
             <CardListSection
                 v-if="isShown(sharedWordGroups)"
                 section-id="shared-word-groups"
-                title="Groupes partagés avec moi"
+                :title="$t('dashboard.sharedWordGroups')"
                 :result="sharedWordGroups.result.value"
                 :is-loading="sharedWordGroups.isLoading.value"
                 :has-failed="sharedWordGroups.hasFailed.value"
@@ -250,7 +251,7 @@ const buttonClass =
             <CardListSection
                 v-if="isShown(sharedGroupCollections)"
                 section-id="shared-group-collections"
-                title="Collections partagées avec moi"
+                :title="$t('dashboard.sharedGroupCollections')"
                 :result="sharedGroupCollections.result.value"
                 :is-loading="sharedGroupCollections.isLoading.value"
                 :has-failed="sharedGroupCollections.hasFailed.value"

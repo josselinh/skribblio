@@ -1,0 +1,46 @@
+{
+    "card": {
+        "updatedOn": "Modifiée le",
+        "becamePrivate": "Cette collection est devenue privée : vous n’y avez plus accès."
+    },
+    "create": {
+        "title": "Nouvelle collection",
+        "submit": "Créer la collection"
+    },
+    "fields": {
+        "name": "Nom de la collection"
+    },
+    "show": {
+        "notFound": {
+            "title": "Collection introuvable",
+            "description": "Cette collection n'existe pas ou vous n'y avez pas accès."
+        },
+        "loadFailed": "Impossible de charger la collection.",
+        "hidden": {
+            "message": "1 groupe de cette collection est privé et n’est pas visible pour vous. | {n} groupes de cette collection sont privés et ne sont pas visibles pour vous.",
+            "exportNote": "Les mots des groupes qui vous sont masqués ne sont pas exportés.",
+            "request": "Demander l'accès aux groupes privés",
+            "requested": "Demande d'accès envoyée."
+        },
+        "editGroups": "Modifier les groupes",
+        "membersOnly": "Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes. Demandez-lui son lien de partage pour lui proposer de contribuer.",
+        "closed": "Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.",
+        "empty": "Cette collection ne contient plus aucun groupe : ceux qu’elle contenait ont été supprimés.",
+        "noVisibleGroup": "Aucun groupe visible dans cette collection.",
+        "addition": {
+            "title": "Ajouter ce groupe à la collection ?",
+            "processing": "Ajout…",
+            "message": {
+                "public": "Le groupe « {name} » sera ajouté à cette collection.",
+                "private": "Le groupe « {name} » sera ajouté à cette collection. Il est privé : il restera masqué aux personnes qui n’y ont pas accès."
+            },
+            "done": "Groupe « {name} » ajouté à la collection."
+        },
+        "removal": {
+            "title": "Supprimer ce groupe de la collection ? | Supprimer {n} groupes de la collection ?",
+            "message": "Le groupe lui-même et ses mots sont conservés : il est seulement retiré de cette collection. | Les groupes eux-mêmes et leurs mots sont conservés : ils sont seulement retirés de cette collection.",
+            "done": "1 groupe supprimé de la collection. | {n} groupes supprimés de la collection.",
+            "keepOne": "Une collection doit contenir au moins un groupe : gardez-en au moins un."
+        }
+    }
+}

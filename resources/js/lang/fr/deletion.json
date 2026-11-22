@@ -1,0 +1,18 @@
+{
+    "button": "Supprimer",
+    "confirm": "Supprimer définitivement",
+    "processing": "Suppression…",
+    "failed": "Impossible de supprimer. Réessayez.",
+    "title": {
+        "wordGroup": "Supprimer ce groupe ?",
+        "groupCollection": "Supprimer cette collection ?"
+    },
+    "warning": {
+        "wordGroup": "Le groupe et tous ses mots seront supprimés, et il sera retiré des collections qui le contiennent. Cette action est irréversible.",
+        "groupCollection": "La collection sera supprimée, mais pas les groupes qu’elle contient. Cette action est irréversible."
+    },
+    "done": {
+        "wordGroup": "Groupe supprimé.",
+        "groupCollection": "Collection supprimée."
+    }
+}

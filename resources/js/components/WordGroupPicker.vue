@@ -25,8 +25,8 @@ function remove(wordGroup: WordGroup): void {
 
 <template>
     <div>
-        <label for="word-group-search" class="block text-sm font-medium">Groupes</label>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400">Vos groupes et les groupes publics des autres utilisateurs. Au moins un.</p>
+        <label for="word-group-search" class="block text-sm font-medium">{{ $t('wordGroups.picker.label') }}</label>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('wordGroups.picker.hint') }}</p>
 
         <WordGroupSearch
             class="mt-2"
@@ -36,7 +36,7 @@ function remove(wordGroup: WordGroup): void {
             @select="add"
         />
 
-        <ul v-if="selected.length > 0" class="mt-3 flex flex-wrap gap-2" aria-label="Groupes sélectionnés">
+        <ul v-if="selected.length > 0" class="mt-3 flex flex-wrap gap-2" :aria-label="$t('wordGroups.picker.selected')">
             <li
                 v-for="wordGroup in selected"
                 :key="wordGroup.id"
@@ -46,7 +46,7 @@ function remove(wordGroup: WordGroup): void {
                 <button
                     type="button"
                     class="rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100"
-                    :aria-label="`Retirer ${wordGroup.name}`"
+                    :aria-label="$t('wordGroups.picker.remove', { name: wordGroup.name })"
                     @click="remove(wordGroup)"
                 >
                     ×

@@ -1,0 +1,127 @@
+{
+    "pendingRequest": "Demande d’accès en attente.",
+    "request": {
+        "access": {
+            "withoutItem": "{user} demande l'accès",
+            "wordGroup": "{user} demande l'accès au groupe {item}",
+            "groupCollection": "{user} demande l'accès à la collection {item}"
+        },
+        "contribution": {
+            "withoutItem": "{user} demande à contribuer",
+            "wordGroup": "{user} demande à contribuer au groupe {item}",
+            "groupCollection": "{user} demande à contribuer à la collection {item}"
+        },
+        "viaCollection": "Depuis la collection « {name} »",
+        "accept": "Accepter",
+        "refuse": "Refuser",
+        "accepted": "Demande de {name} acceptée.",
+        "refused": "Demande de {name} refusée."
+    },
+    "accept": {
+        "processing": "Acceptation…",
+        "title": {
+            "access": "Donner l’accès ?",
+            "contribution": "Autoriser à contribuer ?"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} aura accès au groupe « {item} » et pourra exporter ses mots. Vous pourrez lui retirer l'accès à tout moment.",
+                "groupCollection": "{name} aura accès à la collection « {item} » et pourra exporter ses mots. Vous pourrez lui retirer l'accès à tout moment."
+            },
+            "contribution": {
+                "wordGroup": "{name} pourra contribuer au groupe « {item} ». Vous pourrez lui retirer cette autorisation à tout moment.",
+                "groupCollection": "{name} pourra contribuer à la collection « {item} ». Vous pourrez lui retirer cette autorisation à tout moment."
+            }
+        }
+    },
+    "management": {
+        "label": "Accès",
+        "loadFailed": "Impossible de charger les accès.",
+        "requests": {
+            "access": "Demandes d'accès",
+            "contribution": "Demandes de contribution"
+        },
+        "members": {
+            "access": "Personnes ayant accès",
+            "contribution": "Personnes autorisées à contribuer"
+        },
+        "noMembers": "Personne d'autre que vous pour l'instant. Envoyez le lien d'invitation pour recevoir des demandes.",
+        "since": "Depuis le {date}"
+    },
+    "revoke": {
+        "button": "Retirer",
+        "processing": "Retrait…",
+        "title": {
+            "access": "Retirer l’accès ?",
+            "contribution": "Retirer l’autorisation de contribuer ?"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} n'aura plus accès à ce groupe. Cette personne pourra vous redemander l'accès avec le lien de partage.",
+                "groupCollection": "{name} n'aura plus accès à cette collection. Cette personne pourra vous redemander l'accès avec le lien de partage."
+            },
+            "contribution": {
+                "wordGroup": "{name} ne pourra plus contribuer à ce groupe. Ses contributions sont conservées, et cette personne pourra vous redemander l'autorisation.",
+                "groupCollection": "{name} ne pourra plus contribuer à cette collection. Ses contributions sont conservées, et cette personne pourra vous redemander l'autorisation."
+            }
+        },
+        "done": {
+            "access": "{name} n’a plus accès.",
+            "contribution": "{name} ne peut plus contribuer."
+        }
+    },
+    "invite": {
+        "button": "Inviter",
+        "title": {
+            "access": "Inviter des personnes",
+            "contribution": "Inviter des contributeurs"
+        },
+        "description": {
+            "access": "Les personnes qui ouvrent ce lien peuvent vous demander l'accès. Vous accepterez ou refuserez chaque demande.",
+            "contribution": "Les personnes qui ouvrent ce lien peuvent vous demander à contribuer. Vous accepterez ou refuserez chaque demande."
+        },
+        "link": {
+            "access": "Lien de demande d'accès",
+            "contribution": "Lien de demande de contribution"
+        }
+    },
+    "link": {
+        "copied": "Lien copié.",
+        "copyFailed": "Copie impossible : sélectionnez le lien et copiez-le.",
+        "regenerated": "Nouveau lien créé. L’ancien ne fonctionne plus.",
+        "regenerate": "Régénérer le lien",
+        "regenerateConfirm": "Régénérer",
+        "regenerateWarning": "L'ancien lien ne fonctionnera plus. Continuer ?"
+    },
+    "invitation": {
+        "invalid": {
+            "title": "Lien invalide",
+            "description": "Ce lien de partage n'existe pas ou n'est plus valable. Demandez-en un nouveau."
+        },
+        "loadFailed": "Impossible de charger le partage.",
+        "sharedBy": {
+            "access": {
+                "wordGroup": "{name} partage le groupe privé",
+                "groupCollection": "{name} partage la collection privée"
+            },
+            "contribution": {
+                "wordGroup": "{name} partage le groupe",
+                "groupCollection": "{name} partage la collection"
+            }
+        },
+        "membersOnly": {
+            "wordGroup": "Tout le monde peut le consulter, mais seules les personnes autorisées par {name} peuvent y contribuer.",
+            "groupCollection": "Tout le monde peut la consulter, mais seules les personnes autorisées par {name} peuvent y contribuer."
+        },
+        "seeContent": "Voir le contenu",
+        "sent": {
+            "access": "Demande d'accès envoyée. Vous recevrez un email dès que {name} l'aura traitée.",
+            "contribution": "Demande de contribution envoyée. Vous recevrez un email dès que {name} l'aura traitée."
+        },
+        "refused": "Votre précédente demande a été refusée. Vous pouvez en envoyer une nouvelle.",
+        "send": {
+            "access": "Envoyer une demande d'accès",
+            "contribution": "Demander à contribuer"
+        }
+    }
+}

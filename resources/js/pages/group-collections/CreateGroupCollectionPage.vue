@@ -37,7 +37,7 @@ async function submit(): Promise<void> {
 <template>
     <AppLayout>
         <div class="mx-auto max-w-lg">
-            <h1 class="text-2xl font-semibold">Nouvelle collection</h1>
+            <h1 class="text-2xl font-semibold">{{ $t('groupCollections.create.title') }}</h1>
 
             <form
                 class="mt-6 space-y-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
@@ -47,7 +47,7 @@ async function submit(): Promise<void> {
                 <FormField
                     id="name"
                     v-model="form.data.name"
-                    label="Nom de la collection"
+                    :label="$t('groupCollections.fields.name')"
                     :error="form.errors.value.name"
                     required
                 />
@@ -61,7 +61,7 @@ async function submit(): Promise<void> {
                     :members-only-error="form.errors.value.contributions_members_only"
                 />
                 <WordGroupPicker v-model="selectedWordGroups" :error="wordGroupsError" />
-                <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
+                <PrimaryButton :is-loading="form.isProcessing.value">{{ $t('groupCollections.create.submit') }}</PrimaryButton>
             </form>
         </div>
     </AppLayout>

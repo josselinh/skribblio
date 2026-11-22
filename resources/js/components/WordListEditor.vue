@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, reactive, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { deleteWords, updateWords, type WordRename } from '@/api/words';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 }>();
 
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 /** Names being typed, by word id. */
 const draftNames = reactive<Record<string, string>>({});
@@ -128,13 +130,13 @@ async function save(): Promise<void> {
     try {
         await updateWords(props.wordGroupId, sentWords);
         emit('saved');
-        showToast(sentWords.length > 1 ? `${sentWords.length} mots modifiés.` : '1 mot modifié.');
+        showToast(t('words.editor.saved', sentWords.length));
     } catch (error) {
         if (isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422) {
             nameErrors.value = errorsByWordId(sentWords, error.response.data.errors);
-            saveError.value = 'Certains mots n’ont pas pu être enregistrés : corrigez-les puis réessayez.';
+            saveError.value = t('words.editor.invalid');
         } else {
-            saveError.value = 'Impossible d’enregistrer les modifications. Rechargez la page et réessayez.';
+            saveError.value = t('words.editor.saveFailed');
         }
     } finally {
         isSaving.value = false;
@@ -155,9 +157,9 @@ async function confirmDelete(): Promise<void> {
         isConfirmingDelete.value = false;
         selectedWordIds.value = [];
         emit('deleted', deletedCount);
-        showToast(deletedCount > 1 ? `${deletedCount} mots supprimés.` : '1 mot supprimé.');
+        showToast(t('words.editor.deleted', deletedCount));
     } catch {
-        deleteError.value = 'Impossible de supprimer ces mots. Rechargez la page et réessayez.';
+        deleteError.value = t('words.editor.deleteFailed');
     } finally {
         isDeleting.value = false;
     }
@@ -181,11 +183,8 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                             :class="checkboxClass"
                             @change="toggleAllDeletableWords"
                         />
-                        <span v-if="selectedWordIds.length === 0">Tout sélectionner</span>
-                        <span v-else>
-                            {{ selectedWordIds.length }} mot{{ selectedWordIds.length > 1 ? 's' : '' }}
-                            sélectionné{{ selectedWordIds.length > 1 ? 's' : '' }}
-                        </span>
+                        <span v-if="selectedWordIds.length === 0">{{ $t('common.selectAll') }}</span>
+                        <span v-else>{{ $t('words.editor.selected', selectedWordIds.length) }}</span>
                     </label>
                     <button
                         v-if="deletableWords.length > 0"
@@ -194,7 +193,7 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                         class="font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
                         @click="askDeleteConfirmation"
                     >
-                        Supprimer la sélection
+                        {{ $t('common.deleteSelection') }}
                     </button>
                 </div>
                 <div class="flex items-center gap-3">
@@ -204,14 +203,14 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                         class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                         @click="cancel"
                     >
-                        Annuler
+                        {{ $t('common.cancel') }}
                     </button>
                     <button
                         type="submit"
                         :disabled="isSaving || changedWords.length === 0"
                         class="rounded-lg bg-brand-600 px-3 py-1.5 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}<template v-if="!isSaving && changedWords.length > 0"> ({{ changedWords.length }})</template>
+                        {{ isSaving ? $t('common.saving') : changedWords.length > 0 ? $t('words.editor.saveCount', { count: changedWords.length }) : $t('common.save') }}
                     </button>
                 </div>
             </div>
@@ -231,7 +230,7 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                         v-model="selectedWordIds"
                         type="checkbox"
                         :value="word.id"
-                        :aria-label="`Sélectionner « ${word.name} »`"
+                        :aria-label="$t('words.editor.selectWord', { name: word.name })"
                         class="mt-2"
                         :class="checkboxClass"
                     />
@@ -239,7 +238,7 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
     
                     <div class="min-w-0 flex-1">
                         <template v-if="word.can.update">
-                            <label :for="`word-${word.id}`" class="sr-only">Mot « {{ word.name }} »</label>
+                            <label :for="`word-${word.id}`" class="sr-only">{{ $t('words.editor.wordLabel', { name: word.name }) }}</label>
                             <input
                                 :id="`word-${word.id}`"
                                 v-model="draftNames[word.id]"
@@ -254,18 +253,18 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                                 {{ nameErrors[word.id] }}
                             </p>
                             <p v-if="isChanged(word)" class="mt-1 flex flex-wrap items-baseline gap-x-2 text-xs">
-                                <span class="font-medium text-brand-700 dark:text-brand-300">Modifié</span>
-                                <span class="min-w-0 break-words text-zinc-500 dark:text-zinc-400">(avant : {{ word.name }})</span>
+                                <span class="font-medium text-brand-700 dark:text-brand-300">{{ $t('words.editor.changed') }}</span>
+                                <span class="min-w-0 break-words text-zinc-500 dark:text-zinc-400">{{ $t('words.editor.before', { name: word.name }) }}</span>
                                 <button
                                     type="button"
                                     class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100"
                                     @click="restore(word)"
                                 >
-                                    Rétablir
+                                    {{ $t('words.editor.restore') }}
                                 </button>
                             </p>
                         </template>
-                        <p v-else class="py-1 text-sm text-zinc-500 dark:text-zinc-400 break-words" title="Vous ne pouvez pas modifier ce mot">
+                        <p v-else class="py-1 text-sm text-zinc-500 dark:text-zinc-400 break-words" :title="$t('words.editor.notEditable')">
                             {{ word.name }}
                         </p>
                     </div>
@@ -275,19 +274,19 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
 
         <ConfirmDialog
             v-model:open="isConfirmingDelete"
-            :title="selectedWordIds.length > 1 ? `Supprimer ${selectedWordIds.length} mots ?` : 'Supprimer ce mot ?'"
-            :message="`${selectedWordIds.length > 1 ? 'Ces mots seront retirés' : 'Ce mot sera retiré'} du groupe. Cette action est irréversible.`"
-            confirm-label="Supprimer"
-            processing-label="Suppression…"
+            :title="$t('words.editor.deleteTitle', selectedWordIds.length)"
+            :message="$t('words.editor.deleteMessage', selectedWordIds.length)"
+            :confirm-label="$t('deletion.button')"
+            :processing-label="$t('deletion.processing')"
             :is-processing="isDeleting"
             :error="deleteError"
             @confirm="confirmDelete"
         />
         <ConfirmDialog
             v-model:open="isConfirmingCancel"
-            :title="changedWords.length > 1 ? `Abandonner ${changedWords.length} modifications ?` : 'Abandonner la modification ?'"
-            message="Les mots modifiés reprendront leur nom actuel."
-            confirm-label="Abandonner"
+            :title="$t('words.editor.discardTitle', changedWords.length)"
+            :message="$t('words.editor.discardMessage')"
+            :confirm-label="$t('words.editor.discard')"
             @confirm="confirmCancel"
         />
     </div>

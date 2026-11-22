@@ -1,0 +1,35 @@
+{
+    "search": {
+        "placeholder": "Rechercher un groupe…",
+        "empty": "Aucun groupe trouvé."
+    },
+    "count": "{n} groupe | {n} groupes",
+    "card": {
+        "updatedOn": "Modifié le",
+        "becamePrivate": "Ce groupe est devenu privé : vous n’y avez plus accès."
+    },
+    "picker": {
+        "label": "Groupes",
+        "hint": "Vos groupes et les groupes publics des autres utilisateurs. Au moins un.",
+        "selected": "Groupes sélectionnés",
+        "remove": "Retirer {name}"
+    },
+    "create": {
+        "title": "Nouveau groupe",
+        "submit": "Créer le groupe"
+    },
+    "fields": {
+        "name": "Nom du groupe"
+    },
+    "show": {
+        "notFound": {
+            "title": "Groupe introuvable",
+            "description": "Ce groupe n'existe pas ou vous n'y avez pas accès."
+        },
+        "loadFailed": "Impossible de charger le groupe.",
+        "membersOnly": "Seules les personnes autorisées par le créateur de ce groupe peuvent y ajouter des mots. Demandez-lui son lien de partage pour lui proposer de contribuer.",
+        "closed": "Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.",
+        "empty": "Ce groupe ne contient encore aucun mot.",
+        "editWords": "Modifier les mots"
+    }
+}

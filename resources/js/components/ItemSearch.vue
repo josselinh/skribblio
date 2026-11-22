@@ -117,7 +117,7 @@ function select(item: T): void {
             role="listbox"
             class="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 shadow-lg"
         >
-            <li v-if="isSearching && results.length === 0" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">Recherche…</li>
+            <li v-if="isSearching && results.length === 0" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('common.searching') }}</li>
             <li v-else-if="results.length === 0" class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">{{ emptyMessage }}</li>
             <li v-for="item in results" :key="item.id" role="option" :aria-selected="isExcluded(item)">
                 <button

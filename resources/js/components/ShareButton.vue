@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>();
 
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const isOpen = ref(false);
 const url = ref<string | null>(null);
@@ -52,9 +54,9 @@ async function copy(): Promise<void> {
     }
     try {
         await navigator.clipboard.writeText(url.value);
-        showToast('Lien copié.');
+        showToast(t('sharing.link.copied'));
     } catch {
-        showToast('Copie impossible : sélectionnez le lien et copiez-le.', 'error', 6000);
+        showToast(t('sharing.link.copyFailed'), 'error', 6000);
     }
 }
 
@@ -62,7 +64,7 @@ async function regenerate(): Promise<void> {
     isConfirmingRegeneration.value = false;
     await run(async () => {
         url.value = await regenerateShareLink(props.kind, props.id);
-        showToast('Nouveau lien créé. L’ancien ne fonctionne plus.');
+        showToast(t('sharing.link.regenerated'));
     });
 }
 </script>
@@ -74,31 +76,22 @@ async function regenerate(): Promise<void> {
         aria-haspopup="dialog"
         @click="open"
     >
-        Inviter
+        {{ $t('sharing.invite.button') }}
     </button>
 
-    <ModalDialog
-        v-model:open="isOpen"
-        :title="purpose === 'contribution' ? 'Inviter des contributeurs' : 'Inviter des personnes'"
-    >
-        <p>
-            {{
-                purpose === 'contribution'
-                    ? 'Les personnes qui ouvrent ce lien peuvent vous demander à contribuer. Vous accepterez ou refuserez chaque demande.'
-                    : "Les personnes qui ouvrent ce lien peuvent vous demander l'accès. Vous accepterez ou refuserez chaque demande."
-            }}
-        </p>
-        <p v-if="hasFailed" role="alert" class="mt-3 text-red-600 dark:text-red-400">Une erreur est survenue, veuillez réessayer.</p>
+    <ModalDialog v-model:open="isOpen" :title="$t(`sharing.invite.title.${purpose}`)">
+        <p>{{ $t(`sharing.invite.description.${purpose}`) }}</p>
+        <p v-if="hasFailed" role="alert" class="mt-3 text-red-600 dark:text-red-400">{{ $t('common.unexpectedError') }}</p>
 
         <label for="share-url" class="mt-4 block font-medium text-zinc-900 dark:text-zinc-100">
-            {{ purpose === 'contribution' ? 'Lien de demande de contribution' : "Lien de demande d'accès" }}
+            {{ $t(`sharing.invite.link.${purpose}`) }}
         </label>
         <div class="mt-1 flex flex-col gap-2 sm:flex-row">
             <input
                 id="share-url"
                 type="text"
                 readonly
-                :value="url ?? 'Chargement…'"
+                :value="url ?? $t('common.loading')"
                 class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100"
                 @focus="($event.target as HTMLInputElement).select()"
             />
@@ -109,7 +102,7 @@ async function regenerate(): Promise<void> {
                 class="shrink-0 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:py-2"
                 @click="copy"
             >
-                Copier
+                {{ $t('common.copy') }}
             </button>
         </div>
 
@@ -117,12 +110,12 @@ async function regenerate(): Promise<void> {
             v-if="isConfirmingRegeneration"
             class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 px-3 py-2"
         >
-            <span class="text-red-800 dark:text-red-300">L'ancien lien ne fonctionnera plus. Continuer ?</span>
+            <span class="text-red-800 dark:text-red-300">{{ $t('sharing.link.regenerateWarning') }}</span>
             <span class="flex gap-3">
                 <button type="button" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100" @click="isConfirmingRegeneration = false">
-                    Annuler
+                    {{ $t('common.cancel') }}
                 </button>
-                <button type="button" class="font-medium text-red-600 dark:text-red-400 hover:underline" @click="regenerate">Régénérer</button>
+                <button type="button" class="font-medium text-red-600 dark:text-red-400 hover:underline" @click="regenerate">{{ $t('sharing.link.regenerateConfirm') }}</button>
             </span>
         </div>
         <button
@@ -132,7 +125,7 @@ async function regenerate(): Promise<void> {
             class="mt-4 text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100 disabled:opacity-60"
             @click="isConfirmingRegeneration = true"
         >
-            Régénérer le lien
+            {{ $t('sharing.link.regenerate') }}
         </button>
 
         <template #actions>
@@ -141,7 +134,7 @@ async function regenerate(): Promise<void> {
                 class="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 sm:w-auto sm:py-2"
                 @click="isOpen = false"
             >
-                Fermer
+                {{ $t('common.close') }}
             </button>
         </template>
     </ModalDialog>

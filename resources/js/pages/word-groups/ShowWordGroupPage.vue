@@ -163,16 +163,16 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 <template>
     <AppLayout>
 
-        <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
+        <p v-if="groupStatus === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
 
         <div v-else-if="groupStatus === 'not-found'" class="mt-4">
-            <h1 class="text-2xl font-semibold">Groupe introuvable</h1>
-            <p class="mt-2 text-zinc-500 dark:text-zinc-400">Ce groupe n'existe pas ou vous n'y avez pas accès.</p>
+            <h1 class="text-2xl font-semibold">{{ $t('wordGroups.show.notFound.title') }}</h1>
+            <p class="mt-2 text-zinc-500 dark:text-zinc-400">{{ $t('wordGroups.show.notFound.description') }}</p>
         </div>
 
         <p v-else-if="groupStatus === 'failed'" class="mt-4 text-red-600 dark:text-red-400">
-            Impossible de charger le groupe.
-            <button type="button" class="underline" @click="loadWordGroup">Réessayer</button>
+            {{ $t('wordGroups.show.loadFailed') }}
+            <button type="button" class="underline" @click="loadWordGroup">{{ $t('common.retry') }}</button>
         </p>
 
         <template v-else-if="wordGroup">
@@ -185,7 +185,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     kind="word-groups"
                     :creator="wordGroup.creator"
                     :can-edit="wordGroup.can.update"
-                    name-label="Nom du groupe"
+                    :name-label="$t('wordGroups.fields.name')"
                     :save="saveWordGroup"
                 >
                     <template v-if="wordGroup.is_favorite !== undefined" #after-title>
@@ -227,33 +227,32 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
             <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                Seules les personnes autorisées par le créateur de ce groupe peuvent y ajouter des mots. Demandez-lui
-                son lien de partage pour lui proposer de contribuer.
+                {{ $t('wordGroups.show.membersOnly') }}
             </p>
             <p v-else class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.
+                {{ $t('wordGroups.show.closed') }}
             </p>
 
             <p v-if="haveWordsFailed" class="mt-6 text-red-600 dark:text-red-400">
-                Impossible de charger les mots.
-                <button type="button" class="underline" @click="loadWords">Réessayer</button>
+                {{ $t('exports.panel.loadFailed') }}
+                <button type="button" class="underline" @click="loadWords">{{ $t('common.retry') }}</button>
             </p>
 
             <p v-else-if="words && words.meta.total === 0" class="mt-6 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400">
-                Ce groupe ne contient encore aucun mot.
+                {{ $t('wordGroups.show.empty') }}
             </p>
 
             <template v-else-if="words">
                 <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                     <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('words.count', words.meta.total) }}</p>
                         <button
                             v-if="hasEditableWords && !isEditingWords"
                             type="button"
                             class="text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
                             @click="isEditingWords = true"
                         >
-                            Modifier les mots
+                            {{ $t('wordGroups.show.editWords') }}
                         </button>
                     </div>
                     <WordSortControl

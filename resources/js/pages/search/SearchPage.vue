@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router';
 import { fetchGroupCollectionSearchResults, fetchWordGroupSearchResults } from '@/api/search';
 import AppLayout from '@/components/AppLayout.vue';
@@ -16,22 +17,19 @@ const PREVIEW_SIZE = 6;
 const PAGE_SIZE = 12;
 const DEFAULT_SORT: SearchSort = 'recent';
 
-const typeOptions: { value: TypeFilter; label: string }[] = [
-    { value: 'all', label: 'Tout' },
-    { value: 'word-groups', label: 'Groupes' },
-    { value: 'group-collections', label: 'Collections' },
-];
-const authorOptions: { value: AuthorFilter; label: string }[] = [
-    { value: 'all', label: 'Tout le monde' },
-    { value: 'me', label: 'Moi' },
-    { value: 'others', label: 'Les autres' },
-];
-const sortOptions: { value: SearchSort; label: string }[] = [
-    { value: 'recent', label: 'Récents' },
-    { value: 'popular', label: 'Populaires' },
-    { value: 'largest', label: 'Les plus fournis' },
-    { value: 'name', label: 'A → Z' },
-];
+const { t } = useI18n();
+
+const typeOptions = computed(() => [
+    { value: 'all' as const, label: t('search.types.all') },
+    { value: 'word-groups' as const, label: t('search.types.wordGroups') },
+    { value: 'group-collections' as const, label: t('search.types.groupCollections') },
+]);
+const authorOptions = computed(() =>
+    (['all', 'me', 'others'] as const).map((value) => ({ value, label: t(`search.authors.${value}`) })),
+);
+const sortOptions = computed(() =>
+    (['recent', 'popular', 'largest', 'name'] as const).map((value) => ({ value, label: t(`search.sorts.${value}`) })),
+);
 
 /**
  * Without a search, the page is a catalogue to discover what other users share,
@@ -132,36 +130,35 @@ const pillClass = (isActive: boolean) =>
 <template>
     <AppLayout>
         <h1 class="text-2xl font-semibold">
-            <template v-if="q">Résultats pour « {{ q }} »</template>
-            <template v-else>Explorer</template>
+            {{ q ? $t('search.resultsFor', { q }) : $t('search.title') }}
         </h1>
         <p v-if="isCatalogue" class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Découvrez les groupes et collections partagés par les autres utilisateurs, ou cherchez-en un par son nom.
+            {{ $t('search.catalogueDescription') }}
         </p>
 
         <form role="search" class="mt-4" @submit.prevent="updateQuery({ q: searchInput.trim() || undefined })">
-            <label for="search" class="sr-only">Rechercher un groupe ou une collection</label>
+            <label for="search" class="sr-only">{{ $t('layout.header.searchLabel') }}</label>
             <div class="flex gap-2">
                 <input
                     id="search"
                     v-model="searchInput"
                     type="search"
-                    placeholder="Nom d'un groupe ou d'une collection…"
+                    :placeholder="$t('search.placeholder')"
                     class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                 />
                 <button
                     type="submit"
                     class="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
                 >
-                    Rechercher
+                    {{ $t('search.submit') }}
                 </button>
             </div>
         </form>
 
         <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8">
             <fieldset class="flex flex-wrap items-center gap-2">
-                <legend class="sr-only">Type</legend>
-                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Type :</span>
+                <legend class="sr-only">{{ $t('search.filters.type') }}</legend>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.typePrefix') }}</span>
                 <label v-for="option in typeOptions" :key="option.value" :class="pillClass(type === option.value)">
                     <input
                         type="radio"
@@ -174,8 +171,8 @@ const pillClass = (isActive: boolean) =>
                 </label>
             </fieldset>
             <fieldset class="flex flex-wrap items-center gap-2">
-                <legend class="sr-only">Créés par</legend>
-                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Créés par :</span>
+                <legend class="sr-only">{{ $t('search.filters.author') }}</legend>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.authorPrefix') }}</span>
                 <label v-for="option in authorOptions" :key="option.value" :class="pillClass(author === option.value)">
                     <input
                         type="radio"
@@ -188,8 +185,8 @@ const pillClass = (isActive: boolean) =>
                 </label>
             </fieldset>
             <fieldset class="flex flex-wrap items-center gap-2">
-                <legend class="sr-only">Trier par</legend>
-                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">Tri :</span>
+                <legend class="sr-only">{{ $t('search.filters.sort') }}</legend>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
                 <label v-for="option in sortOptions" :key="option.value" :class="pillClass(sort === option.value)">
                     <input
                         type="radio"
@@ -207,12 +204,12 @@ const pillClass = (isActive: boolean) =>
             <CardListSection
                 v-if="type !== 'group-collections'"
                 section-id="word-groups"
-                title="Groupes"
+                :title="$t('search.types.wordGroups')"
                 :result="wordGroups.result.value"
                 :is-loading="wordGroups.isLoading.value"
                 :has-failed="wordGroups.hasFailed.value"
-                empty-message="Aucun groupe trouvé."
-                :see-all="seeAll('word-groups', wordGroups.result.value?.meta.total, `Voir les ${wordGroups.result.value?.meta.total} groupes →`)"
+                :empty-message="$t('wordGroups.search.empty')"
+                :see-all="seeAll('word-groups', wordGroups.result.value?.meta.total, $t('search.seeAll.wordGroups', { count: wordGroups.result.value?.meta.total ?? 0 }))"
                 :paginated="type !== 'all'"
                 @retry="wordGroups.reload"
             >
@@ -224,16 +221,16 @@ const pillClass = (isActive: boolean) =>
             <CardListSection
                 v-if="type !== 'word-groups'"
                 section-id="group-collections"
-                title="Collections"
+                :title="$t('search.types.groupCollections')"
                 :result="groupCollections.result.value"
                 :is-loading="groupCollections.isLoading.value"
                 :has-failed="groupCollections.hasFailed.value"
-                empty-message="Aucune collection trouvée."
+                :empty-message="$t('search.emptyGroupCollections')"
                 :see-all="
                     seeAll(
                         'group-collections',
                         groupCollections.result.value?.meta.total,
-                        `Voir les ${groupCollections.result.value?.meta.total} collections →`,
+                        $t('search.seeAll.groupCollections', { count: groupCollections.result.value?.meta.total ?? 0 }),
                     )
                 "
                 :paginated="type !== 'all'"

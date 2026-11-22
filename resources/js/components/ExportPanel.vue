@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
 import WordListExport from '@/components/WordListExport.vue';
+import { intlLocale } from '@/lib/i18n';
 import type { FavoriteKind } from '@/types/models';
 
 /**
@@ -38,7 +39,7 @@ const isNothingSelected = computed(() => showsSelection.value && selectedWordGro
 const words = computed(() =>
     props.kind === 'word-groups'
         ? wordGroupWords.value
-        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, 'fr')),
+        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, intlLocale)),
 );
 
 function toggleWordGroup(id: string, isSelected: boolean): void {
@@ -92,29 +93,29 @@ const linkButtonClass =
             aria-controls="export-panel"
             @click="toggle"
         >
-            Exporter pour Skribbl.io
+            {{ $t('exports.panel.button') }}
         </button>
 
         <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
-            <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">Chargement…</p>
+            <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
 
             <p v-else-if="hasFailed" role="alert" class="text-sm text-red-600 dark:text-red-400">
-                Impossible de charger les mots.
-                <button type="button" class="underline" @click="load">Réessayer</button>
+                {{ $t('exports.panel.loadFailed') }}
+                <button type="button" class="underline" @click="load">{{ $t('common.retry') }}</button>
             </p>
 
             <template v-else>
                 <fieldset v-if="showsSelection" class="mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
                     <legend class="text-sm font-medium">
-                        Groupes à exporter
-                        <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ selectedWordGroups.length }} sur {{ wordGroups.length }})</span>
+                        {{ $t('exports.panel.groups') }}
+                        <span class="font-normal text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.selectedCount', { selected: selectedWordGroups.length, total: wordGroups.length }) }}</span>
                     </legend>
                     <div class="mt-1 flex gap-3">
                         <button type="button" :class="linkButtonClass" :disabled="isEverythingSelected" @click="selectAll(true)">
-                            Tout cocher
+                            {{ $t('exports.panel.selectAll') }}
                         </button>
                         <button type="button" :class="linkButtonClass" :disabled="isNothingSelected" @click="selectAll(false)">
-                            Tout décocher
+                            {{ $t('exports.panel.selectNone') }}
                         </button>
                     </div>
                     <div class="mt-2 flex flex-wrap gap-2">
@@ -130,15 +131,15 @@ const linkButtonClass =
                             />
                             {{ wordGroup.name }}
                             <span class="text-zinc-500 dark:text-zinc-400">
-                                · {{ wordGroup.words.length }} mot{{ wordGroup.words.length > 1 ? 's' : '' }}
+                                · {{ $t('words.count', wordGroup.words.length) }}
                             </span>
                         </label>
                     </div>
                 </fieldset>
 
-                <p v-if="isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">Choisissez au moins un groupe à exporter.</p>
+                <p v-if="isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.nothingSelected') }}</p>
 
-                <p v-else-if="words.length === 0" class="text-sm text-zinc-500 dark:text-zinc-400">Aucun mot à exporter.</p>
+                <p v-else-if="words.length === 0" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.noWords') }}</p>
 
                 <WordListExport v-else :words="words" :note="note" :is-loading="isLoading" />
             </template>

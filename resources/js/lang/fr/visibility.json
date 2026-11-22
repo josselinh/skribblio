@@ -1,0 +1,11 @@
+{
+    "field": "Visibilité",
+    "public": {
+        "label": "Public",
+        "description": "Visible par tous les utilisateurs."
+    },
+    "private": {
+        "label": "Privé",
+        "description": "Visible par vous uniquement."
+    }
+}

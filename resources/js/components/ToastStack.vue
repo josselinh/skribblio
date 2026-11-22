@@ -70,7 +70,7 @@ const toneClasses: Record<string, string> = {
                 <button
                     type="button"
                     class="-m-1 rounded p-1 leading-none opacity-70 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
-                    aria-label="Fermer la notification"
+                    :aria-label="$t('layout.toasts.close')"
                     @click="dismissToast(toast.id)"
                 >
                     <span aria-hidden="true">✕</span>

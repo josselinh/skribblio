@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { attachWordGroup, detachWordGroups, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
@@ -22,6 +23,7 @@ import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
 
 const route = useRoute();
+const { t } = useI18n();
 
 const groupCollectionId = computed(() => String(route.params.id));
 
@@ -42,17 +44,12 @@ const accessPurpose = computed<AccessPurpose>(() =>
 
 const hiddenGroupsMessage = computed(() => {
     const count = groupCollection.value?.hidden_word_groups_count ?? 0;
-    if (count === 0) {
-        return null;
-    }
 
-    return count === 1
-        ? '1 groupe de cette collection est privé et n’est pas visible pour vous.'
-        : `${count} groupes de cette collection sont privés et ne sont pas visibles pour vous.`;
+    return count === 0 ? null : t('groupCollections.show.hidden.message', count);
 });
 
 const exportNote = computed(() =>
-    hiddenGroupsMessage.value ? 'Les mots des groupes qui vous sont masqués ne sont pas exportés.' : null,
+    hiddenGroupsMessage.value ? t('groupCollections.show.hidden.exportNote') : null,
 );
 
 /** Whether some hidden groups were not requested yet. */
@@ -106,7 +103,7 @@ const { showToast } = useToasts();
 function groupChangeErrorMessage(error: unknown): string {
     return isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
         ? error.response.data.message
-        : 'Une erreur est survenue, veuillez réessayer.';
+        : t('common.unexpectedError');
 }
 
 /** Group picked in the search, being confirmed in `ConfirmDialog` before it is added. */
@@ -128,9 +125,7 @@ const additionMessage = computed(() => {
         return '';
     }
 
-    return wordGroup.visibility === 'private'
-        ? `Le groupe « ${wordGroup.name} » sera ajouté à cette collection. Il est privé : il restera masqué aux personnes qui n’y ont pas accès.`
-        : `Le groupe « ${wordGroup.name} » sera ajouté à cette collection.`;
+    return t(`groupCollections.show.addition.message.${wordGroup.visibility}`, { name: wordGroup.name });
 });
 
 function confirmAddition(wordGroup: WordGroup): void {
@@ -150,7 +145,7 @@ async function addWordGroup(): Promise<void> {
         await attachWordGroup(groupCollectionId.value, wordGroup.id);
         wordGroupToAdd.value = null;
         await loadGroupCollection();
-        showToast(`Groupe « ${wordGroup.name} » ajouté à la collection.`);
+        showToast(t('groupCollections.show.addition.done', { name: wordGroup.name }));
     } catch (error) {
         additionError.value = groupChangeErrorMessage(error);
     } finally {
@@ -206,9 +201,7 @@ async function removeSelectedWordGroups(): Promise<void> {
         isConfirmingRemoval.value = false;
         stopSelectingGroups();
         await loadGroupCollection();
-        showToast(
-            removedCount > 1 ? `${removedCount} groupes supprimés de la collection.` : '1 groupe supprimé de la collection.',
-        );
+        showToast(t('groupCollections.show.removal.done', removedCount));
     } catch (error) {
         removalError.value = groupChangeErrorMessage(error);
     } finally {
@@ -230,16 +223,16 @@ watch(
 <template>
     <AppLayout>
 
-        <p v-if="status === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
+        <p v-if="status === 'loading'" class="mt-4 text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
 
         <div v-else-if="status === 'not-found'" class="mt-4">
-            <h1 class="text-2xl font-semibold">Collection introuvable</h1>
-            <p class="mt-2 text-zinc-500 dark:text-zinc-400">Cette collection n'existe pas ou vous n'y avez pas accès.</p>
+            <h1 class="text-2xl font-semibold">{{ $t('groupCollections.show.notFound.title') }}</h1>
+            <p class="mt-2 text-zinc-500 dark:text-zinc-400">{{ $t('groupCollections.show.notFound.description') }}</p>
         </div>
 
         <p v-else-if="status === 'failed'" class="mt-4 text-red-600 dark:text-red-400">
-            Impossible de charger la collection.
-            <button type="button" class="underline" @click="loadGroupCollection">Réessayer</button>
+            {{ $t('groupCollections.show.loadFailed') }}
+            <button type="button" class="underline" @click="loadGroupCollection">{{ $t('common.retry') }}</button>
         </p>
 
         <template v-else-if="groupCollection">
@@ -252,7 +245,7 @@ watch(
                     kind="group-collections"
                     :creator="groupCollection.creator"
                     :can-edit="groupCollection.can.update"
-                    name-label="Nom de la collection"
+                    :name-label="$t('groupCollections.fields.name')"
                     :save="saveGroupCollection"
                 >
                     <template v-if="groupCollection.is_favorite !== undefined" #after-title>
@@ -302,11 +295,11 @@ watch(
                     class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-60"
                     @click="requestHiddenGroups"
                 >
-                    Demander l'accès aux groupes privés
+                    {{ $t('groupCollections.show.hidden.request') }}
                 </button>
-                <p v-else class="font-medium">Demande d'accès envoyée.</p>
+                <p v-else class="font-medium">{{ $t('groupCollections.show.hidden.requested') }}</p>
                 <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600 dark:text-red-400">
-                    Une erreur est survenue, veuillez réessayer.
+                    {{ $t('common.unexpectedError') }}
                 </p>
             </div>
 
@@ -321,7 +314,7 @@ watch(
             <section class="mt-8" aria-labelledby="collection-groups-title">
                 <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <h2 id="collection-groups-title" class="text-lg font-semibold">
-                        Groupes <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ totalWordGroupsCount }})</span>
+                        {{ $t('common.wordGroups') }} <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ totalWordGroupsCount }})</span>
                     </h2>
                     <button
                         v-if="canRemoveWordGroups && !isSelectingGroups"
@@ -329,12 +322,12 @@ watch(
                         class="text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
                         @click="startSelectingGroups"
                     >
-                        Modifier les groupes
+                        {{ $t('groupCollections.show.editGroups') }}
                     </button>
                 </div>
 
                 <div v-if="groupCollection.can.add_word_group" class="mt-3">
-                    <label for="add-word-group" class="sr-only">Ajouter un groupe</label>
+                    <label for="add-word-group" class="sr-only">{{ $t('exports.create.addWordGroup') }}</label>
                     <WordGroupSearch
                         input-id="add-word-group"
                         :excluded-ids="wordGroupIds"
@@ -344,22 +337,17 @@ watch(
                 </div>
 
                 <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                    Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes.
-                    Demandez-lui son lien de partage pour lui proposer de contribuer.
+                    {{ $t('groupCollections.show.membersOnly') }}
                 </p>
                 <p v-else class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                    Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.
+                    {{ $t('groupCollections.show.closed') }}
                 </p>
 
                 <p
                     v-if="groupCollection.word_groups.length === 0"
                     class="mt-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400"
                 >
-                    {{
-                        totalWordGroupsCount === 0
-                            ? 'Cette collection ne contient plus aucun groupe : ceux qu’elle contenait ont été supprimés.'
-                            : 'Aucun groupe visible dans cette collection.'
-                    }}
+                    {{ totalWordGroupsCount === 0 ? $t('groupCollections.show.empty') : $t('groupCollections.show.noVisibleGroup') }}
                 </p>
 
                 <div
@@ -375,11 +363,8 @@ watch(
                                 class="size-4 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400"
                                 @change="toggleAllRemovableWordGroups"
                             />
-                            <span v-if="selectedWordGroupIds.length === 0">Tout sélectionner</span>
-                            <span v-else>
-                                {{ selectedWordGroupIds.length }} groupe{{ selectedWordGroupIds.length > 1 ? 's' : '' }}
-                                sélectionné{{ selectedWordGroupIds.length > 1 ? 's' : '' }}
-                            </span>
+                            <span v-if="selectedWordGroupIds.length === 0">{{ $t('common.selectAll') }}</span>
+                            <span v-else>{{ $t('exports.create.selectedCount', selectedWordGroupIds.length) }}</span>
                         </label>
                         <div class="flex items-center gap-3">
                             <button
@@ -387,7 +372,7 @@ watch(
                                 class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 @click="stopSelectingGroups"
                             >
-                                Annuler
+                                {{ $t('common.cancel') }}
                             </button>
                             <button
                                 type="button"
@@ -396,12 +381,12 @@ watch(
                                 aria-haspopup="dialog"
                                 @click="askRemovalConfirmation"
                             >
-                                Supprimer la sélection
+                                {{ $t('common.deleteSelection') }}
                             </button>
                         </div>
                     </div>
                     <p v-if="wouldEmptyCollection && selectedWordGroupIds.length > 0" class="mt-1 text-amber-700 dark:text-amber-300">
-                        Une collection doit contenir au moins un groupe : gardez-en au moins un.
+                        {{ $t('groupCollections.show.removal.keepOne') }}
                     </p>
                 </div>
 
@@ -425,17 +410,17 @@ watch(
                                 :value="wordGroup.id"
                                 class="size-5 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400 focus-visible:outline-none"
                             />
-                            <span class="sr-only">Sélectionner « {{ wordGroup.name }} »</span>
+                            <span class="sr-only">{{ $t('words.editor.selectWord', { name: wordGroup.name }) }}</span>
                         </label>
                     </li>
                 </ul>
 
                 <ConfirmDialog
                     v-model:open="isConfirmingAddition"
-                    title="Ajouter ce groupe à la collection ?"
+                    :title="$t('groupCollections.show.addition.title')"
                     :message="additionMessage"
-                    confirm-label="Ajouter"
-                    processing-label="Ajout…"
+                    :confirm-label="$t('words.add.submit')"
+                    :processing-label="$t('groupCollections.show.addition.processing')"
                     tone="primary"
                     :is-processing="isUpdatingGroups"
                     :error="additionError"
@@ -443,18 +428,10 @@ watch(
                 />
                 <ConfirmDialog
                     v-model:open="isConfirmingRemoval"
-                    :title="
-                        selectedWordGroupIds.length > 1
-                            ? `Supprimer ${selectedWordGroupIds.length} groupes de la collection ?`
-                            : 'Supprimer ce groupe de la collection ?'
-                    "
-                    :message="
-                        selectedWordGroupIds.length > 1
-                            ? 'Les groupes eux-mêmes et leurs mots sont conservés : ils sont seulement retirés de cette collection.'
-                            : 'Le groupe lui-même et ses mots sont conservés : il est seulement retiré de cette collection.'
-                    "
-                    confirm-label="Supprimer"
-                    processing-label="Suppression…"
+                    :title="$t('groupCollections.show.removal.title', selectedWordGroupIds.length)"
+                    :message="$t('groupCollections.show.removal.message', selectedWordGroupIds.length)"
+                    :confirm-label="$t('deletion.button')"
+                    :processing-label="$t('deletion.processing')"
                     :is-processing="isUpdatingGroups"
                     :error="removalError"
                     @confirm="removeSelectedWordGroups"
