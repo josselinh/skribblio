@@ -2,7 +2,7 @@
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { attachWordGroup, detachWordGroup, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
+import { attachWordGroup, detachWordGroups, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
 import { requestHiddenWordGroupsAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
@@ -86,6 +86,9 @@ async function loadGroupCollection(): Promise<void> {
     try {
         groupCollection.value = await fetchGroupCollection(groupCollectionId.value);
         status.value = 'loaded';
+        selectedWordGroupIds.value = selectedWordGroupIds.value.filter((id) =>
+            removableWordGroups.value.some((wordGroup) => wordGroup.id === id),
+        );
     } catch (error) {
         status.value = isAxiosError(error) && error.response?.status === 404 ? 'not-found' : 'failed';
     }
@@ -99,26 +102,30 @@ async function saveGroupCollection(payload: NameVisibilityPayload): Promise<void
 
 const { showToast } = useToasts();
 
-/** Change to the groups of the collection being confirmed, in `ConfirmDialog`. */
-const pendingGroupChange = ref<{ action: 'add' | 'remove'; wordGroup: WordGroup } | null>(null);
-const groupChangeError = ref<string | null>(null);
+/** Error of a 422 response (e.g. removing every group), or a generic message. */
+function groupChangeErrorMessage(error: unknown): string {
+    return isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
+        ? error.response.data.message
+        : 'Une erreur est survenue, veuillez réessayer.';
+}
 
-const isConfirmingGroupChange = computed({
-    get: () => pendingGroupChange.value !== null,
+/** Group picked in the search, being confirmed in `ConfirmDialog` before it is added. */
+const wordGroupToAdd = ref<WordGroup | null>(null);
+const additionError = ref<string | null>(null);
+
+const isConfirmingAddition = computed({
+    get: () => wordGroupToAdd.value !== null,
     set: (isOpen: boolean) => {
         if (!isOpen) {
-            pendingGroupChange.value = null;
+            wordGroupToAdd.value = null;
         }
     },
 });
 
-const groupChangeMessage = computed(() => {
-    if (!pendingGroupChange.value) {
+const additionMessage = computed(() => {
+    const wordGroup = wordGroupToAdd.value;
+    if (!wordGroup) {
         return '';
-    }
-    const { action, wordGroup } = pendingGroupChange.value;
-    if (action === 'remove') {
-        return `Le groupe « ${wordGroup.name} » sera retiré de cette collection. Le groupe lui-même et ses mots sont conservés.`;
     }
 
     return wordGroup.visibility === 'private'
@@ -126,37 +133,84 @@ const groupChangeMessage = computed(() => {
         : `Le groupe « ${wordGroup.name} » sera ajouté à cette collection.`;
 });
 
-function confirmGroupChange(action: 'add' | 'remove', wordGroup: WordGroup): void {
-    groupChangeError.value = null;
-    pendingGroupChange.value = { action, wordGroup };
+function confirmAddition(wordGroup: WordGroup): void {
+    additionError.value = null;
+    wordGroupToAdd.value = wordGroup;
 }
 
-/** Applies the confirmed change, then reloads the collection; errors (e.g. removing the last group) stay in the dialog. */
-async function applyGroupChange(): Promise<void> {
-    if (!pendingGroupChange.value) {
+/** Adds the confirmed group, then reloads the collection; errors stay in the dialog. */
+async function addWordGroup(): Promise<void> {
+    const wordGroup = wordGroupToAdd.value;
+    if (!wordGroup) {
         return;
     }
-    const { action, wordGroup } = pendingGroupChange.value;
     isUpdatingGroups.value = true;
-    groupChangeError.value = null;
+    additionError.value = null;
     try {
-        if (action === 'add') {
-            await attachWordGroup(groupCollectionId.value, wordGroup.id);
-        } else {
-            await detachWordGroup(groupCollectionId.value, wordGroup.id);
-        }
-        pendingGroupChange.value = null;
+        await attachWordGroup(groupCollectionId.value, wordGroup.id);
+        wordGroupToAdd.value = null;
+        await loadGroupCollection();
+        showToast(`Groupe « ${wordGroup.name} » ajouté à la collection.`);
+    } catch (error) {
+        additionError.value = groupChangeErrorMessage(error);
+    } finally {
+        isUpdatingGroups.value = false;
+    }
+}
+
+/**
+ * Selection mode: the groups the user may remove become selectable, and are removed together. The
+ * collection must keep at least one group, hidden ones included.
+ */
+const isSelectingGroups = ref(false);
+const selectedWordGroupIds = ref<string[]>([]);
+const removableWordGroups = computed(
+    () => groupCollection.value?.word_groups.filter((wordGroup) => wordGroup.can.remove_from_collection) ?? [],
+);
+const canRemoveWordGroups = computed(() => removableWordGroups.value.length > 0 && totalWordGroupsCount.value > 1);
+const areAllRemovableWordGroupsSelected = computed(
+    () => removableWordGroups.value.length > 0 && selectedWordGroupIds.value.length === removableWordGroups.value.length,
+);
+const wouldEmptyCollection = computed(() => selectedWordGroupIds.value.length >= totalWordGroupsCount.value);
+const isConfirmingRemoval = ref(false);
+const removalError = ref<string | null>(null);
+
+function startSelectingGroups(): void {
+    selectedWordGroupIds.value = [];
+    isSelectingGroups.value = true;
+}
+
+function stopSelectingGroups(): void {
+    isSelectingGroups.value = false;
+    selectedWordGroupIds.value = [];
+}
+
+function toggleAllRemovableWordGroups(): void {
+    selectedWordGroupIds.value = areAllRemovableWordGroupsSelected.value
+        ? []
+        : removableWordGroups.value.map((wordGroup) => wordGroup.id);
+}
+
+function askRemovalConfirmation(): void {
+    removalError.value = null;
+    isConfirmingRemoval.value = true;
+}
+
+/** Removes the selected groups, then leaves selection mode and reloads the collection; errors stay in the dialog. */
+async function removeSelectedWordGroups(): Promise<void> {
+    const removedCount = selectedWordGroupIds.value.length;
+    isUpdatingGroups.value = true;
+    removalError.value = null;
+    try {
+        await detachWordGroups(groupCollectionId.value, selectedWordGroupIds.value);
+        isConfirmingRemoval.value = false;
+        stopSelectingGroups();
         await loadGroupCollection();
         showToast(
-            action === 'add'
-                ? `Groupe « ${wordGroup.name} » ajouté à la collection.`
-                : `Groupe « ${wordGroup.name} » retiré de la collection.`,
+            removedCount > 1 ? `${removedCount} groupes supprimés de la collection.` : '1 groupe supprimé de la collection.',
         );
     } catch (error) {
-        groupChangeError.value =
-            isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
-                ? error.response.data.message
-                : 'Une erreur est survenue, veuillez réessayer.';
+        removalError.value = groupChangeErrorMessage(error);
     } finally {
         isUpdatingGroups.value = false;
     }
@@ -166,6 +220,7 @@ watch(
     groupCollectionId,
     () => {
         status.value = 'loading';
+        stopSelectingGroups();
         void loadGroupCollection();
     },
     { immediate: true },
@@ -264,9 +319,19 @@ watch(
             />
 
             <section class="mt-8" aria-labelledby="collection-groups-title">
-                <h2 id="collection-groups-title" class="text-lg font-semibold">
-                    Groupes <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ totalWordGroupsCount }})</span>
-                </h2>
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h2 id="collection-groups-title" class="text-lg font-semibold">
+                        Groupes <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ totalWordGroupsCount }})</span>
+                    </h2>
+                    <button
+                        v-if="canRemoveWordGroups && !isSelectingGroups"
+                        type="button"
+                        class="text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
+                        @click="startSelectingGroups"
+                    >
+                        Modifier les groupes
+                    </button>
+                </div>
 
                 <div v-if="groupCollection.can.add_word_group" class="mt-3">
                     <label for="add-word-group" class="sr-only">Ajouter un groupe</label>
@@ -274,7 +339,7 @@ watch(
                         input-id="add-word-group"
                         :excluded-ids="wordGroupIds"
                         :disabled="isUpdatingGroups"
-                        @select="confirmGroupChange('add', $event)"
+                        @select="confirmAddition"
                     />
                 </div>
 
@@ -297,38 +362,102 @@ watch(
                     }}
                 </p>
 
+                <div
+                    v-if="isSelectingGroups && groupCollection.word_groups.length > 0"
+                    class="mt-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-4 py-2 text-sm"
+                >
+                    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                        <label class="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                :checked="areAllRemovableWordGroupsSelected"
+                                :indeterminate="selectedWordGroupIds.length > 0 && !areAllRemovableWordGroupsSelected"
+                                class="size-4 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400"
+                                @change="toggleAllRemovableWordGroups"
+                            />
+                            <span v-if="selectedWordGroupIds.length === 0">Tout sélectionner</span>
+                            <span v-else>
+                                {{ selectedWordGroupIds.length }} groupe{{ selectedWordGroupIds.length > 1 ? 's' : '' }}
+                                sélectionné{{ selectedWordGroupIds.length > 1 ? 's' : '' }}
+                            </span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <button
+                                type="button"
+                                class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                                @click="stopSelectingGroups"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                :disabled="selectedWordGroupIds.length === 0 || wouldEmptyCollection || isUpdatingGroups"
+                                class="font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-haspopup="dialog"
+                                @click="askRemovalConfirmation"
+                            >
+                                Supprimer la sélection
+                            </button>
+                        </div>
+                    </div>
+                    <p v-if="wouldEmptyCollection && selectedWordGroupIds.length > 0" class="mt-1 text-amber-700 dark:text-amber-300">
+                        Une collection doit contenir au moins un groupe : gardez-en au moins un.
+                    </p>
+                </div>
+
                 <ul
-                    v-else
+                    v-if="groupCollection.word_groups.length > 0"
                     class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                     :class="{ 'opacity-60': isUpdatingGroups }"
                 >
                     <li v-for="wordGroup in groupCollection.word_groups" :key="wordGroup.id" class="relative">
-                        <WordGroupCard :word-group="wordGroup" />
-                        <button
-                            v-if="wordGroup.can.remove_from_collection"
-                            type="button"
-                            class="absolute right-3 bottom-3 rounded-md px-2 py-1 text-xs text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-500 dark:disabled:hover:text-zinc-400"
-                            :disabled="isUpdatingGroups || totalWordGroupsCount === 1"
-                            :title="totalWordGroupsCount === 1 ? 'Une collection doit contenir au moins un groupe.' : undefined"
-                            :aria-label="`Retirer ${wordGroup.name} de la collection`"
-                            aria-haspopup="dialog"
-                            @click="confirmGroupChange('remove', wordGroup)"
+                        <WordGroupCard
+                            :word-group="wordGroup"
+                            :class="{ 'opacity-50': isSelectingGroups && !wordGroup.can.remove_from_collection }"
+                        />
+                        <label
+                            v-if="isSelectingGroups && wordGroup.can.remove_from_collection"
+                            class="absolute inset-0 z-20 flex cursor-pointer items-end justify-end rounded-xl p-3 ring-inset has-checked:bg-brand-50/50 dark:has-checked:bg-brand-950/40 has-checked:ring-2 has-checked:ring-brand-500 dark:has-checked:ring-brand-400 has-focus-visible:outline-2 has-focus-visible:outline-brand-600 dark:has-focus-visible:outline-brand-400"
                         >
-                            Retirer
-                        </button>
+                            <input
+                                v-model="selectedWordGroupIds"
+                                type="checkbox"
+                                :value="wordGroup.id"
+                                class="size-5 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400 focus-visible:outline-none"
+                            />
+                            <span class="sr-only">Sélectionner « {{ wordGroup.name }} »</span>
+                        </label>
                     </li>
                 </ul>
 
                 <ConfirmDialog
-                    v-model:open="isConfirmingGroupChange"
-                    :title="pendingGroupChange?.action === 'add' ? 'Ajouter ce groupe à la collection ?' : 'Retirer ce groupe de la collection ?'"
-                    :message="groupChangeMessage"
-                    :confirm-label="pendingGroupChange?.action === 'add' ? 'Ajouter' : 'Retirer'"
-                    :processing-label="pendingGroupChange?.action === 'add' ? 'Ajout…' : 'Retrait…'"
-                    :tone="pendingGroupChange?.action === 'add' ? 'primary' : 'danger'"
+                    v-model:open="isConfirmingAddition"
+                    title="Ajouter ce groupe à la collection ?"
+                    :message="additionMessage"
+                    confirm-label="Ajouter"
+                    processing-label="Ajout…"
+                    tone="primary"
                     :is-processing="isUpdatingGroups"
-                    :error="groupChangeError"
-                    @confirm="applyGroupChange"
+                    :error="additionError"
+                    @confirm="addWordGroup"
+                />
+                <ConfirmDialog
+                    v-model:open="isConfirmingRemoval"
+                    :title="
+                        selectedWordGroupIds.length > 1
+                            ? `Supprimer ${selectedWordGroupIds.length} groupes de la collection ?`
+                            : 'Supprimer ce groupe de la collection ?'
+                    "
+                    :message="
+                        selectedWordGroupIds.length > 1
+                            ? 'Les groupes eux-mêmes et leurs mots sont conservés : ils sont seulement retirés de cette collection.'
+                            : 'Le groupe lui-même et ses mots sont conservés : il est seulement retiré de cette collection.'
+                    "
+                    confirm-label="Supprimer"
+                    processing-label="Suppression…"
+                    :is-processing="isUpdatingGroups"
+                    :error="removalError"
+                    @confirm="removeSelectedWordGroups"
                 />
             </section>
         </template>

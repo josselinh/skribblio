@@ -95,7 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
         Route::post('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'store'])
             ->name('group-collections.word-groups.store');
-        Route::delete('group-collections/{group_collection}/word-groups/{word_group}', [GroupCollectionWordGroupController::class, 'destroy'])
+        Route::delete('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'destroy'])
             ->name('group-collections.word-groups.destroy');
     });
 });

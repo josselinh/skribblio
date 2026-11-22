@@ -43,9 +43,12 @@ export async function attachWordGroup(groupCollectionId: string, wordGroupId: st
     await http.post(`/api/group-collections/${groupCollectionId}/word-groups`, { word_group_id: wordGroupId });
 }
 
-/** Fails with a 422 when the group is the last one of the collection. */
-export async function detachWordGroup(groupCollectionId: string, wordGroupId: string): Promise<void> {
-    await http.delete(`/api/group-collections/${groupCollectionId}/word-groups/${wordGroupId}`);
+/**
+ * Removes several groups from a collection at once: nothing is removed unless the user may remove every one
+ * of them. Fails with a 422 when the collection would have no group left (hidden groups included).
+ */
+export async function detachWordGroups(groupCollectionId: string, wordGroupIds: string[]): Promise<void> {
+    await http.delete(`/api/group-collections/${groupCollectionId}/word-groups`, { data: { word_group_ids: wordGroupIds } });
 }
 
 /**
