@@ -15,6 +15,7 @@ import ShareButton from '@/components/ShareButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
+import WordListEditor from '@/components/WordListEditor.vue';
 import WordListItem from '@/components/WordListItem.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
@@ -129,15 +130,32 @@ function onWordUpdated(updatedWord: Word): void {
     }
 }
 
-/** Reloads the page, or goes back one page when the deleted word was the last one on it. */
-async function onWordDeleted(): Promise<void> {
-    if (words.value?.data.length === 1 && currentPage.value > 1) {
+/** Edit mode: the words of the current page become text fields (sorting and pagination are hidden meanwhile). */
+const isEditingWords = ref(false);
+const hasEditableWords = computed(() => words.value?.data.some((word) => word.can.update) ?? false);
+
+/** Leaves edit mode and shows the new names. */
+async function onWordsSaved(): Promise<void> {
+    isEditingWords.value = false;
+    await loadWords();
+}
+
+/** Stays in edit mode; goes back one page when the deletion emptied the current one. */
+async function onWordsDeleted(deletedCount: number): Promise<void> {
+    const isPageEmptied = deletedCount === words.value?.data.length;
+    if (isPageEmptied && currentPage.value > 1) {
         await router.push({ query: { ...route.query, page: String(currentPage.value - 1) } });
     } else {
         await loadWords();
     }
+    if (!hasEditableWords.value) {
+        isEditingWords.value = false;
+    }
 }
 
+watch(wordGroupId, () => {
+    isEditingWords.value = false;
+});
 watch(wordGroupId, loadWordGroup, { immediate: true });
 watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 </script>
@@ -227,8 +245,19 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
 
             <template v-else-if="words">
                 <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
+                    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ words.meta.total }} mot{{ words.meta.total > 1 ? 's' : '' }}</p>
+                        <button
+                            v-if="hasEditableWords && !isEditingWords"
+                            type="button"
+                            class="text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
+                            @click="isEditingWords = true"
+                        >
+                            Modifier les mots
+                        </button>
+                    </div>
                     <WordSortControl
+                        v-if="!isEditingWords"
                         :sort="order.sort"
                         :direction="order.direction"
                         :default-directions="defaultDirections"
@@ -236,7 +265,17 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         @sort="sortWords"
                     />
                 </div>
+                <WordListEditor
+                    v-if="isEditingWords"
+                    class="mt-2"
+                    :word-group-id="wordGroup.id"
+                    :words="words.data"
+                    @saved="onWordsSaved"
+                    @deleted="onWordsDeleted"
+                    @cancel="isEditingWords = false"
+                />
                 <ul
+                    v-else
                     class="mt-2 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
                     :class="{ 'opacity-60': areWordsLoading }"
                 >
@@ -246,10 +285,9 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         :word="word"
                         :show-votes="showVotes"
                         @updated="onWordUpdated"
-                        @deleted="onWordDeleted"
                     />
                 </ul>
-                <PaginationNav class="mt-4" :current-page="words.meta.current_page" :last-page="words.meta.last_page" />
+                <PaginationNav v-if="!isEditingWords" class="mt-4" :current-page="words.meta.current_page" :last-page="words.meta.last_page" />
             </template>
         </template>
     </AppLayout>

@@ -87,6 +87,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
         Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::patch('word-groups/{word_group}/words', [WordController::class, 'updateMany'])->name('word-groups.words.update-many');
+        Route::delete('word-groups/{word_group}/words', [WordController::class, 'destroyMany'])->name('word-groups.words.destroy-many');
         Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['index', 'store', 'update', 'destroy']);
         Route::put('words/{word}/vote', [WordVoteController::class, 'update'])->name('words.vote.update');
         Route::delete('words/{word}/vote', [WordVoteController::class, 'destroy'])->name('words.vote.destroy');

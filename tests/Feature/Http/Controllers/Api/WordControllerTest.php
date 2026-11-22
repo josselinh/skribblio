@@ -373,4 +373,198 @@ class WordControllerTest extends TestCase
 
         $this->assertSame('chat', $word->fresh()->name);
     }
+
+    public function test_destroy_many_deletes_the_selected_words_and_touches_the_group(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create(['updated_at' => now()->subDay()]);
+        $selectedWords = Word::factory()->count(2)->for($wordGroup)->createdBy(User::factory()->create())->create();
+        $keptWord = Word::factory()->for($wordGroup)->create();
+        $selectedWords[0]->voteFor(User::factory()->create(), WordVote::Up);
+
+        $this->actingAs($user)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => $selectedWords->modelKeys()])
+            ->assertNoContent();
+
+        $this->assertModelMissing($selectedWords[0]);
+        $this->assertModelMissing($selectedWords[1]);
+        $this->assertModelExists($keptWord);
+        $this->assertTrue($wordGroup->fresh()->updated_at->isToday());
+    }
+
+    public function test_destroy_many_lets_the_author_delete_their_own_words_while_the_group_is_open(): void
+    {
+        $author = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $word = Word::factory()->for($wordGroup)->createdBy($author)->create();
+
+        $this->actingAs($author)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => [$word->id]])
+            ->assertNoContent();
+
+        $this->assertModelMissing($word);
+    }
+
+    public function test_destroy_many_returns_403_and_deletes_nothing_when_one_word_cannot_be_deleted(): void
+    {
+        $author = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $ownWord = Word::factory()->for($wordGroup)->createdBy($author)->create();
+        $otherWord = Word::factory()->for($wordGroup)->create();
+
+        $this->actingAs($author)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => [$ownWord->id, $otherWord->id]])
+            ->assertForbidden();
+
+        $this->assertModelExists($ownWord);
+        $this->assertModelExists($otherWord);
+    }
+
+    public function test_destroy_many_returns_404_for_a_private_group_of_another_user(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+        $word = Word::factory()->for($wordGroup)->create();
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => [$word->id]])
+            ->assertNotFound();
+
+        $this->assertModelExists($word);
+    }
+
+    public function test_destroy_many_returns_422_for_a_word_of_another_group(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $wordOfAnotherGroup = Word::factory()->for(WordGroup::factory()->createdBy($user))->create();
+
+        $this->actingAs($user)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => [$wordOfAnotherGroup->id]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['word_ids.0' => 'Un des mots sélectionnés n’est plus dans le groupe.']);
+
+        $this->assertModelExists($wordOfAnotherGroup);
+    }
+
+    public function test_destroy_many_returns_422_without_any_word(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+
+        $this->actingAs($user)
+            ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => []])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['word_ids' => 'Sélectionnez au moins un mot.']);
+    }
+
+    public function test_update_many_renames_the_words_and_touches_the_group(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create(['updated_at' => now()->subDay()]);
+        $cat = Word::factory()->for($wordGroup)->createdBy(User::factory()->create())->create(['name' => 'chta']);
+        $dog = Word::factory()->for($wordGroup)->create(['name' => 'chein']);
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [
+                ['id' => $cat->id, 'name' => 'chat'],
+                ['id' => $dog->id, 'name' => 'chien'],
+            ]])
+            ->assertNoContent();
+
+        $this->assertSame('chat', $cat->fresh()->name);
+        $this->assertSame('chien', $dog->fresh()->name);
+        $this->assertTrue($wordGroup->fresh()->updated_at->isToday());
+    }
+
+    public function test_update_many_returns_403_and_renames_nothing_when_one_word_cannot_be_updated(): void
+    {
+        $author = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $ownWord = Word::factory()->for($wordGroup)->createdBy($author)->create(['name' => 'chat']);
+        $otherWord = Word::factory()->for($wordGroup)->create(['name' => 'chien']);
+
+        $this->actingAs($author)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [
+                ['id' => $ownWord->id, 'name' => 'chaton'],
+                ['id' => $otherWord->id, 'name' => 'chiot'],
+            ]])
+            ->assertForbidden();
+
+        $this->assertSame('chat', $ownWord->fresh()->name);
+        $this->assertSame('chien', $otherWord->fresh()->name);
+    }
+
+    public function test_update_many_returns_404_for_a_private_group_of_another_user(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+        $word = Word::factory()->for($wordGroup)->create();
+
+        $this->actingAs(User::factory()->create())
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [['id' => $word->id, 'name' => 'chat']]])
+            ->assertNotFound();
+    }
+
+    public function test_update_many_refuses_a_name_already_taken_by_another_word_of_the_group_even_one_renamed_too(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $cat = Word::factory()->for($wordGroup)->create(['name' => 'chat']);
+        $dog = Word::factory()->for($wordGroup)->create(['name' => 'chien']);
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [
+                ['id' => $cat->id, 'name' => 'chien'],
+                ['id' => $dog->id, 'name' => 'chat'],
+            ]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'words.0.name' => 'Ce mot est déjà dans le groupe.',
+                'words.1.name' => 'Ce mot est déjà dans le groupe.',
+            ]);
+
+        $this->assertSame('chat', $cat->fresh()->name);
+    }
+
+    public function test_update_many_refuses_the_same_new_name_twice(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        [$first, $second] = Word::factory()->count(2)->for($wordGroup)->create();
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [
+                ['id' => $first->id, 'name' => 'chat'],
+                ['id' => $second->id, 'name' => 'Chat'],
+            ]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['words.1.name' => 'Vous avez saisi ce mot plusieurs fois.']);
+    }
+
+    public function test_update_many_refuses_a_name_with_a_comma(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $word = Word::factory()->for($wordGroup)->create();
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [['id' => $word->id, 'name' => 'chat, chien']]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'words.0.name' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
+            ]);
+    }
+
+    public function test_update_many_returns_422_for_a_word_of_another_group(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $wordOfAnotherGroup = Word::factory()->for(WordGroup::factory()->createdBy($user))->create(['name' => 'chat']);
+
+        $this->actingAs($user)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [['id' => $wordOfAnotherGroup->id, 'name' => 'chien']]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['words.0.id' => 'Ce mot n’est plus dans le groupe.']);
+
+        $this->assertSame('chat', $wordOfAnotherGroup->fresh()->name);
+    }
 }

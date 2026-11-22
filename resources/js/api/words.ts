@@ -2,10 +2,6 @@ import { http } from '@/lib/http';
 import type { CreateWordsResponse, ResourceResponse, WordsResponse } from '@/types/api';
 import type { SortDirection, Word, WordSort, WordVote } from '@/types/models';
 
-export interface WordPayload {
-    name: string;
-}
-
 export interface WordOrder {
     sort: WordSort;
     direction: SortDirection;
@@ -30,14 +26,22 @@ export async function createWords(wordGroupId: string, names: string[]): Promise
     return data;
 }
 
-export async function updateWord(id: string, payload: WordPayload): Promise<Word> {
-    const { data } = await http.patch<ResourceResponse<Word>>(`/api/words/${id}`, payload);
-
-    return data.data;
+export interface WordRename {
+    id: string;
+    name: string;
 }
 
-export async function deleteWord(id: string): Promise<void> {
-    await http.delete(`/api/words/${id}`);
+/**
+ * Renames several words of a group at once: nothing is renamed unless every name is valid and the
+ * user may update every word. Validation errors are keyed by position (`words.N.name`).
+ */
+export async function updateWords(wordGroupId: string, words: WordRename[]): Promise<void> {
+    await http.patch(`/api/word-groups/${wordGroupId}/words`, { words });
+}
+
+/** Deletes several words of a group at once: nothing is deleted unless the user may delete every one of them. */
+export async function deleteWords(wordGroupId: string, wordIds: string[]): Promise<void> {
+    await http.delete(`/api/word-groups/${wordGroupId}/words`, { data: { word_ids: wordIds } });
 }
 
 /** Records the current user's vote (null removes it) and returns the word with its updated counts. */
