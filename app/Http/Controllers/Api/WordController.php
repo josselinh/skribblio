@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DestroyWordsRequest;
 use App\Http\Requests\ListWordsRequest;
 use App\Http\Requests\StoreWordRequest;
 use App\Http\Requests\UpdateWordRequest;
+use App\Http\Requests\UpdateWordsRequest;
 use App\Http\Resources\WordResource;
 use App\Models\Word;
 use App\Models\WordGroup;
@@ -16,6 +18,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class WordController extends Controller
 {
@@ -87,11 +90,65 @@ class WordController extends Controller
         return new WordResource($word->load('creator')->loadVotes($request->user()));
     }
 
+    /**
+     * Rename several words of a group at once. Nothing is renamed unless the user may update every
+     * one of them; the group is touched once. A conflict that validation could not foresee (two names
+     * that the database considers equal, such as with and without accents) is reported on the word.
+     */
+    public function updateMany(UpdateWordsRequest $request, WordGroup $wordGroup): Response
+    {
+        $namesByWordId = $request->namesByWordId();
+        $words = $wordGroup->words()->whereKey(array_keys($namesByWordId))->get();
+        $words->each->setRelation('wordGroup', $wordGroup);
+        foreach ($words as $word) {
+            Gate::authorize('update', $word);
+        }
+
+        DB::transaction(function () use ($wordGroup, $words, $namesByWordId, $request): void {
+            Word::withoutTouching(function () use ($words, $namesByWordId, $request): void {
+                foreach ($words as $word) {
+                    try {
+                        $word->update(['name' => $namesByWordId[$word->id]]);
+                    } catch (UniqueConstraintViolationException) {
+                        $index = array_search($word->id, array_column($request->validated('words'), 'id'), true);
+
+                        throw ValidationException::withMessages([
+                            "words.{$index}.name" => 'Ce mot est déjà dans le groupe.',
+                        ]);
+                    }
+                }
+            });
+            $wordGroup->touch();
+        });
+
+        return response()->noContent();
+    }
+
     public function destroy(Word $word): Response
     {
         Gate::authorize('delete', $word);
 
         $word->delete();
+
+        return response()->noContent();
+    }
+
+    /**
+     * Delete several words of a group at once. Nothing is deleted unless the user may delete
+     * every one of them; the group is touched once.
+     */
+    public function destroyMany(DestroyWordsRequest $request, WordGroup $wordGroup): Response
+    {
+        $words = $wordGroup->words()->whereKey($request->wordIds())->get();
+        $words->each->setRelation('wordGroup', $wordGroup);
+        foreach ($words as $word) {
+            Gate::authorize('delete', $word);
+        }
+
+        DB::transaction(function () use ($wordGroup, $words): void {
+            $wordGroup->words()->whereKey($words->modelKeys())->delete();
+            $wordGroup->touch();
+        });
 
         return response()->noContent();
     }
