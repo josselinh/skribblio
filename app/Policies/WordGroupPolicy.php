@@ -45,8 +45,8 @@ class WordGroupPolicy
         return $wordGroup->acceptsContributionFrom($user)
             ? Response::allow()
             : Response::deny($wordGroup->restrictsContributionsToMembers()
-                ? 'Seuls les membres autorisés par le créateur peuvent contribuer à ce groupe.'
-                : 'Ce groupe n’est pas ouvert aux contributions.');
+                ? __('word_groups.contributions_members_only')
+                : __('word_groups.contributions_closed'));
     }
 
     /**
@@ -93,6 +93,6 @@ class WordGroupPolicy
             return Response::denyAsNotFound();
         }
 
-        return $wordGroup->isMember($user) ? Response::allow() : Response::deny('Vous n’êtes pas membre de ce groupe.');
+        return $wordGroup->isMember($user) ? Response::allow() : Response::deny(__('word_groups.not_a_member'));
     }
 }

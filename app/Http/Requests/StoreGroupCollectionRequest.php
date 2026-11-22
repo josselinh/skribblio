@@ -51,7 +51,7 @@ class StoreGroupCollectionRequest extends FormRequest
                     return;
                 }
                 if ($this->wordGroups()->count() !== count($this->input('word_group_ids'))) {
-                    $validator->errors()->add('word_group_ids', 'Un ou plusieurs groupes sélectionnés sont introuvables.');
+                    $validator->errors()->add('word_group_ids', __('group_collections.word_groups.not_found'));
                 }
             },
         ];
@@ -65,10 +65,10 @@ class StoreGroupCollectionRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'visibility' => 'visibilité',
-            'accepts_contributions' => 'ouvert aux contributions',
-            'contributions_members_only' => 'contributions des membres uniquement',
-            'word_group_ids' => 'groupes',
+            'visibility' => __('fields.visibility'),
+            'accepts_contributions' => __('fields.accepts_contributions'),
+            'contributions_members_only' => __('fields.contributions_members_only'),
+            'word_group_ids' => __('fields.word_group_ids'),
         ];
     }
 
@@ -80,8 +80,8 @@ class StoreGroupCollectionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'word_group_ids.required' => 'Choisissez au moins un groupe.',
-            'word_group_ids.min' => 'Choisissez au moins un groupe.',
+            'word_group_ids.required' => __('group_collections.word_groups.required'),
+            'word_group_ids.min' => __('group_collections.word_groups.required'),
         ];
     }
 

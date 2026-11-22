@@ -54,7 +54,7 @@ class StoreWordRequest extends FormRequest
         return [
             function (Validator $validator): void {
                 if ($validator->errors()->isEmpty() && $this->submittedNames() === []) {
-                    $validator->errors()->add('names', 'Saisissez au moins un mot.');
+                    $validator->errors()->add('names', __('words.add.required'));
                 }
             },
         ];
@@ -68,8 +68,8 @@ class StoreWordRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'names.required' => 'Saisissez au moins un mot.',
-            'names.max' => 'Vous pouvez ajouter au plus '.self::MAX_NAMES.' mots à la fois.',
+            'names.required' => __('words.add.required'),
+            'names.max' => __('words.add.max', ['max' => self::MAX_NAMES]),
         ];
     }
 
@@ -121,8 +121,8 @@ class StoreWordRequest extends FormRequest
     private function errorFor(string $name): ?string
     {
         return match (true) {
-            str_contains($name, ',') => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
-            mb_strlen($name) > Word::NAME_MAX_LENGTH => 'Un mot ne peut pas dépasser '.Word::NAME_MAX_LENGTH.' caractères.',
+            str_contains($name, ',') => __('words.name_contains_comma'),
+            mb_strlen($name) > Word::NAME_MAX_LENGTH => __('words.name_too_long', ['max' => Word::NAME_MAX_LENGTH]),
             default => null,
         };
     }

@@ -48,7 +48,7 @@ class AttachWordGroupRequest extends FormRequest
                 }
                 $wordGroup = $this->wordGroup();
                 if ($wordGroup === null || ! $this->user()->can('attachWordGroup', [$this->groupCollection(), $wordGroup])) {
-                    $validator->errors()->add('word_group_id', 'Ce groupe est introuvable.');
+                    $validator->errors()->add('word_group_id', __('word_groups.not_found'));
                 }
             },
         ];

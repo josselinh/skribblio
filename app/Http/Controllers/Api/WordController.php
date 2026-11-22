@@ -113,7 +113,7 @@ class WordController extends Controller
                         $index = array_search($word->id, array_column($request->validated('words'), 'id'), true);
 
                         throw ValidationException::withMessages([
-                            "words.{$index}.name" => 'Ce mot est déjà dans le groupe.',
+                            "words.{$index}.name" => __('words.name_taken'),
                         ]);
                     }
                 }

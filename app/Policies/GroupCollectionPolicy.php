@@ -54,8 +54,8 @@ class GroupCollectionPolicy
         return $groupCollection->acceptsContributionFrom($user)
             ? Response::allow()
             : Response::deny($groupCollection->restrictsContributionsToMembers()
-                ? 'Seuls les membres autorisés par le créateur peuvent contribuer à cette collection.'
-                : 'Cette collection n’est pas ouverte aux contributions.');
+                ? __('group_collections.contributions_members_only')
+                : __('group_collections.contributions_closed'));
     }
 
     /**
@@ -119,6 +119,6 @@ class GroupCollectionPolicy
             return Response::denyAsNotFound();
         }
 
-        return $groupCollection->isMember($user) ? Response::allow() : Response::deny('Vous n’êtes pas membre de cette collection.');
+        return $groupCollection->isMember($user) ? Response::allow() : Response::deny(__('group_collections.not_a_member'));
     }
 }

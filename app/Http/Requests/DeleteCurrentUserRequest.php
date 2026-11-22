@@ -38,7 +38,7 @@ class DeleteCurrentUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'password.current_password' => 'Le mot de passe est incorrect.',
+            'password.current_password' => __('account.password_incorrect'),
         ];
     }
 }

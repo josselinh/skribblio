@@ -38,32 +38,27 @@ class AccessRequestDecided extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $creatorName = $this->accessRequest->item->creator->name;
-        $mail = (new MailMessage)->greeting("Bonjour {$notifiable->name},");
+        $outcome = match (true) {
+            $this->accessRequest->isForContribution() && $this->accessRequest->isAccepted() => 'contribution_accepted',
+            $this->accessRequest->isForContribution() => 'contribution_refused',
+            $this->accessRequest->isAccepted() => 'access_accepted',
+            default => 'access_refused',
+        };
+        $replacements = [
+            'creator' => $this->accessRequest->item->creator->name,
+            'target' => $outcome === 'access_refused' && $this->isSentFromCollection()
+                ? __('access_requests.target.hidden_word_group')
+                : $this->accessRequest->accessTarget(),
+        ];
 
-        if ($this->accessRequest->isForContribution()) {
-            return $this->accessRequest->isAccepted()
-                ? $mail
-                    ->subject("Vous pouvez contribuer {$this->accessRequest->accessTarget()}")
-                    ->line("{$creatorName} vous autorise à contribuer {$this->accessRequest->accessTarget()}.")
-                    ->action('Ouvrir', url($this->accessRequest->itemPath()))
-                : $mail
-                    ->subject('Demande de contribution refusée')
-                    ->line("{$creatorName} a refusé votre demande de contribution {$this->accessRequest->accessTarget()}.");
-        }
+        $mail = (new MailMessage)
+            ->subject(__("access_requests.mail.{$outcome}.subject", $replacements))
+            ->greeting(__('access_requests.mail.greeting', ['name' => $notifiable->name]))
+            ->line(__("access_requests.mail.{$outcome}.line", $replacements));
 
-        if ($this->accessRequest->isAccepted()) {
-            return $mail
-                ->subject("Accès accordé {$this->accessRequest->accessTarget()}")
-                ->line("{$creatorName} vous a donné accès {$this->accessRequest->accessTarget()}.")
-                ->action('Ouvrir', url($this->accessRequest->itemPath()));
-        }
-
-        $accessTarget = $this->isSentFromCollection() ? 'à un groupe privé' : $this->accessRequest->accessTarget();
-
-        return $mail
-            ->subject("Demande d'accès refusée")
-            ->line("{$creatorName} a refusé votre demande d'accès {$accessTarget}.");
+        return $this->accessRequest->isAccepted()
+            ? $mail->action(__('access_requests.mail.open'), url($this->accessRequest->itemPath()))
+            : $mail;
     }
 
     private function isSentFromCollection(): bool

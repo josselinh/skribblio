@@ -32,7 +32,7 @@ class GroupCollectionAccessRequest extends Model
      */
     public function accessTarget(): string
     {
-        return "à la collection « {$this->item->name} »";
+        return __('access_requests.target.group_collection', ['name' => $this->item->name]);
     }
 
     /**

@@ -45,8 +45,8 @@ class UpdateWordRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.unique' => 'Ce mot est déjà dans le groupe.',
-            'name.not_regex' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
+            'name.unique' => __('words.name_taken'),
+            'name.not_regex' => __('words.name_contains_comma'),
         ];
     }
 
