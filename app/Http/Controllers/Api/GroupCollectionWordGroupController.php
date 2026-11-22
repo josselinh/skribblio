@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttachWordGroupRequest;
+use App\Http\Requests\DetachWordGroupsRequest;
 use App\Models\GroupCollection;
-use App\Models\WordGroup;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Adds groups to and removes groups from a collection. Both actions touch the collection's `updated_at`.
@@ -31,26 +31,21 @@ class GroupCollectionWordGroupController extends Controller
     }
 
     /**
-     * Remove a group from the collection, which must keep at least one group. The creator can remove any
-     * group, a contributor the groups they added while the collection is open to contributions.
-     *
-     * @throws ValidationException
+     * Remove several groups from the collection, which must keep at least one group. The creator can remove
+     * any group, a contributor the groups they added while the collection is open to contributions. Nothing
+     * is removed unless the user may remove every one of them; the collection is touched once.
      */
-    public function destroy(GroupCollection $groupCollection, WordGroup $wordGroup): Response
+    public function destroy(DetachWordGroupsRequest $request, GroupCollection $groupCollection): Response
     {
-        Gate::authorize('view', $groupCollection);
-        $attachedWordGroup = $groupCollection->wordGroups()->whereKey($wordGroup->getKey())->first();
-        abort_if($attachedWordGroup === null, 404);
-        Gate::authorize('detachWordGroup', [$groupCollection, $attachedWordGroup]);
-
-        if ($groupCollection->wordGroups()->count() === 1) {
-            throw ValidationException::withMessages([
-                'word_group_id' => 'Une collection doit contenir au moins un groupe.',
-            ]);
+        $wordGroups = $groupCollection->wordGroups()->whereKey($request->wordGroupIds())->get();
+        foreach ($wordGroups as $wordGroup) {
+            Gate::authorize('detachWordGroup', [$groupCollection, $wordGroup]);
         }
 
-        $groupCollection->wordGroups()->detach($wordGroup);
-        $groupCollection->touch();
+        DB::transaction(function () use ($groupCollection, $wordGroups): void {
+            $groupCollection->wordGroups()->detach($wordGroups->modelKeys());
+            $groupCollection->touch();
+        });
 
         return response()->noContent();
     }
