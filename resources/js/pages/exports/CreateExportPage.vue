@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
 import { createGroupCollection } from '@/api/groupCollections';
@@ -14,6 +15,7 @@ import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import WordListExport from '@/components/WordListExport.vue';
 import { useForm } from '@/composables/useForm';
 import { useToasts } from '@/composables/useToasts';
+import { intlLocale } from '@/lib/i18n';
 import type { GroupCollection, Visibility, WordGroup } from '@/types/models';
 
 /**
@@ -23,6 +25,7 @@ import type { GroupCollection, Visibility, WordGroup } from '@/types/models';
  */
 const router = useRouter();
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const selectedWordGroups = ref<ExportedWordGroup[]>([]);
 const selectedWordGroupIds = computed(() => selectedWordGroups.value.map((wordGroup) => wordGroup.id));
@@ -30,7 +33,7 @@ const hasSelection = computed(() => selectedWordGroups.value.length > 0);
 
 /** Words of the selected groups, sorted by name, duplicates kept (the export options deal with them). */
 const words = computed(() =>
-    selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, 'fr')),
+    selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, intlLocale)),
 );
 
 const isAdding = ref(false);
@@ -54,7 +57,7 @@ async function add(load: () => Promise<void>): Promise<void> {
     try {
         await load();
     } catch {
-        addError.value = 'Impossible d’ajouter cet élément, veuillez réessayer.';
+        addError.value = t('exports.create.addFailed');
     } finally {
         isAdding.value = false;
     }
@@ -80,29 +83,15 @@ function addGroupCollection(groupCollection: GroupCollection): Promise<void> {
     });
 }
 
-function plural(count: number, singular: string, pluralForm: string): string {
-    return `${count} ${count > 1 ? pluralForm : singular}`;
-}
-
 function collectionAddedMessage(name: string, addedCount: number, alreadySelectedCount: number, hiddenCount: number): string {
     const parts = [
-        addedCount === 0
-            ? `Aucun nouveau groupe ajouté depuis « ${name} ».`
-            : `${plural(addedCount, 'groupe', 'groupes')} de « ${name} » ${addedCount > 1 ? 'ajoutés' : 'ajouté'}.`,
+        t('exports.create.collectionAdded.added', { name }, addedCount),
     ];
     if (alreadySelectedCount > 0) {
-        parts.push(
-            alreadySelectedCount === 1
-                ? '1 groupe était déjà dans la sélection.'
-                : `${alreadySelectedCount} groupes étaient déjà dans la sélection.`,
-        );
+        parts.push(t('exports.create.collectionAdded.alreadySelected', alreadySelectedCount));
     }
     if (hiddenCount > 0) {
-        parts.push(
-            hiddenCount === 1
-                ? '1 groupe privé de cette collection ne vous est pas visible et n’a pas été ajouté.'
-                : `${hiddenCount} groupes privés de cette collection ne vous sont pas visibles et n’ont pas été ajoutés.`,
-        );
+        parts.push(t('exports.create.collectionAdded.hidden', hiddenCount));
     }
 
     return parts.join(' ');
@@ -131,7 +120,7 @@ async function saveAsGroupCollection(): Promise<void> {
     await form.submit(async (data) => {
         const groupCollection = await createGroupCollection({ ...data, word_group_ids: wordGroupIds });
         await router.push({ name: 'group-collections.show', params: { id: groupCollection.id } });
-        showToast('Collection créée.');
+        showToast(t('exports.create.saved'));
     });
 }
 
@@ -148,21 +137,20 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 
 <template>
     <AppLayout>
         <div class="mx-auto max-w-3xl">
-            <h1 class="text-2xl font-semibold">Créer un export</h1>
+            <h1 class="text-2xl font-semibold">{{ $t('dashboard.export.button') }}</h1>
             <p class="mt-1 text-zinc-500 dark:text-zinc-400">
-                Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste
-                prête à coller dans Skribbl.io.
+                {{ $t('exports.create.description') }}
             </p>
 
             <section
                 class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                 aria-labelledby="export-selection-title"
             >
-                <h2 id="export-selection-title" class="text-lg font-semibold">Sélection</h2>
+                <h2 id="export-selection-title" class="text-lg font-semibold">{{ $t('exports.create.selection') }}</h2>
 
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="export-word-group-search" class="block text-sm font-medium">Ajouter un groupe</label>
+                        <label for="export-word-group-search" class="block text-sm font-medium">{{ $t('exports.create.addWordGroup') }}</label>
                         <WordGroupSearch
                             class="mt-1"
                             input-id="export-word-group-search"
@@ -173,47 +161,46 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 
                     </div>
                     <div>
                         <label for="export-group-collection-search" class="block text-sm font-medium">
-                            Ajouter les groupes d’une collection
+                            {{ $t('exports.create.addGroupCollection') }}
                         </label>
                         <ItemSearch
                             class="mt-1"
                             input-id="export-group-collection-search"
                             :search="searchGroupCollections"
-                            placeholder="Rechercher une collection…"
-                            empty-message="Aucune collection trouvée."
+                            :placeholder="$t('exports.create.searchGroupCollection')"
+                            :empty-message="$t('search.emptyGroupCollections')"
                             :disabled="isAdding"
                             @select="addGroupCollection"
                         />
                         <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                            Les groupes de la collection choisie sont ajoutés à la sélection : vous pourrez retirer ceux
-                            que vous ne voulez pas.
+                            {{ $t('exports.create.addGroupCollectionHint') }}
                         </p>
                     </div>
                 </div>
 
-                <p v-if="isAdding" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">Ajout en cours…</p>
+                <p v-if="isAdding" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.create.adding') }}</p>
                 <p v-else-if="addError" role="alert" class="mt-4 text-sm text-red-600 dark:text-red-400">{{ addError }}</p>
                 <p v-else-if="addStatus" role="status" class="mt-4 text-sm text-zinc-700 dark:text-zinc-300">{{ addStatus }}</p>
 
-                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">Aucun groupe sélectionné.</p>
+                <p v-if="!hasSelection" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.create.empty') }}</p>
 
                 <template v-else>
                     <div class="mt-4 flex items-center justify-between gap-2">
                         <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                            {{ plural(selectedWordGroups.length, 'groupe sélectionné', 'groupes sélectionnés') }}
+                            {{ $t('exports.create.selectedCount', selectedWordGroups.length) }}
                         </p>
                         <button type="button" class="text-sm text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100" @click="removeAll">
-                            Tout retirer
+                            {{ $t('exports.create.removeAll') }}
                         </button>
                     </div>
-                    <ul class="mt-2 flex flex-wrap gap-2" aria-label="Groupes sélectionnés">
+                    <ul class="mt-2 flex flex-wrap gap-2" :aria-label="$t('wordGroups.picker.selected')">
                         <li v-for="wordGroup in selectedWordGroups" :key="wordGroup.id" :class="tagClass">
                             {{ wordGroup.name }}
                             <span class="text-zinc-500 dark:text-zinc-400">· {{ wordGroup.words.length }}</span>
                             <button
                                 type="button"
                                 :class="removeButtonClass"
-                                :aria-label="`Retirer le groupe ${wordGroup.name}`"
+                                :aria-label="$t('exports.create.removeWordGroup', { name: wordGroup.name })"
                                 @click="removeWordGroup(wordGroup.id)"
                             >
                                 ×
@@ -228,9 +215,9 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 
                     class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                     aria-labelledby="export-result-title"
                 >
-                    <h2 id="export-result-title" class="text-lg font-semibold">Export</h2>
+                    <h2 id="export-result-title" class="text-lg font-semibold">{{ $t('exports.create.result') }}</h2>
 
-                    <p v-if="words.length === 0" class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Aucun mot à exporter.</p>
+                    <p v-if="words.length === 0" class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.noWords') }}</p>
                     <WordListExport v-else class="mt-2" :words="words" />
                 </section>
 
@@ -238,17 +225,16 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 
                     class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm"
                     aria-labelledby="export-save-title"
                 >
-                    <h2 id="export-save-title" class="text-lg font-semibold">Enregistrer comme collection</h2>
+                    <h2 id="export-save-title" class="text-lg font-semibold">{{ $t('exports.create.saveTitle') }}</h2>
                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        La nouvelle collection contiendra les
-                        {{ plural(selectedWordGroups.length, 'groupe', 'groupes') }} de cette sélection.
+                        {{ $t('exports.create.saveDescription', selectedWordGroups.length) }}
                     </p>
 
                     <form class="mt-4 space-y-6" novalidate @submit.prevent="saveAsGroupCollection">
                         <FormField
                             id="name"
                             v-model="form.data.name"
-                            label="Nom de la collection"
+                            :label="$t('groupCollections.fields.name')"
                             :error="form.errors.value.name"
                             required
                         />
@@ -262,7 +248,7 @@ const removeButtonClass = 'rounded-full px-1.5 text-zinc-500 dark:text-zinc-400 
                             :members-only-error="form.errors.value.contributions_members_only"
                         />
                         <p v-if="saveError" role="alert" class="text-sm text-red-600 dark:text-red-400">{{ saveError }}</p>
-                        <PrimaryButton :is-loading="form.isProcessing.value">Créer la collection</PrimaryButton>
+                        <PrimaryButton :is-loading="form.isProcessing.value">{{ $t('groupCollections.create.submit') }}</PrimaryButton>
                     </form>
                 </section>
             </template>

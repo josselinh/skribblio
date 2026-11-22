@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { deleteGroupCollection } from '@/api/groupCollections';
 import { deleteWordGroup } from '@/api/wordGroups';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
+import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind } from '@/types/models';
 
 /**
@@ -18,15 +20,14 @@ const props = defineProps<{
 
 const router = useRouter();
 const { showToast } = useToasts();
+const { t } = useI18n();
 const isConfirming = ref(false);
 const isDeleting = ref(false);
 const error = ref<string | null>(null);
 
-const title = props.kind === 'word-groups' ? 'Supprimer ce groupe ?' : 'Supprimer cette collection ?';
-const warning =
-    props.kind === 'word-groups'
-        ? 'Le groupe et tous ses mots seront supprimés, et il sera retiré des collections qui le contiennent. Cette action est irréversible.'
-        : 'La collection sera supprimée, mais pas les groupes qu’elle contient. Cette action est irréversible.';
+const item = itemKey(props.kind);
+const title = t(`deletion.title.${item}`);
+const warning = t(`deletion.warning.${item}`);
 
 function askConfirmation(): void {
     error.value = null;
@@ -44,9 +45,9 @@ async function confirmDelete(): Promise<void> {
         }
         isConfirming.value = false;
         await router.push({ name: 'dashboard' });
-        showToast(props.kind === 'word-groups' ? 'Groupe supprimé.' : 'Collection supprimée.');
+        showToast(t(`deletion.done.${item}`));
     } catch {
-        error.value = 'Impossible de supprimer. Réessayez.';
+        error.value = t('deletion.failed');
     } finally {
         isDeleting.value = false;
     }
@@ -59,15 +60,15 @@ async function confirmDelete(): Promise<void> {
         class="rounded-lg border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
         @click="askConfirmation"
     >
-        Supprimer
+        {{ $t('deletion.button') }}
     </button>
 
     <ConfirmDialog
         v-model:open="isConfirming"
         :title="title"
         :message="warning"
-        confirm-label="Supprimer définitivement"
-        processing-label="Suppression…"
+        :confirm-label="$t('deletion.confirm')"
+        :processing-label="$t('deletion.processing')"
         :is-processing="isDeleting"
         :error="error"
         @confirm="confirmDelete"

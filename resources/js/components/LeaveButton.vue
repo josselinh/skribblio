@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { leaveItem } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
+import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Visibility } from '@/types/models';
 
 /**
@@ -23,21 +25,14 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const { showToast } = useToasts();
+const { t } = useI18n();
 const isConfirming = ref(false);
 const isLeaving = ref(false);
 const error = ref<string | null>(null);
 
-const isGroup = computed(() => props.kind === 'word-groups');
-const title = computed(() => (isGroup.value ? 'Quitter ce groupe ?' : 'Quitter cette collection ?'));
-const message = computed(() => {
-    const item = isGroup.value ? 'ce groupe' : 'cette collection';
-    const consequence =
-        props.visibility === 'private'
-            ? `Vous ne pourrez plus voir ${item}${isGroup.value ? '' : ' ni les groupes privés qu’elle vous montrait'}, qui seront retirés de vos favoris.`
-            : `Vous pourrez toujours voir ${item}, mais plus y contribuer.`;
-
-    return `${consequence} Vos contributions sont conservées. Pour revenir, il faudra redemander l’accès au créateur.`;
-});
+const item = computed(() => itemKey(props.kind));
+const title = computed(() => t(`leaving.title.${item.value}`));
+const message = computed(() => t(`leaving.message.${props.visibility}.${item.value}`));
 
 function askConfirmation(): void {
     error.value = null;
@@ -55,9 +50,9 @@ async function confirmLeave(): Promise<void> {
         } else {
             emit('left');
         }
-        showToast(isGroup.value ? 'Vous avez quitté le groupe.' : 'Vous avez quitté la collection.');
+        showToast(t(`leaving.done.${item.value}`));
     } catch {
-        error.value = 'Impossible de quitter. Réessayez.';
+        error.value = t('leaving.failed');
     } finally {
         isLeaving.value = false;
     }
@@ -70,15 +65,15 @@ async function confirmLeave(): Promise<void> {
         class="rounded-lg border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
         @click="askConfirmation"
     >
-        Quitter
+        {{ $t('leaving.button') }}
     </button>
 
     <ConfirmDialog
         v-model:open="isConfirming"
         :title="title"
         :message="message"
-        confirm-label="Quitter"
-        processing-label="Départ…"
+        :confirm-label="$t('leaving.button')"
+        :processing-label="$t('leaving.processing')"
         :is-processing="isLeaving"
         :error="error"
         @confirm="confirmLeave"

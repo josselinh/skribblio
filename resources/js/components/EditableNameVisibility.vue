@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
@@ -8,6 +9,7 @@ import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
 import { useToasts } from '@/composables/useToasts';
+import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, User, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
@@ -38,6 +40,7 @@ const props = defineProps<{
 }>();
 
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const isEditing = ref(false);
 const form = useForm<NameVisibilityPayload>({
@@ -59,7 +62,7 @@ function startEditing(): void {
 async function submit(): Promise<void> {
     if (await form.submit((data) => props.save({ ...data }))) {
         isEditing.value = false;
-        showToast(props.kind === 'word-groups' ? 'Groupe modifié.' : 'Collection modifiée.');
+        showToast(t(`editing.done.${itemKey(props.kind)}`));
     }
 }
 </script>
@@ -88,14 +91,14 @@ async function submit(): Promise<void> {
                 class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 @click="isEditing = false"
             >
-                Annuler
+                {{ $t('common.cancel') }}
             </button>
             <button
                 type="submit"
                 :disabled="form.isProcessing.value"
                 class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
             >
-                Enregistrer
+                {{ $t('common.save') }}
             </button>
         </div>
     </form>
@@ -112,7 +115,9 @@ async function submit(): Promise<void> {
                 <slot name="after-title" />
             </div>
             <p v-if="creator" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                par <UserLink :user="creator" self-label="vous" />
+                <i18n-t keypath="common.byUser" scope="global">
+                    <template #user><UserLink :user="creator" :self-label="$t('common.you')" /></template>
+                </i18n-t>
             </p>
         </div>
         <div class="flex flex-wrap items-center justify-end gap-2">
@@ -122,7 +127,7 @@ async function submit(): Promise<void> {
                 class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 @click="startEditing"
             >
-                Modifier
+                {{ $t('editing.button') }}
             </button>
             <slot name="actions" />
         </div>

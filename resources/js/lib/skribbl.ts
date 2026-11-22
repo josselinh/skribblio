@@ -1,3 +1,5 @@
+import { intlLocale } from '@/lib/i18n';
+
 /** Limits of the "Custom words" field of a private Skribbl.io room. */
 export const SKRIBBL_MIN_WORDS = 10;
 export const SKRIBBL_MAX_WORD_LENGTH = 32;
@@ -24,7 +26,7 @@ export function deduplicateWords(words: readonly string[]): string[] {
     const seen = new Set<string>();
 
     return words.filter((word) => {
-        const key = word.toLocaleLowerCase('fr');
+        const key = word.toLocaleLowerCase(intlLocale);
         if (seen.has(key)) {
             return false;
         }

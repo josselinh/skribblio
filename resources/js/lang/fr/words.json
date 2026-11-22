@@ -1,0 +1,79 @@
+{
+    "list": {
+        "updatedOn": "modifié le {date}"
+    },
+    "count": "{n} mot | {n} mots",
+    "sort": {
+        "legend": "Trier les mots par",
+        "prefix": "Tri :",
+        "reverse": "Inverser l’ordre",
+        "order": "Ordre :",
+        "reverseHint": "(inverser)",
+        "criteria": {
+            "created": "Date d’ajout",
+            "name": "Mot",
+            "score": "Votes",
+            "author": "Auteur",
+            "updated": "Date de modification"
+        },
+        "directions": {
+            "name": {
+                "asc": "De A à Z",
+                "desc": "De Z à A"
+            },
+            "author": {
+                "asc": "De A à Z",
+                "desc": "De Z à A"
+            },
+            "created": {
+                "desc": "Plus récents d’abord",
+                "asc": "Plus anciens d’abord"
+            },
+            "updated": {
+                "desc": "Plus récents d’abord",
+                "asc": "Plus anciens d’abord"
+            },
+            "score": {
+                "desc": "Mieux notés d’abord",
+                "asc": "Moins bien notés d’abord"
+            }
+        }
+    },
+    "votes": {
+        "up": "J’aime",
+        "down": "Je n’aime pas",
+        "buttonLabel": "{vote} « {word} » ({count})",
+        "countLabel": "{vote} :",
+        "failed": "Impossible d’enregistrer le vote, veuillez réessayer."
+    },
+    "add": {
+        "label": "Ajouter des mots",
+        "help": "Séparez les mots par des virgules ou des retours à la ligne. Entrée pour ajouter, Maj+Entrée pour aller à la ligne.",
+        "placeholder": "chat, chien, girafe…",
+        "submit": "Ajouter",
+        "added": "{n} mot ajouté | {n} mots ajoutés",
+        "skipped": "{n} déjà présent ignoré | {n} déjà présents ignorés",
+        "invalid": "{n} mot n’a pas pu être ajouté (laissé dans le champ pour correction) : | {n} mots n’ont pas pu être ajoutés (laissés dans le champ pour correction) :",
+        "invalidItem": "{word} : {reason}"
+    },
+    "editor": {
+        "saved": "{n} mot modifié. | {n} mots modifiés.",
+        "deleted": "{n} mot supprimé. | {n} mots supprimés.",
+        "invalid": "Certains mots n’ont pas pu être enregistrés : corrigez-les puis réessayez.",
+        "saveFailed": "Impossible d’enregistrer les modifications. Rechargez la page et réessayez.",
+        "deleteFailed": "Impossible de supprimer ces mots. Rechargez la page et réessayez.",
+        "selected": "{n} mot sélectionné | {n} mots sélectionnés",
+        "saveCount": "Enregistrer ({count})",
+        "selectWord": "Sélectionner « {name} »",
+        "wordLabel": "Mot « {name} »",
+        "changed": "Modifié",
+        "before": "(avant : {name})",
+        "restore": "Rétablir",
+        "notEditable": "Vous ne pouvez pas modifier ce mot",
+        "deleteTitle": "Supprimer ce mot ? | Supprimer {n} mots ?",
+        "deleteMessage": "Ce mot sera retiré du groupe. Cette action est irréversible. | Ces mots seront retirés du groupe. Cette action est irréversible.",
+        "discardTitle": "Abandonner la modification ? | Abandonner {n} modifications ?",
+        "discardMessage": "Les mots modifiés reprendront leur nom actuel.",
+        "discard": "Abandonner"
+    }
+}

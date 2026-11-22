@@ -1,11 +1,12 @@
+import { i18n } from '@/lib/i18n';
 import type { Visibility } from '@/types/models';
 
-export const visibilityLabels: Record<Visibility, string> = {
-    public: 'Public',
-    private: 'Privé',
-};
+/** "Public" or "Privé". */
+export function visibilityLabel(visibility: Visibility): string {
+    return i18n.global.t(`visibility.${visibility}.label`);
+}
 
-export const visibilityDescriptions: Record<Visibility, string> = {
-    public: 'Visible par tous les utilisateurs.',
-    private: 'Visible par vous uniquement.',
-};
+/** What the visibility means, e.g. "Visible par vous uniquement.". */
+export function visibilityDescription(visibility: Visibility): string {
+    return i18n.global.t(`visibility.${visibility}.description`);
+}

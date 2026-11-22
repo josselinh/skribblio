@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { createWords } from '@/api/words';
 import { useForm } from '@/composables/useForm';
 import { useToasts } from '@/composables/useToasts';
@@ -19,16 +20,13 @@ const textarea = useTemplateRef<HTMLTextAreaElement>('textarea');
 const form = useForm({ names: '' });
 const result = ref<CreateWordsResponse | null>(null);
 const { showToast } = useToasts();
-
-function plural(count: number, singular: string, pluralForm: string): string {
-    return `${count} ${count > 1 ? pluralForm : singular}`;
-}
+const { t } = useI18n();
 
 /** Summary of the last submission: how many words were added and skipped. */
 function summary(response: CreateWordsResponse): string {
-    const parts = [`${plural(response.data.length, 'mot ajouté', 'mots ajoutés')}`];
+    const parts = [t('words.add.added', response.data.length)];
     if (response.skipped.length > 0) {
-        parts.push(`${plural(response.skipped.length, 'déjà présent ignoré', 'déjà présents ignorés')}`);
+        parts.push(t('words.add.skipped', response.skipped.length));
     }
 
     return parts.join(' · ');
@@ -64,9 +62,9 @@ async function submit(): Promise<void> {
 
 <template>
     <form novalidate @submit.prevent="submit">
-        <label for="new-words" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Ajouter des mots</label>
+        <label for="new-words" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('words.add.label') }}</label>
         <p id="new-words-help" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-            Séparez les mots par des virgules ou des retours à la ligne. Entrée pour ajouter, Maj+Entrée pour aller à la ligne.
+            {{ $t('words.add.help') }}
         </p>
         <div class="mt-2 flex items-start gap-2">
             <textarea
@@ -74,7 +72,7 @@ async function submit(): Promise<void> {
                 ref="textarea"
                 v-model="form.data.names"
                 rows="3"
-                placeholder="chat, chien, girafe…"
+                :placeholder="$t('words.add.placeholder')"
                 autocomplete="off"
                 :aria-invalid="form.errors.value.names || result?.invalid.length ? true : undefined"
                 aria-describedby="new-words-help new-words-feedback"
@@ -86,7 +84,7 @@ async function submit(): Promise<void> {
                 :disabled="form.isProcessing.value"
                 class="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
             >
-                Ajouter
+                {{ $t('words.add.submit') }}
             </button>
         </div>
         <div id="new-words-feedback" aria-live="polite">
@@ -96,12 +94,14 @@ async function submit(): Promise<void> {
             <template v-else-if="result">
                 <div v-if="result.invalid.length > 0" class="mt-1 text-sm text-red-600 dark:text-red-400">
                     <p>
-                        {{ plural(result.invalid.length, 'mot n’a pas pu être ajouté', 'mots n’ont pas pu être ajoutés') }}
-                        (laissé{{ result.invalid.length > 1 ? 's' : '' }} dans le champ pour correction) :
+                        {{ $t('words.add.invalid', result.invalid.length) }}
                     </p>
                     <ul class="mt-0.5 list-disc pl-5">
                         <li v-for="invalidName in result.invalid" :key="invalidName.name">
-                            <span class="font-medium">{{ invalidName.name }}</span> : {{ invalidName.message }}
+                            <i18n-t keypath="words.add.invalidItem" scope="global">
+                                <template #word><span class="font-medium">{{ invalidName.name }}</span></template>
+                                <template #reason>{{ invalidName.message }}</template>
+                            </i18n-t>
                         </li>
                     </ul>
                 </div>

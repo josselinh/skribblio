@@ -28,15 +28,14 @@ function updateFavorite(isFavorite: boolean): void {
         :accepts-contributions="groupCollection.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(groupCollection)"
         :updated-at="groupCollection.updated_at"
-        updated-label="Modifiée le"
+        :updated-label="$t('groupCollections.card.updatedOn')"
         :is-accessible="groupCollection.is_accessible !== false"
-        :inaccessible-message="groupCollection.access_status === 'pending' ? 'Demande d’accès en attente.' : 'Cette collection est devenue privée : vous n’y avez plus accès.'"
+        :inaccessible-message="groupCollection.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('groupCollections.card.becamePrivate')"
     >
         <template #meta>
             <CardMeta
                 :creator="groupCollection.creator"
-                :count="groupCollection.word_groups_count"
-                :count-labels="['groupe', 'groupes']"
+                :count-label="groupCollection.word_groups_count === undefined ? undefined : $t('wordGroups.count', groupCollection.word_groups_count)"
             />
         </template>
         <template v-if="groupCollection.is_favorite !== undefined && groupCollection.access_status !== 'pending'" #favorite>

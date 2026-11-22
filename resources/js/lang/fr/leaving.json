@@ -1,0 +1,23 @@
+{
+    "button": "Quitter",
+    "processing": "Départ…",
+    "failed": "Impossible de quitter. Réessayez.",
+    "title": {
+        "wordGroup": "Quitter ce groupe ?",
+        "groupCollection": "Quitter cette collection ?"
+    },
+    "message": {
+        "private": {
+            "wordGroup": "Vous ne pourrez plus voir ce groupe, qui sera retiré de vos favoris. Vos contributions sont conservées. Pour revenir, il faudra redemander l’accès au créateur.",
+            "groupCollection": "Vous ne pourrez plus voir cette collection ni les groupes privés qu’elle vous montrait, qui seront retirés de vos favoris. Vos contributions sont conservées. Pour revenir, il faudra redemander l’accès au créateur."
+        },
+        "public": {
+            "wordGroup": "Vous pourrez toujours voir ce groupe, mais plus y contribuer. Vos contributions sont conservées. Pour revenir, il faudra redemander l’accès au créateur.",
+            "groupCollection": "Vous pourrez toujours voir cette collection, mais plus y contribuer. Vos contributions sont conservées. Pour revenir, il faudra redemander l’accès au créateur."
+        }
+    },
+    "done": {
+        "wordGroup": "Vous avez quitté le groupe.",
+        "groupCollection": "Vous avez quitté la collection."
+    }
+}

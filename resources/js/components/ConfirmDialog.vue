@@ -38,7 +38,7 @@ const emit = defineEmits<{ confirm: [] }>();
                 class="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60 sm:w-auto sm:py-2"
                 @click="isOpen = false"
             >
-                Annuler
+                {{ $t('common.cancel') }}
             </button>
             <button
                 type="button"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useToasts } from '@/composables/useToasts';
+import { intlLocale } from '@/lib/i18n';
 import {
     SKRIBBL_MAX_CHARACTERS,
     SKRIBBL_MIN_WORDS,
@@ -26,6 +28,7 @@ const props = withDefaults(
 );
 
 const { showToast } = useToasts();
+const { t } = useI18n();
 
 const shouldDeduplicate = ref(true);
 const shouldShuffle = ref(false);
@@ -43,7 +46,7 @@ const duplicatesCount = computed(() => props.words.length - deduplicateWords(pro
 const hasTooFewWords = computed(() => exportedWords.value.length < SKRIBBL_MIN_WORDS);
 const isOverCharacterLimit = computed(() => exportedList.value.length > SKRIBBL_MAX_CHARACTERS);
 
-const numberFormat = new Intl.NumberFormat('fr-FR');
+const numberFormat = new Intl.NumberFormat(intlLocale);
 
 function reshuffle(): void {
     shuffledWords.value = shuffleWords(availableWords.value);
@@ -66,9 +69,9 @@ watch(
 async function copy(): Promise<void> {
     try {
         await navigator.clipboard.writeText(exportedList.value);
-        showToast('Liste copiée. Collez-la dans le champ « Custom words » de votre salon Skribbl.io.');
+        showToast(t('exports.list.copied'));
     } catch {
-        showToast('Copie impossible : sélectionnez la liste et copiez-la.', 'error', 6000);
+        showToast(t('exports.list.copyFailed'), 'error', 6000);
     }
 }
 
@@ -79,9 +82,9 @@ const secondaryButtonClass =
 
 <template>
     <div>
-        <label for="export-list" class="block text-sm font-medium">Mots personnalisés</label>
+        <label for="export-list" class="block text-sm font-medium">{{ $t('exports.list.label') }}</label>
         <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            Copiez cette liste dans le champ « Custom words » d'un salon privé Skribbl.io.
+            {{ $t('exports.list.help') }}
         </p>
         <p v-if="note" class="mt-1 text-sm text-amber-700 dark:text-amber-400">{{ note }}</p>
 
@@ -97,10 +100,14 @@ const secondaryButtonClass =
 
         <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
             <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                {{ numberFormat.format(exportedWords.length) }} mot{{ exportedWords.length > 1 ? 's' : '' }} ·
+                {{ $t('exports.list.wordCount', { count: numberFormat.format(exportedWords.length) }, exportedWords.length) }} ·
                 <span :class="{ 'font-medium text-red-600 dark:text-red-400': isOverCharacterLimit }">
-                    {{ numberFormat.format(exportedList.length) }} / {{ numberFormat.format(SKRIBBL_MAX_CHARACTERS) }}
-                    caractères
+                    {{
+                        $t('exports.list.characterCount', {
+                            count: numberFormat.format(exportedList.length),
+                            max: numberFormat.format(SKRIBBL_MAX_CHARACTERS),
+                        })
+                    }}
                 </span>
             </p>
             <button
@@ -109,12 +116,12 @@ const secondaryButtonClass =
                 class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                 @click="copy"
             >
-                Copier
+                {{ $t('common.copy') }}
             </button>
         </div>
 
         <div v-if="hasTooFewWords" role="note" class="mt-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
-            Skribbl.io demande au moins {{ SKRIBBL_MIN_WORDS }} mots personnalisés.
+            {{ $t('exports.list.tooFewWords', { min: SKRIBBL_MIN_WORDS }) }}
         </div>
 
         <div
@@ -122,16 +129,13 @@ const secondaryButtonClass =
             role="note"
             class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
         >
-            <p>
-                La liste dépasse la limite de {{ numberFormat.format(SKRIBBL_MAX_CHARACTERS) }} caractères de
-                Skribbl.io.
-            </p>
+            <p>{{ $t('exports.list.tooManyCharacters', { max: numberFormat.format(SKRIBBL_MAX_CHARACTERS) }) }}</p>
             <button
                 type="button"
                 class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40"
                 @click="draw"
             >
-                Tirer au hasard une sélection qui tient dans la limite
+                {{ $t('exports.list.draw') }}
             </button>
         </div>
 
@@ -140,27 +144,31 @@ const secondaryButtonClass =
             class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm"
         >
             <p>
-                Sélection aléatoire de {{ numberFormat.format(drawnWords.length) }} mots sur
-                {{ numberFormat.format(availableWords.length) }}.
+                {{
+                    $t('exports.list.drawn', {
+                        count: numberFormat.format(drawnWords.length),
+                        total: numberFormat.format(availableWords.length),
+                    })
+                }}
             </p>
             <div class="flex gap-2">
-                <button type="button" :class="secondaryButtonClass" @click="draw">Nouveau tirage</button>
+                <button type="button" :class="secondaryButtonClass" @click="draw">{{ $t('exports.list.drawAgain') }}</button>
                 <button type="button" :class="secondaryButtonClass" @click="drawnWords = null">
-                    Revenir à la liste complète
+                    {{ $t('exports.list.undraw') }}
                 </button>
             </div>
         </div>
 
         <fieldset class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-            <legend class="sr-only">Options de la liste</legend>
+            <legend class="sr-only">{{ $t('exports.list.options') }}</legend>
             <label class="inline-flex items-center gap-2">
                 <input v-model="shouldDeduplicate" type="checkbox" :class="checkboxClass" />
-                Retirer les doublons
+                {{ $t('exports.list.deduplicate') }}
                 <span v-if="duplicatesCount > 0" class="text-zinc-500 dark:text-zinc-400">({{ duplicatesCount }})</span>
             </label>
             <label class="inline-flex items-center gap-2" :class="{ 'opacity-60': drawnWords }">
                 <input v-model="shouldShuffle" type="checkbox" :class="checkboxClass" :disabled="drawnWords !== null" />
-                Mélanger l'ordre
+                {{ $t('exports.list.shuffle') }}
             </label>
             <button
                 v-if="shouldShuffle && !drawnWords"
@@ -168,7 +176,7 @@ const secondaryButtonClass =
                 class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100"
                 @click="reshuffle"
             >
-                Remélanger
+                {{ $t('exports.list.reshuffle') }}
             </button>
         </fieldset>
     </div>

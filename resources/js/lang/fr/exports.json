@@ -1,0 +1,53 @@
+{
+    "panel": {
+        "button": "Exporter pour Skribbl.io",
+        "loadFailed": "Impossible de charger les mots.",
+        "groups": "Groupes à exporter",
+        "selectedCount": "({selected} sur {total})",
+        "selectAll": "Tout cocher",
+        "selectNone": "Tout décocher",
+        "nothingSelected": "Choisissez au moins un groupe à exporter.",
+        "noWords": "Aucun mot à exporter."
+    },
+    "list": {
+        "label": "Mots personnalisés",
+        "help": "Copiez cette liste dans le champ « Custom words » d'un salon privé Skribbl.io.",
+        "copied": "Liste copiée. Collez-la dans le champ « Custom words » de votre salon Skribbl.io.",
+        "copyFailed": "Copie impossible : sélectionnez la liste et copiez-la.",
+        "wordCount": "{count} mot | {count} mots",
+        "characterCount": "{count} / {max} caractères",
+        "tooFewWords": "Skribbl.io demande au moins {min} mots personnalisés.",
+        "tooManyCharacters": "La liste dépasse la limite de {max} caractères de Skribbl.io.",
+        "draw": "Tirer au hasard une sélection qui tient dans la limite",
+        "drawn": "Sélection aléatoire de {count} mots sur {total}.",
+        "drawAgain": "Nouveau tirage",
+        "undraw": "Revenir à la liste complète",
+        "options": "Options de la liste",
+        "deduplicate": "Retirer les doublons",
+        "shuffle": "Mélanger l'ordre",
+        "reshuffle": "Remélanger"
+    },
+    "create": {
+        "description": "Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste prête à coller dans Skribbl.io.",
+        "selection": "Sélection",
+        "addWordGroup": "Ajouter un groupe",
+        "addGroupCollection": "Ajouter les groupes d’une collection",
+        "searchGroupCollection": "Rechercher une collection…",
+        "addGroupCollectionHint": "Les groupes de la collection choisie sont ajoutés à la sélection : vous pourrez retirer ceux que vous ne voulez pas.",
+        "adding": "Ajout en cours…",
+        "addFailed": "Impossible d’ajouter cet élément, veuillez réessayer.",
+        "collectionAdded": {
+            "added": "Aucun nouveau groupe ajouté depuis « {name} ». | 1 groupe de « {name} » ajouté. | {n} groupes de « {name} » ajoutés.",
+            "alreadySelected": "1 groupe était déjà dans la sélection. | {n} groupes étaient déjà dans la sélection.",
+            "hidden": "1 groupe privé de cette collection ne vous est pas visible et n’a pas été ajouté. | {n} groupes privés de cette collection ne vous sont pas visibles et n’ont pas été ajoutés."
+        },
+        "empty": "Aucun groupe sélectionné.",
+        "selectedCount": "{n} groupe sélectionné | {n} groupes sélectionnés",
+        "removeAll": "Tout retirer",
+        "removeWordGroup": "Retirer le groupe {name}",
+        "result": "Export",
+        "saveTitle": "Enregistrer comme collection",
+        "saveDescription": "La nouvelle collection contiendra le groupe de cette sélection. | La nouvelle collection contiendra les {n} groupes de cette sélection.",
+        "saved": "Collection créée."
+    }
+}

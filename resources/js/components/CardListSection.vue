@@ -47,10 +47,10 @@ defineSlots<{
             <slot name="actions" />
         </div>
 
-        <p v-if="isLoading && !result" class="mt-4 text-zinc-500 dark:text-zinc-400">Chargement…</p>
+        <p v-if="isLoading && !result" class="mt-4 text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
         <p v-else-if="hasFailed" class="mt-4 text-red-600 dark:text-red-400">
-            Impossible de charger la liste.
-            <button type="button" class="underline" @click="$emit('retry')">Réessayer</button>
+            {{ $t('common.listLoadFailed') }}
+            <button type="button" class="underline" @click="$emit('retry')">{{ $t('common.retry') }}</button>
         </p>
         <div v-else-if="result?.data.length === 0" class="mt-4">
             <slot name="empty">

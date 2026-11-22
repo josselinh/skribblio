@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { fetchItemAccess, revokeAccess } from '@/api/sharing';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import { formatDateTime } from '@/lib/format';
+import { itemKey } from '@/lib/i18n';
 import type { AccessPurpose, FavoriteKind, ItemAccess } from '@/types/models';
 
 /**
@@ -24,6 +26,7 @@ type Member = ItemAccess['members'][number];
 /** Member whose access is being confirmed for removal, in `ConfirmDialog`. */
 const memberBeingRevoked = ref<Member | null>(null);
 const { showToast } = useToasts();
+const { t } = useI18n();
 const isRevoking = ref(false);
 const revokeError = ref<string | null>(null);
 
@@ -37,12 +40,7 @@ const isConfirmingRevocation = computed({
 });
 
 const revocationMessage = computed(() => {
-    const name = memberBeingRevoked.value?.name ?? '';
-    const item = props.kind === 'word-groups' ? 'ce groupe' : 'cette collection';
-
-    return props.purpose === 'contribution'
-        ? `${name} ne pourra plus contribuer à ${item}. Ses contributions sont conservées, et cette personne pourra vous redemander l'autorisation.`
-        : `${name} n'aura plus accès à ${item}. Cette personne pourra vous redemander l'accès avec le lien de partage.`;
+    return t(`sharing.revoke.message.${props.purpose}.${itemKey(props.kind)}`, { name: memberBeingRevoked.value?.name ?? '' });
 });
 
 function confirmRevocation(member: Member): void {
@@ -69,14 +67,10 @@ async function revoke(): Promise<void> {
         const member = memberBeingRevoked.value;
         await revokeAccess(props.kind, props.id, member.id);
         memberBeingRevoked.value = null;
-        showToast(
-            props.purpose === 'contribution'
-                ? `${member.name} ne peut plus contribuer.`
-                : `${member.name} n’a plus accès.`,
-        );
+        showToast(t(`sharing.revoke.done.${props.purpose}`, { name: member.name }));
         await load();
     } catch {
-        revokeError.value = 'Une erreur est survenue, veuillez réessayer.';
+        revokeError.value = t('common.unexpectedError');
     } finally {
         isRevoking.value = false;
     }
@@ -86,16 +80,16 @@ watch(() => props.id, load, { immediate: true });
 </script>
 
 <template>
-    <section class="space-y-6" aria-label="Accès">
+    <section class="space-y-6" :aria-label="$t('sharing.management.label')">
         <p v-if="hasFailed" class="text-sm text-red-600 dark:text-red-400">
-            Impossible de charger les accès.
-            <button type="button" class="underline" @click="load">Réessayer</button>
+            {{ $t('sharing.management.loadFailed') }}
+            <button type="button" class="underline" @click="load">{{ $t('common.retry') }}</button>
         </p>
 
         <template v-else-if="access">
             <div v-if="access.pending_requests.length > 0">
                 <h2 class="text-lg font-semibold">
-                    {{ purpose === 'contribution' ? 'Demandes de contribution' : "Demandes d'accès" }}
+                    {{ $t(`sharing.management.requests.${purpose}`) }}
                     <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ access.pending_requests.length }})</span>
                 </h2>
                 <ul class="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
@@ -110,18 +104,20 @@ watch(() => props.id, load, { immediate: true });
 
             <div>
                 <h2 class="text-lg font-semibold">
-                    {{ purpose === 'contribution' ? 'Personnes autorisées à contribuer' : 'Personnes ayant accès' }}
+                    {{ $t(`sharing.management.members.${purpose}`) }}
                     <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ access.members.length }})</span>
                 </h2>
                 <p v-if="access.members.length === 0" class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                    Personne d'autre que vous pour l'instant. Envoyez le lien d'invitation pour recevoir des demandes.
+                    {{ $t('sharing.management.noMembers') }}
                 </p>
                 <ul v-else class="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
                     <li v-for="member in access.members" :key="member.id" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                         <div>
                             <p class="font-medium">{{ member.name }}</p>
                             <p v-if="member.granted_at" class="text-zinc-500 dark:text-zinc-400">
-                                Depuis le <time :datetime="member.granted_at">{{ formatDateTime(member.granted_at) }}</time>
+                                <i18n-t keypath="sharing.management.since" scope="global">
+                                    <template #date><time :datetime="member.granted_at">{{ formatDateTime(member.granted_at) }}</time></template>
+                                </i18n-t>
                             </p>
                         </div>
                         <button
@@ -130,7 +126,7 @@ watch(() => props.id, load, { immediate: true });
                             aria-haspopup="dialog"
                             @click="confirmRevocation(member)"
                         >
-                            Retirer
+                            {{ $t('sharing.revoke.button') }}
                         </button>
                     </li>
                 </ul>
@@ -139,10 +135,10 @@ watch(() => props.id, load, { immediate: true });
 
         <ConfirmDialog
             v-model:open="isConfirmingRevocation"
-            :title="purpose === 'contribution' ? 'Retirer l’autorisation de contribuer ?' : 'Retirer l’accès ?'"
+            :title="$t(`sharing.revoke.title.${purpose}`)"
             :message="revocationMessage"
-            confirm-label="Retirer"
-            processing-label="Retrait…"
+            :confirm-label="$t('sharing.revoke.button')"
+            :processing-label="$t('sharing.revoke.processing')"
             :is-processing="isRevoking"
             :error="revokeError"
             @confirm="revoke"

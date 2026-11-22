@@ -70,7 +70,7 @@ async function logout(): Promise<void> {
                 class="block px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="close"
             >
-                Mon profil
+                {{ $t('layout.userMenu.profile') }}
             </RouterLink>
             <button
                 type="button"
@@ -78,7 +78,7 @@ async function logout(): Promise<void> {
                 class="block w-full px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="logout"
             >
-                Se déconnecter
+                {{ $t('layout.userMenu.logout') }}
             </button>
         </div>
     </div>

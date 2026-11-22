@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from '@/App.vue';
 import { http } from '@/lib/http';
+import { i18n } from '@/lib/i18n';
 import { router } from '@/router';
 import { useAuthStore } from '@/stores/auth';
 
@@ -10,6 +11,7 @@ const app = createApp(App);
 
 app.use(createPinia());
 app.use(router);
+app.use(i18n);
 
 /**
  * Sends the user back to the right screen when the server says the session

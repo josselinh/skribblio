@@ -27,8 +27,8 @@ defineEmits<{
     <ItemSearch
         :input-id="inputId"
         :search="searchWordGroups"
-        placeholder="Rechercher un groupe…"
-        empty-message="Aucun groupe trouvé."
+        :placeholder="$t('wordGroups.search.placeholder')"
+        :empty-message="$t('wordGroups.search.empty')"
         :excluded-ids="excludedIds"
         :invalid="invalid"
         :disabled="disabled"

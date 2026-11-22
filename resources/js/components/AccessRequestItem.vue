@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import { decideAccessRequest } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserLink from '@/components/UserLink.vue';
 import { useToasts } from '@/composables/useToasts';
 import { formatDateTime } from '@/lib/format';
+import { itemKey } from '@/lib/i18n';
 import type { AccessRequest } from '@/types/models';
 
 /** One pending access (or contribution) request with its Accept and Refuse buttons; the decision is confirmed in a notification. */
@@ -22,11 +24,13 @@ const emit = defineEmits<{
     decided: [accessRequest: AccessRequest, accepted: boolean];
 }>();
 
-const requestLabel = computed(() =>
-    props.accessRequest.purpose === 'contribution' ? 'demande à contribuer' : "demande l'accès",
-);
-
 const { showToast } = useToasts();
+const { t } = useI18n();
+
+/** "Bob demande l'accès" or, with `showItem`, "Bob demande l'accès au groupe Animaux". */
+const requestKeypath = computed(
+    () => `sharing.request.${props.accessRequest.purpose}.${props.showItem ? itemKey(props.accessRequest.kind) : 'withoutItem'}`,
+);
 
 const isDeciding = ref(false);
 const hasFailed = ref(false);
@@ -34,11 +38,8 @@ const isConfirmingAcceptance = ref(false);
 
 const acceptanceMessage = computed(() => {
     const { requester, item, kind, purpose } = props.accessRequest;
-    const target = `${kind === 'word-groups' ? 'au groupe' : 'à la collection'} « ${item.name} »`;
 
-    return purpose === 'contribution'
-        ? `${requester.name} pourra contribuer ${target}. Vous pourrez lui retirer cette autorisation à tout moment.`
-        : `${requester.name} aura accès ${target} et pourra exporter ses mots. Vous pourrez lui retirer l'accès à tout moment.`;
+    return t(`sharing.accept.message.${purpose}.${itemKey(kind)}`, { name: requester.name, item: item.name });
 });
 
 async function decide(accept: boolean): Promise<void> {
@@ -48,7 +49,7 @@ async function decide(accept: boolean): Promise<void> {
         await decideAccessRequest(props.accessRequest, accept);
         isConfirmingAcceptance.value = false;
         emit('decided', props.accessRequest, accept);
-        showToast(`Demande de ${props.accessRequest.requester.name} ${accept ? 'acceptée' : 'refusée'}.`);
+        showToast(t(accept ? 'sharing.request.accepted' : 'sharing.request.refused', { name: props.accessRequest.requester.name }));
     } catch {
         hasFailed.value = true;
     } finally {
@@ -60,10 +61,9 @@ async function decide(accept: boolean): Promise<void> {
 <template>
     <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div class="min-w-0 text-sm">
-            <p>
-                <UserLink :user="accessRequest.requester" class="font-medium" />{{ ' ' }}
-                <template v-if="showItem">
-                    {{ requestLabel }} {{ accessRequest.kind === 'word-groups' ? 'au groupe' : 'à la collection' }}
+            <i18n-t :keypath="requestKeypath" tag="p" scope="global">
+                <template #user><UserLink :user="accessRequest.requester" class="font-medium" /></template>
+                <template #item>
                     <RouterLink
                         :to="{
                             name: accessRequest.kind === 'word-groups' ? 'word-groups.show' : 'group-collections.show',
@@ -74,17 +74,16 @@ async function decide(accept: boolean): Promise<void> {
                         {{ accessRequest.item.name }}
                     </RouterLink>
                 </template>
-                <template v-else>{{ requestLabel }}</template>
-            </p>
+            </i18n-t>
             <p class="text-zinc-500 dark:text-zinc-400">
                 <template v-if="accessRequest.via_group_collection">
-                    Depuis la collection « {{ accessRequest.via_group_collection.name }} » ·
+                    {{ $t('sharing.request.viaCollection', { name: accessRequest.via_group_collection.name }) }} ·
                 </template>
                 <time v-if="accessRequest.created_at" :datetime="accessRequest.created_at">
                     {{ formatDateTime(accessRequest.created_at) }}
                 </time>
             </p>
-            <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">Une erreur est survenue, veuillez réessayer.</p>
+            <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">{{ $t('common.unexpectedError') }}</p>
         </div>
         <div class="flex gap-2">
             <button
@@ -93,7 +92,7 @@ async function decide(accept: boolean): Promise<void> {
                 class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60"
                 @click="decide(false)"
             >
-                Refuser
+                {{ $t('sharing.request.refuse') }}
             </button>
             <button
                 type="button"
@@ -102,19 +101,19 @@ async function decide(accept: boolean): Promise<void> {
                 aria-haspopup="dialog"
                 @click="isConfirmingAcceptance = true"
             >
-                Accepter
+                {{ $t('sharing.request.accept') }}
             </button>
         </div>
 
         <ConfirmDialog
             v-model:open="isConfirmingAcceptance"
             tone="primary"
-            :title="accessRequest.purpose === 'contribution' ? 'Autoriser à contribuer ?' : 'Donner l’accès ?'"
+            :title="$t(`sharing.accept.title.${accessRequest.purpose}`)"
             :message="acceptanceMessage"
-            confirm-label="Accepter"
-            processing-label="Acceptation…"
+            :confirm-label="$t('sharing.request.accept')"
+            :processing-label="$t('sharing.accept.processing')"
             :is-processing="isDeciding"
-            :error="hasFailed ? 'Une erreur est survenue, veuillez réessayer.' : null"
+            :error="hasFailed ? $t('common.unexpectedError') : null"
             @confirm="decide(true)"
         />
     </li>

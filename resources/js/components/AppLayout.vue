@@ -23,10 +23,10 @@ async function search(): Promise<void> {
     <div class="flex min-h-screen flex-col">
         <header class="border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
-                <nav class="flex items-center gap-x-5" aria-label="Navigation principale">
-                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">Skribblio Tools</RouterLink>
-                    <RouterLink :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">Tableau de bord</RouterLink>
-                    <RouterLink :to="{ name: 'search' }" :class="navLinkClass('search')">Explorer</RouterLink>
+                <nav class="flex items-center gap-x-5" :aria-label="$t('layout.header.mainNavigation')">
+                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
+                    <RouterLink :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">{{ $t('layout.header.dashboard') }}</RouterLink>
+                    <RouterLink :to="{ name: 'search' }" :class="navLinkClass('search')">{{ $t('layout.header.explore') }}</RouterLink>
                 </nav>
                 <!-- The search page has its own, larger search field. -->
                 <form
@@ -35,12 +35,12 @@ async function search(): Promise<void> {
                     class="order-last w-full sm:order-none sm:w-auto sm:flex-1 sm:max-w-sm"
                     @submit.prevent="search"
                 >
-                    <label for="header-search" class="sr-only">Rechercher un groupe ou une collection</label>
+                    <label for="header-search" class="sr-only">{{ $t('layout.header.searchLabel') }}</label>
                     <input
                         id="header-search"
                         v-model="searchQuery"
                         type="search"
-                        placeholder="Rechercher un groupe ou une collection…"
+                        :placeholder="$t('layout.header.searchPlaceholder')"
                         class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                     />
                 </form>
