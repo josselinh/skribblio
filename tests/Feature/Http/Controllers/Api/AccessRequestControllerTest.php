@@ -39,7 +39,10 @@ class AccessRequestControllerTest extends TestCase
     {
         Notification::fake();
         $creator = User::factory()->create();
-        $accessRequest = WordGroupAccessRequest::factory()->for(WordGroup::factory()->private()->createdBy($creator), 'item')->create();
+        $accessRequest = WordGroupAccessRequest::factory()
+            ->for(WordGroup::factory()->private()->createdBy($creator), 'item')
+            ->by(User::factory()->wantsEmails()->create())
+            ->create();
 
         $this->actingAs($creator)->postJson("/api/access-requests/word-groups/{$accessRequest->id}/accept")->assertNoContent();
 
@@ -52,13 +55,29 @@ class AccessRequestControllerTest extends TestCase
     {
         Notification::fake();
         $creator = User::factory()->create();
-        $accessRequest = GroupCollectionAccessRequest::factory()->for(GroupCollection::factory()->private()->createdBy($creator), 'item')->create();
+        $accessRequest = GroupCollectionAccessRequest::factory()
+            ->for(GroupCollection::factory()->private()->createdBy($creator), 'item')
+            ->by(User::factory()->wantsEmails()->create())
+            ->create();
 
         $this->actingAs($creator)->postJson("/api/access-requests/group-collections/{$accessRequest->id}/refuse")->assertNoContent();
 
         $this->assertFalse($accessRequest->item->fresh()->isVisibleTo($accessRequest->requester));
         $this->assertSame('refused', $accessRequest->fresh()->status->value);
         Notification::assertSentTo($accessRequest->requester, AccessRequestDecided::class);
+    }
+
+    public function test_decision_sends_no_email_to_a_requester_who_did_not_turn_them_on(): void
+    {
+        Notification::fake();
+        $requester = User::factory()->create();
+        $accessRequest = WordGroupAccessRequest::factory()->by($requester)->create();
+
+        $this->actingAs($accessRequest->item->creator)
+            ->postJson("/api/access-requests/word-groups/{$accessRequest->id}/accept")
+            ->assertNoContent();
+
+        Notification::assertNothingSentTo($requester);
     }
 
     public function test_decision_returns_403_for_another_user(): void

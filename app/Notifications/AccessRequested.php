@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\EmailNotification;
 use App\Models\GroupCollectionAccessRequest;
 use App\Models\WordGroupAccessRequest;
 use Illuminate\Bus\Queueable;
@@ -24,13 +25,17 @@ class AccessRequested extends Notification implements ShouldQueue
     public function __construct(public WordGroupAccessRequest|GroupCollectionAccessRequest $accessRequest) {}
 
     /**
-     * Get the notification's delivery channels.
+     * Get the notification's delivery channels: none when the creator turned these emails off.
      *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $kind = $this->accessRequest instanceof WordGroupAccessRequest
+            ? EmailNotification::WordGroupAccessRequested
+            : EmailNotification::GroupCollectionAccessRequested;
+
+        return $notifiable->wantsEmail($kind) ? ['mail'] : [];
     }
 
     /**

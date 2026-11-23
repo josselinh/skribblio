@@ -50,7 +50,7 @@ class FavoriteGroupCollectionController extends Controller
     {
         Gate::authorize('favorite', $groupCollection);
 
-        $request->user()->favoriteGroupCollections()->syncWithoutDetaching([$groupCollection->getKey()]);
+        $groupCollection->addToFavoritesOf($request->user());
 
         return response()->noContent();
     }

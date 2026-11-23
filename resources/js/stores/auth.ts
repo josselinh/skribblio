@@ -3,7 +3,8 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { ensureCsrfCookie, http } from '@/lib/http';
 import type { MessageResponse, ResourceResponse } from '@/types/api';
-import type { User } from '@/types/models';
+import { applyTheme } from '@/lib/theme';
+import type { EmailNotification, Theme, User } from '@/types/models';
 
 export interface LoginPayload {
     email: string;
@@ -29,6 +30,11 @@ export interface UpdatePasswordPayload {
     password_confirmation: string;
 }
 
+export interface PreferencesPayload {
+    theme?: Theme;
+    email_notifications?: Partial<Record<EmailNotification, boolean>>;
+}
+
 export interface ResetPasswordPayload {
     token: string;
     email: string;
@@ -43,10 +49,16 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => user.value !== null);
     const isVerified = computed(() => user.value?.email_verified_at != null);
 
+    /** Stores the user and applies their theme (a visitor keeps the one last used on this device). */
+    function setUser(newUser: User): void {
+        user.value = newUser;
+        applyTheme(newUser.theme);
+    }
+
     async function fetchUser(): Promise<User | null> {
         try {
             const { data } = await http.get<ResourceResponse<User>>('/api/user');
-            user.value = data.data;
+            setUser(data.data);
         } catch (error) {
             if (!isAxiosError(error) || error.response?.status !== 401) {
                 throw error;
@@ -110,6 +122,12 @@ export const useAuthStore = defineStore('auth', () => {
         await fetchUser();
     }
 
+    /** Saves the theme and/or some email preferences; the other ones are kept. */
+    async function updatePreferences(payload: PreferencesPayload): Promise<void> {
+        const { data } = await http.patch<ResourceResponse<User>>('/api/user/preferences', payload);
+        setUser(data.data);
+    }
+
     async function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
         await http.put('/user/password', payload);
     }
@@ -142,6 +160,7 @@ export const useAuthStore = defineStore('auth', () => {
         resetPassword,
         updateProfileInformation,
         updatePassword,
+        updatePreferences,
         deleteAccount,
         clear,
     };

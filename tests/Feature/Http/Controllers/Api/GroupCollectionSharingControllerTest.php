@@ -28,8 +28,8 @@ class GroupCollectionSharingControllerTest extends TestCase
     {
         Notification::fake();
         $viewer = User::factory()->create();
-        $alice = User::factory()->create();
-        $bob = User::factory()->create();
+        $alice = User::factory()->wantsEmails()->create();
+        $bob = User::factory()->wantsEmails()->create();
         $alicesGroup = WordGroup::factory()->private()->createdBy($alice)->create();
         $bobsGroup = WordGroup::factory()->private()->createdBy($bob)->create();
         $groupCollection = GroupCollection::factory()->public()

@@ -1,5 +1,11 @@
 {
     "title": "Mon profil",
+    "nav": {
+        "label": "Mon compte",
+        "profile": "Profil",
+        "security": "Sécurité",
+        "preferences": "Préférences"
+    },
     "information": {
         "title": "Informations",
         "emailHint": "Si vous la modifiez, vous devrez confirmer la nouvelle adresse avant de continuer.",
@@ -19,5 +25,31 @@
         "password": "Mot de passe, pour confirmer",
         "failed": "Impossible de supprimer votre compte. Réessayez.",
         "done": "Votre compte a été supprimé."
+    },
+    "security": {
+        "title": "Sécurité"
+    },
+    "preferences": {
+        "title": "Préférences",
+        "saved": "Vos préférences ont été enregistrées.",
+        "failed": "Impossible d’enregistrer vos préférences. Réessayez.",
+        "theme": {
+            "title": "Thème",
+            "description": "Le thème système suit le réglage de votre appareil.",
+            "system": "Système",
+            "light": "Clair",
+            "dark": "Foncé"
+        },
+        "emails": {
+            "title": "Emails",
+            "description": "Choisissez les emails que vous recevez. Ceux qui concernent votre compte (confirmation d’adresse, mot de passe oublié) sont toujours envoyés.",
+            "accessRequests": "Demandes d’accès et de contribution",
+            "favorites": "Favoris",
+            "word_group_access_requested": "Quelqu’un demande l’accès à l’un de vos groupes, ou à y contribuer",
+            "group_collection_access_requested": "Quelqu’un demande l’accès à l’une de vos collections, ou à y contribuer",
+            "access_request_decided": "Une de vos demandes est acceptée ou refusée",
+            "word_group_favorited": "Quelqu’un ajoute l’un de vos groupes à ses favoris",
+            "group_collection_favorited": "Quelqu’un ajoute l’une de vos collections à ses favoris"
+        }
     }
 }

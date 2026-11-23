@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\EmailNotification;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +32,16 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Indicate that the user turned on every optional email (they are all off by default).
+     */
+    public function wantsEmails(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_notifications' => array_fill_keys(EmailNotification::values(), true),
+        ]);
     }
 
     /**

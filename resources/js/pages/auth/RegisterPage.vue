@@ -29,7 +29,8 @@ async function submit(): Promise<void> {
                 id="name"
                 v-model="form.data.name"
                 :label="$t('auth.fields.name')"
-                autocomplete="name"
+                autocomplete="nickname"
+                :hint="$t('auth.fields.nameHint')"
                 :error="form.errors.value.name"
                 required
             />

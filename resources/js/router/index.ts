@@ -79,7 +79,19 @@ export const router = createRouter({
         {
             path: '/profile',
             name: 'profile',
-            component: () => import('@/pages/ProfilePage.vue'),
+            component: () => import('@/pages/account/ProfilePage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
+            path: '/security',
+            name: 'security',
+            component: () => import('@/pages/account/SecurityPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
+            path: '/preferences',
+            name: 'preferences',
+            component: () => import('@/pages/account/PreferencesPage.vue'),
             meta: { requiresVerified: true },
         },
         {

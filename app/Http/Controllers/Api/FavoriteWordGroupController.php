@@ -50,7 +50,7 @@ class FavoriteWordGroupController extends Controller
     {
         Gate::authorize('favorite', $wordGroup);
 
-        $request->user()->favoriteWordGroups()->syncWithoutDetaching([$wordGroup->getKey()]);
+        $wordGroup->addToFavoritesOf($request->user());
 
         return response()->noContent();
     }

@@ -24,6 +24,8 @@
     },
     "userMenu": {
         "profile": "Mon profil",
+        "security": "Sécurité",
+        "preferences": "Préférences",
         "logout": "Se déconnecter"
     },
     "toasts": {
