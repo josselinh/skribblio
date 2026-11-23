@@ -29,8 +29,8 @@ class GroupCollectionFactory extends Factory
     }
 
     /**
-     * A collection must contain at least one group: when none was attached
-     * (e.g. with hasAttached()), one group of the same creator and language is added.
+     * Most collections contain groups: when none was attached (e.g. with hasAttached()), one group of the
+     * same creator and language is added (detach it for an empty collection).
      */
     public function configure(): static
     {

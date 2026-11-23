@@ -10,7 +10,7 @@
     },
     "picker": {
         "label": "Groupes",
-        "hint": "Vos groupes et les groupes publics des autres utilisateurs. Au moins un.",
+        "hint": "Vos groupes et les groupes publics des autres utilisateurs.",
         "selected": "Groupes sélectionnés",
         "remove": "Retirer {name}"
     },

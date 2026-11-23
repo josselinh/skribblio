@@ -10,13 +10,11 @@ return [
     'word_groups' => [
         'language_mismatch' => 'The groups of a collection must all be in :language, like the collection.',
         'wrong_language' => 'This group is in :group_language, whereas this collection is in :language.',
-        'required' => 'Choose at least one group.',
         'not_found' => 'One or more of the selected groups could not be found.',
     ],
     'remove_word_groups' => [
         'required' => 'Select at least one group.',
         'max' => 'You can remove at most :max groups at once.',
         'no_longer_in_collection' => 'One of the selected groups is no longer in the collection.',
-        'last_word_group' => 'A collection must contain at least one group.',
     ],
 ];

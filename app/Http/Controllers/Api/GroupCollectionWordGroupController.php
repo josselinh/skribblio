@@ -31,7 +31,7 @@ class GroupCollectionWordGroupController extends Controller
     }
 
     /**
-     * Remove several groups from the collection, which must keep at least one group. The creator can remove
+     * Remove several groups from the collection, possibly all of them. The creator can remove
      * any group, a contributor the groups they added while the collection is open to contributions. Nothing
      * is removed unless the user may remove every one of them; the collection is touched once.
      */

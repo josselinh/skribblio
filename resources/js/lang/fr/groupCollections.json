@@ -32,7 +32,7 @@
         "editGroups": "Modifier les groupes",
         "membersOnly": "Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes. Demandez-lui son lien de partage pour lui proposer de contribuer.",
         "closed": "Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.",
-        "empty": "Cette collection ne contient plus aucun groupe : ceux qu’elle contenait ont été supprimés.",
+        "empty": "Cette collection ne contient aucun groupe.",
         "noVisibleGroup": "Aucun groupe visible dans cette collection.",
         "addition": {
             "title": "Ajouter ce groupe à la collection ?",
@@ -46,8 +46,7 @@
         "removal": {
             "title": "Supprimer ce groupe de la collection ? | Supprimer {n} groupes de la collection ?",
             "message": "Le groupe lui-même et ses mots sont conservés : il est seulement retiré de cette collection. | Les groupes eux-mêmes et leurs mots sont conservés : ils sont seulement retirés de cette collection.",
-            "done": "1 groupe supprimé de la collection. | {n} groupes supprimés de la collection.",
-            "keepOne": "Une collection doit contenir au moins un groupe : gardez-en au moins un."
+            "done": "1 groupe supprimé de la collection. | {n} groupes supprimés de la collection."
         }
     }
 }

@@ -40,7 +40,7 @@ usePageTitle(() => groupCollection.value?.name);
 
 const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((wordGroup) => wordGroup.id) ?? []);
 
-/** Includes the groups hidden from the user: the collection must keep at least one group. */
+/** Includes the groups hidden from the user. */
 const totalWordGroupsCount = computed(() =>
     groupCollection.value ? groupCollection.value.word_groups.length + groupCollection.value.hidden_word_groups_count : 0,
 );
@@ -175,19 +175,18 @@ async function addWordGroup(): Promise<void> {
 }
 
 /**
- * Selection mode: the groups the user may remove become selectable, and are removed together. The
- * collection must keep at least one group, hidden ones included.
+ * Selection mode: the groups the user may remove become selectable, and are removed together (possibly
+ * all of them).
  */
 const isSelectingGroups = ref(false);
 const selectedWordGroupIds = ref<string[]>([]);
 const removableWordGroups = computed(
     () => groupCollection.value?.word_groups.filter((wordGroup) => wordGroup.can.remove_from_collection) ?? [],
 );
-const canRemoveWordGroups = computed(() => removableWordGroups.value.length > 0 && totalWordGroupsCount.value > 1);
+const canRemoveWordGroups = computed(() => removableWordGroups.value.length > 0);
 const areAllRemovableWordGroupsSelected = computed(
     () => removableWordGroups.value.length > 0 && selectedWordGroupIds.value.length === removableWordGroups.value.length,
 );
-const wouldEmptyCollection = computed(() => selectedWordGroupIds.value.length >= totalWordGroupsCount.value);
 const isConfirmingRemoval = ref(false);
 const removalError = ref<string | null>(null);
 
@@ -412,7 +411,7 @@ watch(
                             </button>
                             <button
                                 type="button"
-                                :disabled="selectedWordGroupIds.length === 0 || wouldEmptyCollection || isUpdatingGroups"
+                                :disabled="selectedWordGroupIds.length === 0 || isUpdatingGroups"
                                 class="font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
                                 aria-haspopup="dialog"
                                 @click="askRemovalConfirmation"
@@ -421,9 +420,6 @@ watch(
                             </button>
                         </div>
                     </div>
-                    <p v-if="wouldEmptyCollection && selectedWordGroupIds.length > 0" class="mt-1 text-amber-700 dark:text-amber-300">
-                        {{ $t('groupCollections.show.removal.keepOne') }}
-                    </p>
                 </div>
 
                 <ul
