@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useToasts } from '@/composables/useToasts';
 import type { SortDirection, WordSort } from '@/types/models';
 
 /**
  * Order of a group's words: one pill per criterion, then a button that reverses the direction.
  * Choosing a criterion sorts in its natural direction.
+ * A locked criterion (for visitors) stays visible but only shows a notification asking to log in.
  */
 const props = defineProps<{
     sort: WordSort;
@@ -14,6 +16,10 @@ const props = defineProps<{
     defaultDirections: Record<WordSort, SortDirection>;
     /** Offers sorting by votes. */
     showVotes: boolean;
+    /** Offers sorting by author (not to visitors, who do not see the authors). */
+    showAuthor: boolean;
+    /** Criteria shown but asking to log in. */
+    lockedSorts: WordSort[];
 }>();
 
 const emit = defineEmits<{
@@ -26,9 +32,17 @@ const sorts: WordSort[] = ['created', 'name', 'score', 'author', 'updated'];
 
 const options = computed(() =>
     sorts
-        .filter((sort) => sort !== 'score' || props.showVotes)
+        .filter((sort) => (sort !== 'score' || props.showVotes) && (sort !== 'author' || props.showAuthor))
         .map((sort) => ({ value: sort, label: t(`words.sort.criteria.${sort}`) })),
 );
+
+const { showToast } = useToasts();
+const LOCKED_OPTION_TOAST_MS = 5000;
+
+/** The header has the links to log in and register: the notification only says why nothing happens. */
+function onLockedSortClick(): void {
+    showToast(t('guest.lockedOption'), 'info', LOCKED_OPTION_TOAST_MS);
+}
 
 
 const pillClass = (isActive: boolean) =>
@@ -43,16 +57,26 @@ const pillClass = (isActive: boolean) =>
         <fieldset class="flex flex-wrap items-center gap-1.5">
             <legend class="sr-only">{{ $t('words.sort.legend') }}</legend>
             <span class="text-xs text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
-            <label v-for="option in options" :key="option.value" :class="pillClass(sort === option.value)">
-                <input
-                    type="radio"
-                    name="word-sort"
-                    class="sr-only"
-                    :checked="sort === option.value"
-                    @change="emit('sort', option.value, defaultDirections[option.value])"
-                />
-                {{ option.label }}
-            </label>
+            <template v-for="option in options" :key="option.value">
+                <button
+                    v-if="lockedSorts.includes(option.value)"
+                    type="button"
+                    :class="pillClass(false)"
+                    @click="onLockedSortClick"
+                >
+                    {{ option.label }}
+                </button>
+                <label v-else :class="pillClass(sort === option.value)">
+                    <input
+                        type="radio"
+                        name="word-sort"
+                        class="sr-only"
+                        :checked="sort === option.value"
+                        @change="emit('sort', option.value, defaultDirections[option.value])"
+                    />
+                    {{ option.label }}
+                </label>
+            </template>
         </fieldset>
         <button
             type="button"

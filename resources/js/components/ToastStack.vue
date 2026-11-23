@@ -41,6 +41,7 @@ watch(
 const toneClasses: Record<string, string> = {
     success: 'border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200',
     error: 'border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200',
+    info: 'border-brand-200 dark:border-brand-900 bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-200',
 };
 </script>
 

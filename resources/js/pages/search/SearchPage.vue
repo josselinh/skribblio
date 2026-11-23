@@ -7,7 +7,10 @@ import AppLayout from '@/components/AppLayout.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
+import { useToasts } from '@/composables/useToasts';
+import { useAuthStore } from '@/stores/auth';
 import type { AuthorFilter, SearchSort } from '@/types/models';
 
 type TypeFilter = 'all' | 'word-groups' | 'group-collections';
@@ -16,8 +19,25 @@ type TypeFilter = 'all' | 'word-groups' | 'group-collections';
 const PREVIEW_SIZE = 6;
 const PAGE_SIZE = 12;
 const DEFAULT_SORT: SearchSort = 'recent';
+/** Sorts shown to visitors but asking them to log in. */
+const MEMBERS_ONLY_SORTS: readonly SearchSort[] = ['popular', 'largest'];
 
 const { t } = useI18n();
+const auth = useAuthStore();
+
+/**
+ * Visitors (and users whose email is not verified, whom the API treats the same way) only see public items:
+ * they cannot filter by author, and the members-only sorts are shown but ask them to log in.
+ */
+const isMember = computed(() => auth.isVerified);
+const isSortLocked = (value: SearchSort): boolean => !isMember.value && MEMBERS_ONLY_SORTS.includes(value);
+const { showToast } = useToasts();
+const LOCKED_OPTION_TOAST_MS = 5000;
+
+/** A locked sort only tells the visitor to log in (the header has the links), without any request. */
+function onLockedSortClick(): void {
+    showToast(t('guest.lockedOption'), 'info', LOCKED_OPTION_TOAST_MS);
+}
 
 const typeOptions = computed(() => [
     { value: 'all' as const, label: t('search.types.all') },
@@ -36,7 +56,7 @@ const sortOptions = computed(() =>
  * so it shows their groups and collections by default.
  */
 function defaultAuthor(search: string): AuthorFilter {
-    return search ? 'all' : 'others';
+    return search || !isMember.value ? 'all' : 'others';
 }
 
 const route = useRoute();
@@ -51,8 +71,14 @@ function queryValue<T extends string>(key: string, allowed: readonly T[], fallba
 const q = computed(() => (typeof route.query.q === 'string' ? route.query.q : ''));
 const type = computed(() => queryValue<TypeFilter>('type', ['all', 'word-groups', 'group-collections'], 'all'));
 const isCatalogue = computed(() => q.value === '');
-const author = computed(() => queryValue<AuthorFilter>('author', ['all', 'me', 'others'], defaultAuthor(q.value)));
-const sort = computed(() => queryValue<SearchSort>('sort', ['recent', 'popular', 'largest', 'name'], DEFAULT_SORT));
+const author = computed(() =>
+    isMember.value ? queryValue<AuthorFilter>('author', ['all', 'me', 'others'], defaultAuthor(q.value)) : 'all',
+);
+const sort = computed(() =>
+    queryValue<SearchSort>('sort', (['recent', 'popular', 'largest', 'name'] as const).filter((value) => !isSortLocked(value)), DEFAULT_SORT),
+);
+
+usePageTitle(() => (q.value ? t('search.resultsFor', { q: q.value }) : t('search.title')));
 
 const searchInput = ref(q.value);
 watch(q, (value) => (searchInput.value = value));
@@ -170,7 +196,7 @@ const pillClass = (isActive: boolean) =>
                     {{ option.label }}
                 </label>
             </fieldset>
-            <fieldset class="flex flex-wrap items-center gap-2">
+            <fieldset v-if="isMember" class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">{{ $t('search.filters.author') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.authorPrefix') }}</span>
                 <label v-for="option in authorOptions" :key="option.value" :class="pillClass(author === option.value)">
@@ -187,16 +213,27 @@ const pillClass = (isActive: boolean) =>
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">{{ $t('search.filters.sort') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
-                <label v-for="option in sortOptions" :key="option.value" :class="pillClass(sort === option.value)">
-                    <input
-                        type="radio"
-                        name="sort"
-                        class="sr-only"
-                        :checked="sort === option.value"
-                        @change="updateQuery({ sort: option.value })"
-                    />
-                    {{ option.label }}
-                </label>
+                <template v-for="option in sortOptions" :key="option.value">
+                    <!-- Shown to visitors too, so that they know it exists, but it asks them to log in. -->
+                    <button
+                        v-if="isSortLocked(option.value)"
+                        type="button"
+                        :class="pillClass(false)"
+                        @click="onLockedSortClick"
+                    >
+                        {{ option.label }}
+                    </button>
+                    <label v-else :class="pillClass(sort === option.value)">
+                        <input
+                            type="radio"
+                            name="sort"
+                            class="sr-only"
+                            :checked="sort === option.value"
+                            @change="updateQuery({ sort: option.value })"
+                        />
+                        {{ option.label }}
+                    </label>
+                </template>
             </fieldset>
         </div>
 

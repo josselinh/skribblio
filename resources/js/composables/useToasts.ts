@@ -1,6 +1,7 @@
 import { readonly, ref } from 'vue';
 
-export type ToastTone = 'success' | 'error';
+/** `info` for a neutral message, e.g. an option that needs an account. */
+export type ToastTone = 'success' | 'error' | 'info';
 
 export interface Toast {
     id: number;

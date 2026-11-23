@@ -17,21 +17,23 @@ const form = useForm({ email: '', password: '', remember: false });
 /** E.g. the confirmation that the account was deleted. */
 const status = consumeHistoryStatus();
 
-/** Only follows internal paths, to avoid open redirects. */
-function redirectTarget(): string | { name: string } {
+/**
+ * Only follows internal paths, to avoid open redirects. Without one, goes back to the page remembered when
+ * the visitor chose to register (and finally logged in instead), or to the dashboard.
+ */
+function redirectTarget(pendingRedirect: string | null): string | { name: string } {
     const redirect = route.query.redirect;
 
     return typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')
         ? redirect
-        : { name: 'dashboard' };
+        : (pendingRedirect ?? { name: 'dashboard' });
 }
 
 async function submit(): Promise<void> {
     const isSuccessful = await form.submit((data) => auth.login(data));
 
     if (isSuccessful) {
-        consumePendingRedirect();
-        await router.push(redirectTarget());
+        await router.push(redirectTarget(consumePendingRedirect()));
     } else {
         form.reset('password');
     }

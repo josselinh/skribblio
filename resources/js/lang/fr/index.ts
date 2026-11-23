@@ -8,6 +8,7 @@ import editing from './editing.json';
 import exports from './exports.json';
 import favorites from './favorites.json';
 import groupCollections from './groupCollections.json';
+import guest from './guest.json';
 import layout from './layout.json';
 import leaving from './leaving.json';
 import profile from './profile.json';
@@ -30,6 +31,7 @@ export default {
     exports,
     favorites,
     groupCollections,
+    guest,
     layout,
     leaving,
     profile,

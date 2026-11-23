@@ -3,15 +3,23 @@ import { ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import AppFooter from '@/components/AppFooter.vue';
 import UserMenu from '@/components/UserMenu.vue';
+import { rememberPendingRedirect } from '@/lib/pendingRedirect';
+import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 
 const searchQuery = ref('');
 
 /** Navigation link style, darker for the current page's section. */
 const navLinkClass = (routeName: string) =>
     route.name === routeName ? 'text-sm font-medium text-brand-700 dark:text-brand-300' : 'text-sm text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300';
+
+/** Registering goes through the email verification, opened in a new tab: the page is remembered until then. */
+function rememberCurrentPage(): void {
+    rememberPendingRedirect(route.fullPath);
+}
 
 async function search(): Promise<void> {
     await router.push({ name: 'search', query: { q: searchQuery.value.trim() || undefined } });
@@ -24,8 +32,8 @@ async function search(): Promise<void> {
         <header class="border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" :aria-label="$t('layout.header.mainNavigation')">
-                    <RouterLink :to="{ name: 'dashboard' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
-                    <RouterLink :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">{{ $t('layout.header.dashboard') }}</RouterLink>
+                    <RouterLink :to="{ name: auth.isAuthenticated ? 'dashboard' : 'search' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
+                    <RouterLink v-if="auth.isAuthenticated" :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">{{ $t('layout.header.dashboard') }}</RouterLink>
                     <RouterLink :to="{ name: 'search' }" :class="navLinkClass('search')">{{ $t('layout.header.explore') }}</RouterLink>
                 </nav>
                 <!-- The search page has its own, larger search field. -->
@@ -45,7 +53,19 @@ async function search(): Promise<void> {
                     />
                 </form>
                 <!-- Kept on the right when the header wraps on phones, so that its menu, aligned on its right edge, stays on screen. -->
-                <UserMenu class="ml-auto" />
+                <UserMenu v-if="auth.isAuthenticated" class="ml-auto" />
+                <div v-else class="ml-auto flex items-center gap-3">
+                    <RouterLink :to="{ name: 'login', query: { redirect: route.fullPath } }" class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300">
+                        {{ $t('guest.login') }}
+                    </RouterLink>
+                    <RouterLink
+                        :to="{ name: 'register' }"
+                        class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
+                        @click="rememberCurrentPage"
+                    >
+                        {{ $t('guest.register') }}
+                    </RouterLink>
+                </div>
             </div>
         </header>
         <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
