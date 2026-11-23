@@ -3,18 +3,21 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AccountNav from '@/components/AccountNav.vue';
 import AppLayout from '@/components/AppLayout.vue';
+import { useLocaleChoice } from '@/composables/useLocaleChoice';
 import { useToasts } from '@/composables/useToasts';
+import { LOCALES } from '@/lib/i18n';
 import { applyTheme } from '@/lib/theme';
 import { useAuthStore } from '@/stores/auth';
 import type { EmailNotification, Theme } from '@/types/models';
 
 /**
- * The user's preferences, each saved as soon as it changes (optimistic, reverted on failure): the theme, applied
- * at once, and the emails they receive.
+ * The user's preferences, each saved as soon as it changes (optimistic, reverted on failure): the interface's
+ * language and the theme, applied at once, and the emails they receive.
  */
 const auth = useAuthStore();
 const { showToast } = useToasts();
 const { t } = useI18n();
+const { locale, changeLocale } = useLocaleChoice();
 
 const themes: Theme[] = ['system', 'light', 'dark'];
 
@@ -68,6 +71,22 @@ async function toggleEmail(notification: EmailNotification, isWanted: boolean): 
         <div class="mx-auto max-w-lg">
             <h1 class="text-2xl font-semibold">{{ $t('profile.preferences.title') }}</h1>
             <AccountNav class="mt-4" />
+
+            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="language-title">
+                <h2 id="language-title" class="text-lg font-semibold">{{ $t('profile.preferences.language.title') }}</h2>
+                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $t('profile.preferences.language.description') }}</p>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="language-title">
+                    <label
+                        v-for="choice in LOCALES"
+                        :key="choice"
+                        :lang="choice"
+                        class="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
+                    >
+                        <input type="radio" name="locale" :value="choice" :checked="locale === choice" @change="changeLocale(choice)" />
+                        <span class="text-sm font-medium">{{ $t(`layout.locales.${choice}`) }}</span>
+                    </label>
+                </div>
+            </section>
 
             <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="theme-title">
                 <h2 id="theme-title" class="text-lg font-semibold">{{ $t('profile.preferences.theme.title') }}</h2>

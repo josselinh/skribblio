@@ -1,0 +1,127 @@
+{
+    "pendingRequest": "Access request pending.",
+    "request": {
+        "access": {
+            "withoutItem": "{user} is asking for access",
+            "wordGroup": "{user} is asking for access to the group {item}",
+            "groupCollection": "{user} is asking for access to the collection {item}"
+        },
+        "contribution": {
+            "withoutItem": "{user} is asking to contribute",
+            "wordGroup": "{user} is asking to contribute to the group {item}",
+            "groupCollection": "{user} is asking to contribute to the collection {item}"
+        },
+        "viaCollection": "From the collection “{name}”",
+        "accept": "Accept",
+        "refuse": "Refuse",
+        "accepted": "Request from {name} accepted.",
+        "refused": "Request from {name} refused."
+    },
+    "accept": {
+        "processing": "Accepting…",
+        "title": {
+            "access": "Give access?",
+            "contribution": "Allow to contribute?"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} will have access to the group “{item}” and can export its words. You can remove their access at any time.",
+                "groupCollection": "{name} will have access to the collection “{item}” and can export its words. You can remove their access at any time."
+            },
+            "contribution": {
+                "wordGroup": "{name} will be able to contribute to the group “{item}”. You can withdraw this permission at any time.",
+                "groupCollection": "{name} will be able to contribute to the collection “{item}”. You can withdraw this permission at any time."
+            }
+        }
+    },
+    "management": {
+        "label": "Access",
+        "loadFailed": "The access list could not be loaded.",
+        "requests": {
+            "access": "Access requests",
+            "contribution": "Contribution requests"
+        },
+        "members": {
+            "access": "People with access",
+            "contribution": "People allowed to contribute"
+        },
+        "noMembers": "Nobody but you for now. Send the invitation link to receive requests.",
+        "since": "Since {date}"
+    },
+    "revoke": {
+        "button": "Remove",
+        "processing": "Removing…",
+        "title": {
+            "access": "Remove access?",
+            "contribution": "Withdraw the permission to contribute?"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} will no longer have access to this group. They can ask you for access again with the share link.",
+                "groupCollection": "{name} will no longer have access to this collection. They can ask you for access again with the share link."
+            },
+            "contribution": {
+                "wordGroup": "{name} will no longer be able to contribute to this group. Their contributions are kept, and they can ask you for permission again.",
+                "groupCollection": "{name} will no longer be able to contribute to this collection. Their contributions are kept, and they can ask you for permission again."
+            }
+        },
+        "done": {
+            "access": "{name} no longer has access.",
+            "contribution": "{name} can no longer contribute."
+        }
+    },
+    "invite": {
+        "button": "Invite",
+        "title": {
+            "access": "Invite people",
+            "contribution": "Invite contributors"
+        },
+        "description": {
+            "access": "People who open this link can ask you for access. You will accept or refuse each request.",
+            "contribution": "People who open this link can ask you to contribute. You will accept or refuse each request."
+        },
+        "link": {
+            "access": "Access request link",
+            "contribution": "Contribution request link"
+        }
+    },
+    "link": {
+        "copied": "Link copied.",
+        "copyFailed": "Could not copy: select the link and copy it.",
+        "regenerated": "New link created. The old one no longer works.",
+        "regenerate": "Regenerate the link",
+        "regenerateConfirm": "Regenerate",
+        "regenerateWarning": "The old link will no longer work. Continue?"
+    },
+    "invitation": {
+        "invalid": {
+            "title": "Invalid link",
+            "description": "This share link does not exist or is no longer valid. Ask for a new one."
+        },
+        "loadFailed": "The share could not be loaded.",
+        "sharedBy": {
+            "access": {
+                "wordGroup": "{name} is sharing the private group",
+                "groupCollection": "{name} is sharing the private collection"
+            },
+            "contribution": {
+                "wordGroup": "{name} is sharing the group",
+                "groupCollection": "{name} is sharing the collection"
+            }
+        },
+        "membersOnly": {
+            "wordGroup": "Everyone can view it, but only the people allowed by {name} can contribute to it.",
+            "groupCollection": "Everyone can view it, but only the people allowed by {name} can contribute to it."
+        },
+        "seeContent": "See the content",
+        "sent": {
+            "access": "Access request sent. You will receive an email as soon as {name} has handled it.",
+            "contribution": "Contribution request sent. You will receive an email as soon as {name} has handled it."
+        },
+        "refused": "Your previous request was refused. You can send a new one.",
+        "send": {
+            "access": "Send an access request",
+            "contribution": "Ask to contribute"
+        }
+    }
+}

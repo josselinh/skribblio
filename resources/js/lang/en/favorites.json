@@ -1,0 +1,15 @@
+{
+    "added": {
+        "wordGroup": "Group “{name}” added to favorites.",
+        "groupCollection": "Collection “{name}” added to favorites."
+    },
+    "removed": {
+        "wordGroup": "Group “{name}” removed from favorites.",
+        "groupCollection": "Collection “{name}” removed from favorites."
+    },
+    "failed": "Could not update your favorites, please try again.",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "addNamed": "Add {name} to favorites",
+    "removeNamed": "Remove {name} from favorites"
+}

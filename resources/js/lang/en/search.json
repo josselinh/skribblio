@@ -1,0 +1,35 @@
+{
+    "title": "Explore",
+    "resultsFor": "Results for “{q}”",
+    "catalogueDescription": "Discover the groups and collections shared by other users, or search for one by its name.",
+    "placeholder": "Name of a group or a collection…",
+    "submit": "Search",
+    "filters": {
+        "type": "Type",
+        "typePrefix": "Type:",
+        "author": "Created by",
+        "authorPrefix": "Created by:",
+        "sort": "Sort by"
+    },
+    "types": {
+        "all": "All",
+        "wordGroups": "Groups",
+        "groupCollections": "Collections"
+    },
+    "authors": {
+        "all": "Everyone",
+        "me": "Me",
+        "others": "Others"
+    },
+    "sorts": {
+        "recent": "Recent",
+        "popular": "Popular",
+        "largest": "Largest",
+        "name": "A → Z"
+    },
+    "emptyGroupCollections": "No collection found.",
+    "seeAll": {
+        "wordGroups": "See the {count} groups →",
+        "groupCollections": "See the {count} collections →"
+    }
+}

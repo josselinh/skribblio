@@ -3,7 +3,8 @@
         "license": "Projet open source sous licence MIT",
         "sourceCode": "Code source sur GitHub",
         "reportIssue": "Signaler un problème",
-        "notAffiliated": "Projet indépendant, non affilié à Skribbl.io."
+        "notAffiliated": "Projet indépendant, non affilié à Skribbl.io.",
+        "language": "Langue"
     },
     "notFound": {
         "title": "Page introuvable",
@@ -30,5 +31,9 @@
     },
     "toasts": {
         "close": "Fermer la notification"
+    },
+    "locales": {
+        "fr": "Français",
+        "en": "English"
     }
 }

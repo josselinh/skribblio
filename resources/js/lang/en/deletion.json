@@ -1,0 +1,18 @@
+{
+    "button": "Delete",
+    "confirm": "Delete permanently",
+    "processing": "Deleting…",
+    "failed": "Could not delete. Try again.",
+    "title": {
+        "wordGroup": "Delete this group?",
+        "groupCollection": "Delete this collection?"
+    },
+    "warning": {
+        "wordGroup": "The group and all its words will be deleted, and it will be removed from the collections that contain it. This cannot be undone.",
+        "groupCollection": "The collection will be deleted, but not the groups it contains. This cannot be undone."
+    },
+    "done": {
+        "wordGroup": "Group deleted.",
+        "groupCollection": "Collection deleted."
+    }
+}

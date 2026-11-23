@@ -1,6 +1,9 @@
 /** Colour theme of the interface: the system's one, or forced light or dark. */
 export type Theme = 'system' | 'light' | 'dark';
 
+/** Language of the interface (and of the emails sent to the user). */
+export type Locale = 'fr' | 'en';
+
 /** Kinds of emails the user chooses to receive or not (account emails are always sent). */
 export type EmailNotification =
     | 'word_group_access_requested'
@@ -17,6 +20,7 @@ export interface User {
     email: string;
     email_verified_at: string | null;
     theme: Theme;
+    locale: Locale;
     /** Whether each kind of email is sent to the user. */
     email_notifications: Record<EmailNotification, boolean>;
     created_at: string | null;

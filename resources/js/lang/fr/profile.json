@@ -33,6 +33,10 @@
         "title": "Préférences",
         "saved": "Vos préférences ont été enregistrées.",
         "failed": "Impossible d’enregistrer vos préférences. Réessayez.",
+        "language": {
+            "title": "Langue de l’interface",
+            "description": "La langue des menus, des boutons et des emails. Elle ne change pas la langue des mots."
+        },
         "theme": {
             "title": "Thème",
             "description": "Le thème système suit le réglage de votre appareil.",

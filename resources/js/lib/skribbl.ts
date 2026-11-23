@@ -34,7 +34,7 @@ export function deduplicateWords(words: readonly string[]): string[] {
     const seen = new Set<string>();
 
     return words.filter((word) => {
-        const key = word.toLocaleLowerCase(intlLocale);
+        const key = word.toLocaleLowerCase(intlLocale());
         if (seen.has(key)) {
             return false;
         }

@@ -1,0 +1,35 @@
+{
+    "search": {
+        "placeholder": "Search for a group…",
+        "empty": "No group found."
+    },
+    "count": "{n} group | {n} groups",
+    "card": {
+        "updatedOn": "Updated on",
+        "becamePrivate": "This group became private: you no longer have access to it."
+    },
+    "picker": {
+        "label": "Groups",
+        "hint": "Your groups and the public groups of other users. At least one.",
+        "selected": "Selected groups",
+        "remove": "Remove {name}"
+    },
+    "create": {
+        "title": "New group",
+        "submit": "Create the group"
+    },
+    "fields": {
+        "name": "Group name"
+    },
+    "show": {
+        "notFound": {
+            "title": "Group not found",
+            "description": "This group does not exist or you do not have access to it."
+        },
+        "loadFailed": "The group could not be loaded.",
+        "membersOnly": "Only the people allowed by the creator of this group can add words to it. Ask them for their share link to offer to contribute.",
+        "closed": "This group is not open to contributions: only its creator can change its words.",
+        "empty": "This group does not contain any word yet.",
+        "editWords": "Edit the words"
+    }
+}
