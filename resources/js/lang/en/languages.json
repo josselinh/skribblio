@@ -1,0 +1,32 @@
+{
+    "names": {
+        "fr": "French",
+        "en": "English"
+    },
+    "codes": {
+        "fr": "FR",
+        "en": "EN"
+    },
+    "badgeHint": {
+        "fr": "Words in French",
+        "en": "Words in English"
+    },
+    "field": {
+        "wordGroup": "Language of the words",
+        "groupCollection": "Language of the groups",
+        "wordGroupHint": "Changing the language removes the group from the collections in the other language: a collection does not mix languages.",
+        "groupCollectionHint": "All the groups of a collection are in its language."
+    },
+    "filter": {
+        "label": "Language of the lists",
+        "prefix": "Language:",
+        "all": "All"
+    },
+    "preference": {
+        "title": "Language of the lists",
+        "description": "The language of the groups and collections suggested by default in Explore, and of your new groups. It can differ from the interface’s, for instance to practise a language."
+    },
+    "picker": {
+        "hint": "Only the groups in the collection’s language are suggested."
+    }
+}

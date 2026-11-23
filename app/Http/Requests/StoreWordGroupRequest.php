@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\WordGroup;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -27,6 +28,7 @@ class StoreWordGroupRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'language' => ['sometimes', Rule::enum(Locale::class)],
             'visibility' => ['required', Rule::enum(Visibility::class)],
             'accepts_contributions' => ['sometimes', 'boolean'],
             'contributions_members_only' => ['sometimes', 'boolean'],
@@ -41,6 +43,7 @@ class StoreWordGroupRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'language' => __('fields.language'),
             'visibility' => __('fields.visibility'),
             'accepts_contributions' => __('fields.accepts_contributions'),
             'contributions_members_only' => __('fields.contributions_members_only'),

@@ -50,16 +50,23 @@ class PreferencesControllerTest extends TestCase
         $this->assertFalse($user->wantsEmail(EmailNotification::GroupCollectionFavorited));
     }
 
-    public function test_updates_the_interface_language(): void
+    public function test_updates_the_interface_and_content_languages_independently(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
             ->patchJson('/api/user/preferences', ['locale' => 'en'])
             ->assertOk()
-            ->assertJsonPath('data.locale', 'en');
+            ->assertJsonPath('data.locale', 'en')
+            ->assertJsonPath('data.content_locale', 'fr');
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['content_locale' => 'en'])
+            ->assertOk()
+            ->assertJsonPath('data.content_locale', 'en');
 
-        $this->assertSame(Locale::En, $user->fresh()->locale);
+        $user->refresh();
+        $this->assertSame(Locale::En, $user->locale);
+        $this->assertSame(Locale::En, $user->content_locale);
     }
 
     public function test_turning_an_email_back_off_stops_it(): void

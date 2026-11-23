@@ -4,14 +4,22 @@ import { createWordGroup } from '@/api/wordGroups';
 import AppLayout from '@/components/AppLayout.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
+import LanguageField from '@/components/LanguageField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
+import { preferredContentLanguage } from '@/lib/contentLanguage';
 import type { Visibility } from '@/types/models';
 
 const router = useRouter();
 
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false, contributions_members_only: false });
+const form = useForm({
+    name: '',
+    language: preferredContentLanguage(),
+    visibility: 'private' as Visibility,
+    accepts_contributions: false,
+    contributions_members_only: false,
+});
 
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
@@ -32,6 +40,7 @@ async function submit(): Promise<void> {
                 @submit.prevent="submit"
             >
                 <FormField id="name" v-model="form.data.name" :label="$t('wordGroups.fields.name')" :error="form.errors.value.name" required />
+                <LanguageField v-model="form.data.language" kind="word-groups" :error="form.errors.value.language" />
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                 <ContributionsField
                     v-model="form.data.accepts_contributions"

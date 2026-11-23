@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\WordGroup;
@@ -30,6 +31,7 @@ class StoreGroupCollectionRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'language' => ['sometimes', Rule::enum(Locale::class)],
             'visibility' => ['required', Rule::enum(Visibility::class)],
             'accepts_contributions' => ['sometimes', 'boolean'],
             'contributions_members_only' => ['sometimes', 'boolean'],
@@ -39,7 +41,8 @@ class StoreGroupCollectionRequest extends FormRequest
     }
 
     /**
-     * Every selected group must exist and be visible to the user (their own groups or public ones).
+     * Every selected group must exist, be visible to the user (their own groups or public ones) and be in the
+     * collection's language.
      *
      * @return array<int, callable>
      */
@@ -52,6 +55,12 @@ class StoreGroupCollectionRequest extends FormRequest
                 }
                 if ($this->wordGroups()->count() !== count($this->input('word_group_ids'))) {
                     $validator->errors()->add('word_group_ids', __('group_collections.word_groups.not_found'));
+
+                    return;
+                }
+                $language = $this->language();
+                if ($this->wordGroups()->contains(fn (WordGroup $wordGroup): bool => $wordGroup->language !== $language)) {
+                    $validator->errors()->add('word_group_ids', __('group_collections.word_groups.language_mismatch', ['language' => $language->label()]));
                 }
             },
         ];
@@ -65,6 +74,7 @@ class StoreGroupCollectionRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'language' => __('fields.language'),
             'visibility' => __('fields.visibility'),
             'accepts_contributions' => __('fields.accepts_contributions'),
             'contributions_members_only' => __('fields.contributions_members_only'),
@@ -83,6 +93,14 @@ class StoreGroupCollectionRequest extends FormRequest
             'word_group_ids.required' => __('group_collections.word_groups.required'),
             'word_group_ids.min' => __('group_collections.word_groups.required'),
         ];
+    }
+
+    /**
+     * Language of the collection: the one given, otherwise the one of its first group.
+     */
+    public function language(): Locale
+    {
+        return Locale::tryFrom((string) $this->validated('language')) ?? $this->wordGroups()->first()->language;
     }
 
     /**

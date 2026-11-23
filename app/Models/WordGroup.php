@@ -6,6 +6,7 @@ use App\Enums\Visibility;
 use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
 use App\Models\Concerns\HasCopyName;
+use App\Models\Concerns\HasLanguage;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use App\Models\Concerns\Shareable;
@@ -19,11 +20,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable(['name', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
+#[Fillable(['name', 'language', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
 class WordGroup extends Model
 {
     /** @use HasFactory<WordGroupFactory> */
-    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasLanguage, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
      * Default values, matching the database defaults: groups are closed to contributions.
@@ -50,6 +51,7 @@ class WordGroup extends Model
         return DB::transaction(function () use ($user): self {
             $copy = $user->wordGroups()->create([
                 'name' => $this->copyName(),
+                'language' => $this->language,
                 'visibility' => Visibility::Private,
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,
@@ -77,6 +79,23 @@ class WordGroup extends Model
     public function words(): HasMany
     {
         return $this->hasMany(Word::class);
+    }
+
+    /**
+     * Once the group's language changed: removes it from the collections in another language (a collection
+     * never mixes languages), as deleting it would, even when it was a collection's last group. Those
+     * collections are touched.
+     */
+    public function detachFromCollectionsInOtherLanguages(): void
+    {
+        $groupCollectionIds = $this->groupCollections()
+            ->where('group_collections.language', '!=', $this->language->value)
+            ->pluck('group_collections.id');
+
+        if ($groupCollectionIds->isNotEmpty()) {
+            $this->groupCollections()->detach($groupCollectionIds);
+            GroupCollection::whereKey($groupCollectionIds)->touch();
+        }
     }
 
     /**

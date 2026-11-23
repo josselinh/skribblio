@@ -1,9 +1,10 @@
 import { http } from '@/lib/http';
 import type { PaginatedResponse, ResourceResponse } from '@/types/api';
-import type { Visibility, WordGroup } from '@/types/models';
+import type { Locale, Visibility, WordGroup } from '@/types/models';
 
 export interface WordGroupPayload {
     name: string;
+    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
@@ -16,9 +17,12 @@ export async function fetchMyWordGroups(page = 1): Promise<PaginatedResponse<Wor
     return data;
 }
 
-/** Groups the current user can see (their own first, then public ones) whose name contains the query. */
-export async function searchWordGroups(query: string): Promise<WordGroup[]> {
-    const { data } = await http.get<{ data: WordGroup[] }>('/api/word-groups/search', { params: { q: query } });
+/**
+ * Groups the current user can see (their own first, then public ones) whose name contains the query, in
+ * `language` only when given.
+ */
+export async function searchWordGroups(query: string, language?: Locale): Promise<WordGroup[]> {
+    const { data } = await http.get<{ data: WordGroup[] }>('/api/word-groups/search', { params: { q: query, language } });
 
     return data.data;
 }

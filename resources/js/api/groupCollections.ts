@@ -1,15 +1,19 @@
 import { http } from '@/lib/http';
 import type { PaginatedResponse, ResourceResponse } from '@/types/api';
-import type { DuplicatedGroupCollection, GroupCollection, GroupCollectionDetail, Visibility } from '@/types/models';
+import type { DuplicatedGroupCollection, GroupCollection, GroupCollectionDetail, Locale, Visibility } from '@/types/models';
 
 export interface GroupCollectionPayload {
     name: string;
+    /** Every group of the collection must be in it. */
+    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
 }
 
-export interface CreateGroupCollectionPayload extends GroupCollectionPayload {
+export interface CreateGroupCollectionPayload extends Omit<GroupCollectionPayload, 'language'> {
+    /** The language of the groups when left out; they must all share it. */
+    language?: Locale;
     /** At least one group. */
     word_group_ids: string[];
 }

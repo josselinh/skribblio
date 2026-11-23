@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
@@ -29,18 +30,25 @@ class GroupCollectionFactory extends Factory
 
     /**
      * A collection must contain at least one group: when none was attached
-     * (e.g. with hasAttached()), one group of the same creator is added.
+     * (e.g. with hasAttached()), one group of the same creator and language is added.
      */
     public function configure(): static
     {
         return $this->afterCreating(function (GroupCollection $groupCollection): void {
             if (! $groupCollection->wordGroups()->exists()) {
                 $groupCollection->wordGroups()->attach(
-                    WordGroup::factory()->createdBy($groupCollection->creator)->create(),
+                    WordGroup::factory()->createdBy($groupCollection->creator)->inLanguage($groupCollection->language)->create(),
                     ['added_by' => $groupCollection->created_by],
                 );
             }
         });
+    }
+
+    public function inLanguage(Locale $language): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'language' => $language,
+        ]);
     }
 
     public function public(): static

@@ -24,6 +24,7 @@ function updateFavorite(isFavorite: boolean): void {
     <ItemCard
         :to="{ name: 'group-collections.show', params: { id: groupCollection.id } }"
         :name="groupCollection.name"
+        :language="groupCollection.language"
         :visibility="groupCollection.visibility"
         :accepts-contributions="groupCollection.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(groupCollection)"

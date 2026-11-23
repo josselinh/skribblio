@@ -8,11 +8,11 @@ import { useToasts } from '@/composables/useToasts';
 import { LOCALES } from '@/lib/i18n';
 import { applyTheme } from '@/lib/theme';
 import { useAuthStore } from '@/stores/auth';
-import type { EmailNotification, Theme } from '@/types/models';
+import type { EmailNotification, Locale, Theme } from '@/types/models';
 
 /**
  * The user's preferences, each saved as soon as it changes (optimistic, reverted on failure): the interface's
- * language and the theme, applied at once, and the emails they receive.
+ * language and the theme, applied at once, the language of the lists they browse, and the emails they receive.
  */
 const auth = useAuthStore();
 const { showToast } = useToasts();
@@ -34,6 +34,19 @@ const emailSections: { title: string; notifications: EmailNotification[] }[] = [
 ];
 
 const theme = ref<Theme>(auth.user?.theme ?? 'system');
+const contentLocale = ref<Locale>(auth.user?.content_locale ?? 'fr');
+
+async function changeContentLocale(newLocale: Locale): Promise<void> {
+    const previousLocale = contentLocale.value;
+    contentLocale.value = newLocale;
+    try {
+        await auth.updatePreferences({ content_locale: newLocale });
+        showToast(t('profile.preferences.saved'));
+    } catch {
+        contentLocale.value = previousLocale;
+        showToast(t('profile.preferences.failed'), 'error');
+    }
+}
 const emailNotifications = ref({ ...auth.user!.email_notifications });
 const isSaving = ref(false);
 
@@ -84,6 +97,21 @@ async function toggleEmail(notification: EmailNotification, isWanted: boolean): 
                     >
                         <input type="radio" name="locale" :value="choice" :checked="locale === choice" @change="changeLocale(choice)" />
                         <span class="text-sm font-medium">{{ $t(`layout.locales.${choice}`) }}</span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="content-language-title">
+                <h2 id="content-language-title" class="text-lg font-semibold">{{ $t('languages.preference.title') }}</h2>
+                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $t('languages.preference.description') }}</p>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="content-language-title">
+                    <label
+                        v-for="choice in LOCALES"
+                        :key="choice"
+                        class="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
+                    >
+                        <input type="radio" name="content-locale" :value="choice" :checked="contentLocale === choice" @change="changeContentLocale(choice)" />
+                        <span class="text-sm font-medium">{{ $t(`languages.names.${choice}`) }}</span>
                     </label>
                 </div>
             </section>

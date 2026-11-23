@@ -39,14 +39,15 @@ class GroupCollectionController extends Controller
     }
 
     /**
-     * Create a collection owned by the current user, with its groups.
+     * Create a collection owned by the current user, with its groups (all in its language).
      */
     public function store(StoreGroupCollectionRequest $request): JsonResponse
     {
         $groupCollection = DB::transaction(function () use ($request) {
-            $groupCollection = $request->user()->groupCollections()->create(
-                $request->safe()->only(['name', 'visibility', 'accepts_contributions', 'contributions_members_only']),
-            );
+            $groupCollection = $request->user()->groupCollections()->create([
+                ...$request->safe()->only(['name', 'visibility', 'accepts_contributions', 'contributions_members_only']),
+                'language' => $request->language(),
+            ]);
             $groupCollection->wordGroups()->attach($request->wordGroups(), ['added_by' => $request->user()->getKey()]);
 
             return $groupCollection->setAttribute('is_favorite', false);

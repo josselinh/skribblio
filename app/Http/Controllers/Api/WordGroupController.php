@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WordGroupController extends Controller
@@ -36,11 +37,14 @@ class WordGroupController extends Controller
     }
 
     /**
-     * Create a group owned by the current user.
+     * Create a group owned by the current user, in their content language unless another one is given.
      */
     public function store(StoreWordGroupRequest $request): JsonResponse
     {
-        $wordGroup = $request->user()->wordGroups()->create($request->validated());
+        $wordGroup = $request->user()->wordGroups()->create([
+            'language' => $request->user()->content_locale,
+            ...$request->validated(),
+        ]);
         $wordGroup->setAttribute('is_favorite', false);
 
         return (new WordGroupResource($wordGroup))->response()->setStatusCode(201);
@@ -53,9 +57,19 @@ class WordGroupController extends Controller
         return new WordGroupResource($wordGroup->load('creator')->loadIsFavorite($request->user()));
     }
 
+    /**
+     * Update a group. Changing its language removes it from the collections in the other language.
+     */
     public function update(UpdateWordGroupRequest $request, WordGroup $wordGroup): WordGroupResource
     {
-        $wordGroup->update($request->validated());
+        DB::transaction(function () use ($request, $wordGroup): void {
+            $wordGroup->fill($request->validated());
+            $hasLanguageChanged = $wordGroup->isDirty('language');
+            $wordGroup->save();
+            if ($hasLanguageChanged) {
+                $wordGroup->detachFromCollectionsInOtherLanguages();
+            }
+        });
 
         return new WordGroupResource($wordGroup->load('creator')->loadIsFavorite($request->user()));
     }

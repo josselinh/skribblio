@@ -35,6 +35,7 @@ class GroupCollectionControllerTest extends TestCase
             ->assertJsonPath('data.0', [
                 'id' => $newerCollection->id,
                 'name' => $newerCollection->name,
+                'language' => 'fr',
                 'visibility' => 'public',
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,
