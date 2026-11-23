@@ -25,7 +25,7 @@ export const router = createRouter({
             /* Redirected by the guard: to the dashboard for logged-in users, to the Explorer for visitors. */
             path: '/',
             name: 'home',
-            component: () => import('@/pages/search/SearchPage.vue'),
+            component: () => import('@/pages/explore/ExplorePage.vue'),
             meta: { isPublic: true },
         },
         {
@@ -65,9 +65,9 @@ export const router = createRouter({
             meta: { isPublic: true },
         },
         {
-            path: '/search',
-            name: 'search',
-            component: () => import('@/pages/search/SearchPage.vue'),
+            path: '/explore',
+            name: 'explore',
+            component: () => import('@/pages/explore/ExplorePage.vue'),
             meta: { isPublic: true },
         },
         {
@@ -131,7 +131,7 @@ router.beforeEach(async (to) => {
     await auth.ensureLoaded();
 
     if (to.name === 'home') {
-        return auth.isAuthenticated ? { name: 'dashboard' } : { name: 'search' };
+        return auth.isAuthenticated ? { name: 'dashboard' } : { name: 'explore' };
     }
 
     if ((to.meta.requiresAuth || to.meta.requiresVerified) && !auth.isAuthenticated) {
