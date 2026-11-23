@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\WordVote;
 use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\Word;
@@ -18,7 +19,7 @@ class WordExportControllerTest extends TestCase
         $wordGroup = WordGroup::factory()->public()->create();
         Word::factory()->for($wordGroup)->create(['name' => 'chat']);
 
-        $this->getJson("/api/word-groups/{$wordGroup->id}/export")->assertOk()->assertExactJson(['data' => ['chat']]);
+        $this->getJson("/api/word-groups/{$wordGroup->id}/export")->assertOk()->assertExactJson(['data' => [['name' => 'chat', 'score' => 0]]]);
     }
 
     public function test_word_group_export_returns_404_to_guest_for_private_group(): void
@@ -46,9 +47,40 @@ class WordExportControllerTest extends TestCase
         $response = $this->actingAs(User::factory()->create())->getJson("/api/word-groups/{$wordGroup->id}/export");
 
         $response->assertOk()->assertJsonCount(27, 'data');
-        $this->assertContains('chat', $response->json('data'));
-        $this->assertNotContains('autre groupe', $response->json('data'));
-        $this->assertSame($wordGroup->words()->orderBy('name')->pluck('name')->all(), $response->json('data'));
+        $names = $response->collect('data')->pluck('name');
+        $this->assertContains('chat', $names);
+        $this->assertNotContains('autre groupe', $names);
+        $this->assertSame($wordGroup->words()->orderBy('name')->pluck('name')->all(), $names->all());
+    }
+
+    public function test_word_group_export_returns_the_score_of_each_word(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $disliked = Word::factory()->for($wordGroup)->create(['name' => 'chat']);
+        $liked = Word::factory()->for($wordGroup)->create(['name' => 'zèbre']);
+        foreach (range(1, 6) as $ignored) {
+            $disliked->voteFor(User::factory()->create(), WordVote::Down);
+        }
+        foreach (range(1, 5) as $ignored) {
+            $disliked->voteFor(User::factory()->create(), WordVote::Up);
+        }
+        $liked->voteFor(User::factory()->create(), WordVote::Up);
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}/export")
+            ->assertOk()
+            ->assertExactJson(['data' => [['name' => 'chat', 'score' => -1], ['name' => 'zèbre', 'score' => 1]]]);
+    }
+
+    public function test_group_collection_export_returns_the_score_of_each_word(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        Word::factory()->for($wordGroup)->create(['name' => 'chat'])->voteFor(User::factory()->create(), WordVote::Down);
+        $groupCollection = GroupCollection::factory()->public()->hasAttached($wordGroup)->create();
+
+        $this->actingAs(User::factory()->create())
+            ->getJson("/api/group-collections/{$groupCollection->id}/export")
+            ->assertOk()
+            ->assertJsonPath('data.word_groups.0.words', [['name' => 'chat', 'score' => -1]]);
     }
 
     public function test_word_group_export_returns_404_for_private_group_of_another_user(): void
@@ -70,7 +102,7 @@ class WordExportControllerTest extends TestCase
         $this->actingAs($member)
             ->getJson("/api/word-groups/{$wordGroup->id}/export")
             ->assertOk()
-            ->assertExactJson(['data' => ['chat']]);
+            ->assertExactJson(['data' => [['name' => 'chat', 'score' => 0]]]);
     }
 
     public function test_group_collection_export_returns_visible_groups_only_with_their_words_sorted_by_name(): void
@@ -91,8 +123,8 @@ class WordExportControllerTest extends TestCase
             ->getJson("/api/group-collections/{$groupCollection->id}/export")
             ->assertOk()
             ->assertExactJson(['data' => ['hidden_word_groups_count' => 1, 'word_groups' => [
-                ['id' => $secondGroup->id, 'name' => 'Arbres', 'words' => ['arbre', 'chat']],
-                ['id' => $firstGroup->id, 'name' => 'Bêtes', 'words' => ['chat']],
+                ['id' => $secondGroup->id, 'name' => 'Arbres', 'words' => [['name' => 'arbre', 'score' => 0], ['name' => 'chat', 'score' => 0]]],
+                ['id' => $firstGroup->id, 'name' => 'Bêtes', 'words' => [['name' => 'chat', 'score' => 0]]],
             ]]]);
     }
 

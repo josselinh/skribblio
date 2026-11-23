@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\GroupCollection;
+use App\Models\Word;
 use App\Models\WordGroup;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Every word of a group or a collection, unpaginated, for the Skribbl.io export. The SPA
- * deduplicates, shuffles and formats the list (and, for a collection, combines the chosen groups).
+ * Every word of a group or a collection, unpaginated, with its score (upvotes minus downvotes), for the
+ * Skribbl.io export. The SPA leaves out the words scored too low, deduplicates, shuffles and formats the
+ * list (and, for a collection, combines the chosen groups).
  */
 class WordExportController extends Controller
 {
@@ -20,7 +23,9 @@ class WordExportController extends Controller
     {
         Gate::authorize('view', $wordGroup);
 
-        return response()->json(['data' => $wordGroup->words()->orderBy('name')->pluck('name')]);
+        $words = $wordGroup->words()->select('name')->withScore()->orderBy('name')->get();
+
+        return response()->json(['data' => self::exportedWords($words)]);
     }
 
     /**
@@ -34,7 +39,7 @@ class WordExportController extends Controller
 
         $wordGroups = $groupCollection->wordGroups()
             ->visibleTo($request->user())
-            ->with(['words' => fn (HasMany $query) => $query->select(['id', 'word_group_id', 'name'])->orderBy('name')])
+            ->with(['words' => fn (HasMany $query) => $query->select(['id', 'word_group_id', 'name'])->withScore()->orderBy('name')])
             ->orderBy('name')
             ->get(['word_groups.id', 'word_groups.name']);
 
@@ -43,8 +48,17 @@ class WordExportController extends Controller
             'word_groups' => $wordGroups->map(fn (WordGroup $wordGroup): array => [
                 'id' => $wordGroup->id,
                 'name' => $wordGroup->name,
-                'words' => $wordGroup->words->pluck('name'),
+                'words' => self::exportedWords($wordGroup->words),
             ]),
         ]]);
+    }
+
+    /**
+     * @param  EloquentCollection<int, Word>  $words  loaded with the `withScore` scope
+     * @return list<array{name: string, score: int}>
+     */
+    private static function exportedWords(EloquentCollection $words): array
+    {
+        return $words->map(fn (Word $word): array => ['name' => $word->name, 'score' => (int) $word->score])->values()->all();
     }
 }

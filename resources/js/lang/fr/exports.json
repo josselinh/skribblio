@@ -25,6 +25,12 @@
         "options": "Options de la liste",
         "deduplicate": "Retirer les doublons",
         "shuffle": "Mélanger l'ordre",
+        "excludeLowScored": "Exclure les mots mal notés",
+        "threshold": "Note de {threshold} ou moins",
+        "thresholdLabel": "Seuil d’exclusion",
+        "lowerThreshold": "Abaisser le seuil",
+        "raiseThreshold": "Relever le seuil",
+        "excludedCount": "{n} mot exclu | {n} mots exclus",
         "reshuffle": "Remélanger"
     },
     "create": {

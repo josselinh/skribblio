@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
+import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWord, type ExportedWordGroup } from '@/api/exports';
 import { useI18n } from 'vue-i18n';
 import WordListExport from '@/components/WordListExport.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -32,7 +32,7 @@ const isOpen = ref(false);
 const isLoading = ref(false);
 const hasFailed = ref(false);
 /** Words of a group, or the groups of a collection with their words. */
-const wordGroupWords = ref<string[]>([]);
+const wordGroupWords = ref<ExportedWord[]>([]);
 const wordGroups = ref<ExportedWordGroup[]>([]);
 
 /**
@@ -50,7 +50,7 @@ const isNothingSelected = computed(() => showsSelection.value && selectedWordGro
 const words = computed(() =>
     props.kind === 'word-groups'
         ? wordGroupWords.value
-        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, intlLocale)),
+        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.name.localeCompare(b.name, intlLocale)),
 );
 
 function toggleWordGroup(id: string, isSelected: boolean): void {

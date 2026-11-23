@@ -33,7 +33,7 @@ const hasSelection = computed(() => selectedWordGroups.value.length > 0);
 
 /** Words of the selected groups, sorted by name, duplicates kept (the export options deal with them). */
 const words = computed(() =>
-    selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.localeCompare(b, intlLocale)),
+    selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.name.localeCompare(b.name, intlLocale)),
 );
 
 const isAdding = ref(false);

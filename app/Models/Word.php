@@ -25,8 +25,9 @@ use Illuminate\Support\Facades\DB;
  * when they delete their account: the word stays in the group.
  *
  * In a group open to contributions, users vote for or against a word (`word_votes`); the votes
- * are only an indicator for the contributors and do not change the export.
+ * are an indicator for the contributors, and the export may leave out the words whose score is too low.
  *
+ * @property int|null $score
  * @property int|null $upvotes_count
  * @property int|null $downvotes_count
  * @property int|null $my_vote
@@ -109,6 +110,17 @@ class Word extends Model
         if ($user !== null) {
             $query->addSelect(['my_vote' => self::votesQuery()->select('value')->where('user_id', $user->getKey())]);
         }
+    }
+
+    /**
+     * Adds the `score` of each record: upvotes minus downvotes, 0 without votes.
+     *
+     * @param  Builder<static>  $query
+     */
+    #[Scope]
+    protected function withScore(Builder $query): void
+    {
+        $query->addSelect(['score' => self::votesQuery()->selectRaw('coalesce(sum(value), 0)')]);
     }
 
     /**
