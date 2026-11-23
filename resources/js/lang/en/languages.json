@@ -25,8 +25,5 @@
     "preference": {
         "title": "Language of the lists",
         "description": "The language of the groups and collections suggested by default in Explore, and of your new groups. It can differ from the interface’s, for instance to practise a language."
-    },
-    "picker": {
-        "hint": "Only the groups in the collection’s language are suggested."
     }
 }

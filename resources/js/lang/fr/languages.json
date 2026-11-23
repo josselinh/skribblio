@@ -25,8 +25,5 @@
     "preference": {
         "title": "Langue des listes",
         "description": "La langue des groupes et collections proposés par défaut dans l’Explorer, et de vos nouveaux groupes. Elle peut différer de celle de l’interface, par exemple pour progresser dans une langue."
-    },
-    "picker": {
-        "hint": "Seuls les groupes dans la langue de la collection sont proposés."
     }
 }

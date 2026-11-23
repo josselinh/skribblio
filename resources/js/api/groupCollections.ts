@@ -15,8 +15,8 @@ export interface CreateGroupCollectionPayload extends GroupCollectionPayload {
      * changed afterwards.
      */
     language?: Locale;
-    /** At least one group. */
-    word_group_ids: string[];
+    /** Groups to put in it at once (saving an export's selection); none from the creation form. */
+    word_group_ids?: string[];
 }
 
 /** Collections created by the current user, most recently updated first. */
