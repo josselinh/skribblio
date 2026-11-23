@@ -66,16 +66,30 @@ const canRequestHiddenGroups = computed(
         groupCollection.value.hidden_word_groups_requested_count < groupCollection.value.hidden_word_groups_count,
 );
 const isRequestingHiddenGroups = ref(false);
-const hiddenGroupsRequestFailed = ref(false);
+const hiddenGroupsRequestError = ref<string | null>(null);
+const isConfirmingHiddenGroupsRequest = ref(false);
 
+/** Hidden groups not requested yet, which the request will be sent for. */
+const unrequestedHiddenGroupsCount = computed(() =>
+    groupCollection.value ? groupCollection.value.hidden_word_groups_count - groupCollection.value.hidden_word_groups_requested_count : 0,
+);
+
+function askHiddenGroupsRequestConfirmation(): void {
+    hiddenGroupsRequestError.value = null;
+    isConfirmingHiddenGroupsRequest.value = true;
+}
+
+/** Sends the confirmed request, then reloads the collection; errors stay in the dialog. */
 async function requestHiddenGroups(): Promise<void> {
     isRequestingHiddenGroups.value = true;
-    hiddenGroupsRequestFailed.value = false;
+    hiddenGroupsRequestError.value = null;
     try {
         await requestHiddenWordGroupsAccess(groupCollectionId.value);
+        isConfirmingHiddenGroupsRequest.value = false;
         await loadGroupCollection();
+        showToast(t('groupCollections.show.hidden.confirmation.done'));
     } catch {
-        hiddenGroupsRequestFailed.value = true;
+        hiddenGroupsRequestError.value = t('common.unexpectedError');
     } finally {
         isRequestingHiddenGroups.value = false;
     }
@@ -300,15 +314,24 @@ watch(
                     type="button"
                     :disabled="isRequestingHiddenGroups"
                     class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-60"
-                    @click="requestHiddenGroups"
+                    aria-haspopup="dialog"
+                    @click="askHiddenGroupsRequestConfirmation"
                 >
                     {{ $t('groupCollections.show.hidden.request') }}
                 </button>
                 <p v-else-if="isMember" class="font-medium">{{ $t('groupCollections.show.hidden.requested') }}</p>
-                <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600 dark:text-red-400">
-                    {{ $t('common.unexpectedError') }}
-                </p>
             </div>
+            <ConfirmDialog
+                v-model:open="isConfirmingHiddenGroupsRequest"
+                :title="$t('groupCollections.show.hidden.confirmation.title')"
+                :message="$t('groupCollections.show.hidden.confirmation.message', unrequestedHiddenGroupsCount)"
+                :confirm-label="$t('groupCollections.show.hidden.confirmation.confirm')"
+                :processing-label="$t('groupCollections.show.hidden.confirmation.processing')"
+                tone="primary"
+                :is-processing="isRequestingHiddenGroups"
+                :error="hiddenGroupsRequestError"
+                @confirm="requestHiddenGroups"
+            />
 
             <AccessManagement
                 v-if="groupCollection.can.share"
