@@ -2,6 +2,7 @@
     "notFound": "Utilisateur introuvable",
     "loadFailed": "Impossible de charger cet utilisateur.",
     "description": "Ses groupes et collections publics, et ceux qu'il ou elle partage avec vous.",
+    "ownDescription": "Votre page telle que la voient les autres : vos groupes et collections publics. Les membres de vos éléments privés y voient aussi ceux que vous partagez avec eux.",
     "wordGroups": {
         "empty": "Aucun groupe visible."
     },

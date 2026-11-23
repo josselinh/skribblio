@@ -8,12 +8,18 @@ import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
+import { useAuthStore } from '@/stores/auth';
 import type { User } from '@/types/models';
 
-/** Another user's page: their groups and collections visible to the current user (public and shared). */
+/**
+ * A user's page: their groups and collections visible to the current user (public and shared). On their own
+ * page, users see what the others see: their public items only.
+ */
 const route = useRoute();
+const auth = useAuthStore();
 
 const userId = computed(() => String(route.params.id));
+const isOwnPage = computed(() => userId.value === auth.user?.id);
 
 const user = ref<Pick<User, 'id' | 'name'> | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
@@ -53,7 +59,7 @@ watch(userId, loadUser, { immediate: true });
 
         <template v-else-if="user">
             <h1 class="mt-2 text-2xl font-semibold">{{ user.name }}</h1>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('users.description') }}</p>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ isOwnPage ? $t('users.ownDescription') : $t('users.description') }}</p>
 
             <div class="mt-8 space-y-12">
                 <CardListSection

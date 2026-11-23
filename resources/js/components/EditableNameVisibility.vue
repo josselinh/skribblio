@@ -120,7 +120,7 @@ async function submit(): Promise<void> {
             </div>
             <p v-if="creator" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                 <i18n-t keypath="common.byUser" scope="global">
-                    <template #user><UserLink :user="creator" :self-label="$t('common.you')" /></template>
+                    <template #user><UserLink :user="creator" /></template>
                 </i18n-t>
             </p>
         </div>

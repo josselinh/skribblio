@@ -27,6 +27,8 @@ class WordGroupController extends Controller
     {
         $wordGroups = $request->user()
             ->wordGroups()
+            ->with('creator')
+            ->withCount('words')
             ->withIsFavorite($request->user())
             ->latest('updated_at')
             ->latest('id')

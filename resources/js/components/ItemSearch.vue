@@ -1,8 +1,6 @@
 <script setup lang="ts" generic="T extends SearchableItem">
 import { ref, shallowRef, watch } from 'vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
-import { creatorLabel } from '@/lib/creator';
-import { useAuthStore } from '@/stores/auth';
 import type { User, Visibility } from '@/types/models';
 
 /** What the dropdown needs to show a result. */
@@ -34,8 +32,6 @@ const props = withDefaults(
 const emit = defineEmits<{
     select: [item: T];
 }>();
-
-const auth = useAuthStore();
 
 const query = ref('');
 const results = shallowRef<T[]>([]);
@@ -129,7 +125,7 @@ function select(item: T): void {
                     <span class="truncate">{{ item.name }}</span>
                     <span class="flex shrink-0 items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                         <VisibilityBadge :visibility="item.visibility" />
-                        {{ creatorLabel(item.creator, auth.user?.id) }}
+                        {{ item.creator?.name }}
                     </span>
                 </button>
             </li>
