@@ -357,7 +357,7 @@ watch(
                 </div>
 
                 <div v-if="groupCollection.can.add_word_group" class="mt-3">
-                    <label for="add-word-group" class="sr-only">{{ $t('exports.create.addWordGroup') }}</label>
+                    <label for="add-word-group" class="sr-only">{{ $t('groupCollections.show.addWordGroup') }}</label>
                     <WordGroupSearch
                         input-id="add-word-group"
                         :language="groupCollection.language"
@@ -399,7 +399,7 @@ watch(
                                 @change="toggleAllRemovableWordGroups"
                             />
                             <span v-if="selectedWordGroupIds.length === 0">{{ $t('common.selectAll') }}</span>
-                            <span v-else>{{ $t('exports.create.selectedCount', selectedWordGroupIds.length) }}</span>
+                            <span v-else>{{ $t('groupCollections.show.selectedCount', selectedWordGroupIds.length) }}</span>
                         </label>
                         <div class="flex items-center gap-3">
                             <button

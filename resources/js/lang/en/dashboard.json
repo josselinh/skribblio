@@ -5,10 +5,6 @@
         "description": "Browse the groups and collections shared by other users and add your favorites with the star ☆.",
         "explore": "Discover the community’s groups →"
     },
-    "export": {
-        "description": "Combine the words of several groups and collections into a list ready to paste.",
-        "button": "Create an export"
-    },
     "receivedRequests": "Access requests received",
     "wordGroups": {
         "title": "My groups",

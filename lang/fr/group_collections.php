@@ -8,9 +8,7 @@ return [
     'not_a_member' => 'Vous n’êtes pas membre de cette collection.',
     'language_locked' => 'La langue d’une collection ne peut pas être modifiée.',
     'word_groups' => [
-        'language_mismatch' => 'Les groupes d’une collection doivent tous être en :language, comme elle.',
         'wrong_language' => 'Ce groupe est en :group_language, alors que cette collection est en :language.',
-        'not_found' => 'Un ou plusieurs groupes sélectionnés sont introuvables.',
     ],
     'remove_word_groups' => [
         'required' => 'Sélectionnez au moins un groupe.',

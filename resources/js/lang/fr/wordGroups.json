@@ -8,9 +8,6 @@
         "updatedOn": "Modifié le",
         "becamePrivate": "Ce groupe est devenu privé : vous n’y avez plus accès."
     },
-    "picker": {
-        "selected": "Groupes sélectionnés"
-    },
     "create": {
         "title": "Nouveau groupe",
         "submit": "Créer le groupe"

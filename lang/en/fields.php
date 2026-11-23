@@ -15,5 +15,4 @@ return [
     'visibility' => 'visibility',
     'accepts_contributions' => 'open to contributions',
     'contributions_members_only' => 'contributions from members only',
-    'word_group_ids' => 'groups',
 ];

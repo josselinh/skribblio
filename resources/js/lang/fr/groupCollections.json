@@ -30,6 +30,8 @@
             }
         },
         "editGroups": "Modifier les groupes",
+        "addWordGroup": "Ajouter un groupe",
+        "selectedCount": "{n} groupe sélectionné | {n} groupes sélectionnés",
         "membersOnly": "Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes. Demandez-lui son lien de partage pour lui proposer de contribuer.",
         "closed": "Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.",
         "empty": "Cette collection ne contient aucun groupe.",
