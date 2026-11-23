@@ -106,18 +106,6 @@ const buttonClass =
                 </RouterLink>
             </div>
 
-            <div
-                class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-5 shadow-xs"
-            >
-                <div>
-                    <p class="font-semibold text-brand-800 dark:text-brand-200">{{ $t('exports.panel.button') }}</p>
-                    <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        {{ $t('dashboard.export.description') }}
-                    </p>
-                </div>
-                <RouterLink :to="{ name: 'exports.create' }" :class="buttonClass">{{ $t('dashboard.export.button') }}</RouterLink>
-            </div>
-
             <section v-if="receivedAccessRequests.length > 0" aria-labelledby="received-access-requests-title">
                 <h2 id="received-access-requests-title" class="text-lg font-semibold">
                     {{ $t('dashboard.receivedRequests') }}

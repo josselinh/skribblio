@@ -13,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class GroupCollectionController extends Controller
@@ -39,19 +38,16 @@ class GroupCollectionController extends Controller
     }
 
     /**
-     * Create a collection owned by the current user, with its groups (all in its language).
+     * Create an empty collection owned by the current user, in their content language unless another one is
+     * given; its groups are added afterwards.
      */
     public function store(StoreGroupCollectionRequest $request): JsonResponse
     {
-        $groupCollection = DB::transaction(function () use ($request) {
-            $groupCollection = $request->user()->groupCollections()->create([
-                ...$request->safe()->only(['name', 'visibility', 'accepts_contributions', 'contributions_members_only']),
-                'language' => $request->language(),
-            ]);
-            $groupCollection->wordGroups()->attach($request->wordGroups(), ['added_by' => $request->user()->getKey()]);
-
-            return $groupCollection->setAttribute('is_favorite', false);
-        });
+        $groupCollection = $request->user()->groupCollections()->create([
+            'language' => $request->user()->content_locale,
+            ...$request->validated(),
+        ]);
+        $groupCollection->setAttribute('is_favorite', false);
 
         return (new GroupCollectionResource($groupCollection))->response()->setStatusCode(201);
     }

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
-use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
@@ -59,16 +58,13 @@ class GroupCollectionControllerTest extends TestCase
             ->assertJsonPath('meta.total', 13);
     }
 
-    public function test_store_creates_collection_with_own_groups_and_public_groups_of_others(): void
+    public function test_store_creates_an_empty_collection_owned_by_the_current_user(): void
     {
         $user = User::factory()->create();
-        $ownPrivateGroup = WordGroup::factory()->private()->createdBy($user)->create();
-        $publicGroupOfOtherUser = WordGroup::factory()->public()->create();
 
         $response = $this->actingAs($user)->postJson('/api/group-collections', [
             'name' => 'Soirée jeux',
             'visibility' => 'public',
-            'word_group_ids' => [$ownPrivateGroup->id, $publicGroupOfOtherUser->id],
         ]);
 
         $response->assertCreated()
@@ -76,58 +72,7 @@ class GroupCollectionControllerTest extends TestCase
             ->assertJsonPath('data.accepts_contributions', false);
         $groupCollection = GroupCollection::findOrFail($response->json('data.id'));
         $this->assertTrue($groupCollection->isCreatedBy($user));
-        $this->assertSame([$user->id, $user->id], $groupCollection->wordGroups()->pluck('groups_collections.added_by')->all());
-        $this->assertEqualsCanonicalizing(
-            [$ownPrivateGroup->id, $publicGroupOfOtherUser->id],
-            $groupCollection->wordGroups()->pluck('word_groups.id')->all(),
-        );
-    }
-
-    public function test_store_creates_an_empty_collection_in_the_users_content_language(): void
-    {
-        $user = User::factory()->create(['content_locale' => Locale::En]);
-
-        $response = $this->actingAs($user)->postJson('/api/group-collections', [
-            'name' => 'Game night',
-            'visibility' => 'public',
-            'word_group_ids' => [],
-        ]);
-
-        $response->assertCreated()->assertJsonPath('data.language', 'en');
-        $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
-    }
-
-    public function test_store_rejects_private_group_of_another_user_with_422(): void
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->postJson('/api/group-collections', [
-            'name' => 'Soirée jeux',
-            'visibility' => 'private',
-            'word_group_ids' => [
-                WordGroup::factory()->createdBy($user)->create()->id,
-                WordGroup::factory()->private()->create()->id,
-            ],
-        ]);
-
-        $response->assertUnprocessable()->assertJsonValidationErrors([
-            'word_group_ids' => 'Un ou plusieurs groupes sélectionnés sont introuvables.',
-        ]);
-        $this->assertDatabaseCount('group_collections', 0);
-    }
-
-    public function test_store_rejects_duplicate_and_malformed_group_ids_with_422(): void
-    {
-        $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->createdBy($user)->create();
-
-        $response = $this->actingAs($user)->postJson('/api/group-collections', [
-            'name' => 'Soirée jeux',
-            'visibility' => 'private',
-            'word_group_ids' => [$wordGroup->id, $wordGroup->id, 'not-a-uuid'],
-        ]);
-
-        $response->assertUnprocessable()->assertJsonValidationErrors(['word_group_ids.0', 'word_group_ids.2']);
+        $this->assertFalse($groupCollection->wordGroups()->exists());
     }
 
     public function test_store_with_empty_payload_returns_422(): void
@@ -249,7 +194,6 @@ class GroupCollectionControllerTest extends TestCase
             'name' => 'Soirée jeux',
             'visibility' => 'public',
             'accepts_contributions' => true,
-            'word_group_ids' => [WordGroup::factory()->createdBy($user)->create()->id],
         ]);
 
         $response->assertCreated()->assertJsonPath('data.accepts_contributions', true);

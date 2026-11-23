@@ -32,28 +32,5 @@
         "raiseThreshold": "Raise the threshold",
         "excludedCount": "{n} word left out | {n} words left out",
         "reshuffle": "Shuffle again"
-    },
-    "create": {
-        "description": "Choose groups, one by one or all those of a collection: their words are combined into a list ready to paste into Skribbl.io.",
-        "selection": "Selection",
-        "addWordGroup": "Add a group",
-        "addGroupCollection": "Add the groups of a collection",
-        "searchGroupCollection": "Search for a collection…",
-        "addGroupCollectionHint": "The groups of the chosen collection are added to the selection: you can then remove the ones you do not want.",
-        "adding": "Adding…",
-        "addFailed": "This item could not be added, please try again.",
-        "collectionAdded": {
-            "added": "No new group added from “{name}”. | 1 group from “{name}” added. | {n} groups from “{name}” added.",
-            "alreadySelected": "1 group was already in the selection. | {n} groups were already in the selection.",
-            "hidden": "1 private group of this collection is not visible to you and was not added. | {n} private groups of this collection are not visible to you and were not added."
-        },
-        "empty": "No group selected.",
-        "selectedCount": "{n} group selected | {n} groups selected",
-        "removeAll": "Remove all",
-        "removeWordGroup": "Remove the group {name}",
-        "result": "Export",
-        "saveTitle": "Save as a collection",
-        "saveDescription": "The new collection will contain the group of this selection. | The new collection will contain the {n} groups of this selection.",
-        "saved": "Collection created."
     }
 }

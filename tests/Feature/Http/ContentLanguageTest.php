@@ -40,24 +40,18 @@ class ContentLanguageTest extends TestCase
         $this->assertSame(Locale::Fr, $wordGroup->fresh()->language);
     }
 
-    public function test_a_new_collection_takes_the_language_of_its_groups_which_must_all_share_it(): void
+    public function test_a_new_collection_is_in_the_users_content_language_unless_another_one_is_given(): void
     {
-        $user = User::factory()->create();
-        $englishGroup = WordGroup::factory()->createdBy($user)->inLanguage(Locale::En)->create();
-        $frenchGroup = WordGroup::factory()->createdBy($user)->create();
+        $user = User::factory()->create(['content_locale' => Locale::En]);
 
         $this->actingAs($user)
-            ->postJson('/api/group-collections', ['name' => 'Party', 'visibility' => 'private', 'word_group_ids' => [$englishGroup->id]])
+            ->postJson('/api/group-collections', ['name' => 'Party', 'visibility' => 'private'])
             ->assertCreated()
             ->assertJsonPath('data.language', 'en');
         $this->actingAs($user)
-            ->postJson('/api/group-collections', ['name' => 'Mix', 'visibility' => 'private', 'word_group_ids' => [$englishGroup->id, $frenchGroup->id]])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids' => 'Les groupes d’une collection doivent tous être en anglais, comme elle.']);
-        $this->actingAs($user)
-            ->postJson('/api/group-collections', ['name' => 'Fête', 'visibility' => 'private', 'language' => 'fr', 'word_group_ids' => [$englishGroup->id]])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids' => 'Les groupes d’une collection doivent tous être en français, comme elle.']);
+            ->postJson('/api/group-collections', ['name' => 'Fête', 'visibility' => 'private', 'language' => 'fr'])
+            ->assertCreated()
+            ->assertJsonPath('data.language', 'fr');
     }
 
     public function test_a_group_in_another_language_cannot_be_added_to_a_collection(): void

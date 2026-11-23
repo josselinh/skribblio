@@ -32,28 +32,5 @@
         "raiseThreshold": "Relever le seuil",
         "excludedCount": "{n} mot exclu | {n} mots exclus",
         "reshuffle": "Remélanger"
-    },
-    "create": {
-        "description": "Choisissez des groupes, un par un ou tous ceux d’une collection : leurs mots sont réunis dans une liste prête à coller dans Skribbl.io.",
-        "selection": "Sélection",
-        "addWordGroup": "Ajouter un groupe",
-        "addGroupCollection": "Ajouter les groupes d’une collection",
-        "searchGroupCollection": "Rechercher une collection…",
-        "addGroupCollectionHint": "Les groupes de la collection choisie sont ajoutés à la sélection : vous pourrez retirer ceux que vous ne voulez pas.",
-        "adding": "Ajout en cours…",
-        "addFailed": "Impossible d’ajouter cet élément, veuillez réessayer.",
-        "collectionAdded": {
-            "added": "Aucun nouveau groupe ajouté depuis « {name} ». | 1 groupe de « {name} » ajouté. | {n} groupes de « {name} » ajoutés.",
-            "alreadySelected": "1 groupe était déjà dans la sélection. | {n} groupes étaient déjà dans la sélection.",
-            "hidden": "1 groupe privé de cette collection ne vous est pas visible et n’a pas été ajouté. | {n} groupes privés de cette collection ne vous sont pas visibles et n’ont pas été ajoutés."
-        },
-        "empty": "Aucun groupe sélectionné.",
-        "selectedCount": "{n} groupe sélectionné | {n} groupes sélectionnés",
-        "removeAll": "Tout retirer",
-        "removeWordGroup": "Retirer le groupe {name}",
-        "result": "Export",
-        "saveTitle": "Enregistrer comme collection",
-        "saveDescription": "La nouvelle collection contiendra le groupe de cette sélection. | La nouvelle collection contiendra les {n} groupes de cette sélection.",
-        "saved": "Collection créée."
     }
 }

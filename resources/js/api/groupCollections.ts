@@ -9,14 +9,10 @@ export interface GroupCollectionPayload {
     contributions_members_only: boolean;
 }
 
+/** A new collection is empty: its groups are added afterwards. */
 export interface CreateGroupCollectionPayload extends GroupCollectionPayload {
-    /**
-     * Every group must be in it; the language of the groups when left out. Chosen on creation, it cannot be
-     * changed afterwards.
-     */
-    language?: Locale;
-    /** Groups to put in it at once (saving an export's selection); none from the creation form. */
-    word_group_ids?: string[];
+    /** Every group must be in it. Chosen on creation, it cannot be changed afterwards. */
+    language: Locale;
 }
 
 /** Collections created by the current user, most recently updated first. */
