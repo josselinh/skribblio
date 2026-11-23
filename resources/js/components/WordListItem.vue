@@ -24,7 +24,7 @@ const emit = defineEmits<{
             <!-- Visitors do not get the author (undefined); null means the author deleted their account. -->
             <template v-if="word.creator !== undefined">
                 <i18n-t v-if="word.creator" keypath="common.byUser" scope="global">
-                    <template #user><UserLink :user="word.creator" :self-label="$t('common.you')" /></template>
+                    <template #user><UserLink :user="word.creator" /></template>
                 </i18n-t>
                 <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
                 <template v-if="word.created_at"> · </template>

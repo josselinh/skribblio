@@ -81,6 +81,8 @@ class WordGroupControllerTest extends TestCase
         $user = User::factory()->create();
         $olderGroup = WordGroup::factory()->createdBy($user)->create(['updated_at' => now()->subDay()]);
         $newerGroup = WordGroup::factory()->createdBy($user)->public()->create(['updated_at' => now()]);
+        Word::factory()->count(2)->for($newerGroup)->create();
+        $newerGroup->refresh();
         WordGroup::factory()->public()->create();
 
         $response = $this->actingAs($user)->getJson('/api/word-groups');
@@ -94,6 +96,8 @@ class WordGroupControllerTest extends TestCase
                 'visibility' => 'public',
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,
+                'creator' => ['id' => $user->id, 'name' => $user->name],
+                'words_count' => 2,
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),

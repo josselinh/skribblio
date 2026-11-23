@@ -62,4 +62,24 @@ class UserProfileControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.*.id', [$publicCollection->id, $sharedCollection->id]);
     }
+
+    public function test_own_page_lists_only_public_items_as_the_others_see_them(): void
+    {
+        $alice = User::factory()->create();
+        $publicGroup = WordGroup::factory()->public()->createdBy($alice)->create();
+        WordGroup::factory()->private()->createdBy($alice)->create();
+        $publicCollection = GroupCollection::factory()->public()->createdBy($alice)->create();
+        GroupCollection::factory()->private()->createdBy($alice)->create();
+
+        $this->actingAs($alice)
+            ->getJson("/api/users/{$alice->id}/word-groups")
+            ->assertOk()
+            ->assertJsonPath('data.*.id', [$publicGroup->id])
+            ->assertJsonPath('data.0.is_favorite', false);
+
+        $this->actingAs($alice)
+            ->getJson("/api/users/{$alice->id}/group-collections")
+            ->assertOk()
+            ->assertJsonPath('data.*.id', [$publicCollection->id]);
+    }
 }

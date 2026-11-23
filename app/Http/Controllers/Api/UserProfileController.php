@@ -15,7 +15,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 /**
  * Another user's page, as seen by the current user: their name, and the groups and collections they
  * created that the current user can see (public ones and private ones shared with the current user).
- * The email address is never exposed.
+ * On their own page, users see it as the others do: only their public items. The email address is never exposed.
  */
 class UserProfileController extends Controller
 {
@@ -31,7 +31,7 @@ class UserProfileController extends Controller
 
     public function wordGroups(Request $request, User $user): AnonymousResourceCollection
     {
-        $wordGroups = WordGroup::visibleTo($request->user())
+        $wordGroups = WordGroup::visibleTo($this->viewer($request, $user))
             ->where('created_by', $user->getKey())
             ->withCount('words')
             ->withIsFavorite($request->user())
@@ -44,7 +44,7 @@ class UserProfileController extends Controller
 
     public function groupCollections(Request $request, User $user): AnonymousResourceCollection
     {
-        $groupCollections = GroupCollection::visibleTo($request->user())
+        $groupCollections = GroupCollection::visibleTo($this->viewer($request, $user))
             ->where('created_by', $user->getKey())
             ->withCount('wordGroups')
             ->withIsFavorite($request->user())
@@ -53,5 +53,14 @@ class UserProfileController extends Controller
             ->paginate(self::PER_PAGE);
 
         return GroupCollectionResource::collection($groupCollections);
+    }
+
+    /**
+     * Whose eyes the page is seen through: the current user, or, on their own page, nobody in particular,
+     * so that only the public items are listed, as for every other user.
+     */
+    private function viewer(Request $request, User $user): ?User
+    {
+        return $user->is($request->user()) ? null : $request->user();
     }
 }

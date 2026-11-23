@@ -168,11 +168,6 @@ router.beforeEach(async (to) => {
         return { name: 'dashboard' };
     }
 
-    /* The current user's own page is their dashboard. */
-    if (to.name === 'users.show' && to.params.id === auth.user?.id) {
-        return { name: 'dashboard' };
-    }
-
     if (to.meta.guestOnly && auth.isAuthenticated) {
         return { name: 'dashboard' };
     }

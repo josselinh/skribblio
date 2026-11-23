@@ -29,6 +29,8 @@ class GroupCollectionController extends Controller
     {
         $groupCollections = $request->user()
             ->groupCollections()
+            ->with('creator')
+            ->withCount('wordGroups')
             ->withIsFavorite($request->user())
             ->latest('updated_at')
             ->latest('id')

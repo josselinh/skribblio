@@ -2,6 +2,7 @@
     "notFound": "User not found",
     "loadFailed": "This user could not be loaded.",
     "description": "Their public groups and collections, and the ones they share with you.",
+    "ownDescription": "Your page as the others see it: your public groups and collections. Members of your private items also see the ones you share with them.",
     "wordGroups": {
         "empty": "No visible group."
     },

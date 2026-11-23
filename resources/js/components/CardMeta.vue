@@ -14,7 +14,7 @@ defineProps<{
     <!-- Above the card's stretched link so that the creator's name stays clickable. -->
     <p v-if="creator || countLabel" class="relative z-10 text-sm text-zinc-600 dark:text-zinc-400">
         <i18n-t v-if="creator" keypath="common.byUser" scope="global">
-            <template #user><UserLink :user="creator" :self-label="$t('common.you')" /></template>
+            <template #user><UserLink :user="creator" /></template>
         </i18n-t>
         <template v-if="creator && countLabel"> · </template>
         <template v-if="countLabel">{{ countLabel }}</template>
