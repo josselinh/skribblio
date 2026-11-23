@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores/auth';
  * Words formatted for the "Custom words" field of a private Skribbl.io room, with copy, counters,
  * limit warnings and list options (words scored too low, duplicates, shuffle, random selection within
  * the limit). Each occurrence of a word is judged on its own score before duplicates are removed.
- * Visitors see the score option but only get a notification asking to log in.
+ * Visitors see the score and duplicate options, unchecked, but only get a notification asking to log in.
  */
 const props = withDefaults(
     defineProps<{
@@ -42,7 +42,8 @@ const LOCKED_OPTION_TOAST_MS = 5000;
 const shouldExcludeLowScored = ref(false);
 /** Words whose score is at or below it are left out. */
 const scoreThreshold = ref(SCORE_THRESHOLD_MAX);
-const shouldDeduplicate = ref(true);
+/** On by default for logged-in users; visitors cannot use it. */
+const shouldDeduplicate = ref(auth.isVerified);
 const shouldShuffle = ref(false);
 const shuffledWords = ref<string[]>([]);
 /** Random selection fitting in the character limit, when the user asked for one. */
@@ -217,7 +218,7 @@ const secondaryButtonClass =
                 </span>
             </div>
             <label class="inline-flex items-center gap-2">
-                <input v-model="shouldDeduplicate" type="checkbox" :class="checkboxClass" />
+                <input v-model="shouldDeduplicate" type="checkbox" :class="checkboxClass" @click="onLockedOptionClick" />
                 {{ $t('exports.list.deduplicate') }}
                 <span v-if="duplicatesCount > 0" class="text-zinc-500 dark:text-zinc-400">({{ duplicatesCount }})</span>
             </label>
