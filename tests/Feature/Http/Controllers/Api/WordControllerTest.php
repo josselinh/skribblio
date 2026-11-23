@@ -7,17 +7,52 @@ use App\Models\User;
 use App\Models\Word;
 use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class WordControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_returns_401_for_guest(): void
+    public function test_store_returns_401_for_guest_on_a_group_open_to_contributions(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+
+        $this->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['chat']])->assertUnauthorized();
+        $this->assertDatabaseCount('words', 0);
+    }
+
+    public function test_index_lists_words_of_a_public_group_to_guest_with_votes_but_without_authors(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $word = Word::factory()->for($wordGroup)->create();
+        $word->voteFor(User::factory()->create(), WordVote::Up);
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}/words")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $word->id)
+            ->assertJsonMissingPath('data.0.creator')
+            ->assertJsonPath('data.0.upvotes_count', 1)
+            ->assertJsonPath('data.0.my_vote', null)
+            ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false, 'vote' => false]);
+    }
+
+    public function test_index_returns_404_to_guest_for_private_group(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}/words")->assertNotFound();
+    }
+
+    #[TestWith(['author'])]
+    #[TestWith(['score'])]
+    public function test_index_rejects_members_only_sorts_from_guest_with_422(string $sort): void
     {
         $wordGroup = WordGroup::factory()->public()->create();
 
-        $this->getJson("/api/word-groups/{$wordGroup->id}/words")->assertUnauthorized();
+        $this->getJson("/api/word-groups/{$wordGroup->id}/words?sort={$sort}")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['sort' => 'Connectez-vous pour utiliser ce tri.']);
     }
 
     public function test_index_lists_words_of_the_group_most_recent_first_with_their_author(): void

@@ -13,6 +13,12 @@ use Illuminate\Validation\Rule;
 
 class ListWordsRequest extends FormRequest
 {
+    /**
+     * Sorts that guests cannot use: they do not see the authors of the words, and sorting by votes is a
+     * members' feature.
+     */
+    public const array MEMBERS_ONLY_SORTS = [WordSort::Author, WordSort::Score];
+
     public function authorize(): Response
     {
         return Gate::inspect('view', $this->wordGroup());
@@ -26,9 +32,17 @@ class ListWordsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort' => ['nullable', Rule::enum(WordSort::class)],
+            'sort' => ['nullable', $this->user() ? Rule::enum(WordSort::class) : Rule::enum(WordSort::class)->except(self::MEMBERS_ONLY_SORTS)],
             'direction' => ['nullable', Rule::enum(SortDirection::class)],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->user() ? [] : ['sort.enum' => __('search.login_required.word_sort')];
     }
 
     /**

@@ -11,9 +11,9 @@ class GroupCollectionPolicy
 {
     /**
      * A collection is visible to everyone when public, to its creator only when private.
-     * Other users get a 404 so that they cannot tell whether a private collection exists.
+     * Other users and guests (null) get a 404 so that they cannot tell whether a private collection exists.
      */
-    public function view(User $user, GroupCollection $groupCollection): Response
+    public function view(?User $user, GroupCollection $groupCollection): Response
     {
         return $groupCollection->isVisibleTo($user) ? Response::allow() : Response::denyAsNotFound();
     }

@@ -93,18 +93,22 @@ class Word extends Model
     }
 
     /**
-     * Adds `upvotes_count`, `downvotes_count` and the given user's vote (`my_vote`: +1, -1 or null)
-     * to each record, computed in the same query.
+     * Adds `upvotes_count`, `downvotes_count` and the given user's vote (`my_vote`: +1, -1 or null, always
+     * null for a guest) to each record, computed in the same query.
      *
      * @param  Builder<static>  $query
      */
     #[Scope]
-    protected function withVotes(Builder $query, User $user): void
+    protected function withVotes(Builder $query, ?User $user): void
     {
         $query->withCount([
             'voters as upvotes_count' => fn (Builder $query) => $query->where('word_votes.value', 1),
             'voters as downvotes_count' => fn (Builder $query) => $query->where('word_votes.value', -1),
-        ])->addSelect(['my_vote' => self::votesQuery()->select('value')->where('user_id', $user->getKey())]);
+        ]);
+
+        if ($user !== null) {
+            $query->addSelect(['my_vote' => self::votesQuery()->select('value')->where('user_id', $user->getKey())]);
+        }
     }
 
     /**

@@ -57,7 +57,8 @@ class GroupCollectionController extends Controller
 
     /**
      * Show a collection with the groups the current user can see, and how many others are hidden from them
-     * (private groups of other users).
+     * (private groups of other users, or every private group for a guest). Guests cannot request access, so
+     * none of the hidden groups are requested by them.
      */
     public function show(Request $request, GroupCollection $groupCollection): GroupCollectionResource
     {
@@ -75,7 +76,7 @@ class GroupCollectionController extends Controller
         $groupCollection->setAttribute('hidden_word_groups_count', $hiddenWordGroups->count());
         $groupCollection->setAttribute(
             'hidden_word_groups_requested_count',
-            $hiddenWordGroups->whereHas('accessRequests', fn (Builder $query) => $query
+            $request->user() === null ? 0 : $hiddenWordGroups->whereHas('accessRequests', fn (Builder $query) => $query
                 ->where('user_id', $request->user()->getKey())
                 ->where('status', AccessRequestStatus::Pending))->count(),
         );

@@ -14,11 +14,48 @@ class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[TestWith(['/api/search/word-groups'])]
-    #[TestWith(['/api/search/group-collections'])]
-    public function test_returns_401_for_guest(string $uri): void
+    public function test_word_groups_returns_only_public_groups_to_guest_without_creator_or_favorite(): void
     {
-        $this->getJson($uri)->assertUnauthorized();
+        $publicGroup = WordGroup::factory()->public()->create(['name' => 'Chats célèbres']);
+        WordGroup::factory()->private()->create(['name' => 'Chats secrets']);
+
+        $response = $this->getJson('/api/search/word-groups?q=chat');
+
+        $response->assertOk()
+            ->assertJsonPath('data.*.id', [$publicGroup->id])
+            ->assertJsonMissingPath('data.0.creator')
+            ->assertJsonMissingPath('data.0.is_favorite')
+            ->assertJsonPath('data.0.can.update', false);
+    }
+
+    public function test_group_collections_returns_only_public_collections_to_guest(): void
+    {
+        $publicCollection = GroupCollection::factory()->public()->create();
+        GroupCollection::factory()->private()->create();
+
+        $this->getJson('/api/search/group-collections')
+            ->assertOk()
+            ->assertJsonPath('data.*.id', [$publicCollection->id])
+            ->assertJsonMissingPath('data.0.creator');
+    }
+
+    public function test_treats_unverified_user_as_guest(): void
+    {
+        $user = User::factory()->unverified()->create();
+        WordGroup::factory()->private()->createdBy($user)->create();
+
+        $this->actingAs($user)->getJson('/api/search/word-groups')->assertOk()->assertJsonCount(0, 'data');
+    }
+
+    #[TestWith(['author=me', 'author', 'Connectez-vous pour filtrer par auteur.'])]
+    #[TestWith(['author=others', 'author', 'Connectez-vous pour filtrer par auteur.'])]
+    #[TestWith(['sort=popular', 'sort', 'Connectez-vous pour utiliser ce tri.'])]
+    #[TestWith(['sort=largest', 'sort', 'Connectez-vous pour utiliser ce tri.'])]
+    public function test_rejects_members_only_filters_from_guest_with_422(string $query, string $field, string $message): void
+    {
+        $this->getJson("/api/search/word-groups?{$query}")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([$field => $message]);
     }
 
     public function test_word_groups_returns_own_and_public_groups_matching_the_name_but_not_private_groups_of_others(): void

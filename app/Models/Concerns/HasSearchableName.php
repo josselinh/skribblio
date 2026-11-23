@@ -63,17 +63,19 @@ trait HasSearchableName
     }
 
     /**
-     * Keeps the records created by the user, by other users, or both.
+     * Keeps the records created by the user, by other users, or both. A guest (null) has created nothing:
+     * "me" keeps nothing and "others" everything.
      *
      * @param  Builder<static>  $query
      */
     #[Scope]
-    protected function createdByAuthor(Builder $query, AuthorFilter $author, User $user): void
+    protected function createdByAuthor(Builder $query, AuthorFilter $author, ?User $user): void
     {
-        match ($author) {
-            AuthorFilter::All => null,
-            AuthorFilter::Me => $query->where($this->qualifyColumn('created_by'), $user->getKey()),
-            AuthorFilter::Others => $query->where($this->qualifyColumn('created_by'), '!=', $user->getKey()),
+        match (true) {
+            $author === AuthorFilter::All, $user === null && $author === AuthorFilter::Others => null,
+            $user === null => $query->whereRaw('1 = 0'),
+            $author === AuthorFilter::Me => $query->where($this->qualifyColumn('created_by'), $user->getKey()),
+            $author === AuthorFilter::Others => $query->where($this->qualifyColumn('created_by'), '!=', $user->getKey()),
         };
     }
 

@@ -22,6 +22,51 @@ class WordGroupControllerTest extends TestCase
         $this->{$method}('/api/word-groups')->assertUnauthorized();
     }
 
+    #[TestWith(['patchJson'])]
+    #[TestWith(['deleteJson'])]
+    public function test_changing_a_public_group_returns_401_for_guest(string $method): void
+    {
+        $wordGroup = WordGroup::factory()->public()->create();
+
+        $this->{$method}("/api/word-groups/{$wordGroup->id}")->assertUnauthorized();
+    }
+
+    public function test_show_returns_public_group_to_guest_without_creator_favorite_or_actions(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $wordGroup->id)
+            ->assertJsonPath('data.accepts_contributions', true)
+            ->assertJsonMissingPath('data.creator')
+            ->assertJsonMissingPath('data.is_favorite')
+            ->assertJsonPath('data.can', [
+                'update' => false,
+                'delete' => false,
+                'share' => false,
+                'manage_access' => false,
+                'leave' => false,
+                'add_word' => false,
+                'duplicate' => false,
+            ]);
+    }
+
+    public function test_show_returns_404_to_guest_for_private_group(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}")->assertNotFound();
+    }
+
+    public function test_show_returns_404_to_unverified_creator_of_a_private_group(): void
+    {
+        $creator = User::factory()->unverified()->create();
+        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+
+        $this->actingAs($creator)->getJson("/api/word-groups/{$wordGroup->id}")->assertNotFound();
+    }
+
     #[TestWith(['getJson'])]
     #[TestWith(['postJson'])]
     public function test_returns_403_for_unverified_user(string $method): void
