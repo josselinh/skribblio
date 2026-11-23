@@ -11,7 +11,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WordGroupController extends Controller
@@ -58,18 +57,11 @@ class WordGroupController extends Controller
     }
 
     /**
-     * Update a group. Changing its language removes it from the collections in the other language.
+     * Update a group; its language, chosen on creation, cannot change.
      */
     public function update(UpdateWordGroupRequest $request, WordGroup $wordGroup): WordGroupResource
     {
-        DB::transaction(function () use ($request, $wordGroup): void {
-            $wordGroup->fill($request->validated());
-            $hasLanguageChanged = $wordGroup->isDirty('language');
-            $wordGroup->save();
-            if ($hasLanguageChanged) {
-                $wordGroup->detachFromCollectionsInOtherLanguages();
-            }
-        });
+        $wordGroup->update($request->validated());
 
         return new WordGroupResource($wordGroup->load('creator')->loadIsFavorite($request->user()));
     }

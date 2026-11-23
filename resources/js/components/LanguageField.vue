@@ -2,16 +2,14 @@
 import { LOCALES } from '@/lib/i18n';
 import type { FavoriteKind, Locale } from '@/types/models';
 
-/** Language of the content of a group (its words) or of a collection (its groups), in the forms. */
-withDefaults(
-    defineProps<{
-        kind: FavoriteKind;
-        error?: string;
-        /** Shows what changing the language implies (on an existing item). */
-        showHint?: boolean;
-    }>(),
-    { showHint: false },
-);
+/**
+ * Language of the content of a group (its words) or of a collection (its groups), in the creation forms only:
+ * it cannot be changed afterwards.
+ */
+defineProps<{
+    kind: FavoriteKind;
+    error?: string;
+}>();
 
 const model = defineModel<Locale>({ required: true });
 </script>
@@ -21,7 +19,7 @@ const model = defineModel<Locale>({ required: true });
         <legend class="text-sm font-medium">
             {{ kind === 'word-groups' ? $t('languages.field.wordGroup') : $t('languages.field.groupCollection') }}
         </legend>
-        <p v-if="showHint" class="text-sm text-zinc-500 dark:text-zinc-400">
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">
             {{ kind === 'word-groups' ? $t('languages.field.wordGroupHint') : $t('languages.field.groupCollectionHint') }}
         </p>
         <div class="mt-2 grid grid-cols-2 gap-2">

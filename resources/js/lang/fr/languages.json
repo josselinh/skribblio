@@ -14,8 +14,8 @@
     "field": {
         "wordGroup": "Langue des mots",
         "groupCollection": "Langue des groupes",
-        "wordGroupHint": "Changer la langue retire le groupe des collections de l’autre langue : une collection ne mélange pas les langues.",
-        "groupCollectionHint": "Tous les groupes d’une collection sont dans sa langue."
+        "wordGroupHint": "Elle ne pourra plus être modifiée.",
+        "groupCollectionHint": "Tous ses groupes devront être dans cette langue, qui ne pourra plus être modifiée."
     },
     "filter": {
         "label": "Langue des listes",
