@@ -7,7 +7,8 @@ import type { Word, WordVote } from '@/types/models';
 /**
  * Thumbs up and down of a word with their counts. When the user may vote, clicking a thumb records
  * the vote, clicking it again removes it; the change is shown at once and reverted if the request fails.
- * Otherwise the counts are only displayed.
+ * Otherwise (group closed to contributions, author of the word, visitor) the same thumbs are only displayed,
+ * the user's own vote still highlighted.
  */
 const props = defineProps<{
     word: Word;
@@ -82,7 +83,8 @@ function countOf(vote: WordVote): number {
             </button>
             <span
                 v-else
-                class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 tabular-nums"
+                class="inline-flex cursor-default items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1"
+                :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-500 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700'"
                 :title="button.label"
             >
                 <span aria-hidden="true">{{ button.emoji }}</span>

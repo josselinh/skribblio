@@ -99,22 +99,7 @@ class WordControllerTest extends TestCase
             ->assertJsonPath('data.0.upvotes_count', 2)
             ->assertJsonPath('data.0.downvotes_count', 1)
             ->assertJsonPath('data.0.my_vote', 'down')
-            ->assertJsonPath('data.0.can.vote', true)
-            ->assertJsonPath('has_votes', true);
-    }
-
-    public function test_index_says_when_no_word_of_the_group_received_a_vote(): void
-    {
-        $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->createdBy($user)->create();
-        Word::factory()->for($wordGroup)->create();
-        Word::factory()->create()->voteFor($user, WordVote::Up);
-
-        $this->actingAs($user)
-            ->getJson("/api/word-groups/{$wordGroup->id}/words")
-            ->assertOk()
-            ->assertJsonPath('data.0.my_vote', null)
-            ->assertJsonPath('has_votes', false);
+            ->assertJsonPath('data.0.can.vote', true);
     }
 
     public function test_index_sorts_by_score_then_by_most_upvotes(): void

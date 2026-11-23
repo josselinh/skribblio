@@ -118,11 +118,9 @@ async function saveWordGroup(payload: NameVisibilityPayload): Promise<void> {
     await loadWords();
 }
 
-/** Votes are shown while the group is open, and afterwards when some words received votes. */
 const accessPurpose = computed<AccessPurpose>(() =>
     wordGroup.value && restrictsContributionsToMembers(wordGroup.value) ? 'contribution' : 'access',
 );
-const showVotes = computed(() => Boolean(wordGroup.value?.accepts_contributions || words.value?.has_votes));
 
 /** A new word is listed first: show page 1 so that it is visible. */
 async function onWordAdded(): Promise<void> {
@@ -273,7 +271,6 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         :sort="order.sort"
                         :direction="order.direction"
                         :default-directions="defaultDirections"
-                        :show-votes="showVotes"
                         :show-author="isMember"
                         :locked-sorts="lockedSorts"
                         @sort="sortWords"
@@ -297,7 +294,6 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         v-for="word in words.data"
                         :key="word.id"
                         :word="word"
-                        :show-votes="showVotes"
                         @updated="onWordUpdated"
                     />
                 </ul>

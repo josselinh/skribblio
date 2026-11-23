@@ -29,8 +29,6 @@ class WordController extends Controller
 
     /**
      * List the words of a group with their votes, most recently added first unless another order is asked.
-     * `has_votes` tells whether any word of the group received a vote, so that the SPA shows the votes
-     * of a group closed to contributions.
      */
     public function index(ListWordsRequest $request, WordGroup $wordGroup): AnonymousResourceCollection
     {
@@ -41,7 +39,7 @@ class WordController extends Controller
             ->paginate(self::PER_PAGE);
         $words->getCollection()->each->setRelation('wordGroup', $wordGroup);
 
-        return WordResource::collection($words)->additional(['has_votes' => $wordGroup->hasWordVotes()]);
+        return WordResource::collection($words);
     }
 
     /**
