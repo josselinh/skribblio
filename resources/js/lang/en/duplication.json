@@ -1,0 +1,17 @@
+{
+    "button": "Duplicate",
+    "processing": "Duplicating…",
+    "failed": "Could not duplicate. Try again.",
+    "title": {
+        "wordGroup": "Duplicate this group?",
+        "groupCollection": "Duplicate this collection?"
+    },
+    "description": {
+        "wordGroup": "Creates a private copy of this group and its words, with you as their author.",
+        "groupCollection": "Creates a private copy of this collection and of the groups you can see, with their words, with you as their author. Your own groups are kept as they are."
+    },
+    "done": {
+        "wordGroup": "Group duplicated. It is private and closed to contributions.",
+        "groupCollection": "Collection duplicated. It and its copied groups are private and closed to contributions. | Collection duplicated. It and its copied groups are private and closed to contributions. 1 hidden group was not copied. | Collection duplicated. It and its copied groups are private and closed to contributions. {n} hidden groups were not copied."
+    }
+}

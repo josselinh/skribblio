@@ -28,6 +28,7 @@ class CurrentUserTest extends TestCase
                 'email' => $user->email,
                 'email_verified_at' => null,
                 'theme' => 'system',
+                'locale' => 'fr',
                 'email_notifications' => [
                     'word_group_access_requested' => false,
                     'group_collection_access_requested' => false,

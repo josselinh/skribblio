@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\EmailNotification;
+use App\Enums\Locale;
 use App\Enums\Theme;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,9 +18,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'theme', 'email_notifications'])]
+#[Fillable(['name', 'email', 'password', 'theme', 'locale', 'email_notifications'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
@@ -34,8 +36,17 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'theme' => Theme::class,
+            'locale' => Locale::class,
             'email_notifications' => 'array',
         ];
+    }
+
+    /**
+     * Language of the emails sent to the user: the one they chose for the interface.
+     */
+    public function preferredLocale(): string
+    {
+        return ($this->locale ?? Locale::Fr)->value;
     }
 
     /**

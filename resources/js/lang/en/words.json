@@ -1,0 +1,79 @@
+{
+    "list": {
+        "updatedOn": "updated on {date}"
+    },
+    "count": "{n} word | {n} words",
+    "sort": {
+        "legend": "Sort the words by",
+        "prefix": "Sort:",
+        "reverse": "Reverse the order",
+        "order": "Order:",
+        "reverseHint": "(reverse)",
+        "criteria": {
+            "created": "Date added",
+            "name": "Word",
+            "score": "Votes",
+            "author": "Author",
+            "updated": "Date updated"
+        },
+        "directions": {
+            "name": {
+                "asc": "A to Z",
+                "desc": "Z to A"
+            },
+            "author": {
+                "asc": "A to Z",
+                "desc": "Z to A"
+            },
+            "created": {
+                "desc": "Newest first",
+                "asc": "Oldest first"
+            },
+            "updated": {
+                "desc": "Newest first",
+                "asc": "Oldest first"
+            },
+            "score": {
+                "desc": "Best rated first",
+                "asc": "Worst rated first"
+            }
+        }
+    },
+    "votes": {
+        "up": "Like",
+        "down": "Dislike",
+        "buttonLabel": "{vote} “{word}” ({count})",
+        "countLabel": "{vote}:",
+        "failed": "Your vote could not be saved, please try again."
+    },
+    "add": {
+        "label": "Add words",
+        "help": "Separate the words with commas or line breaks. Enter to add, Shift+Enter for a new line.",
+        "placeholder": "cat, dog, giraffe…",
+        "submit": "Add",
+        "added": "{n} word added | {n} words added",
+        "skipped": "{n} already there, skipped | {n} already there, skipped",
+        "invalid": "{n} word could not be added (left in the field to fix): | {n} words could not be added (left in the field to fix):",
+        "invalidItem": "{word}: {reason}"
+    },
+    "editor": {
+        "saved": "{n} word updated. | {n} words updated.",
+        "deleted": "{n} word deleted. | {n} words deleted.",
+        "invalid": "Some words could not be saved: fix them and try again.",
+        "saveFailed": "The changes could not be saved. Reload the page and try again.",
+        "deleteFailed": "These words could not be deleted. Reload the page and try again.",
+        "selected": "{n} word selected | {n} words selected",
+        "saveCount": "Save ({count})",
+        "selectWord": "Select “{name}”",
+        "wordLabel": "Word “{name}”",
+        "changed": "Changed",
+        "before": "(before: {name})",
+        "restore": "Restore",
+        "notEditable": "You cannot edit this word",
+        "deleteTitle": "Delete this word? | Delete {n} words?",
+        "deleteMessage": "This word will be removed from the group. This cannot be undone. | These words will be removed from the group. This cannot be undone.",
+        "discardTitle": "Discard the change? | Discard {n} changes?",
+        "discardMessage": "The changed words will go back to their current name.",
+        "discard": "Discard"
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "panel": {
+        "button": "Export for Skribbl.io",
+        "loadFailed": "The words could not be loaded.",
+        "groups": "Groups to export",
+        "selectedCount": "({selected} of {total})",
+        "selectAll": "Check all",
+        "selectNone": "Uncheck all",
+        "nothingSelected": "Choose at least one group to export.",
+        "noWords": "No words to export."
+    },
+    "list": {
+        "label": "Custom words",
+        "help": "Copy this list into the “Custom words” field of a private Skribbl.io room.",
+        "copied": "List copied. Paste it into the “Custom words” field of your Skribbl.io room.",
+        "copyFailed": "Could not copy: select the list and copy it.",
+        "wordCount": "{count} word | {count} words",
+        "characterCount": "{count} / {max} characters",
+        "tooFewWords": "Skribbl.io requires at least {min} custom words.",
+        "tooManyCharacters": "The list exceeds Skribbl.io’s limit of {max} characters.",
+        "draw": "Draw a random selection that fits within the limit",
+        "drawn": "Random selection of {count} words out of {total}.",
+        "drawAgain": "Draw again",
+        "undraw": "Back to the full list",
+        "options": "List options",
+        "deduplicate": "Remove duplicates",
+        "shuffle": "Shuffle the order",
+        "excludeLowScored": "Leave out low-rated words",
+        "threshold": "Score of {threshold} or less",
+        "thresholdLabel": "Exclusion threshold",
+        "lowerThreshold": "Lower the threshold",
+        "raiseThreshold": "Raise the threshold",
+        "excludedCount": "{n} word left out | {n} words left out",
+        "reshuffle": "Shuffle again"
+    },
+    "create": {
+        "description": "Choose groups, one by one or all those of a collection: their words are combined into a list ready to paste into Skribbl.io.",
+        "selection": "Selection",
+        "addWordGroup": "Add a group",
+        "addGroupCollection": "Add the groups of a collection",
+        "searchGroupCollection": "Search for a collection…",
+        "addGroupCollectionHint": "The groups of the chosen collection are added to the selection: you can then remove the ones you do not want.",
+        "adding": "Adding…",
+        "addFailed": "This item could not be added, please try again.",
+        "collectionAdded": {
+            "added": "No new group added from “{name}”. | 1 group from “{name}” added. | {n} groups from “{name}” added.",
+            "alreadySelected": "1 group was already in the selection. | {n} groups were already in the selection.",
+            "hidden": "1 private group of this collection is not visible to you and was not added. | {n} private groups of this collection are not visible to you and were not added."
+        },
+        "empty": "No group selected.",
+        "selectedCount": "{n} group selected | {n} groups selected",
+        "removeAll": "Remove all",
+        "removeWordGroup": "Remove the group {name}",
+        "result": "Export",
+        "saveTitle": "Save as a collection",
+        "saveDescription": "The new collection will contain the group of this selection. | The new collection will contain the {n} groups of this selection.",
+        "saved": "Collection created."
+    }
+}

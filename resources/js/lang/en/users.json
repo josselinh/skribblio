@@ -1,0 +1,11 @@
+{
+    "notFound": "User not found",
+    "loadFailed": "This user could not be loaded.",
+    "description": "Their public groups and collections, and the ones they share with you.",
+    "wordGroups": {
+        "empty": "No visible group."
+    },
+    "groupCollections": {
+        "empty": "No visible collection."
+    }
+}

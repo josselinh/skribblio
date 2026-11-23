@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { deleteGroupCollection } from '@/api/groupCollections';
@@ -26,8 +26,8 @@ const isDeleting = ref(false);
 const error = ref<string | null>(null);
 
 const item = itemKey(props.kind);
-const title = t(`deletion.title.${item}`);
-const warning = t(`deletion.warning.${item}`);
+const title = computed(() => t(`deletion.title.${item}`));
+const warning = computed(() => t(`deletion.warning.${item}`));
 
 function askConfirmation(): void {
     error.value = null;

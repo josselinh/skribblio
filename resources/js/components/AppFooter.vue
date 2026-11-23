@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { useLocaleChoice } from '@/composables/useLocaleChoice';
+import { LOCALES } from '@/lib/i18n';
+
+const { locale, changeLocale } = useLocaleChoice();
+
 const repositoryUrl = 'https://github.com/josselinh/skribblio';
 </script>
 
@@ -21,5 +26,23 @@ const repositoryUrl = 'https://github.com/josselinh/skribblio';
             </a>
         </p>
         <p class="mt-1">{{ $t('layout.footer.notAffiliated') }}</p>
+        <div class="mt-3 flex items-center justify-center gap-1" role="group" :aria-label="$t('layout.footer.language')">
+            <button
+                v-for="choice in LOCALES"
+                :key="choice"
+                type="button"
+                :lang="choice"
+                :aria-pressed="locale === choice"
+                class="rounded-md px-2 py-1 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+                :class="
+                    locale === choice
+                        ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-950 dark:text-brand-300'
+                        : 'hover:text-zinc-900 dark:hover:text-zinc-100'
+                "
+                @click="changeLocale(choice)"
+            >
+                {{ $t(`layout.locales.${choice}`) }}
+            </button>
+        </div>
     </footer>
 </template>

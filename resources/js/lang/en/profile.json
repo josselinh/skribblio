@@ -1,0 +1,59 @@
+{
+    "title": "My profile",
+    "nav": {
+        "label": "My account",
+        "profile": "Profile",
+        "security": "Security",
+        "preferences": "Preferences"
+    },
+    "information": {
+        "title": "Information",
+        "emailHint": "If you change it, you will have to confirm the new address before going on.",
+        "saved": "Your profile has been updated."
+    },
+    "password": {
+        "current": "Current password",
+        "confirmation": "Confirm the new password",
+        "submit": "Change the password",
+        "saved": "Your password has been changed."
+    },
+    "deletion": {
+        "title": "Delete my account",
+        "description": "Your groups, their words, your collections and your favorites will be permanently deleted. The words you added to other people’s groups will stay there, without your username.",
+        "confirmTitle": "Delete your account?",
+        "confirmMessage": "Everything you created will be deleted and the people you shared it with will no longer have access to it. This cannot be undone.",
+        "password": "Password, to confirm",
+        "failed": "Your account could not be deleted. Try again.",
+        "done": "Your account has been deleted."
+    },
+    "security": {
+        "title": "Security"
+    },
+    "preferences": {
+        "title": "Preferences",
+        "saved": "Your preferences have been saved.",
+        "failed": "Your preferences could not be saved. Try again.",
+        "language": {
+            "title": "Interface language",
+            "description": "The language of the menus, buttons and emails. It does not change the language of the words."
+        },
+        "theme": {
+            "title": "Theme",
+            "description": "The system theme follows your device’s setting.",
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "emails": {
+            "title": "Emails",
+            "description": "Choose which emails you receive. The ones about your account (address confirmation, forgotten password) are always sent.",
+            "accessRequests": "Access and contribution requests",
+            "favorites": "Favorites",
+            "word_group_access_requested": "Someone asks for access to one of your groups, or to contribute to it",
+            "group_collection_access_requested": "Someone asks for access to one of your collections, or to contribute to it",
+            "access_request_decided": "One of your requests is accepted or refused",
+            "word_group_favorited": "Someone adds one of your groups to their favorites",
+            "group_collection_favorited": "Someone adds one of your collections to their favorites"
+        }
+    }
+}

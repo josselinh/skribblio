@@ -1,0 +1,10 @@
+{
+    "login": "Log in",
+    "register": "Sign up",
+    "verifyEmail": "Confirm your email address to contribute.",
+    "contribute": {
+        "wordGroup": "Sign up or log in to add words to this group and vote.",
+        "groupCollection": "Sign up or log in to add groups to this collection."
+    },
+    "lockedOption": "Log in to use this option."
+}

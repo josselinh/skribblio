@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Enums\EmailNotification;
+use App\Enums\Locale;
 use App\Enums\Theme;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,6 +50,18 @@ class PreferencesControllerTest extends TestCase
         $this->assertFalse($user->wantsEmail(EmailNotification::GroupCollectionFavorited));
     }
 
+    public function test_updates_the_interface_language(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['locale' => 'en'])
+            ->assertOk()
+            ->assertJsonPath('data.locale', 'en');
+
+        $this->assertSame(Locale::En, $user->fresh()->locale);
+    }
+
     public function test_turning_an_email_back_off_stops_it(): void
     {
         $user = User::factory()->wantsEmails()->create();
@@ -65,10 +78,11 @@ class PreferencesControllerTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->patchJson('/api/user/preferences', ['theme' => 'pink', 'email_notifications' => ['newsletter' => true]])
+            ->patchJson('/api/user/preferences', ['theme' => 'pink', 'locale' => 'de', 'email_notifications' => ['newsletter' => true]])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
                 'theme' => 'Le champ thème sélectionné est invalide.',
+                'locale' => 'Le champ langue sélectionné est invalide.',
                 'email_notifications',
             ]);
 

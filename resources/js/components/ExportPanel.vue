@@ -50,7 +50,7 @@ const isNothingSelected = computed(() => showsSelection.value && selectedWordGro
 const words = computed(() =>
     props.kind === 'word-groups'
         ? wordGroupWords.value
-        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.name.localeCompare(b.name, intlLocale)),
+        : selectedWordGroups.value.flatMap((wordGroup) => wordGroup.words).sort((a, b) => a.name.localeCompare(b.name, intlLocale())),
 );
 
 function toggleWordGroup(id: string, isSelected: boolean): void {

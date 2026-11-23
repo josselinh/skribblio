@@ -1,0 +1,53 @@
+{
+    "card": {
+        "updatedOn": "Updated on",
+        "becamePrivate": "This collection became private: you no longer have access to it."
+    },
+    "create": {
+        "title": "New collection",
+        "submit": "Create the collection"
+    },
+    "fields": {
+        "name": "Collection name"
+    },
+    "show": {
+        "notFound": {
+            "title": "Collection not found",
+            "description": "This collection does not exist or you do not have access to it."
+        },
+        "loadFailed": "The collection could not be loaded.",
+        "hidden": {
+            "message": "1 group of this collection is private and not visible to you. | {n} groups of this collection are private and not visible to you.",
+            "exportNote": "The words of the groups hidden from you are not exported.",
+            "request": "Request access to the private groups",
+            "requested": "Access request sent.",
+            "confirmation": {
+                "title": "Request access to the private groups?",
+                "message": "The creator of the private group will receive your request by email and can accept or refuse it. You will see the group if they accept. | The creator of each of the {n} private groups will receive your request by email and can accept or refuse it. You will see each group whose request is accepted.",
+                "confirm": "Send the request",
+                "processing": "Sending…",
+                "done": "Access request sent."
+            }
+        },
+        "editGroups": "Edit the groups",
+        "membersOnly": "Only the people allowed by the creator of this collection can add groups to it. Ask them for their share link to offer to contribute.",
+        "closed": "This collection is not open to contributions: only its creator can change its groups.",
+        "empty": "This collection no longer contains any group: the ones it contained were deleted.",
+        "noVisibleGroup": "No visible group in this collection.",
+        "addition": {
+            "title": "Add this group to the collection?",
+            "processing": "Adding…",
+            "message": {
+                "public": "The group “{name}” will be added to this collection.",
+                "private": "The group “{name}” will be added to this collection. It is private: it will stay hidden from the people who do not have access to it."
+            },
+            "done": "Group “{name}” added to the collection."
+        },
+        "removal": {
+            "title": "Remove this group from the collection? | Remove {n} groups from the collection?",
+            "message": "The group itself and its words are kept: it is only removed from this collection. | The groups themselves and their words are kept: they are only removed from this collection.",
+            "done": "1 group removed from the collection. | {n} groups removed from the collection.",
+            "keepOne": "A collection must contain at least one group: keep at least one."
+        }
+    }
+}

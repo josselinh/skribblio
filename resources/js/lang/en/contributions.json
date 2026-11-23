@@ -1,0 +1,25 @@
+{
+    "badge": {
+        "open": "Open to contributions",
+        "membersOnly": "Contributions by permission",
+        "openHint": "People who have access can contribute.",
+        "membersOnlyHint": "Only the people allowed by the creator can contribute."
+    },
+    "field": {
+        "label": "Open to contributions",
+        "who": "Who can contribute?",
+        "description": {
+            "wordGroup": "Allowed people can add words to it, and edit or delete their own. When closed, only you can change the list; the words already added are kept.",
+            "groupCollection": "Allowed people can add groups to it, and remove the ones they added. When closed, only you can change its groups; the ones already added are kept."
+        },
+        "everyone": {
+            "wordGroup": "Everyone who can see the group",
+            "groupCollection": "Everyone who can see the collection",
+            "description": "Every logged-in user can contribute."
+        },
+        "membersOnly": {
+            "label": "Only the people I allow",
+            "description": "Everyone can view it, but only the people you accept through the share link can contribute."
+        }
+    }
+}

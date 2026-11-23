@@ -63,7 +63,7 @@ const duplicatesCount = computed(() => keptNames.value.length - deduplicateWords
 const hasTooFewWords = computed(() => exportedWords.value.length < SKRIBBL_MIN_WORDS);
 const isOverCharacterLimit = computed(() => exportedList.value.length > SKRIBBL_MAX_CHARACTERS);
 
-const numberFormat = new Intl.NumberFormat(intlLocale);
+const numberFormat = computed(() => new Intl.NumberFormat(intlLocale()));
 
 /** The option stays visible to visitors, but only says that logging in is needed (the header has the links). */
 function onLockedOptionClick(event: Event): void {

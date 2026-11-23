@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { duplicateGroupCollection } from '@/api/groupCollections';
@@ -27,8 +27,8 @@ const isConfirming = ref(false);
 const isDuplicating = ref(false);
 const error = ref<string | null>(null);
 
-const title = t(`duplication.title.${itemKey(props.kind)}`);
-const description = t(`duplication.description.${itemKey(props.kind)}`);
+const title = computed(() => t(`duplication.title.${itemKey(props.kind)}`));
+const description = computed(() => t(`duplication.description.${itemKey(props.kind)}`));
 
 function askConfirmation(): void {
     error.value = null;

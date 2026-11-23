@@ -1,0 +1,39 @@
+{
+    "footer": {
+        "license": "Open source project under the MIT license",
+        "sourceCode": "Source code on GitHub",
+        "reportIssue": "Report an issue",
+        "notAffiliated": "Independent project, not affiliated with Skribbl.io.",
+        "language": "Language"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "backHome": "Back to home"
+    },
+    "pagination": {
+        "label": "Pagination",
+        "previous": "← Previous",
+        "next": "Next →",
+        "status": "Page {current} of {last}"
+    },
+    "header": {
+        "mainNavigation": "Main navigation",
+        "dashboard": "Dashboard",
+        "explore": "Explore",
+        "searchLabel": "Search for a group or a collection",
+        "searchPlaceholder": "Search for a group or a collection…"
+    },
+    "userMenu": {
+        "profile": "My profile",
+        "security": "Security",
+        "preferences": "Preferences",
+        "logout": "Log out"
+    },
+    "toasts": {
+        "close": "Close the notification"
+    },
+    "locales": {
+        "fr": "Français",
+        "en": "English"
+    }
+}

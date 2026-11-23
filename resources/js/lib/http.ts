@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { currentLocale } from '@/lib/i18n';
 
 /**
  * Shared HTTP client. Authentication relies on Laravel's session cookie
@@ -12,6 +13,13 @@ export const http = axios.create({
         Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
     },
+});
+
+/** Tells the server the interface's language, used for the messages of a visitor and when they register. */
+http.interceptors.request.use((config) => {
+    config.headers.set('X-Locale', currentLocale());
+
+    return config;
 });
 
 /** Initializes (or refreshes) the CSRF cookie before a state-changing auth request. */

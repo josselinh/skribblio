@@ -6,14 +6,23 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        {{-- Applies the theme before the first paint, as resources/js/lib/theme.ts does afterwards. --}}
+        {{-- Applies the theme and the language before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
         <script>
             (() => {
                 let theme = 'system';
-                try { theme = localStorage.getItem('theme') ?? 'system'; } catch {}
+                let locale = null;
+                try {
+                    theme = localStorage.getItem('theme') ?? 'system';
+                    locale = localStorage.getItem('locale');
+                } catch {}
                 if (theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                 }
+                if (locale !== 'fr' && locale !== 'en') {
+                    const browserLocales = navigator.languages.length > 0 ? navigator.languages : [navigator.language];
+                    locale = browserLocales.map((tag) => tag.slice(0, 2).toLowerCase()).find((tag) => tag === 'fr' || tag === 'en') ?? 'en';
+                }
+                document.documentElement.lang = locale;
             })();
         </script>
 
