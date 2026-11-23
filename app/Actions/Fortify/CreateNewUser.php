@@ -17,7 +17,7 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Validate and create a newly registered user, in the language they were using (so that the verification
-     * email is sent in it).
+     * email is sent in it), which is also, until they change it, the language of the lists they browse.
      *
      * @param  array<string, string>  $input
      *
@@ -41,7 +41,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
-            'locale' => Locale::tryFrom(App::currentLocale()) ?? Locale::Fr,
+            'locale' => $locale = Locale::tryFrom(App::currentLocale()) ?? Locale::Fr,
+            'content_locale' => $locale,
         ]);
     }
 }

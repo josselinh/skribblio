@@ -10,10 +10,14 @@ import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
 import { useToasts } from '@/composables/useToasts';
+import { preferredContentLanguage } from '@/lib/contentLanguage';
+import { LOCALES } from '@/lib/i18n';
 import { useAuthStore } from '@/stores/auth';
-import type { AuthorFilter, SearchSort } from '@/types/models';
+import type { AuthorFilter, Locale, SearchSort } from '@/types/models';
 
 type TypeFilter = 'all' | 'word-groups' | 'group-collections';
+/** Language of the lists shown, or every language. */
+type LanguageFilter = Locale | 'all';
 
 /** With "Tout", each section shows a preview; filtering on a type shows a full paginated list. */
 const PREVIEW_SIZE = 6;
@@ -44,6 +48,10 @@ const typeOptions = computed(() => [
     { value: 'word-groups' as const, label: t('search.types.wordGroups') },
     { value: 'group-collections' as const, label: t('search.types.groupCollections') },
 ]);
+const languageOptions = computed(() => [
+    ...LOCALES.map((value) => ({ value, label: t(`languages.names.${value}`) })),
+    { value: 'all' as const, label: t('languages.filter.all') },
+]);
 const authorOptions = computed(() =>
     (['all', 'me', 'others'] as const).map((value) => ({ value, label: t(`search.authors.${value}`) })),
 );
@@ -71,6 +79,9 @@ function queryValue<T extends string>(key: string, allowed: readonly T[], fallba
 const q = computed(() => (typeof route.query.q === 'string' ? route.query.q : ''));
 const type = computed(() => queryValue<TypeFilter>('type', ['all', 'word-groups', 'group-collections'], 'all'));
 const isCatalogue = computed(() => q.value === '');
+/** The user's content language by default (the interface's for a visitor), left out of the URL. */
+const defaultLanguage = computed<LanguageFilter>(() => preferredContentLanguage());
+const language = computed(() => queryValue<LanguageFilter>('lang', [...LOCALES, 'all'], defaultLanguage.value));
 const author = computed(() =>
     isMember.value ? queryValue<AuthorFilter>('author', ['all', 'me', 'others'], defaultAuthor(q.value)) : 'all',
 );
@@ -91,6 +102,7 @@ function updateQuery(changes: LocationQueryRaw): Promise<unknown> {
     const query: LocationQueryRaw = {
         q: q.value || undefined,
         type: type.value,
+        lang: language.value,
         author: author.value,
         sort: sort.value,
         ...changes,
@@ -98,6 +110,9 @@ function updateQuery(changes: LocationQueryRaw): Promise<unknown> {
     };
     if (query.type === 'all') {
         query.type = undefined;
+    }
+    if (query.lang === defaultLanguage.value) {
+        query.lang = undefined;
     }
     if (query.author === defaultAuthor(typeof query.q === 'string' ? query.q : '')) {
         query.author = undefined;
@@ -116,12 +131,13 @@ const wordGroups = usePaginatedList(
             : fetchWordGroupSearchResults({
                   q: q.value,
                   author: author.value,
+                  language: language.value === 'all' ? null : language.value,
                   sort: sort.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, author, sort],
+    [q, type, language, author, sort],
 );
 
 const groupCollections = usePaginatedList(
@@ -131,12 +147,13 @@ const groupCollections = usePaginatedList(
             : fetchGroupCollectionSearchResults({
                   q: q.value,
                   author: author.value,
+                  language: language.value === 'all' ? null : language.value,
                   sort: sort.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, author, sort],
+    [q, type, language, author, sort],
 );
 
 /** In preview mode ("Tout"), link to the full list of one type when there are more results. */
@@ -192,6 +209,20 @@ const pillClass = (isActive: boolean) =>
                         class="sr-only"
                         :checked="type === option.value"
                         @change="updateQuery({ type: option.value })"
+                    />
+                    {{ option.label }}
+                </label>
+            </fieldset>
+            <fieldset class="flex flex-wrap items-center gap-2">
+                <legend class="sr-only">{{ $t('languages.filter.label') }}</legend>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('languages.filter.prefix') }}</span>
+                <label v-for="option in languageOptions" :key="option.value" :class="pillClass(language === option.value)">
+                    <input
+                        type="radio"
+                        name="lang"
+                        class="sr-only"
+                        :checked="language === option.value"
+                        @change="updateQuery({ lang: option.value })"
                     />
                     {{ option.label }}
                 </label>

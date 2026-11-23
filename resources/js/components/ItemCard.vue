@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
+import LanguageBadge from '@/components/LanguageBadge.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { formatDateTime } from '@/lib/format';
-import type { Visibility } from '@/types/models';
+import type { Locale, Visibility } from '@/types/models';
 
 /**
  * Card of a group or a collection. The title's link is stretched over the whole card, so that the card
@@ -14,6 +15,7 @@ import type { Visibility } from '@/types/models';
 defineProps<{
     to: RouteLocationRaw;
     name: string;
+    language: Locale;
     visibility: Visibility;
     acceptsContributions: boolean;
     /** Public and open to its members only. */
@@ -48,7 +50,10 @@ defineProps<{
                     </RouterLink>
                     <span v-else class="cursor-not-allowed">{{ name }}</span>
                 </h3>
-                <VisibilityBadge :visibility="visibility" />
+                <div class="flex shrink-0 items-center gap-1.5">
+                    <LanguageBadge :language="language" />
+                    <VisibilityBadge :visibility="visibility" />
+                </div>
             </div>
             <slot name="meta" />
             <div v-if="acceptsContributions && isAccessible">

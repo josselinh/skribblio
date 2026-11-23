@@ -90,6 +90,7 @@ class WordGroupControllerTest extends TestCase
             ->assertJsonPath('data.0', [
                 'id' => $newerGroup->id,
                 'name' => $newerGroup->name,
+                'language' => 'fr',
                 'visibility' => 'public',
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,

@@ -260,6 +260,7 @@ watch(
             <div class="mt-2">
                 <EditableNameVisibility
                     :name="groupCollection.name"
+                    :language="groupCollection.language"
                     :visibility="groupCollection.visibility"
                     :accepts-contributions="groupCollection.accepts_contributions"
                     :contributions-members-only="groupCollection.contributions_members_only"
@@ -360,6 +361,7 @@ watch(
                     <label for="add-word-group" class="sr-only">{{ $t('exports.create.addWordGroup') }}</label>
                     <WordGroupSearch
                         input-id="add-word-group"
+                        :language="groupCollection.language"
                         :excluded-ids="wordGroupIds"
                         :disabled="isUpdatingGroups"
                         @select="confirmAddition"

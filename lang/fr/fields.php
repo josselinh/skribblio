@@ -8,6 +8,8 @@ declare(strict_types=1);
 return [
     'pseudo' => 'pseudo',
     'theme' => 'thème',
+    'content_locale' => 'langue des listes',
+    'language' => 'langue',
     'locale' => 'langue',
     'email_notifications' => 'notifications par email',
     'visibility' => 'visibilité',

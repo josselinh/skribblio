@@ -18,12 +18,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'theme', 'locale', 'email_notifications'])]
+#[Fillable(['name', 'email', 'password', 'theme', 'locale', 'content_locale', 'email_notifications'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
+
+    /**
+     * Default values, matching the database defaults.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'locale' => 'fr',
+        'content_locale' => 'fr',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -37,6 +47,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'password' => 'hashed',
             'theme' => Theme::class,
             'locale' => Locale::class,
+            'content_locale' => Locale::class,
             'email_notifications' => 'array',
         ];
     }

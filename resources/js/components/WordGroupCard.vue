@@ -24,6 +24,7 @@ function updateFavorite(isFavorite: boolean): void {
     <ItemCard
         :to="{ name: 'word-groups.show', params: { id: wordGroup.id } }"
         :name="wordGroup.name"
+        :language="wordGroup.language"
         :visibility="wordGroup.visibility"
         :accepts-contributions="wordGroup.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(wordGroup)"

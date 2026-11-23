@@ -25,6 +25,7 @@ class GroupCollectionResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'language' => $this->language->value,
             'visibility' => $this->visibility->value,
             'accepts_contributions' => $this->accepts_contributions,
             'contributions_members_only' => $this->contributions_members_only,

@@ -1,20 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { createGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
+import LanguageField from '@/components/LanguageField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import WordGroupPicker from '@/components/WordGroupPicker.vue';
 import { useForm } from '@/composables/useForm';
+import { preferredContentLanguage } from '@/lib/contentLanguage';
 import type { Visibility, WordGroup } from '@/types/models';
 
 const router = useRouter();
 
 const selectedWordGroups = ref<WordGroup[]>([]);
-const form = useForm({ name: '', visibility: 'private' as Visibility, accepts_contributions: false, contributions_members_only: false });
+const form = useForm({
+    name: '',
+    language: preferredContentLanguage(),
+    visibility: 'private' as Visibility,
+    accepts_contributions: false,
+    contributions_members_only: false,
+});
+
+/** A collection never mixes languages: switching its language drops the groups picked in the other one. */
+watch(
+    () => form.data.language,
+    (language) => {
+        selectedWordGroups.value = selectedWordGroups.value.filter((wordGroup) => wordGroup.language === language);
+    },
+);
 
 /** Errors on the list itself or on one of its items (`word_group_ids.0`…). */
 const wordGroupsError = computed(
@@ -51,6 +67,7 @@ async function submit(): Promise<void> {
                     :error="form.errors.value.name"
                     required
                 />
+                <LanguageField v-model="form.data.language" kind="group-collections" :error="form.errors.value.language" />
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                 <ContributionsField
                     v-model="form.data.accepts_contributions"
@@ -60,7 +77,7 @@ async function submit(): Promise<void> {
                     :error="form.errors.value.accepts_contributions"
                     :members-only-error="form.errors.value.contributions_members_only"
                 />
-                <WordGroupPicker v-model="selectedWordGroups" :error="wordGroupsError" />
+                <WordGroupPicker v-model="selectedWordGroups" :language="form.data.language" :error="wordGroupsError" />
                 <PrimaryButton :is-loading="form.isProcessing.value">{{ $t('groupCollections.create.submit') }}</PrimaryButton>
             </form>
         </div>

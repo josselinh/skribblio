@@ -1,11 +1,13 @@
 import { http } from '@/lib/http';
 import type { PaginatedResponse } from '@/types/api';
-import type { AuthorFilter, GroupCollection, SearchSort, WordGroup } from '@/types/models';
+import type { AuthorFilter, GroupCollection, Locale, SearchSort, WordGroup } from '@/types/models';
 
 export interface SearchParams {
     /** Searched in names only; empty lists everything visible. */
     q: string;
     author: AuthorFilter;
+    /** Language of the content; every language when null. */
+    language: Locale | null;
     /** `recent` by default. */
     sort?: SearchSort;
     page: number;
@@ -13,8 +15,8 @@ export interface SearchParams {
     perPage?: number;
 }
 
-function toQuery({ q, author, sort, page, perPage }: SearchParams) {
-    return { q: q || undefined, author, sort, page, per_page: perPage };
+function toQuery({ q, author, language, sort, page, perPage }: SearchParams) {
+    return { q: q || undefined, author, language: language ?? undefined, sort, page, per_page: perPage };
 }
 
 /** Groups the current user can see (own and public), names starting with `q` first, then `sort`. */

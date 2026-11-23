@@ -1,0 +1,32 @@
+{
+    "names": {
+        "fr": "Français",
+        "en": "Anglais"
+    },
+    "codes": {
+        "fr": "FR",
+        "en": "EN"
+    },
+    "badgeHint": {
+        "fr": "Mots en français",
+        "en": "Mots en anglais"
+    },
+    "field": {
+        "wordGroup": "Langue des mots",
+        "groupCollection": "Langue des groupes",
+        "wordGroupHint": "Changer la langue retire le groupe des collections de l’autre langue : une collection ne mélange pas les langues.",
+        "groupCollectionHint": "Tous les groupes d’une collection sont dans sa langue."
+    },
+    "filter": {
+        "label": "Langue des listes",
+        "prefix": "Langue :",
+        "all": "Toutes"
+    },
+    "preference": {
+        "title": "Langue des listes",
+        "description": "La langue des groupes et collections proposés par défaut dans l’Explorer, et de vos nouveaux groupes. Elle peut différer de celle de l’interface, par exemple pour progresser dans une langue."
+    },
+    "picker": {
+        "hint": "Seuls les groupes dans la langue de la collection sont proposés."
+    }
+}

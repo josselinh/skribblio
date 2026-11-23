@@ -186,6 +186,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             <div class="mt-2">
                 <EditableNameVisibility
                     :name="wordGroup.name"
+                    :language="wordGroup.language"
                     :visibility="wordGroup.visibility"
                     :accepts-contributions="wordGroup.accepts_contributions"
                     :contributions-members-only="wordGroup.contributions_members_only"

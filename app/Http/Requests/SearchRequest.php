@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AuthorFilter;
+use App\Enums\Locale;
 use App\Enums\SearchSort;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,6 +40,7 @@ class SearchRequest extends FormRequest
     {
         return [
             'q' => ['nullable', 'string', 'max:255'],
+            'language' => ['nullable', Rule::enum(Locale::class)],
             'author' => ['nullable', $this->user() ? Rule::enum(AuthorFilter::class) : Rule::enum(AuthorFilter::class)->only(AuthorFilter::All)],
             'sort' => ['nullable', $this->user() ? Rule::enum(SearchSort::class) : Rule::enum(SearchSort::class)->except(self::MEMBERS_ONLY_SORTS)],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
@@ -61,6 +63,14 @@ class SearchRequest extends FormRequest
     public function search(): ?string
     {
         return $this->validated('q');
+    }
+
+    /**
+     * Language of the content searched; every language when none is given.
+     */
+    public function language(): ?Locale
+    {
+        return Locale::tryFrom((string) $this->validated('language'));
     }
 
     public function author(): AuthorFilter

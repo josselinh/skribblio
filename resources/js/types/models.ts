@@ -1,7 +1,10 @@
 /** Colour theme of the interface: the system's one, or forced light or dark. */
 export type Theme = 'system' | 'light' | 'dark';
 
-/** Language of the interface (and of the emails sent to the user). */
+/**
+ * A language of the application: the interface's (and the emails'), or the content's (the words of a group,
+ * the groups of a collection), chosen independently.
+ */
 export type Locale = 'fr' | 'en';
 
 /** Kinds of emails the user chooses to receive or not (account emails are always sent). */
@@ -20,7 +23,10 @@ export interface User {
     email: string;
     email_verified_at: string | null;
     theme: Theme;
+    /** Language of the interface and of the emails. */
     locale: Locale;
+    /** Language of the lists the user browses by default (Explorer). */
+    content_locale: Locale;
     /** Whether each kind of email is sent to the user. */
     email_notifications: Record<EmailNotification, boolean>;
     created_at: string | null;
@@ -31,6 +37,8 @@ export type Visibility = 'public' | 'private';
 export interface WordGroup {
     id: string;
     name: string;
+    /** Language of its words. */
+    language: Locale;
     visibility: Visibility;
     /** Whether the users who can see it can add words (and manage theirs). */
     accepts_contributions: boolean;
@@ -93,6 +101,8 @@ export type SortDirection = 'asc' | 'desc';
 export interface GroupCollection {
     id: string;
     name: string;
+    /** Language of its groups, which are all in it. */
+    language: Locale;
     visibility: Visibility;
     /** Whether the users who can see it can add groups (and remove the ones they added). */
     accepts_contributions: boolean;

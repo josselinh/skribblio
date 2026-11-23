@@ -10,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * The current user's preferences: the theme, the interface language and the emails they receive. Each field is optional, and only the
+ * The current user's preferences: the theme, the interface language, the language of the lists they browse and the emails they receive. Each field is optional, and only the
  * kinds of emails given are changed.
  */
 class UpdatePreferencesRequest extends FormRequest
@@ -33,6 +33,7 @@ class UpdatePreferencesRequest extends FormRequest
         return [
             'theme' => ['sometimes', Rule::enum(Theme::class)],
             'locale' => ['sometimes', Rule::enum(Locale::class)],
+            'content_locale' => ['sometimes', Rule::enum(Locale::class)],
             'email_notifications' => ['sometimes', 'array:'.implode(',', EmailNotification::values())],
             'email_notifications.*' => ['boolean'],
         ];
@@ -48,6 +49,7 @@ class UpdatePreferencesRequest extends FormRequest
         return [
             'theme' => __('fields.theme'),
             'locale' => __('fields.locale'),
+            'content_locale' => __('fields.content_locale'),
             'email_notifications' => __('fields.email_notifications'),
             'email_notifications.*' => __('fields.email_notifications'),
         ];

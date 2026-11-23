@@ -6,6 +6,7 @@ use App\Enums\Visibility;
 use App\Models\Concerns\AcceptsContributions;
 use App\Models\Concerns\Favoritable;
 use App\Models\Concerns\HasCopyName;
+use App\Models\Concerns\HasLanguage;
 use App\Models\Concerns\HasSearchableName;
 use App\Models\Concerns\HasVisibility;
 use App\Models\Concerns\Shareable;
@@ -23,11 +24,11 @@ use Illuminate\Support\Facades\DB;
  * the groups it contains may have any visibility, including private groups
  * that other viewers of the collection cannot see.
  */
-#[Fillable(['name', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
+#[Fillable(['name', 'language', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
 class GroupCollection extends Model
 {
     /** @use HasFactory<GroupCollectionFactory> */
-    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasSearchableName, HasUuids, HasVisibility, Shareable;
+    use AcceptsContributions, Favoritable, HasCopyName, HasFactory, HasLanguage, HasSearchableName, HasUuids, HasVisibility, Shareable;
 
     /**
      * Default values, matching the database defaults: collections are closed to contributions.
@@ -50,6 +51,7 @@ class GroupCollection extends Model
         return DB::transaction(function () use ($user): self {
             $copy = $user->groupCollections()->create([
                 'name' => $this->copyName(),
+                'language' => $this->language,
                 'visibility' => Visibility::Private,
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,

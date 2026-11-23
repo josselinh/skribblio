@@ -11,7 +11,8 @@ use App\Models\WordGroup;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
- * Searches, by name, the groups and collections the current user can see (their own and public ones).
+ * Searches, by name, the groups and collections the current user can see (their own and public ones), in one
+ * language or in all of them.
  * Names starting with the search come first, then the chosen sort (most recently updated by default).
  */
 class SearchController extends Controller
@@ -20,6 +21,7 @@ class SearchController extends Controller
     {
         $wordGroups = WordGroup::visibleTo($request->user())
             ->createdByAuthor($request->author(), $request->user())
+            ->inLanguage($request->language())
             ->nameContains($request->search())
             ->with('creator')
             ->withCount('words')
@@ -36,6 +38,7 @@ class SearchController extends Controller
     {
         $groupCollections = GroupCollection::visibleTo($request->user())
             ->createdByAuthor($request->author(), $request->user())
+            ->inLanguage($request->language())
             ->nameContains($request->search())
             ->with('creator')
             ->withCount('wordGroups')

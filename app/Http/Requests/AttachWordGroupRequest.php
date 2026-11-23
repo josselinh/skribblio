@@ -34,8 +34,8 @@ class AttachWordGroupRequest extends FormRequest
     }
 
     /**
-     * The group must exist and be attachable by the user (any group they can see). A private
-     * group of another user is reported as not found, without revealing that it exists.
+     * The group must exist, be attachable by the user (any group they can see) and be in the collection's
+     * language. A private group of another user is reported as not found, without revealing that it exists.
      *
      * @return array<int, callable>
      */
@@ -49,6 +49,14 @@ class AttachWordGroupRequest extends FormRequest
                 $wordGroup = $this->wordGroup();
                 if ($wordGroup === null || ! $this->user()->can('attachWordGroup', [$this->groupCollection(), $wordGroup])) {
                     $validator->errors()->add('word_group_id', __('word_groups.not_found'));
+
+                    return;
+                }
+                if ($wordGroup->language !== $this->groupCollection()->language) {
+                    $validator->errors()->add('word_group_id', __('group_collections.word_groups.wrong_language', [
+                        'group_language' => $wordGroup->language->label(),
+                        'language' => $this->groupCollection()->language->label(),
+                    ]));
                 }
             },
         ];

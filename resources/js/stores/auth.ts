@@ -34,6 +34,7 @@ export interface UpdatePasswordPayload {
 export interface PreferencesPayload {
     theme?: Theme;
     locale?: Locale;
+    content_locale?: Locale;
     email_notifications?: Partial<Record<EmailNotification, boolean>>;
 }
 

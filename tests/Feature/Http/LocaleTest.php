@@ -41,7 +41,7 @@ class LocaleTest extends TestCase
             ->assertJsonValidationErrors(['names' => 'Enter at least one word.']);
     }
 
-    public function test_registration_keeps_the_language_used_and_sends_the_verification_email_in_it(): void
+    public function test_registration_keeps_the_language_used_for_the_interface_and_the_content_and_sends_the_verification_email_in_it(): void
     {
         Notification::fake();
 
@@ -54,6 +54,7 @@ class LocaleTest extends TestCase
 
         $user = User::firstWhere('email', 'alice@example.com');
         $this->assertSame(Locale::En, $user->locale);
+        $this->assertSame(Locale::En, $user->content_locale);
         Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'en');
     }
 

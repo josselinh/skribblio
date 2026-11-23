@@ -4,28 +4,32 @@ import { useI18n } from 'vue-i18n';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
+import LanguageBadge from '@/components/LanguageBadge.vue';
+import LanguageField from '@/components/LanguageField.vue';
 import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
 import { useToasts } from '@/composables/useToasts';
 import { itemKey } from '@/lib/i18n';
-import type { FavoriteKind, User, Visibility } from '@/types/models';
+import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
     name: string;
+    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
 }
 
 /**
- * Page title showing a name, a visibility badge, whether contributions are open and the creator, with a "Modifier"
+ * Page title showing a name, language and visibility badges, whether contributions are open and the creator, with a "Modifier"
  * button that turns it into an inline form (saving is confirmed in a notification), followed by the `actions` slot (e.g. deletion). Used by the group and
  * collection pages.
  */
 const props = defineProps<{
     name: string;
+    language: Locale;
     visibility: Visibility;
     acceptsContributions: boolean;
     contributionsMembersOnly: boolean;
@@ -45,6 +49,7 @@ const { t } = useI18n();
 const isEditing = ref(false);
 const form = useForm<NameVisibilityPayload>({
     name: props.name,
+    language: props.language,
     visibility: props.visibility,
     accepts_contributions: props.acceptsContributions,
     contributions_members_only: props.contributionsMembersOnly,
@@ -52,6 +57,7 @@ const form = useForm<NameVisibilityPayload>({
 
 function startEditing(): void {
     form.data.name = props.name;
+    form.data.language = props.language;
     form.data.visibility = props.visibility;
     form.data.accepts_contributions = props.acceptsContributions;
     form.data.contributions_members_only = props.contributionsMembersOnly;
@@ -76,6 +82,7 @@ async function submit(): Promise<void> {
         @keydown.esc="isEditing = false"
     >
         <FormField id="edit-name" v-model="form.data.name" :label="nameLabel" :error="form.errors.value.name" required />
+        <LanguageField v-model="form.data.language" :kind="kind" :error="form.errors.value.language" show-hint />
         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
         <ContributionsField
             v-model="form.data.accepts_contributions"
@@ -107,6 +114,7 @@ async function submit(): Promise<void> {
         <div class="min-w-0">
             <div class="flex min-w-0 flex-wrap items-center gap-3">
                 <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
+                <LanguageBadge :language="language" />
                 <VisibilityBadge :visibility="visibility" />
                 <ContributionsBadge
                     v-if="acceptsContributions"

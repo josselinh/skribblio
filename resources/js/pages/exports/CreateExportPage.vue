@@ -107,7 +107,7 @@ function removeAll(): void {
 }
 
 function searchGroupCollections(query: string): Promise<GroupCollection[]> {
-    return fetchGroupCollectionSearchResults({ q: query, author: 'all', page: 1, perPage: 10 }).then(
+    return fetchGroupCollectionSearchResults({ q: query, author: 'all', language: null, page: 1, perPage: 10 }).then(
         (results) => results.data,
     );
 }

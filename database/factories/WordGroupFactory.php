@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\User;
 use App\Models\WordGroup;
@@ -24,6 +25,13 @@ class WordGroupFactory extends Factory
             'visibility' => Visibility::Private,
             'created_by' => User::factory(),
         ];
+    }
+
+    public function inLanguage(Locale $language): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'language' => $language,
+        ]);
     }
 
     public function public(): static

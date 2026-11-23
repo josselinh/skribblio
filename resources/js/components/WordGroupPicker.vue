@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
-import type { WordGroup } from '@/types/models';
+import type { Locale, WordGroup } from '@/types/models';
 
 defineProps<{
     error?: string;
+    /** Only the groups in this language can be picked. */
+    language?: Locale;
 }>();
 
 /** Selected groups. */
@@ -26,12 +28,16 @@ function remove(wordGroup: WordGroup): void {
 <template>
     <div>
         <label for="word-group-search" class="block text-sm font-medium">{{ $t('wordGroups.picker.label') }}</label>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('wordGroups.picker.hint') }}</p>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">
+            {{ $t('wordGroups.picker.hint') }}
+            <template v-if="language">{{ $t('languages.picker.hint') }}</template>
+        </p>
 
         <WordGroupSearch
             class="mt-2"
             input-id="word-group-search"
             :excluded-ids="selectedIds"
+            :language="language"
             :invalid="Boolean(error)"
             @select="add"
         />
