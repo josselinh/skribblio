@@ -101,7 +101,7 @@ const buttonClass =
                         {{ $t('dashboard.newcomer.description') }}
                     </p>
                 </div>
-                <RouterLink :to="{ name: 'search' }" class="text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">
+                <RouterLink :to="{ name: 'explore' }" class="text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200">
                     {{ $t('dashboard.newcomer.explore') }}
                 </RouterLink>
             </div>
