@@ -10,9 +10,9 @@ class WordGroupPolicy
 {
     /**
      * A group is visible to everyone when public, to its creator only when private.
-     * Other users get a 404 so that they cannot tell whether a private group exists.
+     * Other users and guests (null) get a 404 so that they cannot tell whether a private group exists.
      */
-    public function view(User $user, WordGroup $wordGroup): Response
+    public function view(?User $user, WordGroup $wordGroup): Response
     {
         return $wordGroup->isVisibleTo($user) ? Response::allow() : Response::denyAsNotFound();
     }

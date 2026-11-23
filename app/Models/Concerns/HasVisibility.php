@@ -57,9 +57,18 @@ trait HasVisibility
         return $this->visibility === Visibility::Private;
     }
 
-    public function isVisibleTo(User $user): bool
+    /**
+     * Public items are visible to everyone, guests (null) included; private ones only to their creator and members.
+     */
+    public function isVisibleTo(?User $user): bool
     {
-        if ($this->visibility === Visibility::Public || $this->isCreatedBy($user)) {
+        if ($this->visibility === Visibility::Public) {
+            return true;
+        }
+        if ($user === null) {
+            return false;
+        }
+        if ($this->isCreatedBy($user)) {
             return true;
         }
 
@@ -84,13 +93,19 @@ trait HasVisibility
     }
 
     /**
-     * Limits the query to the records the given user is allowed to see.
+     * Limits the query to the records the given user is allowed to see: only the public ones for a guest (null).
      *
      * @param  Builder<static>  $query
      */
     #[Scope]
-    protected function visibleTo(Builder $query, User $user): void
+    protected function visibleTo(Builder $query, ?User $user): void
     {
+        if ($user === null) {
+            $query->where($this->qualifyColumn('visibility'), Visibility::Public);
+
+            return;
+        }
+
         $query->where(function (Builder $query) use ($user): void {
             $query->where($this->qualifyColumn('visibility'), Visibility::Public)
                 ->orWhere($this->qualifyColumn('created_by'), $user->getKey());

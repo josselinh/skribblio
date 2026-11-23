@@ -169,6 +169,30 @@ class GroupCollectionControllerTest extends TestCase
             ->assertJsonPath('data.can.update', false);
     }
 
+    public function test_show_returns_public_collection_to_guest_with_its_public_groups_only(): void
+    {
+        $publicGroup = WordGroup::factory()->public()->create();
+        $groupCollection = GroupCollection::factory()->public()
+            ->hasAttached([$publicGroup, WordGroup::factory()->private()->create()])
+            ->create();
+
+        $this->getJson("/api/group-collections/{$groupCollection->id}")
+            ->assertOk()
+            ->assertJsonPath('data.word_groups.*.id', [$publicGroup->id])
+            ->assertJsonPath('data.hidden_word_groups_count', 1)
+            ->assertJsonPath('data.hidden_word_groups_requested_count', 0)
+            ->assertJsonMissingPath('data.creator')
+            ->assertJsonMissingPath('data.word_groups.0.creator')
+            ->assertJsonPath('data.can.duplicate', false);
+    }
+
+    public function test_show_returns_404_to_guest_for_private_collection(): void
+    {
+        $groupCollection = GroupCollection::factory()->private()->create();
+
+        $this->getJson("/api/group-collections/{$groupCollection->id}")->assertNotFound();
+    }
+
     public function test_show_returns_404_for_private_collection_of_another_user(): void
     {
         $groupCollection = GroupCollection::factory()->private()->create();

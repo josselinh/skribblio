@@ -18,7 +18,12 @@ class SearchRequest extends FormRequest
     public const int MAX_PER_PAGE = 24;
 
     /**
-     * Any verified user can search; results are limited to what they can see.
+     * Sorts that only logged-in users can use.
+     */
+    public const array MEMBERS_ONLY_SORTS = [SearchSort::Popular, SearchSort::Largest];
+
+    /**
+     * Anyone can search, guests included; results are limited to what they can see (public items for guests).
      */
     public function authorize(): bool
     {
@@ -34,9 +39,22 @@ class SearchRequest extends FormRequest
     {
         return [
             'q' => ['nullable', 'string', 'max:255'],
-            'author' => ['nullable', Rule::enum(AuthorFilter::class)],
-            'sort' => ['nullable', Rule::enum(SearchSort::class)],
+            'author' => ['nullable', $this->user() ? Rule::enum(AuthorFilter::class) : Rule::enum(AuthorFilter::class)->only(AuthorFilter::All)],
+            'sort' => ['nullable', $this->user() ? Rule::enum(SearchSort::class) : Rule::enum(SearchSort::class)->except(self::MEMBERS_ONLY_SORTS)],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
+        ];
+    }
+
+    /**
+     * Guests can neither filter by author (they have created nothing) nor use the members-only sorts (popularity, size).
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->user() ? [] : [
+            'author.enum' => __('search.login_required.author'),
+            'sort.enum' => __('search.login_required.sort'),
         ];
     }
 

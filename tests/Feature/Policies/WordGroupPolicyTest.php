@@ -6,12 +6,19 @@ use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class WordGroupPolicyTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_guest_can_view_only_a_public_group(): void
+    {
+        $this->assertTrue(Gate::forUser(null)->allows('view', WordGroup::factory()->public()->create()));
+        $this->assertFalse(Gate::forUser(null)->allows('view', WordGroup::factory()->private()->create()));
+    }
 
     #[TestWith(['view'])]
     #[TestWith(['addWord'])]

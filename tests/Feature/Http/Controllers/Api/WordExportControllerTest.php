@@ -13,11 +13,26 @@ class WordExportControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_returns_401_for_guest(): void
+    public function test_word_group_export_is_allowed_to_guest_for_a_public_group(): void
     {
         $wordGroup = WordGroup::factory()->public()->create();
+        Word::factory()->for($wordGroup)->create(['name' => 'chat']);
 
-        $this->getJson("/api/word-groups/{$wordGroup->id}/export")->assertUnauthorized();
+        $this->getJson("/api/word-groups/{$wordGroup->id}/export")->assertOk()->assertExactJson(['data' => ['chat']]);
+    }
+
+    public function test_word_group_export_returns_404_to_guest_for_private_group(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->create();
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}/export")->assertNotFound();
+    }
+
+    public function test_group_collection_export_returns_401_for_guest_even_on_a_public_collection(): void
+    {
+        $groupCollection = GroupCollection::factory()->public()->create();
+
+        $this->getJson("/api/group-collections/{$groupCollection->id}/export")->assertUnauthorized();
     }
 
     public function test_word_group_export_returns_every_word_of_the_group_sorted_by_name(): void

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\WordExportController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
 use App\Http\Controllers\Api\WordVoteController;
+use App\Http\Middleware\AuthenticateIfVerified;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -77,25 +78,38 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('group-collections', 'groupCollections')->name('group-collections');
         });
 
-        // Skribbl.io export: every word, unpaginated.
-        Route::get('word-groups/{word_group}/export', [WordExportController::class, 'wordGroup'])->name('word-groups.export');
+        // Skribbl.io export of a collection, with the words of each group (the export of a group is public, below).
+        Route::get('group-collections/{group_collection}/export', [WordExportController::class, 'groupCollection'])->name('group-collections.export');
         Route::post('word-groups/{word_group}/duplicate', DuplicateWordGroupController::class)->name('word-groups.duplicate');
         Route::post('group-collections/{group_collection}/duplicate', DuplicateGroupCollectionController::class)->name('group-collections.duplicate');
-        Route::get('group-collections/{group_collection}/export', [WordExportController::class, 'groupCollection'])->name('group-collections.export');
 
-        Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
-        Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
-        Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('word-groups/{word_group}/words', [WordController::class, 'updateMany'])->name('word-groups.words.update-many');
         Route::delete('word-groups/{word_group}/words', [WordController::class, 'destroyMany'])->name('word-groups.words.destroy-many');
-        Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['index', 'store', 'update', 'destroy']);
+        Route::apiResource('word-groups.words', WordController::class)->shallow()->only(['store', 'update', 'destroy']);
         Route::put('words/{word}/vote', [WordVoteController::class, 'update'])->name('words.vote.update');
         Route::delete('words/{word}/vote', [WordVoteController::class, 'destroy'])->name('words.vote.destroy');
-        Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('group-collections', GroupCollectionController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::post('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'store'])
             ->name('group-collections.word-groups.store');
         Route::delete('group-collections/{group_collection}/word-groups', [GroupCollectionWordGroupController::class, 'destroy'])
             ->name('group-collections.word-groups.destroy');
     });
+});
+
+/*
+ * Public reading, open to guests: searching and showing public groups and collections, exporting public groups. A verified
+ * user is authenticated and sees what they can see; guests and unverified users only see public items.
+ * Declared after the authenticated routes so that `word-groups/search` is not taken for a group id.
+ */
+Route::middleware([AuthenticateIfVerified::class, 'throttle:public-api'])->group(function () {
+    Route::get('search/word-groups', [SearchController::class, 'wordGroups'])->name('search.word-groups');
+    Route::get('search/group-collections', [SearchController::class, 'groupCollections'])->name('search.group-collections');
+    Route::get('word-groups/{word_group}', [WordGroupController::class, 'show'])->name('word-groups.show');
+    Route::get('word-groups/{word_group}/words', [WordController::class, 'index'])->name('word-groups.words.index');
+    Route::get('group-collections/{group_collection}', [GroupCollectionController::class, 'show'])->name('group-collections.show');
+
+    // Skribbl.io export of a group: every word, unpaginated. Exporting a collection is for logged-in users.
+    Route::get('word-groups/{word_group}/export', [WordExportController::class, 'wordGroup'])->name('word-groups.export');
 });
