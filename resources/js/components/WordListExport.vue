@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { ExportedWord } from '@/api/exports';
 import { useToasts } from '@/composables/useToasts';
 import { intlLocale } from '@/lib/i18n';
 import {
+    SCORE_THRESHOLD_MAX,
     SKRIBBL_MAX_CHARACTERS,
     SKRIBBL_MIN_WORDS,
     deduplicateWords,
     drawWordsWithinLimit,
+    excludeLowScoredWords,
     formatSkribblList,
     shuffleWords,
 } from '@/lib/skribbl';
+import { useAuthStore } from '@/stores/auth';
 
 /**
  * Words formatted for the "Custom words" field of a private Skribbl.io room, with copy, counters,
- * limit warnings and list options (duplicates, shuffle, random selection within the limit).
+ * limit warnings and list options (words scored too low, duplicates, shuffle, random selection within
+ * the limit). Each occurrence of a word is judged on its own score before duplicates are removed.
+ * Visitors see the score option but only get a notification asking to log in.
  */
 const props = withDefaults(
     defineProps<{
-        words: string[];
+        /** Duplicates kept: the options deal with them. */
+        words: ExportedWord[];
         /** Extra information, e.g. groups left out of the export. */
         note?: string | null;
         /** The words are being reloaded: the copy button waits. */
@@ -29,24 +36,41 @@ const props = withDefaults(
 
 const { showToast } = useToasts();
 const { t } = useI18n();
+const auth = useAuthStore();
+const LOCKED_OPTION_TOAST_MS = 5000;
 
+const shouldExcludeLowScored = ref(false);
+/** Words whose score is at or below it are left out. */
+const scoreThreshold = ref(SCORE_THRESHOLD_MAX);
 const shouldDeduplicate = ref(true);
 const shouldShuffle = ref(false);
 const shuffledWords = ref<string[]>([]);
 /** Random selection fitting in the character limit, when the user asked for one. */
 const drawnWords = ref<string[] | null>(null);
 
-const availableWords = computed(() => (shouldDeduplicate.value ? deduplicateWords(props.words) : props.words));
+const keptNames = computed(() =>
+    (shouldExcludeLowScored.value ? excludeLowScoredWords(props.words, scoreThreshold.value) : props.words).map((word) => word.name),
+);
+const excludedCount = computed(() => props.words.length - keptNames.value.length);
+const availableWords = computed(() => (shouldDeduplicate.value ? deduplicateWords(keptNames.value) : keptNames.value));
 const exportedWords = computed(
     () => drawnWords.value ?? (shouldShuffle.value ? shuffledWords.value : availableWords.value),
 );
 const exportedList = computed(() => formatSkribblList(exportedWords.value));
-const duplicatesCount = computed(() => props.words.length - deduplicateWords(props.words).length);
+const duplicatesCount = computed(() => keptNames.value.length - deduplicateWords(keptNames.value).length);
 
 const hasTooFewWords = computed(() => exportedWords.value.length < SKRIBBL_MIN_WORDS);
 const isOverCharacterLimit = computed(() => exportedList.value.length > SKRIBBL_MAX_CHARACTERS);
 
 const numberFormat = new Intl.NumberFormat(intlLocale);
+
+/** The option stays visible to visitors, but only says that logging in is needed (the header has the links). */
+function onLockedOptionClick(event: Event): void {
+    if (!auth.isVerified) {
+        event.preventDefault();
+        showToast(t('guest.lockedOption'), 'info', LOCKED_OPTION_TOAST_MS);
+    }
+}
 
 function reshuffle(): void {
     shuffledWords.value = shuffleWords(availableWords.value);
@@ -76,6 +100,8 @@ async function copy(): Promise<void> {
 }
 
 const checkboxClass = 'size-4 rounded border-zinc-300 dark:border-zinc-700';
+const stepButtonClass =
+    'inline-flex size-6 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm leading-none hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:cursor-default disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400';
 const secondaryButtonClass =
     'rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60';
 </script>
@@ -161,6 +187,35 @@ const secondaryButtonClass =
 
         <fieldset class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
             <legend class="sr-only">{{ $t('exports.list.options') }}</legend>
+            <div class="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+                <label class="inline-flex items-center gap-2">
+                    <input v-model="shouldExcludeLowScored" type="checkbox" :class="checkboxClass" @click="onLockedOptionClick" />
+                    {{ $t('exports.list.excludeLowScored') }}
+                </label>
+                <span v-if="shouldExcludeLowScored" role="group" :aria-label="$t('exports.list.thresholdLabel')" class="inline-flex items-center gap-1.5">
+                    <button
+                        type="button"
+                        :class="stepButtonClass"
+                        :aria-label="$t('exports.list.lowerThreshold')"
+                        @click="scoreThreshold--"
+                    >
+                        −
+                    </button>
+                    <span class="tabular-nums" aria-live="polite">
+                        {{ $t('exports.list.threshold', { threshold: numberFormat.format(scoreThreshold) }) }}
+                    </span>
+                    <button
+                        type="button"
+                        :class="stepButtonClass"
+                        :aria-label="$t('exports.list.raiseThreshold')"
+                        :disabled="scoreThreshold >= SCORE_THRESHOLD_MAX"
+                        @click="scoreThreshold++"
+                    >
+                        +
+                    </button>
+                    <span class="text-zinc-500 dark:text-zinc-400">({{ $t('exports.list.excludedCount', excludedCount) }})</span>
+                </span>
+            </div>
             <label class="inline-flex items-center gap-2">
                 <input v-model="shouldDeduplicate" type="checkbox" :class="checkboxClass" />
                 {{ $t('exports.list.deduplicate') }}

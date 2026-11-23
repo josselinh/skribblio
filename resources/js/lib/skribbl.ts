@@ -21,6 +21,14 @@ export function parseWordList(text: string): string[] {
         .filter((word) => word !== '');
 }
 
+/** Highest exclusion threshold: excluding from −1 leaves out every word with more downvotes than upvotes. */
+export const SCORE_THRESHOLD_MAX = -1;
+
+/** Leaves out the words whose score is at or below the threshold. */
+export function excludeLowScoredWords<T extends { score: number }>(words: readonly T[], threshold: number): T[] {
+    return words.filter((word) => word.score > threshold);
+}
+
 /** Keeps the first occurrence of each word, ignoring case. */
 export function deduplicateWords(words: readonly string[]): string[] {
     const seen = new Set<string>();

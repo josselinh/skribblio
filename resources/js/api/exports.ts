@@ -1,8 +1,14 @@
 import { http } from '@/lib/http';
 
+/** A word to export, with its score (upvotes minus downvotes). */
+export interface ExportedWord {
+    name: string;
+    score: number;
+}
+
 /** Every word of a group, sorted by name. */
-export async function fetchWordGroupExport(id: string): Promise<string[]> {
-    const { data } = await http.get<{ data: string[] }>(`/api/word-groups/${id}/export`);
+export async function fetchWordGroupExport(id: string): Promise<ExportedWord[]> {
+    const { data } = await http.get<{ data: ExportedWord[] }>(`/api/word-groups/${id}/export`);
 
     return data.data;
 }
@@ -11,7 +17,7 @@ export interface ExportedWordGroup {
     id: string;
     name: string;
     /** Sorted by name. */
-    words: string[];
+    words: ExportedWord[];
 }
 
 export interface GroupCollectionExport {
