@@ -19,7 +19,7 @@
     },
     "deletion": {
         "title": "Supprimer mon compte",
-        "description": "Vos groupes, leurs mots, vos collections et vos favoris seront supprimés définitivement. Les mots que vous avez ajoutés aux groupes d’autres personnes y resteront, sans votre nom.",
+        "description": "Vos groupes, leurs mots, vos collections et vos favoris seront supprimés définitivement. Les mots que vous avez ajoutés aux groupes d’autres personnes y resteront, sans votre pseudo.",
         "confirmTitle": "Supprimer votre compte ?",
         "confirmMessage": "Tout ce que vous avez créé sera supprimé et les personnes avec qui vous l’avez partagé n’y auront plus accès. Cette action est irréversible.",
         "password": "Mot de passe, pour confirmer",
