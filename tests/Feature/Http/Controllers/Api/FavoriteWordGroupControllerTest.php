@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\EmailNotification;
 use App\Enums\Visibility;
 use App\Models\User;
 use App\Models\WordGroup;
+use App\Notifications\ItemFavorited;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class FavoriteWordGroupControllerTest extends TestCase
@@ -26,6 +29,48 @@ class FavoriteWordGroupControllerTest extends TestCase
         $this->actingAs($user)->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
 
         $this->assertSame(1, $user->favoriteWordGroups()->count());
+    }
+
+    public function test_update_notifies_the_creator_once_even_when_favorited_again_after_removal(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $item = WordGroup::factory()->public()->createdBy(User::factory()->wantsEmails()->create())->create();
+
+        $this->actingAs($user)->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+        $this->actingAs($user)->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+        $this->actingAs($user)->deleteJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+        $this->actingAs($user)->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+
+        Notification::assertSentToTimes($item->creator, ItemFavorited::class, 1);
+        Notification::assertSentTo(
+            $item->creator,
+            ItemFavorited::class,
+            fn (ItemFavorited $notification): bool => $notification->toMail($item->creator)->subject
+                === "{$user->name} a ajouté votre groupe « {$item->name} » à ses favoris",
+        );
+    }
+
+    public function test_update_does_not_notify_when_favoriting_own_item(): void
+    {
+        Notification::fake();
+        $user = User::factory()->wantsEmails()->create();
+        $item = WordGroup::factory()->private()->createdBy($user)->create();
+
+        $this->actingAs($user)->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_update_sends_no_email_to_a_creator_who_did_not_turn_them_on(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create(['email_notifications' => [EmailNotification::GroupCollectionFavorited->value => true]]);
+        $item = WordGroup::factory()->public()->createdBy($creator)->create();
+
+        $this->actingAs(User::factory()->create())->putJson("/api/word-groups/{$item->id}/favorite")->assertNoContent();
+
+        Notification::assertNothingSentTo($creator);
     }
 
     public function test_update_returns_404_for_private_item_of_another_user(): void

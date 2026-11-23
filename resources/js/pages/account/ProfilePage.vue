@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import AccountNav from '@/components/AccountNav.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import FormField from '@/components/FormField.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
@@ -16,8 +17,6 @@ const { t } = useI18n();
 
 const profileForm = useForm({ name: auth.user?.name ?? '', email: auth.user?.email ?? '' });
 
-const passwordForm = useForm({ current_password: '', password: '', password_confirmation: '' });
-
 /** A new email address must be verified: the user is then sent to the verification page. */
 async function saveProfile(): Promise<void> {
     const isSuccessful = await profileForm.submit((data) => auth.updateProfileInformation({ ...data }));
@@ -31,15 +30,6 @@ async function saveProfile(): Promise<void> {
         return;
     }
     showToast(t('profile.information.saved'));
-}
-
-async function savePassword(): Promise<void> {
-    const isSuccessful = await passwordForm.submit((data) => auth.updatePassword({ ...data }));
-    passwordForm.reset();
-
-    if (isSuccessful) {
-        showToast(t('profile.password.saved'));
-    }
 }
 
 const deletionForm = useForm({ password: '' });
@@ -78,6 +68,7 @@ const buttonClass =
     <AppLayout>
         <div class="mx-auto max-w-lg">
             <h1 class="text-2xl font-semibold">{{ $t('profile.title') }}</h1>
+            <AccountNav class="mt-4" />
 
             <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="profile-title">
                 <h2 id="profile-title" class="text-lg font-semibold">{{ $t('profile.information.title') }}</h2>
@@ -86,7 +77,7 @@ const buttonClass =
                         id="profile-name"
                         v-model="profileForm.data.name"
                         :label="$t('auth.fields.name')"
-                        autocomplete="name"
+                        autocomplete="nickname"
                         :error="profileForm.errors.value.name"
                         required
                     />
@@ -106,44 +97,6 @@ const buttonClass =
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" :disabled="profileForm.isProcessing.value" :class="buttonClass">{{ $t('common.save') }}</button>
-                    </div>
-                </form>
-            </section>
-
-            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="password-title">
-                <h2 id="password-title" class="text-lg font-semibold">{{ $t('auth.fields.password') }}</h2>
-                <form class="mt-4 space-y-4" novalidate @submit.prevent="savePassword">
-                    <FormField
-                        id="current-password"
-                        v-model="passwordForm.data.current_password"
-                        :label="$t('profile.password.current')"
-                        type="password"
-                        autocomplete="current-password"
-                        :error="passwordForm.errors.value.current_password"
-                        required
-                    />
-                    <FormField
-                        id="new-password"
-                        v-model="passwordForm.data.password"
-                        :label="$t('auth.fields.newPassword')"
-                        type="password"
-                        autocomplete="new-password"
-                        :error="passwordForm.errors.value.password"
-                        required
-                    />
-                    <FormField
-                        id="new-password-confirmation"
-                        v-model="passwordForm.data.password_confirmation"
-                        :label="$t('profile.password.confirmation')"
-                        type="password"
-                        autocomplete="new-password"
-                        :error="passwordForm.errors.value.password_confirmation"
-                        required
-                    />
-                    <div class="flex justify-end">
-                        <button type="submit" :disabled="passwordForm.isProcessing.value" :class="buttonClass">
-                            {{ $t('profile.password.submit') }}
-                        </button>
                     </div>
                 </form>
             </section>

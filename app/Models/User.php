@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EmailNotification;
+use App\Enums\Theme;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -14,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'theme', 'email_notifications'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -31,7 +33,29 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'theme' => Theme::class,
+            'email_notifications' => 'array',
         ];
+    }
+
+    /**
+     * Whether the user wants to receive this kind of email (no unless they turned it on).
+     */
+    public function wantsEmail(EmailNotification $notification): bool
+    {
+        return (bool) ($this->email_notifications[$notification->value] ?? false);
+    }
+
+    /**
+     * Every kind of email with whether the user receives it.
+     *
+     * @return array<string, bool>
+     */
+    public function emailNotificationPreferences(): array
+    {
+        return collect(EmailNotification::cases())
+            ->mapWithKeys(fn (EmailNotification $notification): array => [$notification->value => $this->wantsEmail($notification)])
+            ->all();
     }
 
     /**

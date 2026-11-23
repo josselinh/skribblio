@@ -3,11 +3,17 @@ import { computed, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-/** Header button with the user's initials and name, opening a menu: profile and logout. */
+/** Header button with the user's initials and pseudo, opening a menu: the pages of the account and logout. */
 const auth = useAuthStore();
 const router = useRouter();
 
 const isOpen = ref(false);
+
+const accountLinks = [
+    { name: 'profile', label: 'layout.userMenu.profile' },
+    { name: 'security', label: 'layout.userMenu.security' },
+    { name: 'preferences', label: 'layout.userMenu.preferences' },
+] as const;
 
 const initials = computed(() =>
     (auth.user?.name ?? '')
@@ -65,17 +71,19 @@ async function logout(): Promise<void> {
         >
             <p class="truncate border-b border-zinc-100 dark:border-zinc-800 px-4 py-2 text-xs text-zinc-500 dark:text-zinc-400">{{ auth.user?.email }}</p>
             <RouterLink
-                :to="{ name: 'profile' }"
+                v-for="link in accountLinks"
+                :key="link.name"
+                :to="{ name: link.name }"
                 role="menuitem"
                 class="block px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="close"
             >
-                {{ $t('layout.userMenu.profile') }}
+                {{ $t(link.label) }}
             </RouterLink>
             <button
                 type="button"
                 role="menuitem"
-                class="block w-full px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
+                class="block w-full border-t border-zinc-100 dark:border-zinc-800 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="logout"
             >
                 {{ $t('layout.userMenu.logout') }}

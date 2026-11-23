@@ -1,8 +1,24 @@
+/** Colour theme of the interface: the system's one, or forced light or dark. */
+export type Theme = 'system' | 'light' | 'dark';
+
+/** Kinds of emails the user chooses to receive or not (account emails are always sent). */
+export type EmailNotification =
+    | 'word_group_access_requested'
+    | 'group_collection_access_requested'
+    | 'access_request_decided'
+    | 'word_group_favorited'
+    | 'group_collection_favorited';
+
+/** The current user (GET /api/user). Other users are only exposed as `Pick<User, 'id' | 'name'>`. */
 export interface User {
     id: string;
+    /** Pseudo, shown to the other users. */
     name: string;
     email: string;
     email_verified_at: string | null;
+    theme: Theme;
+    /** Whether each kind of email is sent to the user. */
+    email_notifications: Record<EmailNotification, boolean>;
     created_at: string | null;
 }
 

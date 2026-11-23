@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\EmailNotification;
 use App\Models\GroupCollection;
+use App\Models\GroupCollectionAccessRequest;
 use App\Models\User;
 use App\Models\WordGroup;
 use App\Models\WordGroupAccessRequest;
@@ -57,7 +59,7 @@ class ShareInvitationControllerTest extends TestCase
     public function test_request_creates_pending_request_notifies_creator_once_and_is_idempotent(): void
     {
         Notification::fake();
-        $creator = User::factory()->create();
+        $creator = User::factory()->wantsEmails()->create();
         $requester = User::factory()->create();
         $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
         $token = $wordGroup->ensureShareToken();
@@ -71,11 +73,34 @@ class ShareInvitationControllerTest extends TestCase
         Notification::assertSentToTimes($creator, AccessRequested::class, 1);
     }
 
+    public function test_request_emails_the_creator_only_for_the_kinds_they_turned_on(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create(['email_notifications' => [EmailNotification::GroupCollectionAccessRequested->value => true]]);
+        $requester = User::factory()->create();
+        $wordGroupToken = WordGroup::factory()->private()->createdBy($creator)->create()->ensureShareToken();
+        $groupCollectionToken = GroupCollection::factory()->private()->createdBy($creator)->create()->ensureShareToken();
+
+        $this->actingAs($requester)->postJson("/api/share/word-groups/{$wordGroupToken}/access-request")->assertOk();
+        $this->actingAs($requester)->postJson("/api/share/group-collections/{$groupCollectionToken}/access-request")->assertOk();
+
+        Notification::assertSentToTimes($creator, AccessRequested::class, 1);
+        Notification::assertSentTo(
+            $creator,
+            AccessRequested::class,
+            fn (AccessRequested $notification): bool => $notification->accessRequest instanceof GroupCollectionAccessRequest,
+        );
+    }
+
     public function test_request_after_refusal_sends_a_new_request(): void
     {
         Notification::fake();
         $requester = User::factory()->create();
-        $request = WordGroupAccessRequest::factory()->refused()->by($requester)->create();
+        $request = WordGroupAccessRequest::factory()
+            ->for(WordGroup::factory()->private()->createdBy(User::factory()->wantsEmails()->create()), 'item')
+            ->refused()
+            ->by($requester)
+            ->create();
         $token = $request->item->ensureShareToken();
 
         $this->actingAs($requester)->getJson("/api/share/word-groups/{$token}")->assertJsonPath('data.status', 'refused');
@@ -114,7 +139,7 @@ class ShareInvitationControllerTest extends TestCase
     public function test_share_link_of_a_group_open_to_members_only_asks_to_contribute(): void
     {
         Notification::fake();
-        $wordGroup = WordGroup::factory()->openToMembersOnly()->create();
+        $wordGroup = WordGroup::factory()->openToMembersOnly()->createdBy(User::factory()->wantsEmails()->create())->create();
         $token = $wordGroup->ensureShareToken();
         $requester = User::factory()->create();
 

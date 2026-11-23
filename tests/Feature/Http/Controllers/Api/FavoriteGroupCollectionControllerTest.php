@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\EmailNotification;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
+use App\Notifications\ItemFavorited;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class FavoriteGroupCollectionControllerTest extends TestCase
@@ -26,6 +29,34 @@ class FavoriteGroupCollectionControllerTest extends TestCase
         $this->actingAs($user)->putJson("/api/group-collections/{$item->id}/favorite")->assertNoContent();
 
         $this->assertSame(1, $user->favoriteGroupCollections()->count());
+    }
+
+    public function test_update_notifies_the_creator_who_turned_on_collection_emails(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create(['email_notifications' => [EmailNotification::GroupCollectionFavorited->value => true]]);
+        $user = User::factory()->create();
+        $item = GroupCollection::factory()->public()->createdBy($creator)->create();
+
+        $this->actingAs($user)->putJson("/api/group-collections/{$item->id}/favorite")->assertNoContent();
+
+        Notification::assertSentTo(
+            $creator,
+            ItemFavorited::class,
+            fn (ItemFavorited $notification): bool => $notification->toMail($creator)->subject
+                === "{$user->name} a ajouté votre collection « {$item->name} » à ses favoris",
+        );
+    }
+
+    public function test_update_sends_no_email_to_a_creator_who_only_turned_on_group_emails(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create(['email_notifications' => [EmailNotification::WordGroupFavorited->value => true]]);
+        $item = GroupCollection::factory()->public()->createdBy($creator)->create();
+
+        $this->actingAs(User::factory()->create())->putJson("/api/group-collections/{$item->id}/favorite")->assertNoContent();
+
+        Notification::assertNothingSentTo($creator);
     }
 
     public function test_update_returns_404_for_private_item_of_another_user(): void

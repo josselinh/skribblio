@@ -38,7 +38,11 @@ class RegistrationTest extends TestCase
     {
         $response = $this->postJson('/register', []);
 
-        $response->assertUnprocessable()->assertJsonValidationErrors(['name', 'email', 'password']);
+        $response->assertUnprocessable()->assertJsonValidationErrors([
+            'name' => 'Le champ pseudo est obligatoire.',
+            'email',
+            'password',
+        ]);
         $this->assertGuest();
     }
 }

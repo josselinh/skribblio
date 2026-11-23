@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FavoriteWordGroupController;
 use App\Http\Controllers\Api\GroupCollectionController;
 use App\Http\Controllers\Api\GroupCollectionSharingController;
 use App\Http\Controllers\Api\GroupCollectionWordGroupController;
+use App\Http\Controllers\Api\PreferencesController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SearchWordGroupController;
 use App\Http\Controllers\Api\SharedWithMeController;
@@ -28,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user', [CurrentUserController::class, 'destroy'])->name('api.user.destroy');
 
     Route::middleware('verified')->group(function () {
+        Route::patch('user/preferences', [PreferencesController::class, 'update'])->name('api.user.preferences.update');
+
         Route::get('favorites/word-groups', [FavoriteWordGroupController::class, 'index'])->name('favorites.word-groups.index');
         Route::put('word-groups/{word_group}/favorite', [FavoriteWordGroupController::class, 'update'])->name('word-groups.favorite.update');
         Route::delete('word-groups/{word_group}/favorite', [FavoriteWordGroupController::class, 'destroy'])->name('word-groups.favorite.destroy');

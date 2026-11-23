@@ -27,6 +27,14 @@ class CurrentUserTest extends TestCase
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => null,
+                'theme' => 'system',
+                'email_notifications' => [
+                    'word_group_access_requested' => false,
+                    'group_collection_access_requested' => false,
+                    'access_request_decided' => false,
+                    'word_group_favorited' => false,
+                    'group_collection_favorited' => false,
+                ],
                 'created_at' => $user->created_at->toIso8601String(),
             ],
         ]);
