@@ -8,15 +8,14 @@ use App\Models\GroupCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 
 class DuplicateGroupCollectionController extends Controller
 {
     /**
      * Copy a collection the user can see, with copies of the groups they can see, into a collection
      * of their own (see `GroupCollection::duplicateFor()`). The response tells how many hidden groups
-     * were not copied (`hidden_word_groups_count`), never which ones. Refused when no group is visible,
-     * since a collection must contain at least one group.
+     * were not copied (`hidden_word_groups_count`), never which ones. When no group is visible, the copy
+     * is empty.
      */
     public function __invoke(Request $request, GroupCollection $groupCollection): JsonResponse
     {
@@ -24,11 +23,6 @@ class DuplicateGroupCollectionController extends Controller
         $user = $request->user();
 
         $visibleWordGroupsCount = $groupCollection->wordGroups()->visibleTo($user)->count();
-        if ($visibleWordGroupsCount === 0) {
-            throw ValidationException::withMessages([
-                'word_groups' => __('duplication.nothing_to_copy'),
-            ]);
-        }
         $hiddenWordGroupsCount = $groupCollection->wordGroups()->count() - $visibleWordGroupsCount;
 
         $copy = $groupCollection->duplicateFor($user);

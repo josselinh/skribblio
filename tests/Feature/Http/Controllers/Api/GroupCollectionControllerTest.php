@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
@@ -82,16 +83,18 @@ class GroupCollectionControllerTest extends TestCase
         );
     }
 
-    public function test_store_without_groups_returns_422(): void
+    public function test_store_creates_an_empty_collection_in_the_users_content_language(): void
     {
-        $response = $this->actingAs(User::factory()->create())->postJson('/api/group-collections', [
-            'name' => 'Soirée jeux',
+        $user = User::factory()->create(['content_locale' => Locale::En]);
+
+        $response = $this->actingAs($user)->postJson('/api/group-collections', [
+            'name' => 'Game night',
             'visibility' => 'public',
             'word_group_ids' => [],
         ]);
 
-        $response->assertUnprocessable()->assertJsonValidationErrors(['word_group_ids' => 'Choisissez au moins un groupe.']);
-        $this->assertDatabaseCount('group_collections', 0);
+        $response->assertCreated()->assertJsonPath('data.language', 'en');
+        $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
     }
 
     public function test_store_rejects_private_group_of_another_user_with_422(): void
@@ -132,7 +135,7 @@ class GroupCollectionControllerTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->postJson('/api/group-collections', [])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'visibility', 'word_group_ids']);
+            ->assertJsonValidationErrors(['name', 'visibility']);
     }
 
     public function test_show_returns_collection_with_all_groups_for_its_creator(): void

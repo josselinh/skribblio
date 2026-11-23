@@ -107,22 +107,17 @@ class GroupCollectionWordGroupControllerTest extends TestCase
         $this->assertTrue($groupCollection->fresh()->updated_at->isToday());
     }
 
-    public function test_destroy_refuses_to_remove_every_group_with_422_counting_the_hidden_ones(): void
+    public function test_destroy_can_remove_every_group(): void
     {
         $creator = User::factory()->create();
         $visibleGroups = WordGroup::factory()->count(2)->public()->create();
         $groupCollection = GroupCollection::factory()->public()->createdBy($creator)->hasAttached($visibleGroups)->create();
-        $uri = "/api/group-collections/{$groupCollection->id}/word-groups";
 
         $this->actingAs($creator)
-            ->deleteJson($uri, ['word_group_ids' => $visibleGroups->modelKeys()])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids' => 'Une collection doit contenir au moins un groupe.']);
-        $this->assertSame(2, $groupCollection->wordGroups()->count());
+            ->deleteJson("/api/group-collections/{$groupCollection->id}/word-groups", ['word_group_ids' => $visibleGroups->modelKeys()])
+            ->assertNoContent();
 
-        $groupCollection->wordGroups()->attach(WordGroup::factory()->private()->create());
-        $this->actingAs($creator)->deleteJson($uri, ['word_group_ids' => $visibleGroups->modelKeys()])->assertNoContent();
-        $this->assertSame(1, $groupCollection->wordGroups()->count());
+        $this->assertFalse($groupCollection->wordGroups()->exists());
     }
 
     public function test_destroy_returns_422_for_a_group_not_in_the_collection(): void

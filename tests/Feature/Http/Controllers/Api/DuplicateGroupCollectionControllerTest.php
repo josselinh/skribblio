@@ -106,15 +106,15 @@ class DuplicateGroupCollectionControllerTest extends TestCase
         $this->assertNull($copy->share_token);
     }
 
-    public function test_returns_422_when_no_group_is_visible(): void
+    public function test_copies_an_empty_collection_when_no_group_is_visible(): void
     {
+        $user = User::factory()->create();
         $groupCollection = GroupCollection::factory()->public()->create();
 
-        $this->actingAs(User::factory()->create())
-            ->postJson("/api/group-collections/{$groupCollection->id}/duplicate")
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_groups' => 'Aucun groupe de cette collection ne vous est visible : il n’y a rien à copier.']);
-        $this->assertDatabaseCount('group_collections', 1);
+        $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
+
+        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
     }
 
     public function test_returns_404_for_private_collection_of_another_user(): void

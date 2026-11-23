@@ -20,8 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 /**
- * A named set of word groups. A collection must contain at least one group;
- * the groups it contains may have any visibility, including private groups
+ * A named set of word groups, possibly empty. The groups it contains may have any visibility, including private groups
  * that other viewers of the collection cannot see.
  */
 #[Fillable(['name', 'language', 'visibility', 'accepts_contributions', 'contributions_members_only'])]
@@ -44,7 +43,7 @@ class GroupCollection extends Model
      * Copy this collection into a new collection of the user: private, closed to contributions,
      * containing a copy (see `WordGroup::duplicateFor()`) of each group the user can see, except
      * their own groups, which are kept as they are. Hidden groups are not copied, and neither are
-     * favorites, members or the share link. The caller makes sure that at least one group is visible.
+     * favorites, members or the share link. The copy is empty when no group is visible.
      */
     public function duplicateFor(User $user): self
     {

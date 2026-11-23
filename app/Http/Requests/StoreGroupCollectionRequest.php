@@ -23,7 +23,7 @@ class StoreGroupCollectionRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request. A collection must contain at least one group.
+     * Get the validation rules that apply to the request. A collection may be created without any group.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -35,7 +35,7 @@ class StoreGroupCollectionRequest extends FormRequest
             'visibility' => ['required', Rule::enum(Visibility::class)],
             'accepts_contributions' => ['sometimes', 'boolean'],
             'contributions_members_only' => ['sometimes', 'boolean'],
-            'word_group_ids' => ['required', 'array', 'min:1'],
+            'word_group_ids' => ['sometimes', 'array'],
             'word_group_ids.*' => ['required', 'uuid', 'distinct'],
         ];
     }
@@ -53,7 +53,7 @@ class StoreGroupCollectionRequest extends FormRequest
                 if ($validator->errors()->isNotEmpty()) {
                     return;
                 }
-                if ($this->wordGroups()->count() !== count($this->input('word_group_ids'))) {
+                if ($this->wordGroups()->count() !== count($this->input('word_group_ids', []))) {
                     $validator->errors()->add('word_group_ids', __('group_collections.word_groups.not_found'));
 
                     return;
@@ -83,24 +83,14 @@ class StoreGroupCollectionRequest extends FormRequest
     }
 
     /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'word_group_ids.required' => __('group_collections.word_groups.required'),
-            'word_group_ids.min' => __('group_collections.word_groups.required'),
-        ];
-    }
-
-    /**
-     * Language of the collection: the one given, otherwise the one of its first group.
+     * Language of the collection: the one given, otherwise the one of its first group, otherwise the user's
+     * content language.
      */
     public function language(): Locale
     {
-        return Locale::tryFrom((string) $this->validated('language')) ?? $this->wordGroups()->first()->language;
+        return Locale::tryFrom((string) $this->validated('language'))
+            ?? $this->wordGroups()->first()?->language
+            ?? $this->user()->content_locale;
     }
 
     /**

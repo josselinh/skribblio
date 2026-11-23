@@ -8,12 +8,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 /**
- * Removes several groups from a collection at once. Every group must be in the collection, and the
- * collection must keep at least one group (hidden ones included); the controller checks that the user
- * may remove each of them.
+ * Removes several groups from a collection at once, possibly all of them. Every group must be in the
+ * collection; the controller checks that the user may remove each of them.
  */
 class DetachWordGroupsRequest extends FormRequest
 {
@@ -46,23 +44,6 @@ class DetachWordGroupsRequest extends FormRequest
                 Rule::exists('groups_collections', 'word_group_id')
                     ->where('group_collection_id', $this->groupCollection()->getKey()),
             ],
-        ];
-    }
-
-    /**
-     * The collection must keep at least one group.
-     *
-     * @return array<int, callable>
-     */
-    public function after(): array
-    {
-        return [
-            function (Validator $validator): void {
-                if ($validator->errors()->isEmpty()
-                    && count($this->wordGroupIds()) >= $this->groupCollection()->wordGroups()->count()) {
-                    $validator->errors()->add('word_group_ids', __('group_collections.remove_word_groups.last_word_group'));
-                }
-            },
         ];
     }
 
