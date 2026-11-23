@@ -23,13 +23,15 @@ const emit = defineEmits<{
             <WordVoteButtons v-if="showVotes" class="shrink-0" :word="word" @updated="emit('updated', $event)" />
         </div>
         <p class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-            <i18n-t v-if="word.creator" keypath="common.byUser" scope="global">
-                <template #user><UserLink :user="word.creator" :self-label="$t('common.you')" /></template>
-            </i18n-t>
-            <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
-            <template v-if="word.created_at">
-                · <time :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
+            <!-- Visitors do not get the author (undefined); null means the author deleted their account. -->
+            <template v-if="word.creator !== undefined">
+                <i18n-t v-if="word.creator" keypath="common.byUser" scope="global">
+                    <template #user><UserLink :user="word.creator" :self-label="$t('common.you')" /></template>
+                </i18n-t>
+                <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
+                <template v-if="word.created_at"> · </template>
             </template>
+            <time v-if="word.created_at" :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
             <template v-if="word.updated_at && word.updated_at !== word.created_at">
                 ·
                 <i18n-t keypath="words.list.updatedOn" scope="global">

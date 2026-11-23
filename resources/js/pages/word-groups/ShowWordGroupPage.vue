@@ -18,12 +18,20 @@ import PaginationNav from '@/components/PaginationNav.vue';
 import WordListEditor from '@/components/WordListEditor.vue';
 import WordListItem from '@/components/WordListItem.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { useAuthStore } from '@/stores/auth';
 import type { WordsResponse } from '@/types/api';
 import type { AccessPurpose, SortDirection, Word, WordGroup, WordSort } from '@/types/models';
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
+
+/** Visitors (and unverified users, treated the same way by the API) see neither the authors nor their actions. */
+const isMember = computed(() => auth.isVerified);
+/** Shown to visitors but asking them to log in (sorting by author is not even shown: they do not see the authors). */
+const lockedSorts = computed<WordSort[]>(() => (isMember.value ? [] : ['score']));
 
 const wordGroupId = computed(() => String(route.params.id));
 const currentPage = computed(() => {
@@ -45,7 +53,7 @@ const DEFAULT_ORDER: WordOrder = { sort: 'created', direction: 'desc' };
 /** Order of the words, kept in the URL (`?sort=…&direction=…`) except the default one. */
 const order = computed<WordOrder>(() => {
     const sort = route.query.sort;
-    if (typeof sort !== 'string' || !(sort in defaultDirections)) {
+    if (typeof sort !== 'string' || !(sort in defaultDirections) || (!isMember.value && (sort === 'author' || lockedSorts.value.includes(sort as WordSort)))) {
         return DEFAULT_ORDER;
     }
     const direction = route.query.direction;
@@ -71,6 +79,7 @@ async function sortWords(sort: WordSort, direction: SortDirection): Promise<void
 
 const wordGroup = ref<WordGroup | null>(null);
 const groupStatus = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
+usePageTitle(() => wordGroup.value?.name);
 
 const words = ref<WordsResponse | null>(null);
 const areWordsLoading = ref(false);
@@ -226,6 +235,10 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             />
 
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
+            <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
+            <p v-else-if="!isMember && wordGroup.accepts_contributions" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
+                {{ auth.isAuthenticated ? $t('guest.verifyEmail') : $t('guest.contribute.wordGroup') }}
+            </p>
             <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
                 {{ $t('wordGroups.show.membersOnly') }}
             </p>
@@ -261,6 +274,8 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         :direction="order.direction"
                         :default-directions="defaultDirections"
                         :show-votes="showVotes"
+                        :show-author="isMember"
+                        :locked-sorts="lockedSorts"
                         @sort="sortWords"
                     />
                 </div>

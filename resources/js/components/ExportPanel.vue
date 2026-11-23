@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWordGroup } from '@/api/exports';
+import { useI18n } from 'vue-i18n';
 import WordListExport from '@/components/WordListExport.vue';
+import { useToasts } from '@/composables/useToasts';
 import { intlLocale } from '@/lib/i18n';
 import type { FavoriteKind } from '@/types/models';
 
@@ -15,7 +17,16 @@ const props = defineProps<{
     id: string;
     /** Extra information shown in the panel, e.g. groups of a collection left out of the export. */
     note?: string | null;
+    /**
+     * Shows the button without opening anything: clicking it only says, in a notification, that logging in
+     * is needed (visitors on a collection; the header has the links).
+     */
+    locked?: boolean;
 }>();
+
+const { t } = useI18n();
+const { showToast } = useToasts();
+const LOCKED_OPTION_TOAST_MS = 5000;
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -74,6 +85,11 @@ async function load(): Promise<void> {
 
 /** Reloads the words on each opening so that the list includes the latest changes. */
 async function toggle(): Promise<void> {
+    if (props.locked) {
+        showToast(t('guest.lockedOption'), 'info', LOCKED_OPTION_TOAST_MS);
+
+        return;
+    }
     isOpen.value = !isOpen.value;
     if (isOpen.value) {
         await load();

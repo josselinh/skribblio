@@ -7,7 +7,7 @@
     },
     "notFound": {
         "title": "Page introuvable",
-        "backToDashboard": "Retour au tableau de bord"
+        "backHome": "Retour à l’accueil"
     },
     "pagination": {
         "label": "Pagination",

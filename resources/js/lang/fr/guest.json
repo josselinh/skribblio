@@ -1,0 +1,10 @@
+{
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "verifyEmail": "Confirmez votre adresse email pour contribuer.",
+    "contribute": {
+        "wordGroup": "Créez un compte ou connectez-vous pour ajouter des mots à ce groupe et voter.",
+        "groupCollection": "Créez un compte ou connectez-vous pour ajouter des groupes à cette collection."
+    },
+    "lockedOption": "Connectez-vous pour utiliser cette option."
+}

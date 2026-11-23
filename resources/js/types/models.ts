@@ -46,8 +46,8 @@ export interface WordGroup {
 export interface Word {
     id: string;
     name: string;
-    /** Null once the author deleted their account. */
-    creator: Pick<User, 'id' | 'name'> | null;
+    /** Null once the author deleted their account; left out for visitors, who do not see the users' names. */
+    creator?: Pick<User, 'id' | 'name'> | null;
     upvotes_count: number;
     downvotes_count: number;
     /** The current user's vote, null when they did not vote. */

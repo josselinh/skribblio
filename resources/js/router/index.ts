@@ -10,6 +10,11 @@ declare module 'vue-router' {
         requiresAuth?: boolean;
         /** Requires a logged-in user with a verified email address. */
         requiresVerified?: boolean;
+        /**
+         * Open to visitors (public groups and collections, Explorer): actions that need an account are hidden
+         * or replaced by an invitation to log in. The other app pages require a verified user.
+         */
+        isPublic?: boolean;
     }
 }
 
@@ -17,8 +22,11 @@ export const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
+            /* Redirected by the guard: to the dashboard for logged-in users, to the Explorer for visitors. */
             path: '/',
-            redirect: { name: 'dashboard' },
+            name: 'home',
+            component: () => import('@/pages/search/SearchPage.vue'),
+            meta: { isPublic: true },
         },
         {
             path: '/dashboard',
@@ -42,7 +50,7 @@ export const router = createRouter({
             path: '/groups/:id',
             name: 'word-groups.show',
             component: () => import('@/pages/word-groups/ShowWordGroupPage.vue'),
-            meta: { requiresVerified: true },
+            meta: { isPublic: true },
         },
         {
             path: '/collections/new',
@@ -54,13 +62,13 @@ export const router = createRouter({
             path: '/collections/:id',
             name: 'group-collections.show',
             component: () => import('@/pages/group-collections/ShowGroupCollectionPage.vue'),
-            meta: { requiresVerified: true },
+            meta: { isPublic: true },
         },
         {
             path: '/search',
             name: 'search',
             component: () => import('@/pages/search/SearchPage.vue'),
-            meta: { requiresVerified: true },
+            meta: { isPublic: true },
         },
         {
             path: '/share/:type(groups|collections)/:token',
@@ -121,6 +129,10 @@ export const router = createRouter({
 router.beforeEach(async (to) => {
     const auth = useAuthStore();
     await auth.ensureLoaded();
+
+    if (to.name === 'home') {
+        return auth.isAuthenticated ? { name: 'dashboard' } : { name: 'search' };
+    }
 
     if ((to.meta.requiresAuth || to.meta.requiresVerified) && !auth.isAuthenticated) {
         if (to.name === 'share') {

@@ -17,19 +17,26 @@ import ExportPanel from '@/components/ExportPanel.vue';
 import EditableNameVisibility, { type NameVisibilityPayload } from '@/components/EditableNameVisibility.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { useAuthStore } from '@/stores/auth';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
 
 const route = useRoute();
 const { t } = useI18n();
+const auth = useAuthStore();
+
+/** Visitors (and unverified users, treated the same way by the API) can neither contribute nor request access. */
+const isMember = computed(() => auth.isVerified);
 
 const groupCollectionId = computed(() => String(route.params.id));
 
 const groupCollection = ref<GroupCollectionDetail | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isUpdatingGroups = ref(false);
+usePageTitle(() => groupCollection.value?.name);
 
 const wordGroupIds = computed(() => groupCollection.value?.word_groups.map((wordGroup) => wordGroup.id) ?? []);
 
@@ -280,7 +287,7 @@ watch(
                 </EditableNameVisibility>
             </div>
 
-            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" />
+            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" :locked="!isMember" />
 
             <div
                 v-if="hiddenGroupsMessage"
@@ -289,7 +296,7 @@ watch(
             >
                 <p>{{ hiddenGroupsMessage }}</p>
                 <button
-                    v-if="canRequestHiddenGroups"
+                    v-if="isMember && canRequestHiddenGroups"
                     type="button"
                     :disabled="isRequestingHiddenGroups"
                     class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 disabled:opacity-60"
@@ -297,7 +304,7 @@ watch(
                 >
                     {{ $t('groupCollections.show.hidden.request') }}
                 </button>
-                <p v-else class="font-medium">{{ $t('groupCollections.show.hidden.requested') }}</p>
+                <p v-else-if="isMember" class="font-medium">{{ $t('groupCollections.show.hidden.requested') }}</p>
                 <p v-if="hiddenGroupsRequestFailed" role="alert" class="w-full text-red-600 dark:text-red-400">
                     {{ $t('common.unexpectedError') }}
                 </p>
@@ -336,6 +343,10 @@ watch(
                     />
                 </div>
 
+                <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
+                <p v-else-if="!isMember && groupCollection.accepts_contributions" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+                    {{ auth.isAuthenticated ? $t('guest.verifyEmail') : $t('guest.contribute.groupCollection') }}
+                </p>
                 <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                     {{ $t('groupCollections.show.membersOnly') }}
                 </p>
