@@ -9,10 +9,7 @@
         "becamePrivate": "This group became private: you no longer have access to it."
     },
     "picker": {
-        "label": "Groups",
-        "hint": "Your groups and the public groups of other users.",
-        "selected": "Selected groups",
-        "remove": "Remove {name}"
+        "selected": "Selected groups"
     },
     "create": {
         "title": "New group",

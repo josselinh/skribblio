@@ -9,10 +9,7 @@
         "becamePrivate": "Ce groupe est devenu privé : vous n’y avez plus accès."
     },
     "picker": {
-        "label": "Groupes",
-        "hint": "Vos groupes et les groupes publics des autres utilisateurs.",
-        "selected": "Groupes sélectionnés",
-        "remove": "Retirer {name}"
+        "selected": "Groupes sélectionnés"
     },
     "create": {
         "title": "Nouveau groupe",

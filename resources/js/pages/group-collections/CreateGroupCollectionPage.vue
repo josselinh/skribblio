@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { createGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
@@ -8,14 +7,13 @@ import FormField from '@/components/FormField.vue';
 import LanguageField from '@/components/LanguageField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
-import WordGroupPicker from '@/components/WordGroupPicker.vue';
 import { useForm } from '@/composables/useForm';
 import { preferredContentLanguage } from '@/lib/contentLanguage';
-import type { Visibility, WordGroup } from '@/types/models';
+import type { Visibility } from '@/types/models';
 
+/** Creates an empty collection; its groups are added afterwards, on its page. */
 const router = useRouter();
 
-const selectedWordGroups = ref<WordGroup[]>([]);
 const form = useForm({
     name: '',
     language: preferredContentLanguage(),
@@ -24,27 +22,9 @@ const form = useForm({
     contributions_members_only: false,
 });
 
-/** A collection never mixes languages: switching its language drops the groups picked in the other one. */
-watch(
-    () => form.data.language,
-    (language) => {
-        selectedWordGroups.value = selectedWordGroups.value.filter((wordGroup) => wordGroup.language === language);
-    },
-);
-
-/** Errors on the list itself or on one of its items (`word_group_ids.0`…). */
-const wordGroupsError = computed(
-    () =>
-        form.errors.value.word_group_ids ??
-        Object.entries(form.errors.value).find(([field]) => field.startsWith('word_group_ids.'))?.[1],
-);
-
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
-        const groupCollection = await createGroupCollection({
-            ...data,
-            word_group_ids: selectedWordGroups.value.map((wordGroup) => wordGroup.id),
-        });
+        const groupCollection = await createGroupCollection(data);
         await router.push({ name: 'group-collections.show', params: { id: groupCollection.id } });
     });
 }
@@ -77,7 +57,6 @@ async function submit(): Promise<void> {
                     :error="form.errors.value.accepts_contributions"
                     :members-only-error="form.errors.value.contributions_members_only"
                 />
-                <WordGroupPicker v-model="selectedWordGroups" :language="form.data.language" :error="wordGroupsError" />
                 <PrimaryButton :is-loading="form.isProcessing.value">{{ $t('groupCollections.create.submit') }}</PrimaryButton>
             </form>
         </div>
