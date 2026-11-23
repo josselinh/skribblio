@@ -27,20 +27,17 @@ class ContentLanguageTest extends TestCase
             ->assertJsonPath('data.language', 'fr');
     }
 
-    public function test_changing_the_language_of_a_group_removes_it_from_the_collections_in_the_other_language(): void
+    public function test_the_language_of_a_group_cannot_be_changed(): void
     {
         $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->createdBy($user)->public()->create();
-        $otherUsersCollection = GroupCollection::factory()->private()->hasAttached($wordGroup, ['added_by' => null])->create(['updated_at' => now()->subDay()]);
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
-            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => $wordGroup->name, 'visibility' => 'public', 'language' => 'en'])
-            ->assertOk()
-            ->assertJsonPath('data.language', 'en');
+            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => $wordGroup->name, 'visibility' => 'private', 'language' => 'en'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['language' => 'La langue d’un groupe ne peut pas être modifiée.']);
 
-        $this->assertSame(Locale::En, $wordGroup->fresh()->language);
-        $this->assertFalse($otherUsersCollection->wordGroups()->exists());
-        $this->assertTrue($otherUsersCollection->fresh()->updated_at->isToday());
+        $this->assertSame(Locale::Fr, $wordGroup->fresh()->language);
     }
 
     public function test_a_new_collection_takes_the_language_of_its_groups_which_must_all_share_it(): void
@@ -77,23 +74,17 @@ class ContentLanguageTest extends TestCase
         $this->assertFalse($groupCollection->wordGroups()->whereKey($englishGroup->id)->exists());
     }
 
-    public function test_a_collection_only_changes_language_when_all_its_groups_are_in_the_new_one(): void
+    public function test_the_language_of_a_collection_cannot_be_changed(): void
     {
         $user = User::factory()->create();
         $groupCollection = GroupCollection::factory()->createdBy($user)->create();
-        $payload = ['name' => $groupCollection->name, 'visibility' => 'private', 'language' => 'en'];
 
         $this->actingAs($user)
-            ->patchJson("/api/group-collections/{$groupCollection->id}", $payload)
+            ->patchJson("/api/group-collections/{$groupCollection->id}", ['name' => $groupCollection->name, 'visibility' => 'private', 'language' => 'en'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['language' => 'Une collection ne peut passer en anglais que si tous ses groupes sont en anglais.']);
+            ->assertJsonValidationErrors(['language' => 'La langue d’une collection ne peut pas être modifiée.']);
 
-        $groupCollection->wordGroups()->first()->delete();
-
-        $this->actingAs($user)
-            ->patchJson("/api/group-collections/{$groupCollection->id}", $payload)
-            ->assertOk()
-            ->assertJsonPath('data.language', 'en');
+        $this->assertSame(Locale::Fr, $groupCollection->fresh()->language);
     }
 
     public function test_searches_can_be_limited_to_one_language(): void

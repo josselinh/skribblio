@@ -14,8 +14,8 @@
     "field": {
         "wordGroup": "Language of the words",
         "groupCollection": "Language of the groups",
-        "wordGroupHint": "Changing the language removes the group from the collections in the other language: a collection does not mix languages.",
-        "groupCollectionHint": "All the groups of a collection are in its language."
+        "wordGroupHint": "It cannot be changed afterwards.",
+        "groupCollectionHint": "All its groups must be in this language, which cannot be changed afterwards."
     },
     "filter": {
         "label": "Language of the lists",

@@ -6,9 +6,7 @@ return [
     'contributions_closed' => 'Cette collection n’est pas ouverte aux contributions.',
     'contributions_members_only' => 'Seuls les membres autorisés par le créateur peuvent contribuer à cette collection.',
     'not_a_member' => 'Vous n’êtes pas membre de cette collection.',
-    'language' => [
-        'groups_mismatch' => 'Une collection ne peut passer en :language que si tous ses groupes sont en :language.',
-    ],
+    'language_locked' => 'La langue d’une collection ne peut pas être modifiée.',
     'word_groups' => [
         'language_mismatch' => 'Les groupes d’une collection doivent tous être en :language, comme elle.',
         'wrong_language' => 'Ce groupe est en :group_language, alors que cette collection est en :language.',

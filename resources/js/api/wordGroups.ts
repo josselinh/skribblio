@@ -4,10 +4,14 @@ import type { Locale, Visibility, WordGroup } from '@/types/models';
 
 export interface WordGroupPayload {
     name: string;
-    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
+}
+
+export interface CreateWordGroupPayload extends WordGroupPayload {
+    /** Chosen on creation, it cannot be changed afterwards. */
+    language: Locale;
 }
 
 /** Groups created by the current user, most recently updated first. */
@@ -33,7 +37,7 @@ export async function fetchWordGroup(id: string): Promise<WordGroup> {
     return data.data;
 }
 
-export async function createWordGroup(payload: WordGroupPayload): Promise<WordGroup> {
+export async function createWordGroup(payload: CreateWordGroupPayload): Promise<WordGroup> {
     const { data } = await http.post<ResourceResponse<WordGroup>>('/api/word-groups', payload);
 
     return data.data;

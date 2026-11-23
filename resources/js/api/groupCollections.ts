@@ -4,15 +4,16 @@ import type { DuplicatedGroupCollection, GroupCollection, GroupCollectionDetail,
 
 export interface GroupCollectionPayload {
     name: string;
-    /** Every group of the collection must be in it. */
-    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
 }
 
-export interface CreateGroupCollectionPayload extends Omit<GroupCollectionPayload, 'language'> {
-    /** The language of the groups when left out; they must all share it. */
+export interface CreateGroupCollectionPayload extends GroupCollectionPayload {
+    /**
+     * Every group must be in it; the language of the groups when left out. Chosen on creation, it cannot be
+     * changed afterwards.
+     */
     language?: Locale;
     /** At least one group. */
     word_group_ids: string[];

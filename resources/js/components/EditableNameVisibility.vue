@@ -5,7 +5,6 @@ import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
 import LanguageBadge from '@/components/LanguageBadge.vue';
-import LanguageField from '@/components/LanguageField.vue';
 import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
@@ -16,7 +15,6 @@ import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
 export interface NameVisibilityPayload {
     name: string;
-    language: Locale;
     visibility: Visibility;
     accepts_contributions: boolean;
     contributions_members_only: boolean;
@@ -29,6 +27,7 @@ export interface NameVisibilityPayload {
  */
 const props = defineProps<{
     name: string;
+    /** Chosen on creation, it cannot be changed: only shown as a badge. */
     language: Locale;
     visibility: Visibility;
     acceptsContributions: boolean;
@@ -49,7 +48,6 @@ const { t } = useI18n();
 const isEditing = ref(false);
 const form = useForm<NameVisibilityPayload>({
     name: props.name,
-    language: props.language,
     visibility: props.visibility,
     accepts_contributions: props.acceptsContributions,
     contributions_members_only: props.contributionsMembersOnly,
@@ -57,7 +55,6 @@ const form = useForm<NameVisibilityPayload>({
 
 function startEditing(): void {
     form.data.name = props.name;
-    form.data.language = props.language;
     form.data.visibility = props.visibility;
     form.data.accepts_contributions = props.acceptsContributions;
     form.data.contributions_members_only = props.contributionsMembersOnly;
@@ -82,7 +79,6 @@ async function submit(): Promise<void> {
         @keydown.esc="isEditing = false"
     >
         <FormField id="edit-name" v-model="form.data.name" :label="nameLabel" :error="form.errors.value.name" required />
-        <LanguageField v-model="form.data.language" :kind="kind" :error="form.errors.value.language" show-hint />
         <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
         <ContributionsField
             v-model="form.data.accepts_contributions"

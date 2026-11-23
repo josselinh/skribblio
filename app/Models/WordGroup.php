@@ -82,23 +82,6 @@ class WordGroup extends Model
     }
 
     /**
-     * Once the group's language changed: removes it from the collections in another language (a collection
-     * never mixes languages), as deleting it would, even when it was a collection's last group. Those
-     * collections are touched.
-     */
-    public function detachFromCollectionsInOtherLanguages(): void
-    {
-        $groupCollectionIds = $this->groupCollections()
-            ->where('group_collections.language', '!=', $this->language->value)
-            ->pluck('group_collections.id');
-
-        if ($groupCollectionIds->isNotEmpty()) {
-            $this->groupCollections()->detach($groupCollectionIds);
-            GroupCollection::whereKey($groupCollectionIds)->touch();
-        }
-    }
-
-    /**
      * @return BelongsToMany<GroupCollection, $this>
      */
     public function groupCollections(): BelongsToMany
