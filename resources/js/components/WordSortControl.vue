@@ -14,8 +14,6 @@ const props = defineProps<{
     direction: SortDirection;
     /** Direction applied when choosing each criterion. */
     defaultDirections: Record<WordSort, SortDirection>;
-    /** Offers sorting by votes. */
-    showVotes: boolean;
     /** Offers sorting by author (not to visitors, who do not see the authors). */
     showAuthor: boolean;
     /** Criteria shown but asking to log in. */
@@ -32,7 +30,7 @@ const sorts: WordSort[] = ['created', 'name', 'score', 'author', 'updated'];
 
 const options = computed(() =>
     sorts
-        .filter((sort) => (sort !== 'score' || props.showVotes) && (sort !== 'author' || props.showAuthor))
+        .filter((sort) => sort !== 'author' || props.showAuthor)
         .map((sort) => ({ value: sort, label: t(`words.sort.criteria.${sort}`) })),
 );
 

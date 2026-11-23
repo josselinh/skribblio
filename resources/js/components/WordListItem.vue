@@ -7,8 +7,6 @@ import type { Word } from '@/types/models';
 /** A word of a group, read-only: renaming and deleting happen in `WordListEditor`. */
 defineProps<{
     word: Word;
-    /** Shows the votes. */
-    showVotes: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -20,7 +18,7 @@ const emit = defineEmits<{
     <li class="px-4 py-3">
         <div class="flex items-start justify-between gap-3">
             <p class="min-w-0 text-sm font-medium break-words">{{ word.name }}</p>
-            <WordVoteButtons v-if="showVotes" class="shrink-0" :word="word" @updated="emit('updated', $event)" />
+            <WordVoteButtons class="shrink-0" :word="word" @updated="emit('updated', $event)" />
         </div>
         <p class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
             <!-- Visitors do not get the author (undefined); null means the author deleted their account. -->

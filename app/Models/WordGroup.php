@@ -80,17 +80,6 @@ class WordGroup extends Model
     }
 
     /**
-     * Whether any word of the group received a vote, even if the group is now closed to contributions.
-     */
-    public function hasWordVotes(): bool
-    {
-        return DB::table('word_votes')
-            ->join('words', 'words.id', '=', 'word_votes.word_id')
-            ->where('words.word_group_id', $this->getKey())
-            ->exists();
-    }
-
-    /**
      * @return BelongsToMany<GroupCollection, $this>
      */
     public function groupCollections(): BelongsToMany
