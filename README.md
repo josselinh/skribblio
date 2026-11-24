@@ -22,7 +22,7 @@ L'application est en production sur <https://skribbl-tools.josselinh.fr/>.
 - [Laravel Sanctum](https://laravel.com/docs/sanctum) (mode SPA) et [Laravel Fortify](https://laravel.com/docs/fortify) (sans vues) pour l'authentification
 - [Vue 3](https://vuejs.org) + [TypeScript](https://www.typescriptlang.org), avec [Vue Router](https://router.vuejs.org), [Pinia](https://pinia.vuejs.org) et [axios](https://axios-http.com) : front-end (SPA)
 - Vite et Tailwind CSS 4 pour le build et le style
-- [Laravel Lang](https://laravel-lang.com) pour les traductions françaises
+- [Laravel Lang](https://laravel-lang.com) pour les traductions du framework
 - [Laravel Sail](https://laravel.com/docs/sail) pour l'environnement de développement Docker
 - MySQL 8.4 pour la base de données, le cache et la file d'attente des jobs
 - Mailpit pour intercepter les e-mails en local
@@ -77,7 +77,7 @@ PHP, Composer et Node n'ont pas besoin d'être installés sur votre machine : to
 
    ```sh
    ./vendor/bin/sail artisan key:generate
-   ./vendor/bin/sail artisan migrate
+   ./vendor/bin/sail artisan migrate --seed
    ```
 
 6. Installer les dépendances front-end et lancer Vite :
