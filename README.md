@@ -22,8 +22,7 @@ Elle permet de constituer des listes de mots personnalisés, seul ou à plusieur
 - Vite et Tailwind CSS 4 pour le build et le style
 - [Laravel Lang](https://laravel-lang.com) pour les traductions françaises
 - [Laravel Sail](https://laravel.com/docs/sail) pour l'environnement de développement Docker
-- MySQL 8.4 pour la base de données
-- Redis pour le cache et les files d'attente (jobs)
+- MySQL 8.4 pour la base de données, le cache et la file d'attente des jobs
 - Mailpit pour intercepter les e-mails en local
 
 ## Démarrer le projet avec Sail
@@ -92,7 +91,7 @@ L'application est alors accessible sur <http://localhost:8000>.
 
 ### Traiter les jobs
 
-Les jobs sont placés dans une file Redis. Pour qu'ils soient exécutés, lancez un worker dans un terminal dédié :
+Les jobs sont placés dans une file stockée en base de données (table `jobs`). Pour qu'ils soient exécutés, lancez un worker dans un terminal dédié :
 
 ```sh
 ./vendor/bin/sail artisan queue:work
@@ -106,9 +105,8 @@ Les jobs sont placés dans une file Redis. Pour qu'ils soient exécutés, lancez
 | Vite (dev server)   | <http://localhost:5173>     |
 | Mailpit (web)       | <http://localhost:8025>     |
 | MySQL               | `localhost:3306`            |
-| Redis               | `localhost:6379`            |
 
-Les ports sont modifiables dans le fichier `.env` (`APP_PORT`, `VITE_PORT`, `FORWARD_DB_PORT`, `FORWARD_REDIS_PORT`, `FORWARD_MAILPIT_DASHBOARD_PORT`).
+Les ports sont modifiables dans le fichier `.env` (`APP_PORT`, `VITE_PORT`, `FORWARD_DB_PORT`, `FORWARD_MAILPIT_DASHBOARD_PORT`).
 
 ### Commandes utiles
 
