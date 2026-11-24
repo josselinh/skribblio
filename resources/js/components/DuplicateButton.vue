@@ -12,7 +12,8 @@ import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
 
 /**
- * "Dupliquer" button of a group or collection page, confirmed in a modal explaining what is copied; opens the copy
+ * "Dupliquer" button of a group or collection page, confirmed in a modal explaining what is copied (on a collection,
+ * with a "Copier aussi les groupes" checkbox, checked by default, to link the original groups instead); opens the copy
  * with a status message.
  */
 const props = defineProps<{
@@ -26,12 +27,14 @@ const { t } = useI18n();
 const isConfirming = ref(false);
 const isDuplicating = ref(false);
 const error = ref<string | null>(null);
+const copyWordGroups = ref(true);
 
 const title = computed(() => t(`duplication.title.${itemKey(props.kind)}`));
 const description = computed(() => t(`duplication.description.${itemKey(props.kind)}`));
 
 function askConfirmation(): void {
     error.value = null;
+    copyWordGroups.value = true;
     isConfirming.value = true;
 }
 
@@ -46,10 +49,16 @@ async function duplicate(): Promise<void> {
             await router.push({ name: 'word-groups.show', params: { id: copy.id } });
             showToast(t('duplication.done.wordGroup'));
         } else {
-            const copy = await duplicateGroupCollection(props.id);
+            const copiesWordGroups = copyWordGroups.value;
+            const copy = await duplicateGroupCollection(props.id, copiesWordGroups);
             isConfirming.value = false;
             await router.push({ name: 'group-collections.show', params: { id: copy.id } });
-            showToast(t('duplication.done.groupCollection', copy.hidden_word_groups_count));
+            showToast(
+                t(
+                    copiesWordGroups ? 'duplication.done.groupCollection' : 'duplication.done.groupCollectionLinked',
+                    copy.hidden_word_groups_count,
+                ),
+            );
         }
     } catch (caughtError) {
         error.value =
@@ -74,6 +83,22 @@ async function duplicate(): Promise<void> {
 
     <ModalDialog v-model:open="isConfirming" :title="title" :is-dismissible="!isDuplicating">
         <p>{{ description }}</p>
+        <label
+            v-if="kind === 'group-collections'"
+            class="mt-3 flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
+        >
+            <input v-model="copyWordGroups" type="checkbox" class="mt-1" :disabled="isDuplicating" />
+            <span>
+                <span class="block text-sm font-medium">{{ $t('duplication.copyWordGroups.label') }}</span>
+                <span class="block text-sm text-zinc-500 dark:text-zinc-400">
+                    {{
+                        copyWordGroups
+                            ? $t('duplication.copyWordGroups.description.copied')
+                            : $t('duplication.copyWordGroups.description.linked')
+                    }}
+                </span>
+            </span>
+        </label>
         <p v-if="error" role="alert" class="mt-3 text-red-600 dark:text-red-400">{{ error }}</p>
 
         <template #actions>

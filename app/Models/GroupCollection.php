@@ -42,12 +42,13 @@ class GroupCollection extends Model
     /**
      * Copy this collection into a new collection of the user: private, closed to contributions,
      * containing a copy (see `WordGroup::duplicateFor()`) of each group the user can see, except
-     * their own groups, which are kept as they are. Hidden groups are not copied, and neither are
-     * favorites, members or the share link. The copy is empty when no group is visible.
+     * their own groups, which are kept as they are. Without `$copyWordGroups`, it contains the
+     * visible groups themselves, none of them copied. Hidden groups are left out, and so are
+     * favorites, members and the share link. The copy is empty when no group is visible.
      */
-    public function duplicateFor(User $user): self
+    public function duplicateFor(User $user, bool $copyWordGroups = true): self
     {
-        return DB::transaction(function () use ($user): self {
+        return DB::transaction(function () use ($user, $copyWordGroups): self {
             $copy = $user->groupCollections()->create([
                 'name' => $this->copyName(),
                 'language' => $this->language,
@@ -57,7 +58,7 @@ class GroupCollection extends Model
             ]);
 
             $wordGroupIds = $this->wordGroups()->visibleTo($user)->get()
-                ->map(fn (WordGroup $wordGroup): string => $wordGroup->isCreatedBy($user)
+                ->map(fn (WordGroup $wordGroup): string => ! $copyWordGroups || $wordGroup->isCreatedBy($user)
                     ? $wordGroup->getKey()
                     : $wordGroup->duplicateFor($user)->getKey());
             $copy->wordGroups()->attach($wordGroupIds, ['added_by' => $user->getKey()]);

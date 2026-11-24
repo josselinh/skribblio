@@ -8,10 +8,18 @@
     },
     "description": {
         "wordGroup": "Creates a private copy of this group and its words, with you as their author.",
-        "groupCollection": "Creates a private copy of this collection and of the groups you can see, with their words, with you as their author. Your own groups are kept as they are."
+        "groupCollection": "Creates a private copy of this collection, closed to contributions, with you as its author."
     },
     "done": {
         "wordGroup": "Group duplicated. It is private and closed to contributions.",
-        "groupCollection": "Collection duplicated. It and its copied groups are private and closed to contributions. | Collection duplicated. It and its copied groups are private and closed to contributions. 1 hidden group was not copied. | Collection duplicated. It and its copied groups are private and closed to contributions. {n} hidden groups were not copied."
+        "groupCollection": "Collection duplicated. It and its copied groups are private and closed to contributions. | Collection duplicated. It and its copied groups are private and closed to contributions. 1 hidden group was not copied. | Collection duplicated. It and its copied groups are private and closed to contributions. {n} hidden groups were not copied.",
+        "groupCollectionLinked": "Collection duplicated. It is private and closed to contributions; its groups were not copied. | Collection duplicated. It is private and closed to contributions; its groups were not copied. 1 hidden group was left out. | Collection duplicated. It is private and closed to contributions; its groups were not copied. {n} hidden groups were left out."
+    },
+    "copyWordGroups": {
+        "label": "Copy the groups too",
+        "description": {
+            "copied": "The groups you can see are copied with their words, with you as their author. Your own groups are kept as they are.",
+            "linked": "The copy contains the original groups, without copying them: their changes will show in it."
+        }
     }
 }

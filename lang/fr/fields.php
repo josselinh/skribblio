@@ -15,4 +15,5 @@ return [
     'visibility' => 'visibilité',
     'accepts_contributions' => 'ouvert aux contributions',
     'contributions_members_only' => 'contributions des membres uniquement',
+    'copy_word_groups' => 'copier les groupes',
 ];

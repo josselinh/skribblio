@@ -56,8 +56,10 @@ export async function detachWordGroups(groupCollectionId: string, wordGroupIds: 
  * Copies a collection, with copies of the groups the user can see (their own groups are kept as they are),
  * into a new private collection of the current user. Tells how many hidden groups were not copied.
  */
-export async function duplicateGroupCollection(id: string): Promise<DuplicatedGroupCollection> {
-    const { data } = await http.post<ResourceResponse<DuplicatedGroupCollection>>(`/api/group-collections/${id}/duplicate`);
+export async function duplicateGroupCollection(id: string, copyWordGroups = true): Promise<DuplicatedGroupCollection> {
+    const { data } = await http.post<ResourceResponse<DuplicatedGroupCollection>>(`/api/group-collections/${id}/duplicate`, {
+        copy_word_groups: copyWordGroups,
+    });
 
     return data.data;
 }
