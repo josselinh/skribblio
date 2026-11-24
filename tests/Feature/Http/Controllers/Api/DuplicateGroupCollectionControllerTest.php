@@ -86,6 +86,38 @@ class DuplicateGroupCollectionControllerTest extends TestCase
         $this->assertSame(['secret'], $copiedGroup->words()->pluck('name')->all());
     }
 
+    public function test_links_the_visible_groups_without_copying_them_when_asked(): void
+    {
+        $user = User::factory()->create();
+        $othersGroup = WordGroup::factory()->public()->create();
+        $ownGroup = WordGroup::factory()->private()->createdBy($user)->create();
+        $groupCollection = GroupCollection::factory()->public()
+            ->hasAttached($othersGroup)
+            ->hasAttached($ownGroup)
+            ->hasAttached(WordGroup::factory()->private())
+            ->create();
+
+        $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate", [
+            'copy_word_groups' => false,
+        ]);
+
+        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $linkedGroups = GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->get();
+        $this->assertEqualsCanonicalizing([$othersGroup->id, $ownGroup->id], $linkedGroups->modelKeys());
+        $this->assertSame([$user->id], $linkedGroups->pluck('pivot.added_by')->unique()->values()->all());
+        $this->assertDatabaseCount('word_groups', 3);
+    }
+
+    public function test_rejects_a_copy_word_groups_option_that_is_not_a_boolean(): void
+    {
+        $groupCollection = GroupCollection::factory()->public()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->postJson("/api/group-collections/{$groupCollection->id}/duplicate", ['copy_word_groups' => 'maybe'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('copy_word_groups');
+    }
+
     public function test_does_not_copy_members_favorites_or_share_link(): void
     {
         $creator = User::factory()->create();
