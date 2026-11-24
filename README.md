@@ -4,6 +4,8 @@
 
 Elle permet de constituer des listes de mots personnalisés, seul ou à plusieurs, puis de les exporter pour les utiliser directement comme mots personnalisés lors d'une partie Skribbl.io.
 
+L'application est en production sur <https://skribbl-tools.josselinh.fr/>.
+
 ## Fonctionnalités
 
 - Création de listes de mots personnalisés
