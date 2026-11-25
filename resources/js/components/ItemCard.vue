@@ -7,8 +7,8 @@ import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import type { Locale, User, Visibility } from '@/types/models';
 
 /**
- * Card of a group or a collection: the title, a line "par X · N mots · modifié le …", then the badges, and an
- * optional `footer` slot describing the item's place in its context (who added a group to a collection),
+ * Card of a group or a collection: the title in a tinted header (next to the favorite star), a line
+ * "par X · N mots · modifié le …", then the badges, and an optional `footer` slot describing the item's place in its context (who added a group to a collection),
  * separated from what describes the item itself. The footer keeps the right column free, under the favorite
  * star, for a selection checkbox laid over the card. The title's link is stretched over the whole card, so
  * that the card is clickable while other links (the creator's name, the footer's) and the favorite star stay
@@ -36,7 +36,7 @@ defineProps<{
 <template>
     <div class="relative h-full">
         <article
-            class="relative flex h-full flex-col gap-2 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
+            class="relative flex h-full flex-col gap-3 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
             :class="
                 isAccessible
                     ? 'transition hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm has-[h3_a:focus-visible]:outline-2 has-[h3_a:focus-visible]:outline-brand-600 dark:has-[h3_a:focus-visible]:outline-brand-400'
@@ -45,7 +45,7 @@ defineProps<{
             :aria-disabled="isAccessible ? undefined : 'true'"
             :title="isAccessible ? undefined : inaccessibleMessage"
         >
-            <div class="flex flex-col gap-2 px-4 pt-4 pr-12" :class="{ 'pb-4': !$slots.footer }">
+            <header class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/70 py-3 pr-12 pl-4">
                 <h3 class="truncate font-medium" :title="name">
                     <RouterLink
                         v-if="isAccessible"
@@ -56,6 +56,8 @@ defineProps<{
                     </RouterLink>
                     <span v-else class="cursor-not-allowed">{{ name }}</span>
                 </h3>
+            </header>
+            <div class="flex flex-col gap-2 px-4" :class="{ 'pb-4': !$slots.footer }">
                 <CardMeta :creator="creator" :count-label="countLabel" :updated-at="isAccessible ? updatedAt : null" :updated-label="updatedLabel" />
                 <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
                 <div class="flex flex-wrap items-center gap-1.5">
