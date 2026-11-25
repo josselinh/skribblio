@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import CardMeta from '@/components/CardMeta.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemCard from '@/components/ItemCard.vue';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
@@ -28,17 +27,13 @@ function updateFavorite(isFavorite: boolean): void {
         :visibility="groupCollection.visibility"
         :accepts-contributions="groupCollection.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(groupCollection)"
+        :creator="groupCollection.creator"
+        :count-label="groupCollection.word_groups_count === undefined ? undefined : $t('wordGroups.count', groupCollection.word_groups_count)"
         :updated-at="groupCollection.updated_at"
         :updated-label="$t('groupCollections.card.updatedOn')"
         :is-accessible="groupCollection.is_accessible !== false"
         :inaccessible-message="groupCollection.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('groupCollections.card.becamePrivate')"
     >
-        <template #meta>
-            <CardMeta
-                :creator="groupCollection.creator"
-                :count-label="groupCollection.word_groups_count === undefined ? undefined : $t('wordGroups.count', groupCollection.word_groups_count)"
-            />
-        </template>
         <template v-if="groupCollection.is_favorite !== undefined && groupCollection.access_status !== 'pending'" #favorite>
             <FavoriteButton
                 kind="group-collections"
