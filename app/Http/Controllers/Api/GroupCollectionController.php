@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateGroupCollectionRequest;
 use App\Http\Resources\GroupCollectionResource;
 use App\Models\GroupCollection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -55,7 +56,7 @@ class GroupCollectionController extends Controller
     }
 
     /**
-     * Show a collection with the groups the current user can see, and how many others are hidden from them
+     * Show a collection with the groups the current user can see (each with who added it), and how many others are hidden from them
      * (private groups of other users, or every private group for a guest). Guests cannot request access, so
      * none of the hidden groups are requested by them.
      */
@@ -69,6 +70,7 @@ class GroupCollectionController extends Controller
             ->withIsFavorite($request->user())
             ->orderBy('name')
             ->get();
+        EloquentCollection::make($visibleWordGroups->pluck('pivot'))->load('addedBy');
 
         $groupCollection->setRelation('wordGroups', $visibleWordGroups);
         $hiddenWordGroups = $groupCollection->wordGroups()->whereNotIn('word_groups.id', $visibleWordGroups->modelKeys());
