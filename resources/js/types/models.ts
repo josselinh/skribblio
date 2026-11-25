@@ -48,6 +48,10 @@ export interface WordGroup {
     creator?: Pick<User, 'id' | 'name'>;
     /** Only present in search results. */
     words_count?: number;
+    /** Only when listed by a collection, for logged-in users: who added it to the collection (null once they were deleted). */
+    added_by?: Pick<User, 'id' | 'name'> | null;
+    /** Only when listed by a collection: when it was added to the collection (null for old additions). */
+    added_at?: string | null;
     created_at: string | null;
     updated_at: string | null;
     /** Whether the current user favorited it; absent on some endpoints. */

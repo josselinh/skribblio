@@ -434,7 +434,7 @@ watch(
                         />
                         <label
                             v-if="isSelectingGroups && wordGroup.can.remove_from_collection"
-                            class="absolute inset-0 z-20 flex cursor-pointer items-end justify-end rounded-xl p-3 ring-inset has-checked:bg-brand-50/50 dark:has-checked:bg-brand-950/40 has-checked:ring-2 has-checked:ring-brand-500 dark:has-checked:ring-brand-400 has-focus-visible:outline-2 has-focus-visible:outline-brand-600 dark:has-focus-visible:outline-brand-400"
+                            class="absolute inset-0 z-20 flex cursor-pointer items-end justify-end rounded-xl pr-3.5 pb-2.5 ring-inset has-checked:bg-brand-50/50 dark:has-checked:bg-brand-950/40 has-checked:ring-2 has-checked:ring-brand-500 dark:has-checked:ring-brand-400 has-focus-visible:outline-2 has-focus-visible:outline-brand-600 dark:has-focus-visible:outline-brand-400"
                         >
                             <input
                                 v-model="selectedWordGroupIds"

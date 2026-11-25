@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import CardMeta from '@/components/CardMeta.vue';
+import { computed } from 'vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import UserLink from '@/components/UserLink.vue';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { formatDateTime } from '@/lib/format';
 import type { WordGroup } from '@/types/models';
 
 const props = defineProps<{
@@ -13,6 +15,16 @@ const emit = defineEmits<{
     /** The favorite star was toggled and the server confirmed it. */
     favoriteSaved: [isFavorite: boolean];
 }>();
+
+/** Footer of a group listed by a collection: who added it (never told to guests) and when. */
+const additionKey = computed(() => {
+    const { added_by: addedBy, added_at: addedAt } = props.wordGroup;
+    if (addedBy === undefined) {
+        return 'wordGroups.card.addition.on';
+    }
+
+    return addedAt ? 'wordGroups.card.addition.byOn' : 'wordGroups.card.addition.by';
+});
 
 function updateFavorite(isFavorite: boolean): void {
     // The card's parent owns the data; it is kept in sync here so that the star reflects the change at once.
@@ -28,13 +40,23 @@ function updateFavorite(isFavorite: boolean): void {
         :visibility="wordGroup.visibility"
         :accepts-contributions="wordGroup.accepts_contributions"
         :contributions-members-only="restrictsContributionsToMembers(wordGroup)"
+        :creator="wordGroup.creator"
+        :count-label="wordGroup.words_count === undefined ? undefined : $t('words.count', wordGroup.words_count)"
         :updated-at="wordGroup.updated_at"
         :updated-label="$t('wordGroups.card.updatedOn')"
         :is-accessible="wordGroup.is_accessible !== false"
         :inaccessible-message="wordGroup.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('wordGroups.card.becamePrivate')"
     >
-        <template #meta>
-            <CardMeta :creator="wordGroup.creator" :count-label="wordGroup.words_count === undefined ? undefined : $t('words.count', wordGroup.words_count)" />
+        <template v-if="wordGroup.added_by !== undefined || wordGroup.added_at" #footer>
+            <i18n-t :keypath="additionKey" scope="global">
+                <template #user>
+                    <UserLink v-if="wordGroup.added_by" :user="wordGroup.added_by" class="relative z-10" />
+                    <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
+                </template>
+                <template #date>
+                    <time v-if="wordGroup.added_at" :datetime="wordGroup.added_at">{{ formatDateTime(wordGroup.added_at) }}</time>
+                </template>
+            </i18n-t>
         </template>
         <template v-if="wordGroup.is_favorite !== undefined && wordGroup.access_status !== 'pending'" #favorite>
             <FavoriteButton

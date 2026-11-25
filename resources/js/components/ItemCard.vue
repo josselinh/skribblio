@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
+import CardMeta from '@/components/CardMeta.vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import LanguageBadge from '@/components/LanguageBadge.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
-import { formatDateTime } from '@/lib/format';
-import type { Locale, Visibility } from '@/types/models';
+import type { Locale, User, Visibility } from '@/types/models';
 
 /**
- * Card of a group or a collection. The title's link is stretched over the whole card, so that the card
- * is clickable while other links (the creator's name in the `meta` slot) and the favorite star stay
+ * Card of a group or a collection: the title, a line "par X · N mots · modifié le …", then the badges, and an
+ * optional `footer` slot describing the item's place in its context (who added a group to a collection),
+ * separated from what describes the item itself. The footer keeps the right column free, under the favorite
+ * star, for a selection checkbox laid over the card. The title's link is stretched over the whole card, so
+ * that the card is clickable while other links (the creator's name, the footer's) and the favorite star stay
  * usable on top of it. When the item is no longer accessible (a favorite that became private, a pending
  * request), the card is greyed out and not clickable.
  */
@@ -20,6 +23,9 @@ defineProps<{
     acceptsContributions: boolean;
     /** Public and open to its members only. */
     contributionsMembersOnly: boolean;
+    creator?: Pick<User, 'id' | 'name'>;
+    /** Counted items, e.g. "42 mots". */
+    countLabel?: string;
     updatedAt: string | null;
     updatedLabel: string;
     isAccessible: boolean;
@@ -30,7 +36,7 @@ defineProps<{
 <template>
     <div class="relative h-full">
         <article
-            class="relative flex h-full flex-col gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 pr-12 shadow-xs"
+            class="relative flex h-full flex-col gap-2 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
             :class="
                 isAccessible
                     ? 'transition hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm has-[h3_a:focus-visible]:outline-2 has-[h3_a:focus-visible]:outline-brand-600 dark:has-[h3_a:focus-visible]:outline-brand-400'
@@ -39,7 +45,7 @@ defineProps<{
             :aria-disabled="isAccessible ? undefined : 'true'"
             :title="isAccessible ? undefined : inaccessibleMessage"
         >
-            <div class="flex items-start justify-between gap-2">
+            <div class="flex flex-col gap-2 px-4 pt-4 pr-12" :class="{ 'pb-4': !$slots.footer }">
                 <h3 class="truncate font-medium" :title="name">
                     <RouterLink
                         v-if="isAccessible"
@@ -50,19 +56,20 @@ defineProps<{
                     </RouterLink>
                     <span v-else class="cursor-not-allowed">{{ name }}</span>
                 </h3>
-                <div class="flex shrink-0 items-center gap-1.5">
+                <CardMeta :creator="creator" :count-label="countLabel" :updated-at="isAccessible ? updatedAt : null" :updated-label="updatedLabel" />
+                <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
+                <div class="flex flex-wrap items-center gap-1.5">
                     <LanguageBadge :language="language" />
                     <VisibilityBadge :visibility="visibility" />
+                    <ContributionsBadge v-if="acceptsContributions && isAccessible" :members-only="contributionsMembersOnly" />
                 </div>
             </div>
-            <slot name="meta" />
-            <div v-if="acceptsContributions && isAccessible">
-                <ContributionsBadge :members-only="contributionsMembersOnly" />
+            <div
+                v-if="$slots.footer"
+                class="mt-auto border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 py-2.5 pr-12 pl-4 text-sm text-zinc-500 dark:text-zinc-400"
+            >
+                <slot name="footer" />
             </div>
-            <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
-            <p v-else-if="updatedAt" class="text-sm text-zinc-500 dark:text-zinc-400">
-                {{ updatedLabel }} <time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time>
-            </p>
         </article>
         <div class="absolute top-3 right-3 z-10">
             <slot name="favorite" />
