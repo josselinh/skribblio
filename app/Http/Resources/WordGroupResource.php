@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\WordGroup;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -16,7 +17,8 @@ class WordGroupResource extends JsonResource
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
      * `creator` (never for guests: the names of the users are only shown to logged-in users), `words_count` and `is_favorite` are only included when loaded; `is_accessible` only in the
      * favorites list, where groups that became private are flagged with `false`; `can.remove_from_collection`
-     * only when listed through a collection.
+     * only when listed through a collection, like `added_at` (when it was added to the collection) and `added_by` (who added it,
+     * null once that user was deleted; never for guests, and only when loaded).
      *
      * @return array<string, mixed>
      */
@@ -33,6 +35,10 @@ class WordGroupResource extends JsonResource
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
             ])),
+            'added_by' => $this->when($request->user() !== null, fn (): mixed => $this->whenPivotLoaded('groups_collections', fn (): mixed => $this->pivot->relationLoaded('addedBy')
+                ? ($this->pivot->addedBy === null ? null : ['id' => $this->pivot->addedBy->id, 'name' => $this->pivot->addedBy->name])
+                : new MissingValue)),
+            'added_at' => $this->whenPivotLoaded('groups_collections', fn (): ?string => $this->pivot->created_at?->toIso8601String()),
             'words_count' => $this->whenCounted('words'),
             'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
             'is_accessible' => $this->whenHas('is_accessible'),

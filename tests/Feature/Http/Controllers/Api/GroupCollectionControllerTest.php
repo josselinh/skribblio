@@ -134,6 +134,7 @@ class GroupCollectionControllerTest extends TestCase
             ->assertJsonPath('data.hidden_word_groups_requested_count', 0)
             ->assertJsonMissingPath('data.creator')
             ->assertJsonMissingPath('data.word_groups.0.creator')
+            ->assertJsonMissingPath('data.word_groups.0.added_by')
             ->assertJsonPath('data.can.duplicate', false);
     }
 
@@ -224,6 +225,27 @@ class GroupCollectionControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.can.add_word_group', true)
             ->assertJsonPath('data.word_groups.*.can.remove_from_collection', [false, true]);
+    }
+
+    public function test_show_tells_who_added_each_group_and_null_once_they_were_deleted(): void
+    {
+        $creator = User::factory()->create();
+        $contributor = User::factory()->create();
+        $deletedContributor = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()->createdBy($creator)
+            ->hasAttached(WordGroup::factory()->public()->create(['name' => 'A']), ['added_by' => $creator->id])
+            ->hasAttached(WordGroup::factory()->public()->create(['name' => 'B']), ['added_by' => $contributor->id])
+            ->hasAttached(WordGroup::factory()->public()->create(['name' => 'C']), ['added_by' => $deletedContributor->id])
+            ->create();
+        $deletedContributor->delete();
+
+        $this->actingAs(User::factory()->create())
+            ->getJson("/api/group-collections/{$groupCollection->id}")
+            ->assertOk()
+            ->assertJsonPath('data.word_groups.0.added_by', ['id' => $creator->id, 'name' => $creator->name])
+            ->assertJsonPath('data.word_groups.1.added_by', ['id' => $contributor->id, 'name' => $contributor->name])
+            ->assertJsonPath('data.word_groups.2.added_by', null)
+            ->assertJsonPath('data.word_groups.0.added_at', fn (?string $addedAt): bool => $addedAt !== null);
     }
 
     public function test_destroy_deletes_collection_and_keeps_its_groups(): void

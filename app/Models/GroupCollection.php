@@ -74,7 +74,7 @@ class GroupCollection extends Model
      */
     public function wordGroups(): BelongsToMany
     {
-        return $this->belongsToMany(WordGroup::class, 'groups_collections')->withPivot('added_by')->withTimestamps();
+        return $this->belongsToMany(WordGroup::class, 'groups_collections')->using(GroupCollectionWordGroup::class)->withPivot('added_by')->withTimestamps();
     }
 
     /**
