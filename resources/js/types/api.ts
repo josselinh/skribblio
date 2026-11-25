@@ -1,4 +1,4 @@
-import type { Word } from '@/types/models';
+import type { GroupCollection, Word } from '@/types/models';
 
 /** Shape of a Laravel API Resource response. */
 export interface ResourceResponse<T> {
@@ -46,4 +46,13 @@ export interface ValidationErrorResponse {
 /** Shape of the status responses returned by Fortify (password reset, etc.). */
 export interface MessageResponse {
     message: string;
+}
+
+/**
+ * Collections a group can be added to (`GET /api/word-groups/{id}/collection-targets`). Without a search, `meta.suggestions`
+ * tells whether they are the user's favorite collections or, when no favorite can receive the group, their own ones.
+ */
+export interface CollectionTargetsResponse {
+    data: GroupCollection[];
+    meta?: { suggestions: 'favorites' | 'own' };
 }

@@ -1,0 +1,29 @@
+{
+    "button": "Add to a collection",
+    "buttonTo": "Add to “{name}”",
+    "chooseAnother": "Choose another collection",
+    "picker": {
+        "title": "Add this group to a collection",
+        "searchLabel": "Search for a collection",
+        "searchPlaceholder": "Search for a collection…",
+        "favoritesHint": "Only your favorite collections are suggested here. Search for a collection to find the others.",
+        "ownHint": "None of your favorite collections can receive this group: here are your own collections. Search for a collection to find the others.",
+        "languageHint": {
+            "fr": "Only the French collections you can contribute to can receive this group.",
+            "en": "Only the English collections you can contribute to can receive this group."
+        },
+        "noSuggestion": "You do not have any collection that can receive this group yet. Search for one, or create one from your dashboard.",
+        "noResult": "No collection found.",
+        "loadFailed": "Could not load the collections.",
+        "alreadyAdded": "Already added",
+        "submit": "Add"
+    },
+    "confirmation": {
+        "title": "Add this group to “{name}”?",
+        "message": "The group “{group}” will be added to the collection “{collection}”."
+    },
+    "privateHint": "This group is private: it will stay hidden from the people of the collection who cannot access it.",
+    "processing": "Adding…",
+    "failed": "Could not add the group to the collection.",
+    "done": "Group added to “{name}”."
+}
