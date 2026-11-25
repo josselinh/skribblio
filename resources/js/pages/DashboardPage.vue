@@ -70,8 +70,8 @@ onMounted(() => {
 });
 
 /**
- * Favorites and shared lists only show once loaded with at least one item (or to offer a retry); they come after
- * the user's own lists so that their appearance does not push the rest of the page down.
+ * Favorites and shared lists only show once loaded with at least one item (or to offer a retry); they come before
+ * the user's own lists.
  */
 function isShown(list: ReturnType<typeof usePaginatedList>): boolean {
     return list.hasFailed.value || (list.result.value?.meta.total ?? 0) > 0;
@@ -131,69 +131,6 @@ const buttonClass =
                     />
                 </ul>
             </section>
-
-            <CardListSection
-                section-id="word-groups"
-                :title="$t('dashboard.wordGroups.title')"
-                :result="wordGroups.result.value"
-                :is-loading="wordGroups.isLoading.value"
-                :has-failed="wordGroups.hasFailed.value"
-                paginated
-                page-param="groups_page"
-                @retry="wordGroups.reload"
-            >
-                <template #actions>
-                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">{{ $t('dashboard.wordGroups.create') }}</RouterLink>
-                </template>
-                <template #empty>
-                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.wordGroups.empty') }}</p>
-                        <RouterLink
-                            :to="{ name: 'word-groups.create' }"
-                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
-                        >
-                            {{ $t('dashboard.wordGroups.createFirst') }}
-                        </RouterLink>
-                    </div>
-                </template>
-                <template #item="{ item }">
-                    <WordGroupCard :word-group="item" @favorite-saved="onFavoriteSaved('word-groups', item.id, $event)" />
-                </template>
-            </CardListSection>
-
-            <CardListSection
-                section-id="group-collections"
-                :title="$t('dashboard.groupCollections.title')"
-                :result="groupCollections.result.value"
-                :is-loading="groupCollections.isLoading.value"
-                :has-failed="groupCollections.hasFailed.value"
-                paginated
-                page-param="collections_page"
-                @retry="groupCollections.reload"
-            >
-                <template #actions>
-                    <RouterLink :to="{ name: 'group-collections.create' }" :class="buttonClass">
-                        {{ $t('dashboard.groupCollections.create') }}
-                    </RouterLink>
-                </template>
-                <template #empty>
-                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.groupCollections.empty') }}</p>
-                        <RouterLink
-                            :to="{ name: 'group-collections.create' }"
-                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
-                        >
-                            {{ $t('dashboard.groupCollections.createFirst') }}
-                        </RouterLink>
-                    </div>
-                </template>
-                <template #item="{ item }">
-                    <GroupCollectionCard
-                        :group-collection="item"
-                        @favorite-saved="onFavoriteSaved('group-collections', item.id, $event)"
-                    />
-                </template>
-            </CardListSection>
 
             <CardListSection
                 v-if="isShown(favoriteWordGroups)"
@@ -257,6 +194,68 @@ const buttonClass =
                 page-param="shared_collections_page"
                 @retry="sharedGroupCollections.reload"
             >
+                <template #item="{ item }">
+                    <GroupCollectionCard
+                        :group-collection="item"
+                        @favorite-saved="onFavoriteSaved('group-collections', item.id, $event)"
+                    />
+                </template>
+            </CardListSection>
+            <CardListSection
+                section-id="word-groups"
+                :title="$t('dashboard.wordGroups.title')"
+                :result="wordGroups.result.value"
+                :is-loading="wordGroups.isLoading.value"
+                :has-failed="wordGroups.hasFailed.value"
+                paginated
+                page-param="groups_page"
+                @retry="wordGroups.reload"
+            >
+                <template #actions>
+                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">{{ $t('dashboard.wordGroups.create') }}</RouterLink>
+                </template>
+                <template #empty>
+                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.wordGroups.empty') }}</p>
+                        <RouterLink
+                            :to="{ name: 'word-groups.create' }"
+                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
+                        >
+                            {{ $t('dashboard.wordGroups.createFirst') }}
+                        </RouterLink>
+                    </div>
+                </template>
+                <template #item="{ item }">
+                    <WordGroupCard :word-group="item" @favorite-saved="onFavoriteSaved('word-groups', item.id, $event)" />
+                </template>
+            </CardListSection>
+
+            <CardListSection
+                section-id="group-collections"
+                :title="$t('dashboard.groupCollections.title')"
+                :result="groupCollections.result.value"
+                :is-loading="groupCollections.isLoading.value"
+                :has-failed="groupCollections.hasFailed.value"
+                paginated
+                page-param="collections_page"
+                @retry="groupCollections.reload"
+            >
+                <template #actions>
+                    <RouterLink :to="{ name: 'group-collections.create' }" :class="buttonClass">
+                        {{ $t('dashboard.groupCollections.create') }}
+                    </RouterLink>
+                </template>
+                <template #empty>
+                    <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                        <p class="text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.groupCollections.empty') }}</p>
+                        <RouterLink
+                            :to="{ name: 'group-collections.create' }"
+                            class="mt-2 inline-block text-sm font-medium text-brand-700 dark:text-brand-300 underline hover:text-brand-800 dark:hover:text-brand-200"
+                        >
+                            {{ $t('dashboard.groupCollections.createFirst') }}
+                        </RouterLink>
+                    </div>
+                </template>
                 <template #item="{ item }">
                     <GroupCollectionCard
                         :group-collection="item"
