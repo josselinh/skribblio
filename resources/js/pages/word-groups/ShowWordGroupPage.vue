@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchWordGroup, updateWordGroup } from '@/api/wordGroups';
 import { fetchWords, type WordOrder } from '@/api/words';
+import AddToCollectionButton from '@/components/AddToCollectionButton.vue';
 import AddWordForm from '@/components/AddWordForm.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
@@ -206,6 +207,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     </template>
                     <template #actions>
                         <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" />
+                        <AddToCollectionButton v-if="isMember" :word-group="wordGroup" />
                         <ShareButton
                             v-if="wordGroup.can.share"
                             kind="word-groups"

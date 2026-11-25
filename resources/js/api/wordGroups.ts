@@ -1,5 +1,5 @@
 import { http } from '@/lib/http';
-import type { PaginatedResponse, ResourceResponse } from '@/types/api';
+import type { CollectionTargetsResponse, PaginatedResponse, ResourceResponse } from '@/types/api';
 import type { Locale, Visibility, WordGroup } from '@/types/models';
 
 export interface WordGroupPayload {
@@ -29,6 +29,21 @@ export async function searchWordGroups(query: string, language?: Locale): Promis
     const { data } = await http.get<{ data: WordGroup[] }>('/api/word-groups/search', { params: { q: query, language } });
 
     return data.data;
+}
+
+/**
+ * Collections the current user can add the group to, in its language, each flagged when it already contains it: those
+ * whose name contains `query`, only `groupCollectionId` when given, or suggestions (favorites, otherwise own ones).
+ */
+export async function fetchCollectionTargets(
+    wordGroupId: string,
+    options: { query?: string; groupCollectionId?: string } = {},
+): Promise<CollectionTargetsResponse> {
+    const { data } = await http.get<CollectionTargetsResponse>(`/api/word-groups/${wordGroupId}/collection-targets`, {
+        params: { q: options.query || undefined, group_collection_id: options.groupCollectionId },
+    });
+
+    return data;
 }
 
 export async function fetchWordGroup(id: string): Promise<WordGroup> {

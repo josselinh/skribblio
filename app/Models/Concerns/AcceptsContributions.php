@@ -2,7 +2,10 @@
 
 namespace App\Models\Concerns;
 
+use App\Enums\Visibility;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * The "open to contributions" option of a group (others add words) or a collection (others add groups),
@@ -53,6 +56,28 @@ trait AcceptsContributions
         return $this->accepts_contributions
             && $this->isVisibleTo($user)
             && (! $this->restrictsContributionsToMembers() || $this->isMember($user));
+    }
+
+    /**
+     * Limits the query to the items the user can add content to, as `acceptsContributionFrom()` decides: their own
+     * items, and the items they can see that are open to contributions (and, when public and open to its members
+     * only, of which they are a member).
+     *
+     * @param  Builder<static>  $query
+     */
+    #[Scope]
+    protected function acceptingContributionsFrom(Builder $query, User $user): void
+    {
+        $query->where(function (Builder $query) use ($user): void {
+            $query->where($this->qualifyColumn('created_by'), $user->getKey())
+                ->orWhere(fn (Builder $query) => $query
+                    ->where($this->qualifyColumn('accepts_contributions'), true)
+                    ->visibleTo($user)
+                    ->where(fn (Builder $query) => $query
+                        ->where($this->qualifyColumn('visibility'), Visibility::Private)
+                        ->orWhere($this->qualifyColumn('contributions_members_only'), false)
+                        ->orWhereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()))));
+        });
     }
 
     protected function initializeAcceptsContributions(): void

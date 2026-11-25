@@ -1,3 +1,4 @@
+import addToCollection from './addToCollection.json';
 import auth from './auth.json';
 import common from './common.json';
 import contributions from './contributions.json';
@@ -22,6 +23,7 @@ import words from './words.json';
 
 /** English messages of the SPA, one JSON file per domain, read with explicit keys (e.g. `words.add.submit`). */
 export default {
+    addToCollection,
     auth,
     common,
     contributions,

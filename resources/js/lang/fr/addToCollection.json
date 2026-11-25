@@ -1,0 +1,29 @@
+{
+    "button": "Ajouter à une collection",
+    "buttonTo": "Ajouter à « {name} »",
+    "chooseAnother": "Choisir une autre collection",
+    "picker": {
+        "title": "Ajouter ce groupe à une collection",
+        "searchLabel": "Rechercher une collection",
+        "searchPlaceholder": "Rechercher une collection…",
+        "favoritesHint": "Seules vos collections favorites sont proposées ici. Recherchez une collection pour trouver les autres.",
+        "ownHint": "Aucune de vos collections favorites ne peut recevoir ce groupe : voici vos propres collections. Recherchez une collection pour trouver les autres.",
+        "languageHint": {
+            "fr": "Seules les collections en français auxquelles vous pouvez contribuer peuvent recevoir ce groupe.",
+            "en": "Seules les collections en anglais auxquelles vous pouvez contribuer peuvent recevoir ce groupe."
+        },
+        "noSuggestion": "Vous n’avez encore aucune collection qui puisse recevoir ce groupe. Recherchez-en une, ou créez-en une depuis votre tableau de bord.",
+        "noResult": "Aucune collection trouvée.",
+        "loadFailed": "Impossible de charger les collections.",
+        "alreadyAdded": "Déjà ajouté",
+        "submit": "Ajouter"
+    },
+    "confirmation": {
+        "title": "Ajouter ce groupe à « {name} » ?",
+        "message": "Le groupe « {group} » sera ajouté à la collection « {collection} »."
+    },
+    "privateHint": "Ce groupe est privé : il restera masqué aux personnes de la collection qui n’y ont pas accès.",
+    "processing": "Ajout…",
+    "failed": "Impossible d’ajouter le groupe à la collection.",
+    "done": "Groupe ajouté à « {name} »."
+}

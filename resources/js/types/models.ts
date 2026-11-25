@@ -120,6 +120,8 @@ export interface GroupCollection {
     is_accessible?: boolean;
     /** Only in the "shared with me" list: granted, or requested and waiting. */
     access_status?: AccessStatus;
+    /** Only among the collections a group can be added to: whether it already contains that group. */
+    contains_word_group?: boolean;
     /** Actions the current user may perform on the collection. */
     can: {
         update: boolean;

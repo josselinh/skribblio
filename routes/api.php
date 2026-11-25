@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\ShareInvitationController;
 use App\Http\Controllers\Api\UserProfileController;
 use App\Http\Controllers\Api\WordController;
 use App\Http\Controllers\Api\WordExportController;
+use App\Http\Controllers\Api\WordGroupCollectionTargetController;
 use App\Http\Controllers\Api\WordGroupController;
 use App\Http\Controllers\Api\WordGroupSharingController;
 use App\Http\Controllers\Api\WordVoteController;
@@ -87,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('group-collections/{group_collection}/duplicate', DuplicateGroupCollectionController::class)->name('group-collections.duplicate');
 
         Route::get('word-groups/search', SearchWordGroupController::class)->name('word-groups.search');
+        Route::get('word-groups/{word_group}/collection-targets', WordGroupCollectionTargetController::class)->name('word-groups.collection-targets');
         Route::apiResource('word-groups', WordGroupController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::patch('word-groups/{word_group}/words', [WordController::class, 'updateMany'])->name('word-groups.words.update-many');
         Route::delete('word-groups/{word_group}/words', [WordController::class, 'destroyMany'])->name('word-groups.words.destroy-many');
