@@ -77,9 +77,19 @@ function isShown(list: ReturnType<typeof usePaginatedList>): boolean {
     return list.hasFailed.value || (list.result.value?.meta.total ?? 0) > 0;
 }
 
-/** A user with no group and no favorite yet is invited to explore what others share. */
+/**
+ * A user with no group or collection yet, whether their own, a favorite or shared with them (pending requests
+ * included), is invited to explore what others share. Hidden until every list has answered, so it never flashes.
+ */
 const isNewcomer = computed(() =>
-    [wordGroups, favoriteWordGroups, favoriteGroupCollections].every((list) => list.result.value?.meta.total === 0),
+    [
+        wordGroups,
+        groupCollections,
+        favoriteWordGroups,
+        favoriteGroupCollections,
+        sharedWordGroups,
+        sharedGroupCollections,
+    ].every((list) => list.result.value?.meta.total === 0),
 );
 
 const buttonClass =
