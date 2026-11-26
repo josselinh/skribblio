@@ -1,0 +1,36 @@
+{
+    "panel": {
+        "button": "导出到 Skribbl.io",
+        "loadFailed": "无法加载词语。",
+        "groups": "要导出的词组",
+        "selectedCount": "（{selected} / {total}）",
+        "selectAll": "全部勾选",
+        "selectNone": "全部取消",
+        "nothingSelected": "请至少选择一个要导出的词组。",
+        "noWords": "没有可导出的词语。"
+    },
+    "list": {
+        "label": "自定义词语",
+        "help": "将此列表复制到 Skribbl.io 私人房间的“Custom words”字段中。",
+        "copied": "列表已复制。请将其粘贴到 Skribbl.io 房间的“Custom words”字段中。",
+        "copyFailed": "复制失败：请选中列表后手动复制。",
+        "wordCount": "{count} 个词语",
+        "characterCount": "{count} / {max} 个字符",
+        "tooFewWords": "Skribbl.io 至少需要 {min} 个自定义词语。",
+        "tooManyCharacters": "列表超出了 Skribbl.io 的 {max} 个字符限制。",
+        "draw": "随机抽取一部分以符合限制",
+        "drawn": "从 {total} 个词语中随机抽取了 {count} 个。",
+        "drawAgain": "重新抽取",
+        "undraw": "返回完整列表",
+        "options": "列表选项",
+        "deduplicate": "去除重复项",
+        "shuffle": "打乱顺序",
+        "excludeLowScored": "排除评分低的词语",
+        "threshold": "评分不高于 {threshold}",
+        "thresholdLabel": "排除阈值",
+        "lowerThreshold": "降低阈值",
+        "raiseThreshold": "提高阈值",
+        "excludedCount": "已排除 {n} 个词语",
+        "reshuffle": "重新打乱"
+    }
+}

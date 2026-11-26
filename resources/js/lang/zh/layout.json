@@ -1,0 +1,40 @@
+{
+    "footer": {
+        "license": "基于 MIT 许可证的开源项目",
+        "sourceCode": "GitHub 上的源代码",
+        "reportIssue": "报告问题",
+        "notAffiliated": "独立项目，与 Skribbl.io 无关。",
+        "language": "语言"
+    },
+    "notFound": {
+        "title": "页面未找到",
+        "backHome": "返回首页"
+    },
+    "pagination": {
+        "label": "分页",
+        "previous": "← 上一页",
+        "next": "下一页 →",
+        "status": "第 {current} 页，共 {last} 页"
+    },
+    "header": {
+        "mainNavigation": "主导航",
+        "dashboard": "控制面板",
+        "explore": "探索",
+        "searchLabel": "搜索词组或合集",
+        "searchPlaceholder": "搜索词组或合集…"
+    },
+    "userMenu": {
+        "profile": "我的资料",
+        "security": "安全",
+        "preferences": "偏好设置",
+        "logout": "退出登录"
+    },
+    "toasts": {
+        "close": "关闭通知"
+    },
+    "locales": {
+        "fr": "Français",
+        "en": "English",
+        "zh": "中文"
+    }
+}

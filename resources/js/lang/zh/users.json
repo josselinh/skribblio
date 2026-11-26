@@ -1,0 +1,12 @@
+{
+    "notFound": "未找到用户",
+    "loadFailed": "无法加载该用户。",
+    "description": "该用户的公开词组和合集，以及与你共享的内容。",
+    "ownDescription": "其他人看到的你的页面：你的公开词组和合集。你的私有内容的成员还能看到你与他们共享的内容。",
+    "wordGroups": {
+        "empty": "没有可见的词组。"
+    },
+    "groupCollections": {
+        "empty": "没有可见的合集。"
+    }
+}

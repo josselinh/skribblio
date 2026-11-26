@@ -1,7 +1,8 @@
 import { createI18n } from 'vue-i18n';
 import en from '@/lang/en';
 import fr from '@/lang/fr';
-import type { FavoriteKind, Locale } from '@/types/models';
+import zh from '@/lang/zh';
+import type { FavoriteKind, InterfaceLocale } from '@/types/models';
 
 export type MessageSchema = typeof fr;
 
@@ -9,24 +10,24 @@ declare module 'vue-i18n' {
     export interface DefineLocaleMessage extends MessageSchema {}
 }
 
-/** Languages of the interface, in the order they are offered. */
-export const LOCALES: Locale[] = ['fr', 'en'];
+/** Languages of the interface, in the order they are offered (the content's are `CONTENT_LOCALES`). */
+export const LOCALES: InterfaceLocale[] = ['fr', 'en', 'zh'];
 
 /** Storage key of the language last used on this device, also read by `app.blade.php` before the first paint. */
 export const LOCALE_STORAGE_KEY = 'locale';
 
 /** BCP 47 tags used by the `Intl` formatters. */
-const INTL_LOCALES: Record<Locale, string> = { fr: 'fr-FR', en: 'en-US' };
+const INTL_LOCALES: Record<InterfaceLocale, string> = { fr: 'fr-FR', en: 'en-US', zh: 'zh-CN' };
 
-function isLocale(value: unknown): value is Locale {
-    return LOCALES.includes(value as Locale);
+function isLocale(value: unknown): value is InterfaceLocale {
+    return LOCALES.includes(value as InterfaceLocale);
 }
 
 /**
- * The language of a visitor: the one last chosen on this device, otherwise the first French or English one of
- * the browser, otherwise English. Storage may be unavailable (private browsing).
+ * The language of a visitor: the one last chosen on this device, otherwise the first French, English or Chinese
+ * one of the browser, otherwise English. Storage may be unavailable (private browsing).
  */
-function detectLocale(): Locale {
+function detectLocale(): InterfaceLocale {
     try {
         const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
         if (isLocale(stored)) {
@@ -53,19 +54,34 @@ function frenchPluralRule(choice: number, choicesLength: number): number {
 }
 
 /**
+ * Chinese has no plural: a message has a single form, or two when the wording changes for one item ("删除此词语？ |
+ * 删除这 {n} 个词语？"), and three, like the other languages, when it starts with the zero form.
+ */
+function chinesePluralRule(choice: number, choicesLength: number): number {
+    if (choicesLength === 3) {
+        return Math.min(Math.abs(choice), 2);
+    }
+    if (choicesLength === 2) {
+        return Math.abs(choice) === 1 ? 0 : 1;
+    }
+
+    return 0;
+}
+
+/**
  * Translations of the SPA (`resources/js/lang`), in the Composition API mode. Components use `$t` in
  * templates or `useI18n()` in scripts; modules outside components use `i18n.global.t`.
  */
-export const i18n = createI18n<[MessageSchema], Locale, false>({
+export const i18n = createI18n<[MessageSchema], InterfaceLocale, false>({
     legacy: false,
     locale: detectLocale(),
     fallbackLocale: 'fr',
-    messages: { fr, en },
-    pluralRules: { fr: frenchPluralRule },
+    messages: { fr, en, zh },
+    pluralRules: { fr: frenchPluralRule, zh: chinesePluralRule },
 });
 
 /** The current language of the interface. */
-export function currentLocale(): Locale {
+export function currentLocale(): InterfaceLocale {
     return i18n.global.locale.value;
 }
 
@@ -73,7 +89,7 @@ export function currentLocale(): Locale {
  * Switches the interface to this language and remembers it on this device (the server gets it in the
  * `X-Locale` header of every request, see `@/lib/http`). A logged-in user's choice is also saved on their account.
  */
-export function setLocale(locale: Locale): void {
+export function setLocale(locale: InterfaceLocale): void {
     i18n.global.locale.value = locale;
     document.documentElement.lang = locale;
     try {

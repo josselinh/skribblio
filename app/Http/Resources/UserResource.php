@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Enums\Theme;
 use App\Models\User;
@@ -28,7 +29,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'theme' => ($this->theme ?? Theme::System)->value,
-            'locale' => ($this->locale ?? Locale::Fr)->value,
+            'locale' => ($this->locale ?? InterfaceLocale::Fr)->value,
             'content_locale' => ($this->content_locale ?? Locale::Fr)->value,
             'email_notifications' => $this->emailNotificationPreferences(),
             'created_at' => $this->created_at?->toIso8601String(),

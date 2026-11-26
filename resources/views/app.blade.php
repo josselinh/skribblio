@@ -18,9 +18,10 @@
                 if (theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                 }
-                if (locale !== 'fr' && locale !== 'en') {
+                const locales = ['fr', 'en', 'zh'];
+                if (!locales.includes(locale)) {
                     const browserLocales = navigator.languages.length > 0 ? navigator.languages : [navigator.language];
-                    locale = browserLocales.map((tag) => tag.slice(0, 2).toLowerCase()).find((tag) => tag === 'fr' || tag === 'en') ?? 'en';
+                    locale = browserLocales.map((tag) => tag.slice(0, 2).toLowerCase()).find((tag) => locales.includes(tag)) ?? 'en';
                 }
                 document.documentElement.lang = locale;
             })();

@@ -1,0 +1,15 @@
+{
+    "added": {
+        "wordGroup": "词组“{name}”已加入收藏。",
+        "groupCollection": "合集“{name}”已加入收藏。"
+    },
+    "removed": {
+        "wordGroup": "词组“{name}”已取消收藏。",
+        "groupCollection": "合集“{name}”已取消收藏。"
+    },
+    "failed": "无法更新你的收藏，请重试。",
+    "add": "加入收藏",
+    "remove": "取消收藏",
+    "addNamed": "将 {name} 加入收藏",
+    "removeNamed": "取消收藏 {name}"
+}

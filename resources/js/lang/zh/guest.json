@@ -1,0 +1,14 @@
+{
+    "login": "登录",
+    "register": "注册",
+    "verifyEmail": "确认你的电子邮箱后即可贡献。",
+    "contribute": {
+        "wordGroup": "注册或登录后，即可向此词组添加词语并投票。",
+        "groupCollection": "注册或登录后，即可向此合集添加词组。"
+    },
+    "contributeMembersOnly": {
+        "wordGroup": "注册或登录后即可投票。如需添加词语，还需向此词组的创建者索取邀请链接。",
+        "groupCollection": "请注册或登录，并向此合集的创建者索取邀请链接，即可向其中添加词组。"
+    },
+    "lockedOption": "登录后才能使用此选项。"
+}

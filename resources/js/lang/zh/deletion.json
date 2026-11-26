@@ -1,0 +1,18 @@
+{
+    "button": "删除",
+    "confirm": "永久删除",
+    "processing": "正在删除…",
+    "failed": "删除失败，请重试。",
+    "title": {
+        "wordGroup": "删除此词组？",
+        "groupCollection": "删除此合集？"
+    },
+    "warning": {
+        "wordGroup": "该词组及其所有词语将被删除，并从包含它的合集中移除。此操作无法撤销。",
+        "groupCollection": "该合集将被删除，但其中的词组会保留。此操作无法撤销。"
+    },
+    "done": {
+        "wordGroup": "词组已删除。",
+        "groupCollection": "合集已删除。"
+    }
+}

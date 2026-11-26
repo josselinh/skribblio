@@ -1,11 +1,11 @@
 /** Colour theme of the interface: the system's one, or forced light or dark. */
 export type Theme = 'system' | 'light' | 'dark';
 
-/**
- * A language of the application: the interface's (and the emails'), or the content's (the words of a group,
- * the groups of a collection), chosen independently.
- */
+/** A language of the content (the words of a group, the groups of a collection). */
 export type Locale = 'fr' | 'en';
+
+/** A language of the interface (and of the emails), chosen independently of the content's: it offers more of them. */
+export type InterfaceLocale = Locale | 'zh';
 
 /** Kinds of emails the user chooses to receive or not (account emails are always sent). */
 export type EmailNotification =
@@ -25,7 +25,7 @@ export interface User {
     email_verified_at: string | null;
     theme: Theme;
     /** Language of the interface and of the emails. */
-    locale: Locale;
+    locale: InterfaceLocale;
     /** Language of the lists the user browses by default (Explorer). */
     content_locale: Locale;
     /** Whether each kind of email is sent to the user. */

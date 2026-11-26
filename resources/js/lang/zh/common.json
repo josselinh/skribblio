@@ -1,0 +1,20 @@
+{
+    "appName": "Skribblio Tools",
+    "byUser": "由 {user} 创建",
+    "deletedAccount": "已删除的账号",
+    "cancel": "取消",
+    "loading": "加载中…",
+    "listLoadFailed": "无法加载列表。",
+    "retry": "重试",
+    "unexpectedError": "出现错误，请重试。",
+    "copy": "复制",
+    "close": "关闭",
+    "save": "保存",
+    "saving": "正在保存…",
+    "searching": "正在搜索…",
+    "selectAll": "全选",
+    "deleteSelection": "删除所选",
+    "wordGroups": "词组",
+    "groupCollections": "合集",
+    "actions": "操作"
+}

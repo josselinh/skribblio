@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Enums\EmailNotification;
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Enums\Theme;
 use App\Models\User;
@@ -66,8 +67,25 @@ class PreferencesControllerTest extends TestCase
             ->assertJsonPath('data.content_locale', 'en');
 
         $user->refresh();
-        $this->assertSame(Locale::En, $user->locale);
+        $this->assertSame(InterfaceLocale::En, $user->locale);
         $this->assertSame(Locale::En, $user->content_locale);
+    }
+
+    public function test_chinese_is_offered_for_the_interface_but_not_for_the_content(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['locale' => 'zh'])
+            ->assertOk()
+            ->assertJsonPath('data.locale', 'zh');
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['content_locale' => 'zh'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['content_locale']);
+
+        $this->assertSame(InterfaceLocale::Zh, $user->fresh()->locale);
+        $this->assertSame(Locale::Fr, $user->fresh()->content_locale);
     }
 
     public function test_turning_an_email_back_off_stops_it(): void

@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\Locale;
+use App\Enums\InterfaceLocale;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -23,7 +23,7 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->user()?->locale ?? Locale::tryFrom((string) $request->header(self::HEADER));
+        $locale = $request->user()?->locale ?? InterfaceLocale::tryFrom((string) $request->header(self::HEADER));
 
         if ($locale !== null) {
             App::setLocale($locale->value);

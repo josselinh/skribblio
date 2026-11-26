@@ -1,0 +1,35 @@
+{
+    "title": "探索",
+    "resultsFor": "“{q}”的搜索结果",
+    "catalogueDescription": "发现其他用户共享的词组和合集，或按名称搜索。",
+    "placeholder": "词组或合集的名称…",
+    "submit": "搜索",
+    "filters": {
+        "type": "类型",
+        "typePrefix": "类型：",
+        "author": "创建者",
+        "authorPrefix": "创建者：",
+        "sort": "排序方式"
+    },
+    "types": {
+        "all": "全部",
+        "wordGroups": "词组",
+        "groupCollections": "合集"
+    },
+    "authors": {
+        "all": "所有人",
+        "me": "我",
+        "others": "其他人"
+    },
+    "sorts": {
+        "recent": "最新",
+        "popular": "热门",
+        "largest": "最丰富",
+        "name": "A → Z"
+    },
+    "emptyGroupCollections": "未找到合集。",
+    "seeAll": {
+        "wordGroups": "查看全部 {count} 个词组 →",
+        "groupCollections": "查看全部 {count} 个合集 →"
+    }
+}

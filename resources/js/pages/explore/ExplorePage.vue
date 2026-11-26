@@ -10,8 +10,7 @@ import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
 import { useToasts } from '@/composables/useToasts';
-import { preferredContentLanguage } from '@/lib/contentLanguage';
-import { LOCALES } from '@/lib/i18n';
+import { CONTENT_LOCALES, preferredContentLanguage } from '@/lib/contentLanguage';
 import { useAuthStore } from '@/stores/auth';
 import type { AuthorFilter, Locale, SearchSort } from '@/types/models';
 
@@ -49,7 +48,7 @@ const typeOptions = computed(() => [
     { value: 'group-collections' as const, label: t('search.types.groupCollections') },
 ]);
 const languageOptions = computed(() => [
-    ...LOCALES.map((value) => ({ value, label: t(`languages.names.${value}`) })),
+    ...CONTENT_LOCALES.map((value) => ({ value, label: t(`languages.names.${value}`) })),
     { value: 'all' as const, label: t('languages.filter.all') },
 ]);
 const authorOptions = computed(() =>
@@ -81,7 +80,7 @@ const type = computed(() => queryValue<TypeFilter>('type', ['all', 'word-groups'
 const isCatalogue = computed(() => q.value === '');
 /** The user's content language by default (the interface's for a visitor), left out of the URL. */
 const defaultLanguage = computed<LanguageFilter>(() => preferredContentLanguage());
-const language = computed(() => queryValue<LanguageFilter>('lang', [...LOCALES, 'all'], defaultLanguage.value));
+const language = computed(() => queryValue<LanguageFilter>('lang', [...CONTENT_LOCALES, 'all'], defaultLanguage.value));
 const author = computed(() =>
     isMember.value ? queryValue<AuthorFilter>('author', ['all', 'me', 'others'], defaultAuthor(q.value)) : 'all',
 );
