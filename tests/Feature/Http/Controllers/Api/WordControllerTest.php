@@ -91,7 +91,7 @@ class WordControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.*.id', [$newerWord->id, $olderWord->id])
             ->assertJsonPath('data.0.creator', ['id' => $author->id, 'name' => 'Alice'])
-            ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false, 'vote' => false]);
+            ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false, 'vote' => true]);
     }
 
     public function test_index_paginates_by_twenty(): void
@@ -231,7 +231,7 @@ class WordControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonPath('data.*.name', ['chat', 'chien'])
             ->assertJsonPath('data.0.creator.id', $user->id)
-            ->assertJsonPath('data.0.can', ['update' => true, 'delete' => true, 'vote' => false])
+            ->assertJsonPath('data.0.can', ['update' => true, 'delete' => true, 'vote' => true])
             ->assertJsonPath('skipped', [])
             ->assertJsonPath('invalid', []);
         $this->assertDatabaseHas('words', ['word_group_id' => $wordGroup->id, 'name' => 'chat', 'created_by' => $user->id]);
