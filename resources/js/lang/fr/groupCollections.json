@@ -28,7 +28,6 @@
                 "done": "Demande d’accès envoyée."
             }
         },
-        "editGroups": "Modifier les groupes",
         "addWordGroup": "Ajouter un groupe",
         "selectedCount": "{n} groupe sélectionné | {n} groupes sélectionnés",
         "membersOnly": "Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes. Demandez-lui son lien de partage pour lui proposer de contribuer.",
@@ -48,6 +47,25 @@
             "title": "Supprimer ce groupe de la collection ? | Supprimer {n} groupes de la collection ?",
             "message": "Le groupe lui-même et ses mots sont conservés : il est seulement retiré de cette collection. | Les groupes eux-mêmes et leurs mots sont conservés : ils sont seulement retirés de cette collection.",
             "done": "1 groupe supprimé de la collection. | {n} groupes supprimés de la collection."
+        },
+        "manage": "Gérer",
+        "contribute": "Contribuer"
+    },
+    "edit": {
+        "title": {
+            "manage": "Gérer la collection",
+            "contribute": "Contribuer à la collection"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "Vous ne pouvez pas modifier cette collection.",
+        "noOwnGroups": "Vous n’avez encore ajouté aucun groupe à cette collection.",
+        "sections": {
+            "settings": "Paramètres",
+            "groups": "Groupes",
+            "ownGroups": "Vos groupes",
+            "sharing": "Partage",
+            "deletion": "Supprimer la collection"
         }
     }
 }

@@ -25,7 +25,8 @@ const form = useForm({
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
         const groupCollection = await createGroupCollection(data);
-        await router.push({ name: 'group-collections.show', params: { id: groupCollection.id } });
+        // A new collection is empty: its edit page lets the user add groups right away.
+        await router.push({ name: 'group-collections.edit', params: { id: groupCollection.id } });
     });
 }
 </script>

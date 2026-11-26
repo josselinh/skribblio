@@ -16,7 +16,7 @@ import WordListItem from '@/components/WordListItem.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
-import { secondaryButtonClass } from '@/lib/actionsMenu';
+import { secondaryButtonClass } from '@/lib/buttons';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import { useAuthStore } from '@/stores/auth';
 import type { WordsResponse } from '@/types/api';
@@ -137,14 +137,14 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     >
                         {{ wordGroup.can.update ? $t('wordGroups.show.manage') : $t('wordGroups.show.contribute') }}
                     </RouterLink>
-                    <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" appearance="button" />
-                    <AddToCollectionButton v-if="isMember" :word-group="wordGroup" appearance="button" />
+                    <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" />
+                    <AddToCollectionButton v-if="isMember" :word-group="wordGroup" />
                     <LeaveButton
                         v-if="wordGroup.can.leave"
                         kind="word-groups"
                         :id="wordGroup.id"
                         :visibility="wordGroup.visibility"
-                        appearance="button"
+                       
                         @left="onLeft"
                     />
                 </template>

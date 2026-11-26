@@ -65,6 +65,12 @@ export const router = createRouter({
             meta: { isPublic: true },
         },
         {
+            path: '/collections/:id/edit',
+            name: 'group-collections.edit',
+            component: () => import('@/pages/group-collections/EditGroupCollectionPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/explore',
             name: 'explore',
             component: () => import('@/pages/explore/ExplorePage.vue'),

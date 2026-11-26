@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { attachWordGroup } from '@/api/groupCollections';
 import { fetchCollectionTargets } from '@/api/wordGroups';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import { actionClass, secondaryButtonClass, type ActionAppearance } from '@/lib/actionsMenu';
+import { secondaryButtonClass } from '@/lib/buttons';
 import ModalDialog from '@/components/ModalDialog.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -17,15 +17,12 @@ import type { GroupCollection, WordGroup } from '@/types/models';
 /**
  * "Ajouter à une collection" button of a group page, for logged-in users. A modal picks one of the collections the user
  * can add the group to (their favorites first, a search for the others); the chosen one is remembered on this device, so
- * that the next group pages offer "Ajouter à « X »" (confirmed in a dialog), followed by "Choisir une autre collection"
- * (a "▾" button as a standalone button).
+ * that the next group pages offer "Ajouter à « X »" (confirmed in a dialog), followed by a "▾" button opening the picker.
  * The remembered collection is checked on each page: when it cannot receive this group (other language, already in it,
  * rights lost), the button falls back to the picker.
  */
 const props = defineProps<{
     wordGroup: Pick<WordGroup, 'id' | 'name' | 'language' | 'visibility'>;
-    /** Entries of the actions menu (default) or a standalone button (split in two when a collection is remembered). */
-    appearance?: ActionAppearance;
 }>();
 
 const auth = useAuthStore();
@@ -176,8 +173,8 @@ const hint = computed(() => {
 </script>
 
 <template>
-    <!-- As a standalone button: "Ajouter à « X »" then "▾" opening the picker. -->
-    <span v-if="rememberedTarget && appearance === 'button'" class="inline-flex min-w-0">
+    <!-- Split in two when a collection is remembered: "Ajouter à « X »" then "▾" opening the picker. -->
+    <span v-if="rememberedTarget" class="inline-flex min-w-0">
         <button
             type="button"
             class="min-w-0 rounded-r-none"
@@ -199,30 +196,10 @@ const hint = computed(() => {
             <span aria-hidden="true">▾</span>
         </button>
     </span>
-    <!-- Two entries of the actions menu: the remembered collection, then the picker. -->
-    <template v-else-if="rememberedTarget">
-        <button
-            type="button"
-            class="truncate"
-            :class="actionClass('menu-item')"
-            aria-haspopup="dialog"
-            @click="askConfirmation"
-        >
-            {{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}
-        </button>
-        <button
-            type="button"
-            :class="actionClass('menu-item')"
-            aria-haspopup="dialog"
-            @click="openPicker"
-        >
-            {{ $t('addToCollection.chooseAnother') }}
-        </button>
-    </template>
     <button
         v-else
         type="button"
-        :class="actionClass(appearance ?? 'menu-item')"
+        :class="secondaryButtonClass"
         aria-haspopup="dialog"
         @click="openPicker"
     >

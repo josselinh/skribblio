@@ -28,7 +28,6 @@
                 "done": "Access request sent."
             }
         },
-        "editGroups": "Edit the groups",
         "addWordGroup": "Add a group",
         "selectedCount": "{n} group selected | {n} groups selected",
         "membersOnly": "Only the people allowed by the creator of this collection can add groups to it. Ask them for their share link to offer to contribute.",
@@ -48,6 +47,25 @@
             "title": "Remove this group from the collection? | Remove {n} groups from the collection?",
             "message": "The group itself and its words are kept: it is only removed from this collection. | The groups themselves and their words are kept: they are only removed from this collection.",
             "done": "1 group removed from the collection. | {n} groups removed from the collection."
+        },
+        "manage": "Manage",
+        "contribute": "Contribute"
+    },
+    "edit": {
+        "title": {
+            "manage": "Manage the collection",
+            "contribute": "Contribute to the collection"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "You cannot edit this collection.",
+        "noOwnGroups": "You have not added any group to this collection yet.",
+        "sections": {
+            "settings": "Settings",
+            "groups": "Groups",
+            "ownGroups": "Your groups",
+            "sharing": "Sharing",
+            "deletion": "Delete the collection"
         }
     }
 }
