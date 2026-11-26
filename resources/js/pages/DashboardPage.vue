@@ -92,6 +92,14 @@ const isNewcomer = computed(() =>
     ].every((list) => list.result.value?.meta.total === 0),
 );
 
+/**
+ * The user's own lists only show once their request has answered (or failed), so that they do not stand on the
+ * page as loading placeholders while the lists above them are still arriving.
+ */
+function hasAnswered(list: ReturnType<typeof usePaginatedList>): boolean {
+    return list.result.value !== null || list.hasFailed.value;
+}
+
 const buttonClass =
     'inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700';
 </script>
@@ -202,6 +210,7 @@ const buttonClass =
                 </template>
             </CardListSection>
             <CardListSection
+                v-if="hasAnswered(wordGroups)"
                 section-id="word-groups"
                 :title="$t('dashboard.wordGroups.title')"
                 :result="wordGroups.result.value"
@@ -231,6 +240,7 @@ const buttonClass =
             </CardListSection>
 
             <CardListSection
+                v-if="hasAnswered(groupCollections)"
                 section-id="group-collections"
                 :title="$t('dashboard.groupCollections.title')"
                 :result="groupCollections.result.value"
