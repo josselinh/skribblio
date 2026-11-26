@@ -31,10 +31,8 @@ function updateFavorite(isFavorite: boolean): void {
         :creator="groupCollection.creator"
         :count-label="groupCollection.word_groups_count === undefined ? undefined : $t('wordGroups.count', groupCollection.word_groups_count)"
         :updated-at="groupCollection.updated_at"
-        :is-accessible="groupCollection.is_accessible !== false"
-        :inaccessible-message="groupCollection.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('groupCollections.card.becamePrivate')"
     >
-        <template v-if="groupCollection.is_favorite !== undefined && groupCollection.access_status !== 'pending'" #favorite>
+        <template v-if="groupCollection.is_favorite !== undefined" #favorite>
             <FavoriteButton
                 kind="group-collections"
                 :id="groupCollection.id"

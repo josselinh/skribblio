@@ -78,8 +78,8 @@ function isShown(list: ReturnType<typeof usePaginatedList>): boolean {
 }
 
 /**
- * A user with no group or collection yet, whether their own, a favorite or shared with them (pending requests
- * included), is invited to explore what others share. Hidden until every list has answered, so it never flashes.
+ * A user with no group or collection yet, whether their own, a favorite or shared with them, is invited to explore
+ * what others share. Hidden until every list has answered, so it never flashes.
  */
 const isNewcomer = computed(() =>
     [

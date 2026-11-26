@@ -21,24 +21,21 @@ class FavoriteGroupCollectionController extends Controller
     private const int PER_PAGE = 12;
 
     /**
-     * List the favorite collections, most recently favorited first. Collections that became private
-     * are still listed, flagged with `is_accessible: false`, so that the user can see and remove them.
+     * List the favorite collections, most recently favorited first. Collections the user can no longer see (made private,
+     * access revoked) are left out, but stay in the favorites: they show again once the user regains access.
      */
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
 
         $groupCollections = $user->favoriteGroupCollections()
+            ->visibleTo($user)
             ->with('creator')
             ->withCount('wordGroups')
             ->orderByPivot('created_at', 'desc')
             ->latest('group_collections.id')
-            ->paginate(self::PER_PAGE);
-
-        $groupCollections->getCollection()->each(fn (GroupCollection $groupCollection) => $groupCollection->forceFill([
-            'is_favorite' => true,
-            'is_accessible' => $groupCollection->isVisibleTo($user),
-        ]));
+            ->paginate(self::PER_PAGE)
+            ->through(fn (GroupCollection $groupCollection) => $groupCollection->forceFill(['is_favorite' => true]));
 
         return GroupCollectionResource::collection($groupCollections);
     }

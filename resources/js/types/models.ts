@@ -57,10 +57,6 @@ export interface WordGroup {
     updated_at: string | null;
     /** Whether the current user favorited it; absent on some endpoints. */
     is_favorite?: boolean;
-    /** Only in favorites lists: false when it became private and the user can no longer open it. */
-    is_accessible?: boolean;
-    /** Only in the "shared with me" list: granted, or requested and waiting. */
-    access_status?: AccessStatus;
     /** Actions the current user may perform on the group. */
     can: {
         update: boolean;
@@ -123,10 +119,6 @@ export interface GroupCollection {
     updated_at: string | null;
     /** Whether the current user favorited it; absent on some endpoints. */
     is_favorite?: boolean;
-    /** Only in favorites lists: false when it became private and the user can no longer open it. */
-    is_accessible?: boolean;
-    /** Only in the "shared with me" list: granted, or requested and waiting. */
-    access_status?: AccessStatus;
     /** Only among the collections a group can be added to: whether it already contains that group. */
     contains_word_group?: boolean;
     /** Actions the current user may perform on the collection. */
@@ -157,8 +149,6 @@ export type AuthorFilter = 'all' | 'me' | 'others';
 export type SearchSort = 'recent' | 'popular' | 'largest' | 'name';
 
 export type FavoriteKind = 'word-groups' | 'group-collections';
-
-export type AccessStatus = 'granted' | 'pending';
 
 /**
  * What a share link gives: `access` to a private item, `contribution` to a public item open to its

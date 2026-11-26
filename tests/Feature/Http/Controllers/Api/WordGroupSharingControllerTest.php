@@ -112,22 +112,17 @@ class WordGroupSharingControllerTest extends TestCase
         $this->actingAs(User::factory()->create())->deleteJson("/api/word-groups/{$wordGroup->id}/membership")->assertNotFound();
     }
 
-    public function test_leaving_a_private_group_removes_it_from_favorites_unless_still_visible(): void
+    public function test_leaving_a_private_group_keeps_its_favorite_but_hides_it(): void
     {
-        $creator = User::factory()->create();
         $member = User::factory()->create();
-        $leftGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
-        $stillVisibleGroup = WordGroup::factory()->openToMembersOnly()->createdBy($creator)->create();
-        foreach ([$leftGroup, $stillVisibleGroup] as $wordGroup) {
-            $wordGroup->members()->attach($member);
-            $member->favoriteWordGroups()->attach($wordGroup);
-        }
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
+        $wordGroup->members()->attach($member);
+        $member->favoriteWordGroups()->attach($wordGroup);
 
-        $this->actingAs($member)->deleteJson("/api/word-groups/{$leftGroup->id}/membership")->assertNoContent();
-        $this->actingAs($member)->deleteJson("/api/word-groups/{$stillVisibleGroup->id}/membership")->assertNoContent();
+        $this->actingAs($member)->deleteJson("/api/word-groups/{$wordGroup->id}/membership")->assertNoContent();
 
-        $this->assertDatabaseMissing('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $leftGroup->id]);
-        $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $stillVisibleGroup->id]);
+        $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $wordGroup->id]);
+        $this->actingAs($member)->getJson('/api/favorites/word-groups')->assertJsonCount(0, 'data');
     }
 
     public function test_creator_changes_the_type_of_sharing_of_a_member_who_is_notified(): void
