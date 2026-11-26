@@ -1,0 +1,29 @@
+{
+    "names": {
+        "fr": "法语",
+        "en": "英语"
+    },
+    "codes": {
+        "fr": "FR",
+        "en": "EN"
+    },
+    "badgeHint": {
+        "fr": "法语词语",
+        "en": "英语词语"
+    },
+    "field": {
+        "wordGroup": "词语的语言",
+        "groupCollection": "词组的语言",
+        "wordGroupHint": "之后将无法更改。",
+        "groupCollectionHint": "其中所有词组都必须使用该语言，之后将无法更改。"
+    },
+    "filter": {
+        "label": "列表语言",
+        "prefix": "语言：",
+        "all": "全部"
+    },
+    "preference": {
+        "title": "列表语言",
+        "description": "“探索”中默认推荐的词组和合集的语言，也是你新建词组的语言。它可以与界面语言不同，例如用于学习某种语言。"
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http;
 
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Models\User;
 use App\Models\WordGroup;
@@ -23,6 +24,13 @@ class LocaleTest extends TestCase
             ->assertJsonValidationErrors(['name' => 'The username field is required.']);
     }
 
+    public function test_guest_gets_messages_in_chinese(): void
+    {
+        $this->postJson('/register', [], ['X-Locale' => 'zh'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name' => '昵称 不能为空。']);
+    }
+
     public function test_unknown_language_falls_back_to_french(): void
     {
         $this->postJson('/register', [], ['X-Locale' => 'de'])
@@ -32,7 +40,7 @@ class LocaleTest extends TestCase
 
     public function test_logged_in_user_gets_messages_in_their_language_whatever_the_header(): void
     {
-        $user = User::factory()->create(['locale' => Locale::En]);
+        $user = User::factory()->create(['locale' => InterfaceLocale::En]);
         $wordGroup = WordGroup::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
@@ -53,18 +61,35 @@ class LocaleTest extends TestCase
         ], ['X-Locale' => 'en'])->assertCreated();
 
         $user = User::firstWhere('email', 'alice@example.com');
-        $this->assertSame(Locale::En, $user->locale);
+        $this->assertSame(InterfaceLocale::En, $user->locale);
         $this->assertSame(Locale::En, $user->content_locale);
         Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'en');
+    }
+
+    public function test_registering_in_chinese_browses_english_lists_as_the_content_is_not_offered_in_chinese(): void
+    {
+        Notification::fake();
+
+        $this->postJson('/register', [
+            'name' => 'Alice',
+            'email' => 'alice@example.com',
+            'password' => 'a-strong-password',
+            'password_confirmation' => 'a-strong-password',
+        ], ['X-Locale' => 'zh'])->assertCreated();
+
+        $user = User::firstWhere('email', 'alice@example.com');
+        $this->assertSame(InterfaceLocale::Zh, $user->locale);
+        $this->assertSame(Locale::En, $user->content_locale);
+        Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'zh');
     }
 
     public function test_emails_are_sent_in_the_recipients_language_not_the_senders(): void
     {
         Notification::fake();
-        $creator = User::factory()->wantsEmails()->create(['locale' => Locale::En]);
+        $creator = User::factory()->wantsEmails()->create(['locale' => InterfaceLocale::En]);
         $wordGroup = WordGroup::factory()->public()->createdBy($creator)->create();
 
-        $this->actingAs(User::factory()->create(['locale' => Locale::Fr]))
+        $this->actingAs(User::factory()->create(['locale' => InterfaceLocale::Fr]))
             ->putJson("/api/word-groups/{$wordGroup->id}/favorite")
             ->assertNoContent();
 
@@ -73,24 +98,30 @@ class LocaleTest extends TestCase
 
     public function test_every_translation_of_the_application_and_the_spa_exists_in_every_language(): void
     {
-        foreach (glob(resource_path('js/lang/fr/*.json')) as $frenchFile) {
-            $englishFile = resource_path('js/lang/en/'.basename($frenchFile));
-            $this->assertFileExists($englishFile);
-            $this->assertSame(
-                array_keys(Arr::dot(json_decode(file_get_contents($frenchFile), true))),
-                array_keys(Arr::dot(json_decode(file_get_contents($englishFile), true))),
-                basename($frenchFile).' has different keys in French and in English.',
-            );
-        }
+        foreach (InterfaceLocale::cases() as $locale) {
+            if ($locale === InterfaceLocale::Fr) {
+                continue;
+            }
 
-        foreach (glob(lang_path('fr/*.php')) as $frenchFile) {
-            $englishFile = lang_path('en/'.basename($frenchFile));
-            $this->assertFileExists($englishFile);
-            $this->assertSame(
-                array_keys(Arr::dot(require $frenchFile)),
-                array_keys(Arr::dot(require $englishFile)),
-                basename($frenchFile).' has different keys in French and in English.',
-            );
+            foreach (glob(resource_path('js/lang/fr/*.json')) as $frenchFile) {
+                $translatedFile = resource_path("js/lang/{$locale->value}/".basename($frenchFile));
+                $this->assertFileExists($translatedFile);
+                $this->assertSame(
+                    array_keys(Arr::dot(json_decode(file_get_contents($frenchFile), true))),
+                    array_keys(Arr::dot(json_decode(file_get_contents($translatedFile), true))),
+                    basename($frenchFile)." has different keys in French and in {$locale->value}.",
+                );
+            }
+
+            foreach (glob(lang_path('fr/*.php')) as $frenchFile) {
+                $translatedFile = lang_path("{$locale->value}/".basename($frenchFile));
+                $this->assertFileExists($translatedFile);
+                $this->assertSame(
+                    array_keys(Arr::dot(require $frenchFile)),
+                    array_keys(Arr::dot(require $translatedFile)),
+                    basename($frenchFile)." has different keys in French and in {$locale->value}.",
+                );
+            }
         }
     }
 }

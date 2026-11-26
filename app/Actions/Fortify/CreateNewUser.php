@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
@@ -17,7 +18,8 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Validate and create a newly registered user, in the language they were using (so that the verification
-     * email is sent in it), which is also, until they change it, the language of the lists they browse.
+     * email is sent in it), which is also, until they change it, the language of the lists they browse when the
+     * content is offered in it (English otherwise).
      *
      * @param  array<string, string>  $input
      *
@@ -41,8 +43,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
-            'locale' => $locale = Locale::tryFrom(App::currentLocale()) ?? Locale::Fr,
-            'content_locale' => $locale,
+            'locale' => $locale = InterfaceLocale::tryFrom(App::currentLocale()) ?? InterfaceLocale::Fr,
+            'content_locale' => $locale->contentLocale() ?? Locale::En,
         ]);
     }
 }

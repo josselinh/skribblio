@@ -1,0 +1,79 @@
+{
+    "list": {
+        "updatedOn": "更新于 {date}"
+    },
+    "count": "{n} 个词语",
+    "sort": {
+        "legend": "词语排序方式",
+        "prefix": "排序：",
+        "reverse": "反转顺序",
+        "order": "顺序：",
+        "reverseHint": "（反向）",
+        "criteria": {
+            "created": "添加日期",
+            "name": "词语",
+            "score": "投票",
+            "author": "作者",
+            "updated": "更新日期"
+        },
+        "directions": {
+            "name": {
+                "asc": "A 到 Z",
+                "desc": "Z 到 A"
+            },
+            "author": {
+                "asc": "A 到 Z",
+                "desc": "Z 到 A"
+            },
+            "created": {
+                "desc": "最新在前",
+                "asc": "最早在前"
+            },
+            "updated": {
+                "desc": "最新在前",
+                "asc": "最早在前"
+            },
+            "score": {
+                "desc": "评分最高在前",
+                "asc": "评分最低在前"
+            }
+        }
+    },
+    "votes": {
+        "up": "赞",
+        "down": "踩",
+        "buttonLabel": "{vote}“{word}”（{count}）",
+        "countLabel": "{vote}：",
+        "failed": "无法保存你的投票，请重试。"
+    },
+    "add": {
+        "label": "添加词语",
+        "help": "用逗号或换行分隔词语。按 Enter 添加，按 Shift+Enter 换行。",
+        "placeholder": "猫, 狗, 长颈鹿…",
+        "submit": "添加",
+        "added": "已添加 {n} 个词语",
+        "skipped": "{n} 个已存在，已跳过",
+        "invalid": "{n} 个词语无法添加（已保留在输入框中以便修改）：",
+        "invalidItem": "{word}：{reason}"
+    },
+    "editor": {
+        "saved": "已更新 {n} 个词语。",
+        "deleted": "已删除 {n} 个词语。",
+        "invalid": "部分词语无法保存：请修改后重试。",
+        "saveFailed": "无法保存修改。请刷新页面后重试。",
+        "deleteFailed": "无法删除这些词语。请刷新页面后重试。",
+        "selected": "已选择 {n} 个词语",
+        "saveCount": "保存（{count}）",
+        "selectWord": "选择“{name}”",
+        "wordLabel": "词语“{name}”",
+        "changed": "已修改",
+        "before": "（修改前：{name}）",
+        "restore": "还原",
+        "notEditable": "你无法编辑此词语",
+        "deleteTitle": "删除此词语？ | 删除这 {n} 个词语？",
+        "deleteMessage": "此词语将从词组中移除。此操作无法撤销。 | 这些词语将从词组中移除。此操作无法撤销。",
+        "discardTitle": "放弃此修改？ | 放弃这 {n} 处修改？",
+        "discardMessage": "已修改的词语将恢复为当前名称。",
+        "discard": "放弃"
+    }
+}

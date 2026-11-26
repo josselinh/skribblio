@@ -5,7 +5,7 @@ import { ensureCsrfCookie, http } from '@/lib/http';
 import { setLocale } from '@/lib/i18n';
 import type { MessageResponse, ResourceResponse } from '@/types/api';
 import { applyTheme } from '@/lib/theme';
-import type { EmailNotification, Locale, Theme, User } from '@/types/models';
+import type { EmailNotification, InterfaceLocale, Locale, Theme, User } from '@/types/models';
 
 export interface LoginPayload {
     email: string;
@@ -33,7 +33,7 @@ export interface UpdatePasswordPayload {
 
 export interface PreferencesPayload {
     theme?: Theme;
-    locale?: Locale;
+    locale?: InterfaceLocale;
     content_locale?: Locale;
     email_notifications?: Partial<Record<EmailNotification, boolean>>;
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\EmailNotification;
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Enums\Theme;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -32,7 +33,7 @@ class UpdatePreferencesRequest extends FormRequest
     {
         return [
             'theme' => ['sometimes', Rule::enum(Theme::class)],
-            'locale' => ['sometimes', Rule::enum(Locale::class)],
+            'locale' => ['sometimes', Rule::enum(InterfaceLocale::class)],
             'content_locale' => ['sometimes', Rule::enum(Locale::class)],
             'email_notifications' => ['sometimes', 'array:'.implode(',', EmailNotification::values())],
             'email_notifications.*' => ['boolean'],

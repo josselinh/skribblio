@@ -1,0 +1,54 @@
+{
+    "create": {
+        "title": "新建合集",
+        "submit": "创建合集"
+    },
+    "fields": {
+        "name": "合集名称"
+    },
+    "show": {
+        "notFound": {
+            "title": "未找到合集",
+            "description": "该合集不存在，或你没有访问权限。"
+        },
+        "loadFailed": "无法加载合集。",
+        "addWordGroup": "添加词组",
+        "selectedCount": "已选择 {n} 个词组",
+        "membersOnly": "只有此合集创建者允许的人才能向其中添加词组。请向其索取共享链接以申请贡献。",
+        "closed": "此合集未开放贡献：只有其创建者可以修改其中的词组。",
+        "empty": "此合集不包含任何词组。",
+        "addition": {
+            "title": "将此词组添加到合集？",
+            "processing": "正在添加…",
+            "message": {
+                "public": "词组“{name}”将被添加到此合集。",
+                "private": "词组“{name}”将被添加到此合集。它是私有的：无权访问它的人将看不到它。"
+            },
+            "done": "词组“{name}”已添加到合集。"
+        },
+        "removal": {
+            "title": "从合集中移除此词组？ | 从合集中移除这 {n} 个词组？",
+            "message": "词组本身及其词语会保留：它只是从此合集中移除。 | 这些词组本身及其词语会保留：它们只是从此合集中移除。",
+            "done": "已从合集中移除 {n} 个词组。"
+        },
+        "manage": "管理",
+        "contribute": "贡献"
+    },
+    "edit": {
+        "title": {
+            "manage": "管理合集",
+            "contribute": "为合集做贡献"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "你无法编辑此合集。",
+        "noOwnGroups": "你还没有向此合集添加任何词组。",
+        "sections": {
+            "settings": "设置",
+            "groups": "词组",
+            "ownGroups": "你的词组",
+            "sharing": "共享",
+            "deletion": "删除合集"
+        }
+    }
+}

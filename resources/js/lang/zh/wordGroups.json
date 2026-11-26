@@ -1,0 +1,51 @@
+{
+    "search": {
+        "placeholder": "搜索词组…",
+        "empty": "未找到词组。"
+    },
+    "count": "{n} 个词组",
+    "card": {
+        "addition": {
+            "by": "由 {user} 添加",
+            "on": "添加于 {date}",
+            "date": "于 {date}"
+        }
+    },
+    "create": {
+        "title": "新建词组",
+        "submit": "创建词组"
+    },
+    "fields": {
+        "name": "词组名称"
+    },
+    "show": {
+        "notFound": {
+            "title": "未找到词组",
+            "description": "该词组不存在，或你没有访问权限。"
+        },
+        "loadFailed": "无法加载词组。",
+        "membersOnly": "只有此词组创建者允许的人才能向其中添加词语。请向其索取共享链接以申请贡献。",
+        "closed": "此词组未开放贡献：只有其创建者可以修改其中的词语。",
+        "empty": "此词组还没有任何词语。",
+        "manage": "管理",
+        "contribute": "贡献"
+    },
+    "edit": {
+        "title": {
+            "manage": "管理词组",
+            "contribute": "为词组做贡献"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "你无法编辑此词组。",
+        "unsavedHint": "请先保存或取消你的修改，再对词语排序或翻页。",
+        "sections": {
+            "settings": "设置",
+            "words": "词语",
+            "sharing": "共享",
+            "deletion": "删除词组",
+            "ownWords": "你的词语"
+        },
+        "noOwnWords": "你还没有向此词组添加任何词语。"
+    }
+}

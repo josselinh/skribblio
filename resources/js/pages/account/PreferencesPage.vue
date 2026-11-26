@@ -5,6 +5,7 @@ import AccountNav from '@/components/AccountNav.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import { useLocaleChoice } from '@/composables/useLocaleChoice';
 import { useToasts } from '@/composables/useToasts';
+import { CONTENT_LOCALES } from '@/lib/contentLanguage';
 import { LOCALES } from '@/lib/i18n';
 import { applyTheme } from '@/lib/theme';
 import { useAuthStore } from '@/stores/auth';
@@ -88,7 +89,7 @@ async function toggleEmail(notification: EmailNotification, isWanted: boolean): 
             <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="language-title">
                 <h2 id="language-title" class="text-lg font-semibold">{{ $t('profile.preferences.language.title') }}</h2>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $t('profile.preferences.language.description') }}</p>
-                <div class="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="language-title">
+                <div class="mt-4 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-labelledby="language-title">
                     <label
                         v-for="choice in LOCALES"
                         :key="choice"
@@ -106,7 +107,7 @@ async function toggleEmail(notification: EmailNotification, isWanted: boolean): 
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $t('languages.preference.description') }}</p>
                 <div class="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="content-language-title">
                     <label
-                        v-for="choice in LOCALES"
+                        v-for="choice in CONTENT_LOCALES"
                         :key="choice"
                         class="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
                     >

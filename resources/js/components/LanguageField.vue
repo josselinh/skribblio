@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LOCALES } from '@/lib/i18n';
+import { CONTENT_LOCALES } from '@/lib/contentLanguage';
 import type { FavoriteKind, Locale } from '@/types/models';
 
 /**
@@ -24,7 +24,7 @@ const model = defineModel<Locale>({ required: true });
         </p>
         <div class="mt-2 grid grid-cols-2 gap-2">
             <label
-                v-for="language in LOCALES"
+                v-for="language in CONTENT_LOCALES"
                 :key="language"
                 class="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
             >

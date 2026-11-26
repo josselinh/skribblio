@@ -1,0 +1,188 @@
+{
+    "request": {
+        "access": {
+            "withoutItem": "{user} 请求访问",
+            "wordGroup": "{user} 请求访问词组 {item}",
+            "groupCollection": "{user} 请求访问合集 {item}"
+        },
+        "contribution": {
+            "withoutItem": "{user} 请求贡献",
+            "wordGroup": "{user} 请求为词组 {item} 做贡献",
+            "groupCollection": "{user} 请求为合集 {item} 做贡献"
+        },
+        "viaCollection": "来自合集“{name}”",
+        "accept": "接受",
+        "refuse": "拒绝",
+        "accepted": "已接受 {name} 的请求。",
+        "refused": "已拒绝 {name} 的请求。"
+    },
+    "accept": {
+        "processing": "正在接受…",
+        "title": {
+            "access": "授予访问权限？",
+            "contribution": "允许贡献？"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} 将可以访问词组“{item}”并导出其中的词语。你可以随时撤销其访问权限。",
+                "groupCollection": "{name} 将可以访问合集“{item}”并导出其中的词语。你可以随时撤销其访问权限。"
+            },
+            "contribution": {
+                "wordGroup": "{name} 将可以为词组“{item}”做贡献。你可以随时撤回此权限。",
+                "groupCollection": "{name} 将可以为合集“{item}”做贡献。你可以随时撤回此权限。"
+            }
+        }
+    },
+    "management": {
+        "label": "访问权限",
+        "loadFailed": "无法加载访问列表。",
+        "requests": {
+            "access": "访问请求",
+            "contribution": "贡献请求"
+        },
+        "members": {
+            "access": "有访问权限的人",
+            "contribution": "被允许贡献的人"
+        },
+        "noMembers": "目前只有你。发送邀请链接即可收到请求。",
+        "since": "自 {date} 起"
+    },
+    "revoke": {
+        "button": "移除",
+        "processing": "正在移除…",
+        "title": {
+            "access": "撤销访问权限？",
+            "contribution": "撤回贡献权限？"
+        },
+        "message": {
+            "access": {
+                "wordGroup": "{name} 将无法再访问此词组。对方可以通过共享链接再次向你申请访问。",
+                "groupCollection": "{name} 将无法再访问此合集。对方可以通过共享链接再次向你申请访问。"
+            },
+            "contribution": {
+                "wordGroup": "{name} 将无法再为此词组做贡献。其贡献会保留，对方可以再次向你申请权限。",
+                "groupCollection": "{name} 将无法再为此合集做贡献。其贡献会保留，对方可以再次向你申请权限。"
+            }
+        },
+        "done": {
+            "access": "{name} 已不再拥有访问权限。",
+            "contribution": "{name} 已无法再贡献。"
+        }
+    },
+    "invite": {
+        "button": "邀请",
+        "title": {
+            "access": "邀请他人",
+            "contribution": "邀请贡献者"
+        },
+        "description": {
+            "access": "打开此链接的人可以向你申请访问。你将逐一接受或拒绝每个请求。",
+            "contribution": "打开此链接的人可以向你申请贡献。你将逐一接受或拒绝每个请求。"
+        },
+        "link": {
+            "access": "访问申请链接",
+            "contribution": "贡献申请链接"
+        }
+    },
+    "link": {
+        "copied": "链接已复制。",
+        "copyFailed": "复制失败：请选中链接后手动复制。",
+        "regenerated": "已创建新链接。旧链接已失效。",
+        "regenerate": "重新生成链接",
+        "regenerateConfirm": "重新生成",
+        "regenerateWarning": "旧链接将失效。是否继续？"
+    },
+    "invitation": {
+        "invalid": {
+            "title": "链接无效",
+            "description": "此共享链接不存在或已失效。请索取新的链接。"
+        },
+        "loadFailed": "无法加载共享内容。",
+        "sharedBy": {
+            "access": {
+                "wordGroup": "{name} 与你共享了私有词组",
+                "groupCollection": "{name} 与你共享了私有合集"
+            },
+            "contribution": {
+                "wordGroup": "{name} 与你共享了词组",
+                "groupCollection": "{name} 与你共享了合集"
+            }
+        },
+        "membersOnly": {
+            "wordGroup": "所有人都可以查看，但只有 {name} 允许的人才能为其做贡献。",
+            "groupCollection": "所有人都可以查看，但只有 {name} 允许的人才能为其做贡献。"
+        },
+        "seeContent": "查看内容",
+        "sent": {
+            "access": "访问请求已发送。{name} 处理后，你将收到一封邮件。",
+            "contribution": "贡献请求已发送。{name} 处理后，你将收到一封邮件。"
+        },
+        "refused": "你之前的请求被拒绝了。你可以重新发送请求。",
+        "send": {
+            "access": "发送访问请求",
+            "contribution": "申请贡献"
+        }
+    },
+    "shareType": {
+        "label": "共享方式",
+        "memberLabel": "{name} 的共享方式",
+        "partial": {
+            "label": "部分",
+            "description": {
+                "wordGroup": "此人可以添加词语，但只能编辑或删除自己添加的词语。",
+                "groupCollection": "此人可以添加词组，但只能移除自己添加的词组。"
+            }
+        },
+        "full": {
+            "label": "完全",
+            "description": {
+                "wordGroup": "此人还可以编辑和删除他人的词语，包括你的。",
+                "groupCollection": "此人还可以移除他人添加的词组，包括你添加的。"
+            }
+        },
+        "note": {
+            "wordGroup": "这些权限仅在词组开放贡献期间有效。词组的名称、可见性、共享和删除仍由你掌控。",
+            "groupCollection": "这些权限仅在合集开放贡献期间有效。合集的名称、可见性、共享和删除仍由你掌控。"
+        },
+        "help": {
+            "wordGroup": "部分共享时，此人可以添加词语，但只能编辑或删除自己添加的词语。完全共享时，还可以编辑和删除他人的词语，包括你的。这些权限仅在词组开放贡献期间有效。",
+            "groupCollection": "部分共享时，此人可以添加词组，但只能移除自己添加的词组。完全共享时，还可以移除他人添加的词组，包括你添加的。这些权限仅在合集开放贡献期间有效。"
+        },
+        "changed": {
+            "partial": "{name} 现在是部分共享。",
+            "full": "{name} 现在是完全共享。"
+        },
+        "confirm": {
+            "title": "更改共享方式？",
+            "processing": "正在保存…",
+            "button": {
+                "partial": "改为部分共享",
+                "full": "改为完全共享"
+            },
+            "message": {
+                "partial": {
+                    "wordGroup": "{name} 将只能编辑和删除自己添加的词语。如果对方开启了邮件通知，将收到邮件提醒。",
+                    "groupCollection": "{name} 将只能移除自己添加的词组。如果对方开启了邮件通知，将收到邮件提醒。"
+                },
+                "full": {
+                    "wordGroup": "在词组开放贡献期间，{name} 将可以编辑和删除其中的所有词语，包括你的。如果对方开启了邮件通知，将收到邮件提醒。",
+                    "groupCollection": "在合集开放贡献期间，{name} 将可以移除其中的所有词组，包括你添加的。如果对方开启了邮件通知，将收到邮件提醒。"
+                }
+            }
+        },
+        "inactive": {
+            "privateClosed": {
+                "wordGroup": "在词组不开放贡献期间，这些人无法访问它。你仍然可以选择他们的共享方式：重新开放词组后即生效。",
+                "groupCollection": "在合集不开放贡献期间，这些人无法访问它。你仍然可以选择他们的共享方式：重新开放合集后即生效。"
+            },
+            "publicClosed": {
+                "wordGroup": "在词组不开放贡献期间，这些人和其他人一样可以查看它，但无法贡献。如果你重新向授权的人开放贡献，他们的共享方式将生效。",
+                "groupCollection": "在合集不开放贡献期间，这些人和其他人一样可以查看它，但无法贡献。如果你重新向授权的人开放贡献，他们的共享方式将生效。"
+            },
+            "openToEveryone": {
+                "wordGroup": "此词组向所有人开放贡献：这些人和其他人一样以部分共享的方式贡献。如果你再次将贡献限制为授权的人，他们的共享方式将生效。",
+                "groupCollection": "此合集向所有人开放贡献：这些人和其他人一样以部分共享的方式贡献。如果你再次将贡献限制为授权的人，他们的共享方式将生效。"
+            }
+        }
+    }
+}

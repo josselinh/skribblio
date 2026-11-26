@@ -1,0 +1,25 @@
+{
+    "button": "复制",
+    "processing": "正在复制…",
+    "failed": "复制失败，请重试。",
+    "title": {
+        "wordGroup": "复制此词组？",
+        "groupCollection": "复制此合集？"
+    },
+    "description": {
+        "wordGroup": "创建此词组及其词语的私有副本，作者为你。",
+        "groupCollection": "创建此合集的私有副本，不开放贡献，作者为你。"
+    },
+    "done": {
+        "wordGroup": "词组已复制。副本为私有且不开放贡献。",
+        "groupCollection": "合集已复制。它及其复制的词组均为私有且不开放贡献。",
+        "groupCollectionLinked": "合集已复制。副本为私有且不开放贡献；其中的词组未被复制。"
+    },
+    "copyWordGroups": {
+        "label": "同时复制词组",
+        "description": {
+            "copied": "你能看到的词组会连同其词语一起复制，作者为你。你自己的词组保持不变。",
+            "linked": "副本包含原始词组，但不复制它们：它们的修改会显示在副本中。"
+        }
+    }
+}

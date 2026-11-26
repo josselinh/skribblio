@@ -1,0 +1,15 @@
+{
+    "done": {
+        "wordGroup": "词组已更新。",
+        "groupCollection": "合集已更新。"
+    },
+    "createdBy": {
+        "wordGroup": "由 {user} 创建",
+        "groupCollection": "由 {user} 创建"
+    },
+    "updatedOn": "更新于 {date}",
+    "doneInvite": {
+        "wordGroup": "词组已更新。现在请使用“共享”部分的“邀请”按钮邀请他人。",
+        "groupCollection": "合集已更新。现在请使用“共享”部分的“邀请”按钮邀请他人。"
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EmailNotification;
+use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
 use App\Enums\Theme;
 use Database\Factories\UserFactory;
@@ -46,7 +47,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'theme' => Theme::class,
-            'locale' => Locale::class,
+            'locale' => InterfaceLocale::class,
             'content_locale' => Locale::class,
             'email_notifications' => 'array',
         ];
@@ -57,7 +58,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function preferredLocale(): string
     {
-        return ($this->locale ?? Locale::Fr)->value;
+        return ($this->locale ?? InterfaceLocale::Fr)->value;
     }
 
     /**

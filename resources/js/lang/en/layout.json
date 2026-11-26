@@ -34,6 +34,7 @@
     },
     "locales": {
         "fr": "Français",
-        "en": "English"
+        "en": "English",
+        "zh": "中文"
     }
 }

@@ -1,0 +1,29 @@
+{
+    "button": "添加到合集",
+    "buttonTo": "添加到“{name}”",
+    "chooseAnother": "选择其他合集",
+    "picker": {
+        "title": "将此词组添加到合集",
+        "searchLabel": "搜索合集",
+        "searchPlaceholder": "搜索合集…",
+        "favoritesHint": "这里只推荐你收藏的合集。搜索合集即可找到其他合集。",
+        "ownHint": "你收藏的合集都无法接收此词组：以下是你自己的合集。搜索合集即可找到其他合集。",
+        "languageHint": {
+            "fr": "只有你可以贡献的法语合集才能接收此词组。",
+            "en": "只有你可以贡献的英语合集才能接收此词组。"
+        },
+        "noSuggestion": "你还没有可以接收此词组的合集。请搜索一个，或在控制面板中创建一个。",
+        "noResult": "未找到合集。",
+        "loadFailed": "无法加载合集。",
+        "alreadyAdded": "已添加",
+        "submit": "添加"
+    },
+    "confirmation": {
+        "title": "将此词组添加到“{name}”？",
+        "message": "词组“{group}”将被添加到合集“{collection}”。"
+    },
+    "privateHint": "此词组是私有的：合集中无权访问它的人将看不到它。",
+    "processing": "正在添加…",
+    "failed": "无法将词组添加到合集。",
+    "done": "词组已添加到“{name}”。"
+}
