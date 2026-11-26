@@ -124,7 +124,15 @@ const accessPurpose = computed<AccessPurpose>(() =>
 );
 
 /** A new word is listed first: show page 1 so that it is visible. */
+/** Adding, renaming or deleting words touches the group: shows the new modification date without reloading it. */
+function markWordGroupUpdated(): void {
+    if (wordGroup.value) {
+        wordGroup.value.updated_at = new Date().toISOString();
+    }
+}
+
 async function onWordAdded(): Promise<void> {
+    markWordGroupUpdated();
     if (currentPage.value === 1) {
         await loadWords();
     } else {
@@ -143,13 +151,17 @@ const isEditingWords = ref(false);
 const hasEditableWords = computed(() => words.value?.data.some((word) => word.can.update) ?? false);
 
 /** Leaves edit mode and shows the new names. */
-async function onWordsSaved(): Promise<void> {
+async function onWordsSaved(savedCount: number): Promise<void> {
     isEditingWords.value = false;
+    if (savedCount > 0) {
+        markWordGroupUpdated();
+    }
     await loadWords();
 }
 
 /** Stays in edit mode; goes back one page when the deletion emptied the current one. */
 async function onWordsDeleted(deletedCount: number): Promise<void> {
+    markWordGroupUpdated();
     const isPageEmptied = deletedCount === words.value?.data.length;
     if (isPageEmptied && currentPage.value > 1) {
         await router.push({ query: { ...route.query, page: String(currentPage.value - 1) } });
@@ -193,6 +205,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     :contributions-members-only="wordGroup.contributions_members_only"
                     kind="word-groups"
                     :creator="wordGroup.creator"
+                    :updated-at="wordGroup.updated_at"
                     :can-edit="wordGroup.can.update"
                     :name-label="$t('wordGroups.fields.name')"
                     :save="saveWordGroup"
@@ -204,6 +217,9 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                             :id="wordGroup.id"
                             :name="wordGroup.name"
                         />
+                    </template>
+                    <template #main-action>
+                        <ExportPanel kind="word-groups" :id="wordGroup.id" />
                     </template>
                     <template #actions>
                         <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" />
@@ -226,7 +242,6 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                 </EditableNameVisibility>
             </div>
 
-            <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
             <AccessManagement
                 v-if="wordGroup.can.share"
                 class="mt-8"

@@ -5,6 +5,8 @@ import { onBeforeUnmount, useId, useTemplateRef, watch } from 'vue';
  * Modal built on the native <dialog> (focus trap, Esc, backdrop): a bottom sheet on phones, a centered card from
  * the `sm` breakpoint. The default slot holds the content, the `actions` slot the buttons (stacked full width on
  * phones, the first one at the bottom). Esc and a click on the backdrop close it unless `isDismissible` is false.
+ * Teleported to <body>, so that it still shows when the button opening it sits in a menu that closed meanwhile
+ * (`ActionsMenu`).
  */
 const isOpen = defineModel<boolean>('open', { required: true });
 
@@ -64,6 +66,7 @@ function onClick(event: MouseEvent): void {
 </script>
 
 <template>
+    <Teleport to="body">
     <dialog
         ref="dialog"
         :role="role"
@@ -82,4 +85,5 @@ function onClick(event: MouseEvent): void {
             </div>
         </div>
     </dialog>
+    </Teleport>
 </template>

@@ -22,7 +22,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    saved: [];
+    saved: [savedCount: number];
     deleted: [deletedCount: number];
     cancel: [];
 }>();
@@ -119,7 +119,7 @@ function errorsByWordId(sentWords: WordRename[], errors: Record<string, string[]
 async function save(): Promise<void> {
     const sentWords = changedWords.value;
     if (sentWords.length === 0) {
-        emit('saved');
+        emit('saved', 0);
 
         return;
     }
@@ -129,7 +129,7 @@ async function save(): Promise<void> {
     saveError.value = null;
     try {
         await updateWords(props.wordGroupId, sentWords);
-        emit('saved');
+        emit('saved', sentWords.length);
         showToast(t('words.editor.saved', sentWords.length));
     } catch (error) {
         if (isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422) {

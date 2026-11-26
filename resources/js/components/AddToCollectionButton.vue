@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { attachWordGroup } from '@/api/groupCollections';
 import { fetchCollectionTargets } from '@/api/wordGroups';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { actionButtonClass } from '@/lib/actionsMenu';
 import ModalDialog from '@/components/ModalDialog.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -16,7 +17,7 @@ import type { GroupCollection, WordGroup } from '@/types/models';
 /**
  * "Ajouter à une collection" button of a group page, for logged-in users. A modal picks one of the collections the user
  * can add the group to (their favorites first, a search for the others); the chosen one is remembered on this device, so
- * that the next group pages offer "Ajouter à « X »" (confirmed in a dialog), with a ▾ part to pick another collection.
+ * that the next group pages offer "Ajouter à « X »" (confirmed in a dialog), followed by "Choisir une autre collection".
  * The remembered collection is checked on each page: when it cannot receive this group (other language, already in it,
  * rights lost), the button falls back to the picker.
  */
@@ -172,10 +173,12 @@ const hint = computed(() => {
 </script>
 
 <template>
-    <div v-if="rememberedTarget" class="inline-flex">
+    <!-- Two entries of the actions menu: the remembered collection, then the picker. -->
+    <template v-if="rememberedTarget">
         <button
             type="button"
-            class="max-w-[16rem] truncate rounded-l-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            class="truncate"
+            :class="actionButtonClass"
             aria-haspopup="dialog"
             @click="askConfirmation"
         >
@@ -183,19 +186,17 @@ const hint = computed(() => {
         </button>
         <button
             type="button"
-            class="-ml-px rounded-r-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            :class="actionButtonClass"
             aria-haspopup="dialog"
-            :aria-label="$t('addToCollection.chooseAnother')"
-            :title="$t('addToCollection.chooseAnother')"
             @click="openPicker"
         >
-            <span aria-hidden="true">▾</span>
+            {{ $t('addToCollection.chooseAnother') }}
         </button>
-    </div>
+    </template>
     <button
         v-else
         type="button"
-        class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
+        :class="actionButtonClass"
         aria-haspopup="dialog"
         @click="openPicker"
     >

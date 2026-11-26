@@ -3,5 +3,10 @@
     "done": {
         "wordGroup": "Group updated.",
         "groupCollection": "Collection updated."
-    }
+    },
+    "createdBy": {
+        "wordGroup": "Created by {user}",
+        "groupCollection": "Created by {user}"
+    },
+    "updatedOn": "Updated on {date}"
 }

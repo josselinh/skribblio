@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ActionsMenu from '@/components/ActionsMenu.vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
@@ -10,6 +11,8 @@ import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
 import { useToasts } from '@/composables/useToasts';
+import { actionButtonClass } from '@/lib/actionsMenu';
+import { formatDateTime } from '@/lib/format';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
@@ -21,9 +24,11 @@ export interface NameVisibilityPayload {
 }
 
 /**
- * Page title showing a name, language and visibility badges, whether contributions are open and the creator, with a "Modifier"
- * button that turns it into an inline form (saving is confirmed in a notification), followed by the `actions` slot (e.g. deletion). Used by the group and
- * collection pages.
+ * Page title built like the cards: a tinted header with the name (on two lines at most) and, in its corner, the
+ * `after-title` slot (the favorite star) then "⋮" opening the actions (`ActionsMenu`: "Modifier", which turns the title
+ * into an inline form, saving confirmed in a notification, then the `actions` slot); under it, the language and
+ * visibility badges and whether contributions are open, then the creator and the last update date. The `main-action`
+ * slot (the export) follows the card. Used by the group and collection pages.
  */
 const props = defineProps<{
     name: string;
@@ -33,8 +38,10 @@ const props = defineProps<{
     acceptsContributions: boolean;
     contributionsMembersOnly: boolean;
     kind: FavoriteKind;
-    /** Shown as "par X" under the title, "vous" for the current user. */
+    /** Shown as "Créé par X" under the badges (left out for visitors). */
     creator?: Pick<User, 'id' | 'name'>;
+    /** Shown as "Dernière mise à jour le …" on the next line. */
+    updatedAt: string | null;
     canEdit: boolean;
     /** Label of the name field, e.g. "Nom du groupe". */
     nameLabel: string;
@@ -44,6 +51,9 @@ const props = defineProps<{
 
 const { showToast } = useToasts();
 const { t } = useI18n();
+
+const item = computed(() => itemKey(props.kind));
+const isMembersOnly = computed(() => props.contributionsMembersOnly && props.visibility === 'public');
 
 const isEditing = ref(false);
 const form = useForm<NameVisibilityPayload>({
@@ -106,34 +116,46 @@ async function submit(): Promise<void> {
         </div>
     </form>
 
-    <div v-else class="flex flex-wrap items-center justify-between gap-4">
-        <div class="min-w-0">
-            <div class="flex min-w-0 flex-wrap items-center gap-3">
-                <h1 class="truncate text-2xl font-semibold">{{ name }}</h1>
-                <LanguageBadge :language="language" />
-                <VisibilityBadge :visibility="visibility" />
-                <ContributionsBadge
-                    v-if="acceptsContributions"
-                    :members-only="contributionsMembersOnly && visibility === 'public'"
-                />
-                <slot name="after-title" />
+    <div v-else>
+        <!-- Like the cards: a tinted header with the name, then the details. -->
+        <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs">
+            <header class="flex items-start gap-2 rounded-t-xl border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/70 px-4 py-3">
+                <h1 class="line-clamp-2 min-w-0 flex-1 text-2xl font-semibold break-words" :title="name">{{ name }}</h1>
+                <div class="flex shrink-0 items-center gap-1 pt-0.5">
+                    <slot name="after-title" />
+                    <ActionsMenu>
+                        <button v-if="canEdit" type="button" :class="actionButtonClass" @click="startEditing">
+                            {{ $t('editing.button') }}
+                        </button>
+                        <slot name="actions" />
+                    </ActionsMenu>
+                </div>
+            </header>
+            <div class="space-y-2 px-4 py-3">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <LanguageBadge :language="language" />
+                    <VisibilityBadge :visibility="visibility" />
+                    <ContributionsBadge
+                        v-if="acceptsContributions"
+                        :members-only="isMembersOnly"
+                    />
+                </div>
+                <div class="space-y-0.5 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p v-if="creator">
+                        <i18n-t :keypath="`editing.createdBy.${item}`" scope="global">
+                            <template #user><UserLink :user="creator" /></template>
+                        </i18n-t>
+                    </p>
+                    <p v-if="updatedAt" class="text-zinc-500 dark:text-zinc-400">
+                        <i18n-t keypath="editing.updatedOn" scope="global">
+                            <template #date><time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time></template>
+                        </i18n-t>
+                    </p>
+                </div>
             </div>
-            <p v-if="creator" class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                <i18n-t keypath="common.byUser" scope="global">
-                    <template #user><UserLink :user="creator" /></template>
-                </i18n-t>
-            </p>
         </div>
-        <div class="flex flex-wrap items-center justify-end gap-2">
-            <button
-                v-if="canEdit"
-                type="button"
-                class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                @click="startEditing"
-            >
-                {{ $t('editing.button') }}
-            </button>
-            <slot name="actions" />
+        <div v-if="$slots['main-action']" class="mt-4">
+            <slot name="main-action" />
         </div>
     </div>
 </template>

@@ -7,6 +7,7 @@ import { duplicateGroupCollection } from '@/api/groupCollections';
 import { duplicateWordGroup } from '@/api/wordGroups';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
+import { actionButtonClass } from '@/lib/actionsMenu';
 import { itemKey } from '@/lib/i18n';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
@@ -74,7 +75,7 @@ async function duplicate(): Promise<void> {
 <template>
     <button
         type="button"
-        class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
+        :class="actionButtonClass"
         aria-haspopup="dialog"
         @click="askConfirmation"
     >
