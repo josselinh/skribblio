@@ -47,7 +47,7 @@ async function logout(): Promise<void> {
     <div class="relative" @focusout="onFocusOut" @keydown.esc="close">
         <button
             type="button"
-            class="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+            class="flex items-center gap-2 rounded-full p-0.5 text-sm sm:py-1 sm:pr-2 sm:pl-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
             aria-haspopup="menu"
             :aria-expanded="isOpen"
             aria-controls="user-menu"
@@ -59,8 +59,9 @@ async function logout(): Promise<void> {
             >
                 {{ initials }}
             </span>
-            <span class="max-w-40 truncate font-medium">{{ auth.user?.name }}</span>
-            <span class="text-zinc-500 dark:text-zinc-400" aria-hidden="true">▾</span>
+            <!-- On phones only the initials are shown; the pseudo stays readable by screen readers. -->
+            <span class="sr-only max-w-40 truncate font-medium sm:not-sr-only">{{ auth.user?.name }}</span>
+            <span class="hidden text-zinc-500 sm:inline dark:text-zinc-400" aria-hidden="true">▾</span>
         </button>
 
         <div
