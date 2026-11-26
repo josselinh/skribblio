@@ -32,18 +32,18 @@ class UserProfileControllerTest extends TestCase
         $viewer = User::factory()->create();
         $alice = User::factory()->create();
         $publicGroup = WordGroup::factory()->public()->createdBy($alice)->create(['updated_at' => now()]);
-        $sharedGroup = WordGroup::factory()->private()->createdBy($alice)->create(['updated_at' => now()->subDay()]);
+        $sharedGroup = WordGroup::factory()->private()->openToContributions()->createdBy($alice)->create(['updated_at' => now()->subDay()]);
         $sharedGroup->members()->attach($viewer);
-        $groupSharedThroughCollection = WordGroup::factory()->private()->createdBy($alice)->create(['updated_at' => now()->subDays(2)]);
-        GroupCollection::factory()->private()->createdBy($alice)->hasAttached($groupSharedThroughCollection)->create()
+        $groupHiddenInASharedCollection = WordGroup::factory()->private()->openToContributions()->createdBy($alice)->create(['updated_at' => now()->subDays(2)]);
+        GroupCollection::factory()->private()->openToContributions()->createdBy($alice)->hasAttached($groupHiddenInASharedCollection)->create()
             ->members()->attach($viewer);
-        WordGroup::factory()->private()->createdBy($alice)->create();
+        WordGroup::factory()->private()->openToContributions()->createdBy($alice)->create();
         WordGroup::factory()->public()->create();
 
         $this->actingAs($viewer)
             ->getJson("/api/users/{$alice->id}/word-groups")
             ->assertOk()
-            ->assertJsonPath('data.*.id', [$publicGroup->id, $sharedGroup->id, $groupSharedThroughCollection->id])
+            ->assertJsonPath('data.*.id', [$publicGroup->id, $sharedGroup->id])
             ->assertJsonPath('data.0.words_count', 0)
             ->assertJsonPath('data.0.is_favorite', false);
     }
@@ -53,9 +53,9 @@ class UserProfileControllerTest extends TestCase
         $viewer = User::factory()->create();
         $alice = User::factory()->create();
         $publicCollection = GroupCollection::factory()->public()->createdBy($alice)->create(['updated_at' => now()]);
-        $sharedCollection = GroupCollection::factory()->private()->createdBy($alice)->create(['updated_at' => now()->subDay()]);
+        $sharedCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($alice)->create(['updated_at' => now()->subDay()]);
         $sharedCollection->members()->attach($viewer);
-        GroupCollection::factory()->private()->createdBy($alice)->create();
+        GroupCollection::factory()->private()->openToContributions()->createdBy($alice)->create();
 
         $this->actingAs($viewer)
             ->getJson("/api/users/{$alice->id}/group-collections")

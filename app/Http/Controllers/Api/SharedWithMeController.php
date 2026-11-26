@@ -49,7 +49,8 @@ class SharedWithMeController extends Controller
     }
 
     /**
-     * Items the user is a member of, or has a pending request on. Requests sent from a collection are left
+     * Items the user is a member of and can see (a private item closed to contributions is hidden from its
+     * members), or has a pending request on. Requests sent from a collection are left
      * out for groups: the user does not know those groups' names.
      *
      * @template TModel of WordGroup|GroupCollection
@@ -63,13 +64,12 @@ class SharedWithMeController extends Controller
 
         return $query
             ->where(fn (Builder $query) => $query
-                ->whereHas('members', $isUser)
+                ->where(fn (Builder $query) => $query->whereHas('members', $isUser)->visibleTo($user))
                 ->orWhereHas('accessRequests', fn (Builder $query) => $query
                     ->where('user_id', $user->getKey())
                     ->where('status', AccessRequestStatus::Pending)
                     ->when($fromShareLinkOnly, fn (Builder $query) => $query->whereNull('via_group_collection_id'))))
             ->with('creator')
-            ->withExists(['members as is_member' => $isUser])
             ->withIsFavorite($user)
             ->latest('updated_at')
             ->latest('id');
@@ -84,7 +84,7 @@ class SharedWithMeController extends Controller
     private function flagAccess(LengthAwarePaginator $paginator, User $user): LengthAwarePaginator
     {
         $paginator->getCollection()->each(function (Model $item) use ($user): void {
-            $isAccessible = $item->is_member || $item->isVisibleTo($user);
+            $isAccessible = $item->isVisibleTo($user);
             $item->forceFill([
                 'is_accessible' => $isAccessible,
                 'access_status' => $isAccessible ? 'granted' : 'pending',

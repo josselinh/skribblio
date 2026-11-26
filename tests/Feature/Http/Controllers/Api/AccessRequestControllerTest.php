@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\ShareType;
 use App\Models\GroupCollection;
 use App\Models\GroupCollectionAccessRequest;
 use App\Models\User;
@@ -40,7 +41,7 @@ class AccessRequestControllerTest extends TestCase
         Notification::fake();
         $creator = User::factory()->create();
         $accessRequest = WordGroupAccessRequest::factory()
-            ->for(WordGroup::factory()->private()->createdBy($creator), 'item')
+            ->for(WordGroup::factory()->private()->openToContributions()->createdBy($creator), 'item')
             ->by(User::factory()->wantsEmails()->create())
             ->create();
 
@@ -71,7 +72,10 @@ class AccessRequestControllerTest extends TestCase
     {
         Notification::fake();
         $requester = User::factory()->create();
-        $accessRequest = WordGroupAccessRequest::factory()->by($requester)->create();
+        $accessRequest = WordGroupAccessRequest::factory()
+            ->for(WordGroup::factory()->private()->openToContributions(), 'item')
+            ->by($requester)
+            ->create();
 
         $this->actingAs($accessRequest->item->creator)
             ->postJson("/api/access-requests/word-groups/{$accessRequest->id}/accept")
@@ -112,5 +116,52 @@ class AccessRequestControllerTest extends TestCase
         $mail = (new AccessRequestDecided($accessRequest))->toMail($accessRequest->requester);
 
         $this->assertStringNotContainsString('Secret', implode(' ', [$mail->subject, ...$mail->introLines]));
+    }
+
+    public function test_accept_grants_the_chosen_type_of_sharing_partial_by_default(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
+        $fullRequest = WordGroupAccessRequest::factory()->for($wordGroup, 'item')->create();
+        $partialRequest = WordGroupAccessRequest::factory()->for($wordGroup, 'item')->create();
+
+        $this->actingAs($creator)->postJson("/api/access-requests/word-groups/{$fullRequest->id}/accept", ['share_type' => 'full'])->assertNoContent();
+        $this->actingAs($creator)->postJson("/api/access-requests/word-groups/{$partialRequest->id}/accept")->assertNoContent();
+
+        $this->assertSame(ShareType::Full, $wordGroup->fresh()->shareTypeOf($fullRequest->requester));
+        $this->assertSame(ShareType::Partial, $wordGroup->fresh()->shareTypeOf($partialRequest->requester));
+    }
+
+    public function test_accept_with_an_unknown_type_of_sharing_returns_422(): void
+    {
+        $creator = User::factory()->create();
+        $accessRequest = GroupCollectionAccessRequest::factory()
+            ->for(GroupCollection::factory()->private()->createdBy($creator), 'item')
+            ->create();
+
+        $this->actingAs($creator)
+            ->postJson("/api/access-requests/group-collections/{$accessRequest->id}/accept", ['share_type' => 'owner'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('share_type');
+
+        $this->assertTrue($accessRequest->fresh()->isPending());
+    }
+
+    public function test_accept_returns_422_while_the_item_is_closed_to_contributions_but_refusing_works(): void
+    {
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->closedToContributions()->createdBy($creator)->create();
+        $acceptedRequest = WordGroupAccessRequest::factory()->for($wordGroup, 'item')->create();
+        $refusedRequest = WordGroupAccessRequest::factory()->for($wordGroup, 'item')->create();
+
+        $this->actingAs($creator)
+            ->postJson("/api/access-requests/word-groups/{$acceptedRequest->id}/accept")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['status' => __('access_requests.not_shareable.word_group')]);
+        $this->actingAs($creator)->postJson("/api/access-requests/word-groups/{$refusedRequest->id}/refuse")->assertNoContent();
+
+        $this->assertTrue($acceptedRequest->fresh()->isPending());
+        $this->assertFalse($wordGroup->members()->exists());
     }
 }

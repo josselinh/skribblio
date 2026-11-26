@@ -47,7 +47,7 @@ class DuplicateWordGroupControllerTest extends TestCase
     {
         $creator = User::factory()->create();
         $member = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
         $wordGroup->members()->attach($member);
         $wordGroup->favoritedBy()->attach($member);
         GroupCollection::factory()->createdBy($creator)->hasAttached($wordGroup)->create();

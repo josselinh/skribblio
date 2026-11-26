@@ -12,7 +12,6 @@ use App\Models\Concerns\HasVisibility;
 use App\Models\Concerns\Shareable;
 use Database\Factories\WordGroupFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -107,7 +106,7 @@ class WordGroup extends Model
      */
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'word_group_members')->withTimestamps();
+        return $this->belongsToMany(User::class, 'word_group_members')->withPivot('share_type')->withTimestamps();
     }
 
     /**
@@ -116,32 +115,5 @@ class WordGroup extends Model
     public function accessRequests(): HasMany
     {
         return $this->hasMany(WordGroupAccessRequest::class);
-    }
-
-    /**
-     * A private group is also shared with the members of a private collection containing it, when that
-     * collection belongs to the group's creator: sharing a collection never exposes other people's groups.
-     * The members of a public collection (allowed to contribute to it) do not see its private groups.
-     */
-    protected function isSharedWith(User $user): bool
-    {
-        return $this->isMember($user)
-            || $this->groupCollections()
-                ->where('group_collections.created_by', $this->created_by)
-                ->where('group_collections.visibility', Visibility::Private)
-                ->whereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()))
-                ->exists();
-    }
-
-    /**
-     * @param  Builder<static>  $query
-     */
-    protected function orWhereSharedWith(Builder $query, User $user): void
-    {
-        $query->orWhereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()))
-            ->orWhereHas('groupCollections', fn (Builder $query) => $query
-                ->whereColumn('group_collections.created_by', 'word_groups.created_by')
-                ->where('group_collections.visibility', Visibility::Private)
-                ->whereHas('members', fn (Builder $query) => $query->whereKey($user->getKey())));
     }
 }

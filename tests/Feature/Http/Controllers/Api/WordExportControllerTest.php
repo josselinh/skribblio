@@ -95,7 +95,7 @@ class WordExportControllerTest extends TestCase
     public function test_word_group_export_is_allowed_to_members_of_a_private_group(): void
     {
         $member = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
         $wordGroup->members()->attach($member);
         Word::factory()->for($wordGroup)->create(['name' => 'chat']);
 

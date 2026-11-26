@@ -9,7 +9,7 @@
     "message": {
         "private": {
             "wordGroup": "You will no longer see this group, which will be removed from your favorites. Your contributions are kept. To come back, you will have to ask the creator for access again.",
-            "groupCollection": "You will no longer see this collection nor the private groups it showed you, which will be removed from your favorites. Your contributions are kept. To come back, you will have to ask the creator for access again."
+            "groupCollection": "You will no longer see this collection, which will be removed from your favorites. Your contributions are kept. To come back, you will have to ask the creator for access again."
         },
         "public": {
             "wordGroup": "You will still see this group, but no longer contribute to it. Your contributions are kept. To come back, you will have to ask the creator for access again.",

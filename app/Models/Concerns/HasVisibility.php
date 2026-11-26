@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Shared behavior of the models that have a creator and a public/private visibility, and can be shared:
- * a private item is visible to its creator and to the users granted access (members). The using model
- * defines a `members()` belongs-to-many relation to User, and may widen the access rules by overriding
- * `orWhereSharedWith()` and `isSharedWith()`.
+ * a private item is visible to its creator and, while it is open to contributions, to the users granted access
+ * (members). The using model also uses AcceptsContributions and defines a `members()` belongs-to-many
+ * relation to User. Being a member of a collection gives no access to the private groups it contains.
  *
  * @property Visibility $visibility
  * @property string $created_by
@@ -85,11 +85,13 @@ trait HasVisibility
     }
 
     /**
-     * Whether the user was granted access to this private item.
+     * Whether the user was granted access to this private item: they are a member and the item is still open
+     * to contributions (a private item closed to contributions is only visible to its creator; reopening it
+     * gives its members their access back).
      */
     protected function isSharedWith(User $user): bool
     {
-        return $this->isMember($user);
+        return $this->accepts_contributions && $this->isMember($user);
     }
 
     /**
@@ -120,7 +122,9 @@ trait HasVisibility
      */
     protected function orWhereSharedWith(Builder $query, User $user): void
     {
-        $query->orWhereHas('members', fn (Builder $query) => $query->whereKey($user->getKey()));
+        $query->orWhere(fn (Builder $query) => $query
+            ->where($this->qualifyColumn('accepts_contributions'), true)
+            ->whereHas('members', fn (Builder $query) => $query->whereKey($user->getKey())));
     }
 
     /**
