@@ -229,7 +229,7 @@ const headingClass = 'text-lg font-semibold';
                 <section v-if="wordGroup.can.share" :class="sectionClass" aria-labelledby="sharing-heading">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h2 id="sharing-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.sharing') }}</h2>
-                        <ShareButton kind="word-groups" :id="wordGroup.id" :purpose="accessPurpose" appearance="button" />
+                        <ShareButton kind="word-groups" :id="wordGroup.id" :purpose="accessPurpose" />
                     </div>
                     <AccessManagement class="mt-4" kind="word-groups" :id="wordGroup.id" :purpose="accessPurpose" />
                 </section>
@@ -238,7 +238,7 @@ const headingClass = 'text-lg font-semibold';
                     <h2 id="deletion-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.deletion') }}</h2>
                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('deletion.warning.wordGroup') }}</p>
                     <div class="mt-4">
-                        <DeleteButton kind="word-groups" :id="wordGroup.id" appearance="button" />
+                        <DeleteButton kind="word-groups" :id="wordGroup.id" />
                     </div>
                 </section>
             </template>
