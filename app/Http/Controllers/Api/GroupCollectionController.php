@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\AccessRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGroupCollectionRequest;
 use App\Http\Requests\UpdateGroupCollectionRequest;
 use App\Http\Resources\GroupCollectionResource;
 use App\Models\GroupCollection;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,9 +54,8 @@ class GroupCollectionController extends Controller
     }
 
     /**
-     * Show a collection with the groups the current user can see (each with who added it), and how many others are hidden from them
-     * (private groups of other users, or every private group for a guest). Guests cannot request access, so
-     * none of the hidden groups are requested by them.
+     * Show a collection with the groups the current user can see (each with who added it). Nothing tells that
+     * other groups are hidden from them: they cannot learn that the collection contains private groups.
      */
     public function show(Request $request, GroupCollection $groupCollection): GroupCollectionResource
     {
@@ -73,14 +70,6 @@ class GroupCollectionController extends Controller
         EloquentCollection::make($visibleWordGroups->pluck('pivot'))->load('addedBy');
 
         $groupCollection->setRelation('wordGroups', $visibleWordGroups);
-        $hiddenWordGroups = $groupCollection->wordGroups()->whereNotIn('word_groups.id', $visibleWordGroups->modelKeys());
-        $groupCollection->setAttribute('hidden_word_groups_count', $hiddenWordGroups->count());
-        $groupCollection->setAttribute(
-            'hidden_word_groups_requested_count',
-            $request->user() === null ? 0 : $hiddenWordGroups->whereHas('accessRequests', fn (Builder $query) => $query
-                ->where('user_id', $request->user()->getKey())
-                ->where('status', AccessRequestStatus::Pending))->count(),
-        );
 
         return new GroupCollectionResource($groupCollection->load('creator')->loadIsFavorite($request->user()));
     }

@@ -15,25 +15,11 @@
             "description": "Cette collection n'existe pas ou vous n'y avez pas accès."
         },
         "loadFailed": "Impossible de charger la collection.",
-        "hidden": {
-            "message": "1 groupe de cette collection est privé et n’est pas visible pour vous. | {n} groupes de cette collection sont privés et ne sont pas visibles pour vous.",
-            "exportNote": "Les mots des groupes qui vous sont masqués ne sont pas exportés.",
-            "request": "Demander l'accès aux groupes privés",
-            "requested": "Demande d'accès envoyée.",
-            "confirmation": {
-                "title": "Demander l’accès aux groupes privés ?",
-                "message": "Le créateur du groupe privé recevra votre demande par email et pourra l’accepter ou la refuser. Vous découvrirez le groupe s’il l’accepte. | Le créateur de chacun des {n} groupes privés recevra votre demande par email et pourra l’accepter ou la refuser. Vous découvrirez chaque groupe dont la demande est acceptée.",
-                "confirm": "Envoyer la demande",
-                "processing": "Envoi…",
-                "done": "Demande d’accès envoyée."
-            }
-        },
         "addWordGroup": "Ajouter un groupe",
         "selectedCount": "{n} groupe sélectionné | {n} groupes sélectionnés",
         "membersOnly": "Seules les personnes autorisées par le créateur de cette collection peuvent y ajouter des groupes. Demandez-lui son lien de partage pour lui proposer de contribuer.",
         "closed": "Cette collection n’est pas ouverte aux contributions : seul son créateur peut modifier ses groupes.",
         "empty": "Cette collection ne contient aucun groupe.",
-        "noVisibleGroup": "Aucun groupe visible dans cette collection.",
         "addition": {
             "title": "Ajouter ce groupe à la collection ?",
             "processing": "Ajout…",

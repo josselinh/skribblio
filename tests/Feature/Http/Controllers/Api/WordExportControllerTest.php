@@ -110,7 +110,7 @@ class WordExportControllerTest extends TestCase
         $user = User::factory()->create();
         $firstGroup = WordGroup::factory()->public()->create(['name' => 'Bêtes']);
         $secondGroup = WordGroup::factory()->createdBy($user)->private()->create(['name' => 'Arbres']);
-        $hiddenGroup = WordGroup::factory()->private()->create();
+        $hiddenGroup = WordGroup::factory()->private()->openToContributions()->create();
         Word::factory()->for($firstGroup)->create(['name' => 'chat']);
         Word::factory()->for($secondGroup)->create(['name' => 'arbre']);
         Word::factory()->for($secondGroup)->create(['name' => 'chat']);
@@ -122,7 +122,7 @@ class WordExportControllerTest extends TestCase
         $this->actingAs($user)
             ->getJson("/api/group-collections/{$groupCollection->id}/export")
             ->assertOk()
-            ->assertExactJson(['data' => ['hidden_word_groups_count' => 1, 'word_groups' => [
+            ->assertExactJson(['data' => ['word_groups' => [
                 ['id' => $secondGroup->id, 'name' => 'Arbres', 'words' => [['name' => 'arbre', 'score' => 0], ['name' => 'chat', 'score' => 0]]],
                 ['id' => $firstGroup->id, 'name' => 'Bêtes', 'words' => [['name' => 'chat', 'score' => 0]]],
             ]]]);

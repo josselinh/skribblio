@@ -273,7 +273,7 @@ class WordGroupControllerTest extends TestCase
             ->getJson("/api/group-collections/{$collectionOfAnotherUser->id}")
             ->assertOk()
             ->assertJsonPath('data.word_groups', [])
-            ->assertJsonPath('data.hidden_word_groups_count', 0);
+            ->assertJsonMissingPath('data.hidden_word_groups_count');
     }
 
     public function test_destroy_returns_403_for_another_user_on_public_group(): void

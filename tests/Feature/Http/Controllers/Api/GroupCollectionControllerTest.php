@@ -99,7 +99,7 @@ class GroupCollectionControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.word_groups.*.name', ['A', 'B'])
-            ->assertJsonPath('data.hidden_word_groups_count', 0)
+            ->assertJsonMissingPath('data.hidden_word_groups_count')
             ->assertJsonPath('data.can.update', true);
     }
 
@@ -108,14 +108,14 @@ class GroupCollectionControllerTest extends TestCase
         $creator = User::factory()->create();
         $publicGroup = WordGroup::factory()->public()->createdBy($creator)->create();
         $groupCollection = GroupCollection::factory()->public()->createdBy($creator)
-            ->hasAttached([$publicGroup, WordGroup::factory()->private()->createdBy($creator)->create()])
+            ->hasAttached([$publicGroup, WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create()])
             ->create();
 
         $response = $this->actingAs(User::factory()->create())->getJson("/api/group-collections/{$groupCollection->id}");
 
         $response->assertOk()
             ->assertJsonPath('data.word_groups.*.id', [$publicGroup->id])
-            ->assertJsonPath('data.hidden_word_groups_count', 1)
+            ->assertJsonMissingPath('data.hidden_word_groups_count')
             ->assertJsonPath('data.creator', ['id' => $creator->id, 'name' => $creator->name])
             ->assertJsonPath('data.can.update', false);
     }
@@ -124,14 +124,13 @@ class GroupCollectionControllerTest extends TestCase
     {
         $publicGroup = WordGroup::factory()->public()->create();
         $groupCollection = GroupCollection::factory()->public()
-            ->hasAttached([$publicGroup, WordGroup::factory()->private()->create()])
+            ->hasAttached([$publicGroup, WordGroup::factory()->private()->openToContributions()->create()])
             ->create();
 
         $this->getJson("/api/group-collections/{$groupCollection->id}")
             ->assertOk()
             ->assertJsonPath('data.word_groups.*.id', [$publicGroup->id])
-            ->assertJsonPath('data.hidden_word_groups_count', 1)
-            ->assertJsonPath('data.hidden_word_groups_requested_count', 0)
+            ->assertJsonMissingPath('data.hidden_word_groups_count')
             ->assertJsonMissingPath('data.creator')
             ->assertJsonMissingPath('data.word_groups.0.creator')
             ->assertJsonMissingPath('data.word_groups.0.added_by')

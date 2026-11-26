@@ -15,25 +15,11 @@
             "description": "This collection does not exist or you do not have access to it."
         },
         "loadFailed": "The collection could not be loaded.",
-        "hidden": {
-            "message": "1 group of this collection is private and not visible to you. | {n} groups of this collection are private and not visible to you.",
-            "exportNote": "The words of the groups hidden from you are not exported.",
-            "request": "Request access to the private groups",
-            "requested": "Access request sent.",
-            "confirmation": {
-                "title": "Request access to the private groups?",
-                "message": "The creator of the private group will receive your request by email and can accept or refuse it. You will see the group if they accept. | The creator of each of the {n} private groups will receive your request by email and can accept or refuse it. You will see each group whose request is accepted.",
-                "confirm": "Send the request",
-                "processing": "Sending…",
-                "done": "Access request sent."
-            }
-        },
         "addWordGroup": "Add a group",
         "selectedCount": "{n} group selected | {n} groups selected",
         "membersOnly": "Only the people allowed by the creator of this collection can add groups to it. Ask them for their share link to offer to contribute.",
         "closed": "This collection is not open to contributions: only its creator can change its groups.",
         "empty": "This collection does not contain any group.",
-        "noVisibleGroup": "No visible group in this collection.",
         "addition": {
             "title": "Add this group to the collection?",
             "processing": "Adding…",

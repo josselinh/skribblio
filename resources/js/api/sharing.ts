@@ -61,15 +61,6 @@ export async function requestAccess(kind: FavoriteKind, token: string): Promise<
     return data.data;
 }
 
-/** Requests access to every group of the collection hidden from the current user. */
-export async function requestHiddenWordGroupsAccess(groupCollectionId: string): Promise<number> {
-    const { data } = await http.post<ResourceResponse<{ requested_count: number }>>(
-        `/api/group-collections/${groupCollectionId}/hidden-word-groups/access-requests`,
-    );
-
-    return data.data.requested_count;
-}
-
 /** Private groups shared with the current user, and those requested from a share link. */
 export async function fetchSharedWordGroups(page = 1): Promise<PaginatedResponse<WordGroup>> {
     const { data } = await http.get<PaginatedResponse<WordGroup>>('/api/shared/word-groups', { params: { page } });

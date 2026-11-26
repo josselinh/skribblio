@@ -12,8 +12,8 @@
     },
     "done": {
         "wordGroup": "Group duplicated. It is private and closed to contributions.",
-        "groupCollection": "Collection duplicated. It and its copied groups are private and closed to contributions. | Collection duplicated. It and its copied groups are private and closed to contributions. 1 hidden group was not copied. | Collection duplicated. It and its copied groups are private and closed to contributions. {n} hidden groups were not copied.",
-        "groupCollectionLinked": "Collection duplicated. It is private and closed to contributions; its groups were not copied. | Collection duplicated. It is private and closed to contributions; its groups were not copied. 1 hidden group was left out. | Collection duplicated. It is private and closed to contributions; its groups were not copied. {n} hidden groups were left out."
+        "groupCollection": "Collection duplicated. It and its copied groups are private and closed to contributions.",
+        "groupCollectionLinked": "Collection duplicated. It is private and closed to contributions; its groups were not copied."
     },
     "copyWordGroups": {
         "label": "Copy the groups too",
