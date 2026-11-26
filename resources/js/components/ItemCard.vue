@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import CardMeta from '@/components/CardMeta.vue';
+import CountBadge from '@/components/CountBadge.vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import LanguageBadge from '@/components/LanguageBadge.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
-import type { Locale, User, Visibility } from '@/types/models';
+import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
 /**
- * Card of a group or a collection: the title in a tinted header (next to the favorite star), a line
- * "par X · N mots · modifié le …", then the badges, and an optional `footer` slot describing the item's place in its context (who added a group to a collection),
+ * Card of a group or a collection, in the order of an item's page title: the title in a tinted header (next to the
+ * favorite star), the badges with the count (`CountBadge`) right after the language, then "Créé par X" and "Mise à jour le …" (`CardMeta`), and an optional `footer` slot describing the item's place in its context (who added a group to a collection),
  * separated from what describes the item itself. The footer keeps the right column free, under the favorite
  * star, for a selection checkbox laid over the card. The title's link is stretched over the whole card, so
  * that the card is clickable while other links (the creator's name, the footer's) and the favorite star stay
@@ -16,6 +17,7 @@ import type { Locale, User, Visibility } from '@/types/models';
  * request), the card is greyed out and not clickable.
  */
 defineProps<{
+    kind: FavoriteKind;
     to: RouteLocationRaw;
     name: string;
     language: Locale;
@@ -27,7 +29,6 @@ defineProps<{
     /** Counted items, e.g. "42 mots". */
     countLabel?: string;
     updatedAt: string | null;
-    updatedLabel: string;
     isAccessible: boolean;
     inaccessibleMessage: string;
 }>();
@@ -58,13 +59,14 @@ defineProps<{
                 </h3>
             </header>
             <div class="flex flex-col gap-2 px-4" :class="{ 'pb-4': !$slots.footer }">
-                <CardMeta :creator="creator" :count-label="countLabel" :updated-at="isAccessible ? updatedAt : null" :updated-label="updatedLabel" />
-                <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <LanguageBadge :language="language" />
+                    <CountBadge v-if="countLabel" :label="countLabel" />
                     <VisibilityBadge :visibility="visibility" />
                     <ContributionsBadge v-if="acceptsContributions && isAccessible" :members-only="contributionsMembersOnly" />
                 </div>
+                <CardMeta :kind="kind" :creator="creator" :updated-at="isAccessible ? updatedAt : null" />
+                <p v-if="!isAccessible" class="text-sm text-zinc-600 dark:text-zinc-400">{{ inaccessibleMessage }}</p>
             </div>
             <div
                 v-if="$slots.footer"

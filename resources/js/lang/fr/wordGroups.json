@@ -5,11 +5,10 @@
     },
     "count": "{n} groupe | {n} groupes",
     "card": {
-        "updatedOn": "Modifié le",
         "addition": {
-            "byOn": "Ajouté par {user} le {date}",
             "by": "Ajouté par {user}",
-            "on": "Ajouté le {date}"
+            "on": "Ajouté le {date}",
+            "date": "Le {date}"
         },
         "becamePrivate": "Ce groupe est devenu privé : vous n’y avez plus accès."
     },
