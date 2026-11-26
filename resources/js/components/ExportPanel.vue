@@ -10,7 +10,8 @@ import type { FavoriteKind } from '@/types/models';
 /**
  * "Exporter pour Skribbl.io" button of a group or a collection, opening the list of its words
  * ready to paste into Skribbl.io. A collection's export comes with its groups (the visible ones),
- * so that the user picks which of them to export without reloading anything.
+ * so that the user picks which of them to export without reloading anything. The `actions` slot puts other
+ * buttons beside it (the panel opens under the whole row).
  */
 const props = defineProps<{
     kind: FavoriteKind;
@@ -102,15 +103,18 @@ const linkButtonClass =
 
 <template>
     <div>
-        <button
-            type="button"
-            class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:py-2"
-            :aria-expanded="isOpen"
-            aria-controls="export-panel"
-            @click="toggle"
-        >
-            {{ $t('exports.panel.button') }}
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+            <button
+                type="button"
+                class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:py-2"
+                :aria-expanded="isOpen"
+                aria-controls="export-panel"
+                @click="toggle"
+            >
+                {{ $t('exports.panel.button') }}
+            </button>
+            <slot name="actions" />
+        </div>
 
         <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
             <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>

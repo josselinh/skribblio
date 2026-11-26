@@ -55,6 +55,29 @@ class WordControllerTest extends TestCase
             ->assertJsonValidationErrors(['sort' => 'Connectez-vous pour utiliser ce tri.']);
     }
 
+    public function test_index_rejects_the_author_filter_from_guest_with_422(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->create();
+
+        $this->getJson("/api/word-groups/{$wordGroup->id}/words?author=me")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['author' => 'Connectez-vous pour filtrer par auteur.']);
+    }
+
+    public function test_index_lists_only_the_words_of_the_current_user_with_the_author_filter(): void
+    {
+        $contributor = User::factory()->create();
+        $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
+        $ownWord = Word::factory()->for($wordGroup)->createdBy($contributor)->create();
+        Word::factory()->for($wordGroup)->create();
+
+        $this->actingAs($contributor)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words?author=me")
+            ->assertOk()
+            ->assertJsonPath('data.*.id', [$ownWord->id])
+            ->assertJsonPath('meta.total', 1);
+    }
+
     public function test_index_lists_words_of_the_group_most_recent_first_with_their_author(): void
     {
         $author = User::factory()->create(['name' => 'Alice']);

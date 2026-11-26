@@ -28,6 +28,25 @@
         "membersOnly": "Only the people allowed by the creator of this group can add words to it. Ask them for their share link to offer to contribute.",
         "closed": "This group is not open to contributions: only its creator can change its words.",
         "empty": "This group does not contain any word yet.",
-        "editWords": "Edit the words"
+        "manage": "Manage",
+        "contribute": "Contribute"
+    },
+    "edit": {
+        "title": {
+            "manage": "Manage the group",
+            "contribute": "Contribute to the group"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "You cannot edit this group.",
+        "unsavedHint": "Save or cancel your changes to sort the words or change page.",
+        "sections": {
+            "settings": "Settings",
+            "words": "Words",
+            "sharing": "Sharing",
+            "deletion": "Delete the group",
+            "ownWords": "Your words"
+        },
+        "noOwnWords": "You have not added any word to this group yet."
     }
 }

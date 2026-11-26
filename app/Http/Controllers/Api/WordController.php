@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AuthorFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DestroyWordsRequest;
 use App\Http\Requests\ListWordsRequest;
@@ -11,6 +12,7 @@ use App\Http\Requests\UpdateWordsRequest;
 use App\Http\Resources\WordResource;
 use App\Models\Word;
 use App\Models\WordGroup;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
@@ -28,11 +30,13 @@ class WordController extends Controller
     private const int PER_PAGE = 20;
 
     /**
-     * List the words of a group with their votes, most recently added first unless another order is asked.
+     * List the words of a group with their votes, most recently added first unless another order is asked,
+     * optionally only the current user's (`author=me`).
      */
     public function index(ListWordsRequest $request, WordGroup $wordGroup): AnonymousResourceCollection
     {
         $words = $wordGroup->words()
+            ->when($request->author() === AuthorFilter::Me, fn (Builder $query) => $query->whereBelongsTo($request->user(), 'creator'))
             ->with('creator')
             ->withVotes($request->user())
             ->orderBySort($request->sort(), $request->direction())

@@ -7,7 +7,7 @@ import { duplicateGroupCollection } from '@/api/groupCollections';
 import { duplicateWordGroup } from '@/api/wordGroups';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
-import { actionButtonClass } from '@/lib/actionsMenu';
+import { actionClass, type ActionAppearance } from '@/lib/actionsMenu';
 import { itemKey } from '@/lib/i18n';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
@@ -20,6 +20,8 @@ import type { FavoriteKind } from '@/types/models';
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
+    /** Entry of the actions menu (default) or standalone button. */
+    appearance?: ActionAppearance;
 }>();
 
 const router = useRouter();
@@ -75,7 +77,7 @@ async function duplicate(): Promise<void> {
 <template>
     <button
         type="button"
-        :class="actionButtonClass"
+        :class="actionClass(appearance ?? 'menu-item')"
         aria-haspopup="dialog"
         @click="askConfirmation"
     >

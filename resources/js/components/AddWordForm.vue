@@ -66,46 +66,46 @@ async function submit(): Promise<void> {
         <p id="new-words-help" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
             {{ $t('words.add.help') }}
         </p>
-        <div class="mt-2 flex items-start gap-2">
-            <textarea
-                id="new-words"
-                ref="textarea"
-                v-model="form.data.names"
-                rows="3"
-                :placeholder="$t('words.add.placeholder')"
-                autocomplete="off"
-                :aria-invalid="form.errors.value.names || result?.invalid.length ? true : undefined"
-                aria-describedby="new-words-help new-words-feedback"
-                class="block w-full resize-y rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none aria-invalid:border-red-500"
-                @keydown.enter.exact.prevent="submit"
-            ></textarea>
+        <textarea
+            id="new-words"
+            ref="textarea"
+            v-model="form.data.names"
+            rows="3"
+            :placeholder="$t('words.add.placeholder')"
+            autocomplete="off"
+            :aria-invalid="form.errors.value.names || result?.invalid.length ? true : undefined"
+            aria-describedby="new-words-help new-words-feedback"
+            class="mt-2 block w-full resize-y rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none aria-invalid:border-red-500"
+            @keydown.enter.exact.prevent="submit"
+        ></textarea>
+        <div class="mt-2 flex items-start gap-3">
+            <div id="new-words-feedback" class="min-w-0 flex-1" aria-live="polite">
+                <p v-if="form.errors.value.names" class="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {{ form.errors.value.names }}
+                </p>
+                <template v-else-if="result">
+                    <div v-if="result.invalid.length > 0" class="mt-1 text-sm text-red-600 dark:text-red-400">
+                        <p>
+                            {{ $t('words.add.invalid', result.invalid.length) }}
+                        </p>
+                        <ul class="mt-0.5 list-disc pl-5">
+                            <li v-for="invalidName in result.invalid" :key="invalidName.name">
+                                <i18n-t keypath="words.add.invalidItem" scope="global">
+                                    <template #word><span class="font-medium">{{ invalidName.name }}</span></template>
+                                    <template #reason>{{ invalidName.message }}</template>
+                                </i18n-t>
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+            </div>
             <button
                 type="submit"
                 :disabled="form.isProcessing.value"
-                class="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
+                class="ml-auto shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
             >
                 {{ $t('words.add.submit') }}
             </button>
-        </div>
-        <div id="new-words-feedback" aria-live="polite">
-            <p v-if="form.errors.value.names" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                {{ form.errors.value.names }}
-            </p>
-            <template v-else-if="result">
-                <div v-if="result.invalid.length > 0" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                    <p>
-                        {{ $t('words.add.invalid', result.invalid.length) }}
-                    </p>
-                    <ul class="mt-0.5 list-disc pl-5">
-                        <li v-for="invalidName in result.invalid" :key="invalidName.name">
-                            <i18n-t keypath="words.add.invalidItem" scope="global">
-                                <template #word><span class="font-medium">{{ invalidName.name }}</span></template>
-                                <template #reason>{{ invalidName.message }}</template>
-                            </i18n-t>
-                        </li>
-                    </ul>
-                </div>
-            </template>
         </div>
     </form>
 </template>

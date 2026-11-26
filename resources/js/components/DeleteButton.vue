@@ -6,7 +6,7 @@ import { deleteGroupCollection } from '@/api/groupCollections';
 import { deleteWordGroup } from '@/api/wordGroups';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
-import { dangerActionButtonClass } from '@/lib/actionsMenu';
+import { actionClass, type ActionAppearance } from '@/lib/actionsMenu';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind } from '@/types/models';
 
@@ -17,6 +17,8 @@ import type { FavoriteKind } from '@/types/models';
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
+    /** Entry of the actions menu (default) or standalone button. */
+    appearance?: ActionAppearance;
 }>();
 
 const router = useRouter();
@@ -58,7 +60,7 @@ async function confirmDelete(): Promise<void> {
 <template>
     <button
         type="button"
-        :class="dangerActionButtonClass"
+        :class="actionClass(appearance ?? 'menu-item', true)"
         aria-haspopup="dialog"
         @click="askConfirmation"
     >

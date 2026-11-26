@@ -47,6 +47,12 @@ export const router = createRouter({
             meta: { isPublic: true },
         },
         {
+            path: '/groups/:id/edit',
+            name: 'word-groups.edit',
+            component: () => import('@/pages/word-groups/EditWordGroupPage.vue'),
+            meta: { requiresVerified: true },
+        },
+        {
             path: '/collections/new',
             name: 'group-collections.create',
             component: () => import('@/pages/group-collections/CreateGroupCollectionPage.vue'),
