@@ -17,6 +17,9 @@ enum EmailNotification: string
     /** The creator accepted or refused one of the user's access or contribution requests. */
     case AccessRequestDecided = 'access_request_decided';
 
+    /** The creator of a group or collection the user is a member of changed their type of sharing. */
+    case ShareTypeChanged = 'share_type_changed';
+
     /** Someone added one of the user's groups to their favorites. */
     case WordGroupFavorited = 'word_group_favorited';
 

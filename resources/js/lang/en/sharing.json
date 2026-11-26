@@ -123,5 +123,67 @@
             "access": "Send an access request",
             "contribution": "Ask to contribute"
         }
+    },
+    "shareType": {
+        "label": "Type of sharing",
+        "memberLabel": "Type of sharing of {name}",
+        "partial": {
+            "label": "Partial",
+            "description": {
+                "wordGroup": "This person adds words, and only edits or deletes their own.",
+                "groupCollection": "This person adds groups, and only removes the ones they added."
+            }
+        },
+        "full": {
+            "label": "Full",
+            "description": {
+                "wordGroup": "This person also edits and deletes other people’s words, yours included.",
+                "groupCollection": "This person also removes the groups added by others, you included."
+            }
+        },
+        "note": {
+            "wordGroup": "These rights only apply while the group is open to contributions. The group’s name, visibility, sharing and deletion stay with you.",
+            "groupCollection": "These rights only apply while the collection is open to contributions. The collection’s name, visibility, sharing and deletion stay with you."
+        },
+        "help": {
+            "wordGroup": "With a partial sharing, the person adds words and only edits or deletes their own. With a full sharing, they can also edit and delete other people’s, yours included. These rights only apply while the group is open to contributions.",
+            "groupCollection": "With a partial sharing, the person adds groups and only removes the ones they added. With a full sharing, they can also remove other people’s, yours included. These rights only apply while the collection is open to contributions."
+        },
+        "changed": {
+            "partial": "{name} now has a partial sharing.",
+            "full": "{name} now has a full sharing."
+        },
+        "confirm": {
+            "title": "Change the type of sharing?",
+            "processing": "Saving…",
+            "button": {
+                "partial": "Switch to partial sharing",
+                "full": "Switch to full sharing"
+            },
+            "message": {
+                "partial": {
+                    "wordGroup": "{name} will only be able to edit and delete their own words. They will be notified by email if they turned it on.",
+                    "groupCollection": "{name} will only be able to remove the groups they added. They will be notified by email if they turned it on."
+                },
+                "full": {
+                    "wordGroup": "{name} will be able to edit and delete every word of the group, yours included, while it is open to contributions. They will be notified by email if they turned it on.",
+                    "groupCollection": "{name} will be able to remove every group of the collection, including those you added, while it is open to contributions. They will be notified by email if they turned it on."
+                }
+            }
+        },
+        "inactive": {
+            "privateClosed": {
+                "wordGroup": "While the group is closed to contributions, these people have no access to it. You can still choose their type of sharing: it will apply when you reopen the group.",
+                "groupCollection": "While the collection is closed to contributions, these people have no access to it. You can still choose their type of sharing: it will apply when you reopen the collection."
+            },
+            "publicClosed": {
+                "wordGroup": "While the group is closed to contributions, these people see it like everyone else, without contributing. Their type of sharing will apply if you reopen contributions to authorized people.",
+                "groupCollection": "While the collection is closed to contributions, these people see it like everyone else, without contributing. Their type of sharing will apply if you reopen contributions to authorized people."
+            },
+            "openToEveryone": {
+                "wordGroup": "The group is open to everyone’s contributions: these people contribute like everyone else, with a partial sharing. Their type of sharing will apply if you restrict contributions to authorized people again.",
+                "groupCollection": "The collection is open to everyone’s contributions: these people contribute like everyone else, with a partial sharing. Their type of sharing will apply if you restrict contributions to authorized people again."
+            }
+        }
     }
 }

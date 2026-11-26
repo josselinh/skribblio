@@ -3,18 +3,21 @@
 namespace App\Models\Concerns;
 
 use App\Enums\AccessRequestStatus;
+use App\Enums\ShareType;
 use App\Models\GroupCollectionAccessRequest;
 use App\Models\User;
 use App\Models\WordGroupAccessRequest;
 use App\Notifications\AccessRequestDecided;
 use App\Notifications\AccessRequested;
+use App\Notifications\ShareTypeChanged;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
  * Sharing of a private group or collection, or of a public one whose contributions are restricted to its
  * members: a secret link lets other users request access (to see the item, or to contribute to it), the
- * creator accepts (the requester becomes a member) or refuses, and can revoke access later. The using
+ * creator accepts (the requester becomes a member, with a partial or full sharing, see ShareType) or refuses,
+ * and can change the type of sharing or revoke access later. The using
  * model also uses HasVisibility and AcceptsContributions, and defines `members()` and `accessRequests()`
  * relations.
  *
@@ -22,6 +25,13 @@ use Illuminate\Support\Str;
  */
 trait Shareable
 {
+    /**
+     * Per-instance cache of shareTypeOf(), by user id (null for a non-member).
+     *
+     * @var array<string, ?ShareType>
+     */
+    private array $shareTypeCache = [];
+
     /**
      * Returns the share token, generating it on first use. Does not change `updated_at`.
      */
@@ -93,12 +103,12 @@ trait Shareable
     }
 
     /**
-     * Grants access to the requester and notifies them.
+     * Grants access to the requester, with the given type of sharing, and notifies them.
      */
-    public function acceptAccessRequest(WordGroupAccessRequest|GroupCollectionAccessRequest $accessRequest): void
+    public function acceptAccessRequest(WordGroupAccessRequest|GroupCollectionAccessRequest $accessRequest, ShareType $shareType = ShareType::Partial): void
     {
-        DB::transaction(function () use ($accessRequest): void {
-            $this->members()->syncWithoutDetaching([$accessRequest->user_id]);
+        DB::transaction(function () use ($accessRequest, $shareType): void {
+            $this->members()->syncWithoutDetaching([$accessRequest->user_id => ['share_type' => $shareType->value]]);
             $accessRequest->update(['status' => AccessRequestStatus::Accepted, 'decided_at' => now()]);
         });
 
@@ -116,12 +126,62 @@ trait Shareable
     }
 
     /**
+     * The type of sharing of a member (accepted through the share link), null for anyone else.
+     */
+    public function shareTypeOf(User $user): ?ShareType
+    {
+        if (! array_key_exists($user->getKey(), $this->shareTypeCache)) {
+            $shareType = $this->members()->whereKey($user->getKey())->first()?->pivot->share_type;
+            $this->shareTypeCache[$user->getKey()] = $shareType === null ? null : ShareType::from($shareType);
+        }
+
+        return $this->shareTypeCache[$user->getKey()];
+    }
+
+    /**
+     * Whether the item can be shared through its link: open to contributions, and private or public open to its
+     * members only. Otherwise its members have no access left (a private item closed to contributions is only
+     * visible to its creator), and they get it back when the item becomes shareable again.
+     */
+    public function isShareable(): bool
+    {
+        return $this->accepts_contributions && ($this->isPrivate() || $this->contributions_members_only);
+    }
+
+    /**
+     * Whether the user is a member with a full sharing that still applies (the item is shareable).
+     */
+    public function sharesFullyWith(User $user): bool
+    {
+        return $this->isShareable() && $this->shareTypeOf($user) === ShareType::Full;
+    }
+
+    /**
+     * Changes the type of sharing of a member and notifies them. Returns false, without notifying, when the user
+     * is not a member or already had that type.
+     */
+    public function changeShareType(User $member, ShareType $shareType): bool
+    {
+        $currentShareType = $this->shareTypeOf($member);
+        if ($currentShareType === null || $currentShareType === $shareType) {
+            return false;
+        }
+
+        $this->members()->updateExistingPivot($member->getKey(), ['share_type' => $shareType->value]);
+        $this->shareTypeCache[$member->getKey()] = $shareType;
+        $member->notify(new ShareTypeChanged($this, $shareType));
+
+        return true;
+    }
+
+    /**
      * Removes the user's access and their request, so that they can ask again through the share link.
      */
     public function revokeAccess(User $user): void
     {
         DB::transaction(function () use ($user): void {
             $this->members()->detach($user);
+            unset($this->shareTypeCache[$user->getKey()]);
             $this->accessRequests()->where('user_id', $user->getKey())->delete();
         });
     }

@@ -51,6 +51,7 @@ class GroupCollectionResource extends JsonResource
                 'manage_access' => Gate::allows('manageAccess', $this->resource),
                 'leave' => Gate::allows('leave', $this->resource),
                 'add_word_group' => Gate::allows('addWordGroup', $this->resource),
+                'manage_contributions' => Gate::allows('manageContributions', $this->resource),
                 'duplicate' => Gate::allows('duplicate', $this->resource),
             ],
         ];

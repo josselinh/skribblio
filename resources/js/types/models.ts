@@ -12,6 +12,7 @@ export type EmailNotification =
     | 'word_group_access_requested'
     | 'group_collection_access_requested'
     | 'access_request_decided'
+    | 'share_type_changed'
     | 'word_group_favorited'
     | 'group_collection_favorited';
 
@@ -69,6 +70,8 @@ export interface WordGroup {
         /** Whether the user is a member (accepted through the share link) who can give up their access. */
         leave: boolean;
         add_word: boolean;
+        /** Whether the user changes and deletes every word, not only their own (creator, or member with a full sharing). */
+        manage_contributions: boolean;
         duplicate: boolean;
         /** Only when listed through a collection: whether the user can remove it from that collection. */
         remove_from_collection?: boolean;
@@ -135,6 +138,8 @@ export interface GroupCollection {
         /** Whether the user is a member (accepted through the share link) who can give up their access. */
         leave: boolean;
         add_word_group: boolean;
+        /** Whether the user removes every group, not only those they added (creator, or member with a full sharing). */
+        manage_contributions: boolean;
         duplicate: boolean;
     };
 }
@@ -195,8 +200,20 @@ export interface ShareInvitation {
     status: 'accessible' | 'pending' | 'refused' | 'none';
 }
 
+/**
+ * What the creator lets a member do while the item is open to contributions (`App\Enums\ShareType`): manage
+ * their own contributions only, or everyone's.
+ */
+export type ShareType = 'partial' | 'full';
+
+/** A member of a shared item, as listed to its creator. */
+export interface ItemMember extends Pick<User, 'id' | 'name'> {
+    share_type: ShareType;
+    granted_at: string | null;
+}
+
 /** Pending requests and members of a shared item, for its creator. */
 export interface ItemAccess {
     pending_requests: AccessRequest[];
-    members: (Pick<User, 'id' | 'name'> & { granted_at: string | null })[];
+    members: ItemMember[];
 }

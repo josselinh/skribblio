@@ -85,6 +85,15 @@ class GroupCollectionPolicy
     }
 
     /**
+     * Whether the user changes or removes every contribution (every group), not only their own: the creator,
+     * and members with a full sharing while the item is open to contributions.
+     */
+    public function manageContributions(User $user, GroupCollection $groupCollection): bool
+    {
+        return $groupCollection->allowsChangingEveryContribution($user);
+    }
+
+    /**
      * Favoriting requires being able to see the item. Removing a favorite is always allowed.
      */
     public function favorite(User $user, GroupCollection $groupCollection): Response
@@ -93,12 +102,12 @@ class GroupCollectionPolicy
     }
 
     /**
-     * Only the creator can share a private item, or a public item open to its members only (get or
-     * regenerate its access request link).
+     * Only the creator can share the item while it is open to contributions, private or public open to its
+     * members only (get or regenerate its access request link).
      */
     public function share(User $user, GroupCollection $groupCollection): bool
     {
-        return $groupCollection->isCreatedBy($user) && ($groupCollection->isPrivate() || $groupCollection->restrictsContributionsToMembers());
+        return $groupCollection->isCreatedBy($user) && $groupCollection->isShareable();
     }
 
     /**

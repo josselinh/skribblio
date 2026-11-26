@@ -48,6 +48,7 @@ class WordGroupControllerTest extends TestCase
                 'manage_access' => false,
                 'leave' => false,
                 'add_word' => false,
+                'manage_contributions' => false,
                 'duplicate' => false,
             ]);
     }
@@ -101,7 +102,7 @@ class WordGroupControllerTest extends TestCase
                 'is_favorite' => false,
                 'created_at' => $newerGroup->created_at->toIso8601String(),
                 'updated_at' => $newerGroup->updated_at->toIso8601String(),
-                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'leave' => false, 'add_word' => true, 'duplicate' => true],
+                'can' => ['update' => true, 'delete' => true, 'share' => false, 'manage_access' => true, 'leave' => false, 'add_word' => true, 'manage_contributions' => true, 'duplicate' => true],
             ]);
     }
 
@@ -170,7 +171,7 @@ class WordGroupControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.id', $wordGroup->id)
             ->assertJsonPath('data.creator', ['id' => $wordGroup->creator->id, 'name' => $wordGroup->creator->name])
-            ->assertJsonPath('data.can', ['update' => false, 'delete' => false, 'share' => false, 'manage_access' => false, 'leave' => false, 'add_word' => true, 'duplicate' => true]);
+            ->assertJsonPath('data.can', ['update' => false, 'delete' => false, 'share' => false, 'manage_access' => false, 'leave' => false, 'add_word' => true, 'manage_contributions' => false, 'duplicate' => true]);
     }
 
     public function test_show_returns_404_for_private_group_of_another_user(): void

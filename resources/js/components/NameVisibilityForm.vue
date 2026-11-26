@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ContributionsField from '@/components/ContributionsField.vue';
 import FormField from '@/components/FormField.vue';
@@ -17,21 +18,26 @@ export interface NameVisibilityPayload {
 
 /**
  * Settings form of a group or collection (name, visibility, contributions), saving confirmed in a notification.
- * With `cancelable`, a "Annuler" button emits `cancel`. Starts from `initial`, read when the form is mounted.
+ * With `cancelable`, a "Annuler" button emits `cancel`. Starts from `initial`, read when the form is mounted. Emits
+ * `change` with the values being edited, saved or not, so that the page follows them (e.g. hides the sharing).
  */
 const props = defineProps<{
     initial: NameVisibilityPayload;
     kind: FavoriteKind;
     /** Label of the name field, e.g. "Nom du groupe". */
     nameLabel: string;
-    /** Saves the changes; validation errors (422) are shown in the form. */
-    save: (payload: NameVisibilityPayload) => Promise<void>;
+    /**
+     * Saves the changes; validation errors (422) are shown in the form. May return the message confirming the
+     * saving, instead of the default one.
+     */
+    save: (payload: NameVisibilityPayload) => Promise<string | void>;
     cancelable?: boolean;
 }>();
 
 const emit = defineEmits<{
     saved: [];
     cancel: [];
+    change: [payload: NameVisibilityPayload];
 }>();
 
 const { showToast } = useToasts();
@@ -39,9 +45,15 @@ const { t } = useI18n();
 
 const form = useForm<NameVisibilityPayload>({ ...props.initial });
 
+watch(() => ({ ...form.data }), (payload) => emit('change', payload), { immediate: true });
+
 async function submit(): Promise<void> {
-    if (await form.submit((data) => props.save({ ...data }))) {
-        showToast(t(`editing.done.${itemKey(props.kind)}`));
+    let message: string | null = null;
+    const isSaved = await form.submit(async (data) => {
+        message = (await props.save({ ...data })) ?? null;
+    });
+    if (isSaved) {
+        showToast(message ?? t(`editing.done.${itemKey(props.kind)}`));
         emit('saved');
     }
 }

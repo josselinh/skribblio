@@ -123,5 +123,67 @@
             "access": "Envoyer une demande d'accès",
             "contribution": "Demander à contribuer"
         }
+    },
+    "shareType": {
+        "label": "Type de partage",
+        "memberLabel": "Type de partage de {name}",
+        "partial": {
+            "label": "Partiel",
+            "description": {
+                "wordGroup": "Cette personne ajoute des mots, et ne modifie ou ne supprime que les siens.",
+                "groupCollection": "Cette personne ajoute des groupes, et ne retire que ceux qu’elle a ajoutés."
+            }
+        },
+        "full": {
+            "label": "Total",
+            "description": {
+                "wordGroup": "Cette personne modifie et supprime aussi les mots des autres, y compris les vôtres.",
+                "groupCollection": "Cette personne retire aussi les groupes ajoutés par d’autres, y compris par vous."
+            }
+        },
+        "note": {
+            "wordGroup": "Ces droits ne valent que tant que le groupe est ouvert aux contributions. Le nom, la visibilité, le partage et la suppression du groupe restent à vous.",
+            "groupCollection": "Ces droits ne valent que tant que la collection est ouverte aux contributions. Le nom, la visibilité, le partage et la suppression de la collection restent à vous."
+        },
+        "help": {
+            "wordGroup": "Avec un partage partiel, la personne ajoute des mots et ne modifie ou ne supprime que les siens. Avec un partage total, elle peut aussi modifier et supprimer ceux des autres, y compris les vôtres. Ces droits ne s’appliquent que tant que le groupe est ouvert aux contributions.",
+            "groupCollection": "Avec un partage partiel, la personne ajoute des groupes et ne retire que ceux qu’elle a ajoutés. Avec un partage total, elle peut aussi retirer ceux des autres, y compris les vôtres. Ces droits ne s’appliquent que tant que la collection est ouverte aux contributions."
+        },
+        "changed": {
+            "partial": "{name} a maintenant un partage partiel.",
+            "full": "{name} a maintenant un partage total."
+        },
+        "confirm": {
+            "title": "Changer le type de partage ?",
+            "processing": "Modification…",
+            "button": {
+                "partial": "Passer en partage partiel",
+                "full": "Passer en partage total"
+            },
+            "message": {
+                "partial": {
+                    "wordGroup": "{name} ne pourra plus modifier ni supprimer que ses propres mots. Cette personne sera prévenue par email si elle l’a activé.",
+                    "groupCollection": "{name} ne pourra plus retirer que les groupes qu’elle a ajoutés. Cette personne sera prévenue par email si elle l’a activé."
+                },
+                "full": {
+                    "wordGroup": "{name} pourra modifier et supprimer tous les mots du groupe, y compris les vôtres, tant qu’il est ouvert aux contributions. Cette personne sera prévenue par email si elle l’a activé.",
+                    "groupCollection": "{name} pourra retirer tous les groupes de la collection, y compris ceux que vous avez ajoutés, tant qu’elle est ouverte aux contributions. Cette personne sera prévenue par email si elle l’a activé."
+                }
+            }
+        },
+        "inactive": {
+            "privateClosed": {
+                "wordGroup": "Tant que le groupe est fermé aux contributions, ces personnes n’y ont pas accès. Vous pouvez quand même choisir leur type de partage : il s’appliquera quand vous rouvrirez le groupe.",
+                "groupCollection": "Tant que la collection est fermée aux contributions, ces personnes n’y ont pas accès. Vous pouvez quand même choisir leur type de partage : il s’appliquera quand vous rouvrirez la collection."
+            },
+            "publicClosed": {
+                "wordGroup": "Tant que le groupe est fermé aux contributions, ces personnes le voient comme tout le monde, sans pouvoir y contribuer. Leur type de partage s’appliquera si vous rouvrez les contributions aux personnes autorisées.",
+                "groupCollection": "Tant que la collection est fermée aux contributions, ces personnes la voient comme tout le monde, sans pouvoir y contribuer. Leur type de partage s’appliquera si vous rouvrez les contributions aux personnes autorisées."
+            },
+            "openToEveryone": {
+                "wordGroup": "Le groupe est ouvert aux contributions de tous : ces personnes contribuent comme tout le monde, en partage partiel. Leur type de partage s’appliquera si vous réservez de nouveau les contributions aux personnes autorisées.",
+                "groupCollection": "La collection est ouverte aux contributions de tous : ces personnes contribuent comme tout le monde, en partage partiel. Leur type de partage s’appliquera si vous réservez de nouveau les contributions aux personnes autorisées."
+            }
+        }
     }
 }

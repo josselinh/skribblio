@@ -7,5 +7,9 @@
         "wordGroup": "Created by {user}",
         "groupCollection": "Created by {user}"
     },
-    "updatedOn": "Updated on {date}"
+    "updatedOn": "Updated on {date}",
+    "doneInvite": {
+        "wordGroup": "Group updated. Now invite people with the “Invite” button of the Sharing section.",
+        "groupCollection": "Collection updated. Now invite people with the “Invite” button of the Sharing section."
+    }
 }

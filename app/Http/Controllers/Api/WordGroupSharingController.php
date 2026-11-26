@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\ManagesSharing;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateMemberRequest;
 use App\Models\User;
 use App\Models\WordGroup;
 use Illuminate\Http\JsonResponse;
@@ -36,6 +37,14 @@ class WordGroupSharingController extends Controller
     public function access(WordGroup $wordGroup): JsonResponse
     {
         return $this->accessResponse($wordGroup);
+    }
+
+    /**
+     * Changes the type of sharing of a member.
+     */
+    public function updateMember(UpdateMemberRequest $request, WordGroup $wordGroup, User $user): JsonResponse
+    {
+        return $this->updateMemberResponse($request);
     }
 
     public function revoke(WordGroup $wordGroup, User $user): Response

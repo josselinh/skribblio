@@ -50,6 +50,15 @@ class WordGroupPolicy
     }
 
     /**
+     * Whether the user changes or removes every contribution (every word), not only their own: the creator,
+     * and members with a full sharing while the item is open to contributions.
+     */
+    public function manageContributions(User $user, WordGroup $wordGroup): bool
+    {
+        return $wordGroup->allowsChangingEveryContribution($user);
+    }
+
+    /**
      * Favoriting requires being able to see the item. Removing a favorite is always allowed.
      */
     public function favorite(User $user, WordGroup $wordGroup): Response
@@ -67,12 +76,12 @@ class WordGroupPolicy
     }
 
     /**
-     * Only the creator can share a private item, or a public item open to its members only (get or
-     * regenerate its access request link).
+     * Only the creator can share the item while it is open to contributions, private or public open to its
+     * members only (get or regenerate its access request link).
      */
     public function share(User $user, WordGroup $wordGroup): bool
     {
-        return $wordGroup->isCreatedBy($user) && ($wordGroup->isPrivate() || $wordGroup->restrictsContributionsToMembers());
+        return $wordGroup->isCreatedBy($user) && $wordGroup->isShareable();
     }
 
     /**

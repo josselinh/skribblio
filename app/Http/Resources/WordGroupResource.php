@@ -52,6 +52,7 @@ class WordGroupResource extends JsonResource
                 'manage_access' => Gate::allows('manageAccess', $this->resource),
                 'leave' => Gate::allows('leave', $this->resource),
                 'add_word' => Gate::allows('addWord', $this->resource),
+                'manage_contributions' => Gate::allows('manageContributions', $this->resource),
                 'duplicate' => Gate::allows('duplicate', $this->resource),
                 'remove_from_collection' => $this->whenPivotLoaded('groups_collections', fn (): bool => Gate::allows('detachWordGroup', [$this->pivot->pivotParent, $this->resource])),
             ],

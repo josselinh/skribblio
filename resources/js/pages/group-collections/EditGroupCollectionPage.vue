@@ -14,7 +14,7 @@ import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
-import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
 import { useAuthStore } from '@/stores/auth';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
@@ -22,7 +22,8 @@ import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/mo
 /**
  * Edit page of a collection. The creator ("Gérer") finds its settings, its groups, its sharing and its deletion; a
  * contributor ("Contribuer") only adding groups and the groups they added (the others are on the collection page,
- * they cannot remove them). The listed groups are selectable at once, to remove several together.
+ * they cannot remove them), unless the creator gave them a full sharing: they then find every group. The listed
+ * groups are selectable at once, to remove several together.
  */
 const route = useRoute();
 const { t } = useI18n();
@@ -36,6 +37,8 @@ const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isUpdatingGroups = ref(false);
 
 const isCreator = computed(() => groupCollection.value?.can.update ?? false);
+/** The creator and the members with a full sharing manage every group; other contributors only those they added. */
+const managesEveryGroup = computed(() => groupCollection.value?.can.manage_contributions ?? false);
 const canEdit = computed(
     () => groupCollection.value !== null && (groupCollection.value.can.update || groupCollection.value.can.add_word_group),
 );
@@ -44,11 +47,11 @@ usePageTitle(() =>
     groupCollection.value ? t('groupCollections.edit.pageTitle', { title: title.value, name: groupCollection.value.name }) : null,
 );
 
-/** Every visible group is offered to the creator, only the ones they added to a contributor. */
+/** Every visible group is offered to the creator and full members, only the ones they added to a contributor. */
 const listedWordGroups = computed(() => {
     const wordGroups = groupCollection.value?.word_groups ?? [];
 
-    return isCreator.value ? wordGroups : wordGroups.filter((wordGroup) => wordGroup.added_by?.id === auth.user?.id);
+    return managesEveryGroup.value ? wordGroups : wordGroups.filter((wordGroup) => wordGroup.added_by?.id === auth.user?.id);
 });
 
 /** Groups already in the collection are left out of the search. */
@@ -71,9 +74,34 @@ async function loadGroupCollection(): Promise<void> {
 }
 
 /** Reloads the collection: opening or closing contributions changes which groups the user can remove. */
-async function saveGroupCollection(payload: NameVisibilityPayload): Promise<void> {
+/** Settings being edited, saved or not: the "Partage" section follows them before they are saved. */
+const settingsDraft = ref<NameVisibilityPayload | null>(null);
+const currentSettings = computed(() => settingsDraft.value ?? groupCollection.value);
+
+/**
+ * Whether the settings keep the collection shareable (open to contributions, private or members only): "Inviter" and the
+ * type of sharing are offered. Unchecking "Ouvert aux contributions" hides them at once, even before saving.
+ */
+const isInvitationOffered = computed(
+    () => (groupCollection.value?.can.share ?? false) && currentSettings.value !== null && isShareable(currentSettings.value),
+);
+
+/** Number of members, once `AccessManagement` loaded them: "Inviter" is highlighted while there is none. */
+const membersCount = ref<number | null>(null);
+
+/**
+ * "Partage" is shown to the creator while the collection is shareable, and otherwise as long as it has members, to manage
+ * (or revoke) them. `AccessManagement` stays mounted meanwhile, to count them.
+ */
+const isSharingShown = computed(() => isInvitationOffered.value || (membersCount.value ?? 0) > 0);
+
+/** When the new settings make the collection shareable, the confirmation invites to send the invitation link. */
+async function saveGroupCollection(payload: NameVisibilityPayload): Promise<string | void> {
+    const couldShare = groupCollection.value?.can.share ?? false;
     await updateGroupCollection(groupCollectionId.value, payload);
     await loadGroupCollection();
+
+    return !couldShare && groupCollection.value?.can.share ? t('editing.doneInvite.groupCollection') : undefined;
 }
 
 /** Error of a 422 response, or a generic message. */
@@ -222,12 +250,39 @@ const headingClass = 'text-lg font-semibold';
                         kind="group-collections"
                         :name-label="$t('groupCollections.fields.name')"
                         :save="saveGroupCollection"
+                        @change="settingsDraft = $event"
+                    />
+                </section>
+
+                <section
+                    v-if="groupCollection.can.manage_access"
+                    v-show="isSharingShown"
+                    :class="sectionClass"
+                    aria-labelledby="sharing-heading"
+                >
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h2 id="sharing-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.sharing') }}</h2>
+                        <ShareButton
+                            v-if="isInvitationOffered"
+                            kind="group-collections"
+                            :id="groupCollection.id"
+                            :purpose="accessPurpose"
+                            :prominent="membersCount === 0"
+                        />
+                    </div>
+                    <AccessManagement
+                        class="mt-4"
+                        kind="group-collections"
+                        :id="groupCollection.id"
+                        :purpose="accessPurpose"
+                        :inactive-reason="isInvitationOffered || !currentSettings ? null : inactiveSharingReason(currentSettings)"
+                        @members-count="membersCount = $event"
                     />
                 </section>
 
                 <section :class="sectionClass" aria-labelledby="groups-heading">
                     <h2 id="groups-heading" :class="headingClass">
-                        {{ isCreator ? $t('groupCollections.edit.sections.groups') : $t('groupCollections.edit.sections.ownGroups') }}
+                        {{ managesEveryGroup ? $t('groupCollections.edit.sections.groups') : $t('groupCollections.edit.sections.ownGroups') }}
                     </h2>
 
                     <div v-if="groupCollection.can.add_word_group" class="mt-4">
@@ -248,7 +303,7 @@ const headingClass = 'text-lg font-semibold';
                         v-if="listedWordGroups.length === 0"
                         class="mt-6 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400"
                     >
-                        {{ isCreator ? $t('groupCollections.show.empty') : $t('groupCollections.edit.noOwnGroups') }}
+                        {{ managesEveryGroup ? $t('groupCollections.show.empty') : $t('groupCollections.edit.noOwnGroups') }}
                     </p>
 
                     <template v-else>
@@ -324,14 +379,6 @@ const headingClass = 'text-lg font-semibold';
                         :error="removalError"
                         @confirm="removeSelectedWordGroups"
                     />
-                </section>
-
-                <section v-if="groupCollection.can.share" :class="sectionClass" aria-labelledby="sharing-heading">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                        <h2 id="sharing-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.sharing') }}</h2>
-                        <ShareButton kind="group-collections" :id="groupCollection.id" :purpose="accessPurpose" />
-                    </div>
-                    <AccessManagement class="mt-4" kind="group-collections" :id="groupCollection.id" :purpose="accessPurpose" />
                 </section>
 
                 <section v-if="groupCollection.can.delete" :class="sectionClass" aria-labelledby="deletion-heading">

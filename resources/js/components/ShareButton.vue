@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
-import { secondaryButtonClass } from '@/lib/buttons';
+import { primaryButtonClass, secondaryButtonClass } from '@/lib/buttons';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
@@ -10,12 +10,13 @@ import type { AccessPurpose, FavoriteKind } from '@/types/models';
 /**
  * "Inviter" button of a private group or collection, or of a public one open to its members only, opening a
  * modal with the access (or contribution) request link and its copy and regenerate actions. The link is
- * loaded on the first opening.
+ * loaded on the first opening. `prominent` styles it as the primary action (nobody was invited yet).
  */
 const props = defineProps<{
     kind: FavoriteKind;
     id: string;
     purpose: AccessPurpose;
+    prominent?: boolean;
 }>();
 
 const { showToast } = useToasts();
@@ -73,7 +74,7 @@ async function regenerate(): Promise<void> {
 <template>
     <button
         type="button"
-        :class="secondaryButtonClass"
+        :class="prominent ? primaryButtonClass : secondaryButtonClass"
         aria-haspopup="dialog"
         @click="open"
     >

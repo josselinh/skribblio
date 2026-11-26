@@ -5,6 +5,11 @@ declare(strict_types=1);
 return [
     'already_decided' => 'Cette demande a déjà été traitée.',
 
+    'not_shareable' => [
+        'word_group' => 'Ouvrez le groupe aux contributions pour accepter cette demande.',
+        'group_collection' => 'Ouvrez la collection aux contributions pour accepter cette demande.',
+    ],
+
     /*
      * Names the requested item after "accès" or "contribuer".
      */
@@ -38,6 +43,26 @@ return [
         'contribution_refused' => [
             'subject' => 'Demande de contribution refusée',
             'line' => ':creator a refusé votre demande de contribution :target.',
+        ],
+        'share_type' => [
+            'full' => [
+                'word_group' => 'Partage total : tant que le groupe est ouvert aux contributions, vous pouvez modifier et supprimer tous ses mots, y compris ceux des autres.',
+                'group_collection' => 'Partage total : tant que la collection est ouverte aux contributions, vous pouvez retirer tous ses groupes, y compris ceux ajoutés par d\'autres.',
+            ],
+            'partial' => [
+                'word_group' => 'Partage partiel : vous ne pouvez modifier et supprimer que vos propres mots.',
+                'group_collection' => 'Partage partiel : vous ne pouvez retirer que les groupes que vous avez ajoutés.',
+            ],
+        ],
+        'share_type_changed' => [
+            'subject' => [
+                'word_group' => 'Votre partage du groupe « :name » a changé',
+                'group_collection' => 'Votre partage de la collection « :name » a changé',
+            ],
+            'line' => [
+                'word_group' => ':creator a modifié votre partage du groupe « :name ».',
+                'group_collection' => ':creator a modifié votre partage de la collection « :name ».',
+            ],
         ],
     ],
 ];
