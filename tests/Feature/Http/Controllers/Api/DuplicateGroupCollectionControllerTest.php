@@ -69,21 +69,18 @@ class DuplicateGroupCollectionControllerTest extends TestCase
         $this->assertSame(1, GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->count());
     }
 
-    public function test_copies_the_private_groups_of_the_creator_seen_by_a_member_of_the_collection(): void
+    public function test_member_of_the_collection_does_not_copy_the_private_groups_of_its_creator_they_were_not_given(): void
     {
         $creator = User::factory()->create();
         $member = User::factory()->create();
-        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
-        Word::factory()->for($privateGroup)->create(['name' => 'secret']);
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached($privateGroup)->create();
+        $privateGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->hasAttached($privateGroup)->create();
         $groupCollection->members()->attach($member);
 
         $response = $this->actingAs($member)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
 
-        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 0);
-        $copiedGroup = GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->sole();
-        $this->assertTrue($copiedGroup->isCreatedBy($member));
-        $this->assertSame(['secret'], $copiedGroup->words()->pluck('name')->all());
+        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
     }
 
     public function test_links_the_visible_groups_without_copying_them_when_asked(): void
@@ -122,7 +119,7 @@ class DuplicateGroupCollectionControllerTest extends TestCase
     {
         $creator = User::factory()->create();
         $member = User::factory()->create();
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)
             ->hasAttached(WordGroup::factory()->public())
             ->create();
         $groupCollection->members()->attach($member);

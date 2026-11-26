@@ -17,10 +17,10 @@ class SharedWithMeControllerTest extends TestCase
     public function test_word_groups_lists_granted_groups_and_pending_link_requests_but_not_requests_sent_from_a_collection(): void
     {
         $user = User::factory()->create();
-        $grantedGroup = WordGroup::factory()->private()->create(['updated_at' => now()]);
+        $grantedGroup = WordGroup::factory()->private()->openToContributions()->create(['updated_at' => now()]);
         $grantedGroup->members()->attach($user);
         $pendingRequest = WordGroupAccessRequest::factory()
-            ->for(WordGroup::factory()->private()->state(['updated_at' => now()->subDay()]), 'item')
+            ->for(WordGroup::factory()->private()->openToContributions()->state(['updated_at' => now()->subDay()]), 'item')
             ->by($user)
             ->create();
         WordGroupAccessRequest::factory()->by($user)->create([
@@ -40,10 +40,10 @@ class SharedWithMeControllerTest extends TestCase
     public function test_group_collections_lists_granted_and_pending_collections(): void
     {
         $user = User::factory()->create();
-        $grantedCollection = GroupCollection::factory()->private()->create(['updated_at' => now()]);
+        $grantedCollection = GroupCollection::factory()->private()->openToContributions()->create(['updated_at' => now()]);
         $grantedCollection->members()->attach($user);
         GroupCollectionAccessRequest::factory()
-            ->for(GroupCollection::factory()->private()->state(['updated_at' => now()->subDay()]), 'item')
+            ->for(GroupCollection::factory()->private()->openToContributions()->state(['updated_at' => now()->subDay()]), 'item')
             ->by($user)
             ->create();
 

@@ -63,7 +63,7 @@ class WordGroupPolicyTest extends TestCase
 
         $this->assertTrue($creator->can('addWord', $publicGroup));
         $this->assertFalse(User::factory()->create()->can('addWord', $publicGroup));
-        $this->assertTrue($member->can('view', $privateGroup));
+        $this->assertFalse($member->can('view', $privateGroup));
         $this->assertFalse($member->can('addWord', $privateGroup));
     }
 
@@ -107,15 +107,15 @@ class WordGroupPolicyTest extends TestCase
         $creator = User::factory()->create();
         $member = User::factory()->create();
         $collectionMember = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
         $wordGroup->members()->attach($member);
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->create();
         $groupCollection->wordGroups()->attach($wordGroup);
         $groupCollection->members()->attach($collectionMember);
 
         $this->assertTrue($member->can('leave', $wordGroup));
         $this->assertFalse($creator->can('leave', $wordGroup));
-        $this->assertTrue($collectionMember->can('view', $wordGroup));
+        $this->assertFalse($collectionMember->can('view', $wordGroup));
         $this->assertFalse($collectionMember->can('leave', $wordGroup));
         $this->assertFalse(User::factory()->create()->can('leave', WordGroup::factory()->public()->create()));
     }

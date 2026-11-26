@@ -12,7 +12,8 @@ use Illuminate\Http\Request;
 /**
  * Share links, as opened by the people they were sent to: they see what is shared and can request access
  * (to see a private item, or to contribute to a public item open to its members only).
- * An unknown or regenerated token answers 404.
+ * An unknown or regenerated token answers 404, like the link of an item that can no longer be shared (closed to
+ * contributions, or public and open to everyone).
  */
 class ShareInvitationController extends Controller
 {
@@ -23,6 +24,7 @@ class ShareInvitationController extends Controller
 
     public function requestWordGroup(Request $request, WordGroup $wordGroup): ShareInvitationResource
     {
+        abort_unless($wordGroup->isShareable(), 404);
         $wordGroup->requestAccess($request->user());
 
         return $this->invitation($wordGroup, $request->user());
@@ -35,6 +37,7 @@ class ShareInvitationController extends Controller
 
     public function requestGroupCollection(Request $request, GroupCollection $groupCollection): ShareInvitationResource
     {
+        abort_unless($groupCollection->isShareable(), 404);
         $groupCollection->requestAccess($request->user());
 
         return $this->invitation($groupCollection, $request->user());
@@ -42,6 +45,8 @@ class ShareInvitationController extends Controller
 
     private function invitation(WordGroup|GroupCollection $item, User $user): ShareInvitationResource
     {
+        abort_unless($item->isShareable(), 404);
+
         $status = $item->hasAccess($user) ? 'accessible' : $item->accessRequestStatusOf($user);
 
         return new ShareInvitationResource($item->load('creator')->forceFill([

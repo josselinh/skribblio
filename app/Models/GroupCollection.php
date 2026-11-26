@@ -88,32 +88,15 @@ class GroupCollection extends Model
     }
 
     /**
-     * Once the user left: removes their favorite on the collection when they can no longer see it, and on
-     * its groups hidden from them since (the private groups of its creator, which it showed to them).
-     */
-    protected function removeFavoritesHiddenFrom(User $user): void
-    {
-        if (! $this->fresh()->isVisibleTo($user)) {
-            $this->favoritedBy()->detach($user);
-        }
-
-        $user->favoriteWordGroups()->detach(
-            $this->wordGroups()
-                ->whereNotIn('word_groups.id', WordGroup::query()->visibleTo($user)->select('word_groups.id'))
-                ->pluck('word_groups.id'),
-        );
-    }
-
-    /**
-     * Users granted access to this collection: to see it while private (they also see the private groups
-     * of the collection's creator that it contains), to contribute to it while public and open to its
-     * members only.
+     * Users granted access to this collection: to see it and contribute to it while private and open to
+     * contributions (its private groups stay hidden from them unless they are given access to each one), to
+     * contribute to it while public and open to its members only.
      *
      * @return BelongsToMany<User, $this>
      */
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'group_collection_members')->withTimestamps();
+        return $this->belongsToMany(User::class, 'group_collection_members')->withPivot('share_type')->withTimestamps();
     }
 
     /**

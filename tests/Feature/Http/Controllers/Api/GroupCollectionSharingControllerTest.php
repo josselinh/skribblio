@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\ShareType;
 use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\WordGroup;
@@ -17,7 +18,7 @@ class GroupCollectionSharingControllerTest extends TestCase
     public function test_share_link_points_to_the_collection_share_page(): void
     {
         $creator = User::factory()->create();
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->create();
 
         $url = $this->actingAs($creator)->getJson("/api/group-collections/{$groupCollection->id}/share-link")->assertOk()->json('data.url');
 
@@ -65,18 +66,15 @@ class GroupCollectionSharingControllerTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_member_leaving_a_private_collection_no_longer_sees_its_creators_private_groups(): void
+    public function test_member_leaving_a_private_collection_no_longer_sees_it(): void
     {
-        $creator = User::factory()->create();
         $member = User::factory()->create();
-        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached($privateGroup)->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->create();
         $groupCollection->members()->attach($member);
 
         $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
 
         $this->assertFalse($groupCollection->fresh()->isVisibleTo($member));
-        $this->assertFalse($privateGroup->fresh()->isVisibleTo($member));
     }
 
     public function test_leaving_returns_403_for_a_viewer_who_is_not_a_member(): void
@@ -89,21 +87,19 @@ class GroupCollectionSharingControllerTest extends TestCase
             ->assertJsonPath('message', 'Vous n’êtes pas membre de cette collection.');
     }
 
-    public function test_leaving_a_private_collection_removes_the_favorites_hidden_since(): void
+    public function test_leaving_a_private_collection_removes_it_from_favorites_but_not_its_groups(): void
     {
         $creator = User::factory()->create();
         $member = User::factory()->create();
-        $privateGroup = WordGroup::factory()->private()->createdBy($creator)->create();
         $publicGroup = WordGroup::factory()->public()->createdBy($creator)->create();
-        $groupCollection = GroupCollection::factory()->private()->createdBy($creator)->hasAttached([$privateGroup, $publicGroup])->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->hasAttached($publicGroup)->create();
         $groupCollection->members()->attach($member);
         $member->favoriteGroupCollections()->attach($groupCollection);
-        $member->favoriteWordGroups()->attach([$privateGroup->id, $publicGroup->id]);
+        $member->favoriteWordGroups()->attach($publicGroup);
 
         $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
 
         $this->assertDatabaseMissing('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
-        $this->assertDatabaseMissing('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $privateGroup->id]);
         $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $publicGroup->id]);
     }
 
@@ -117,5 +113,19 @@ class GroupCollectionSharingControllerTest extends TestCase
         $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
 
         $this->assertDatabaseHas('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
+    }
+
+    public function test_creator_changes_the_type_of_sharing_of_a_collection_member(): void
+    {
+        $creator = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->createdBy($creator)->create();
+        $groupCollection->members()->attach($member = User::factory()->create(), ['share_type' => 'full']);
+
+        $this->actingAs($creator)
+            ->patchJson("/api/group-collections/{$groupCollection->id}/members/{$member->id}", ['share_type' => 'partial'])
+            ->assertOk()
+            ->assertJsonPath('data.share_type', 'partial');
+
+        $this->assertSame(ShareType::Partial, $groupCollection->fresh()->shareTypeOf($member));
     }
 }

@@ -20,7 +20,7 @@ class ShareInvitationControllerTest extends TestCase
     public function test_show_describes_the_shared_group_without_its_id_until_access_is_granted(): void
     {
         $creator = User::factory()->create(['name' => 'Alice']);
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create(['name' => 'Animaux']);
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create(['name' => 'Animaux']);
 
         $this->actingAs(User::factory()->create())
             ->getJson('/api/share/word-groups/'.$wordGroup->ensureShareToken())
@@ -36,7 +36,7 @@ class ShareInvitationControllerTest extends TestCase
 
     public function test_show_gives_the_id_when_the_user_already_has_access(): void
     {
-        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
         $wordGroup->members()->attach($member = User::factory()->create());
 
         $this->actingAs($member)
@@ -48,7 +48,7 @@ class ShareInvitationControllerTest extends TestCase
     public function test_show_returns_404_for_unknown_or_regenerated_token(): void
     {
         $user = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
         $oldToken = $wordGroup->ensureShareToken();
         $wordGroup->regenerateShareToken();
 
@@ -61,7 +61,7 @@ class ShareInvitationControllerTest extends TestCase
         Notification::fake();
         $creator = User::factory()->wantsEmails()->create();
         $requester = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
         $token = $wordGroup->ensureShareToken();
 
         $this->actingAs($requester)->postJson("/api/share/word-groups/{$token}/access-request")
@@ -78,8 +78,8 @@ class ShareInvitationControllerTest extends TestCase
         Notification::fake();
         $creator = User::factory()->create(['email_notifications' => [EmailNotification::GroupCollectionAccessRequested->value => true]]);
         $requester = User::factory()->create();
-        $wordGroupToken = WordGroup::factory()->private()->createdBy($creator)->create()->ensureShareToken();
-        $groupCollectionToken = GroupCollection::factory()->private()->createdBy($creator)->create()->ensureShareToken();
+        $wordGroupToken = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create()->ensureShareToken();
+        $groupCollectionToken = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->create()->ensureShareToken();
 
         $this->actingAs($requester)->postJson("/api/share/word-groups/{$wordGroupToken}/access-request")->assertOk();
         $this->actingAs($requester)->postJson("/api/share/group-collections/{$groupCollectionToken}/access-request")->assertOk();
@@ -97,7 +97,7 @@ class ShareInvitationControllerTest extends TestCase
         Notification::fake();
         $requester = User::factory()->create();
         $request = WordGroupAccessRequest::factory()
-            ->for(WordGroup::factory()->private()->createdBy(User::factory()->wantsEmails()->create()), 'item')
+            ->for(WordGroup::factory()->private()->openToContributions()->createdBy(User::factory()->wantsEmails()->create()), 'item')
             ->refused()
             ->by($requester)
             ->create();
@@ -113,7 +113,7 @@ class ShareInvitationControllerTest extends TestCase
     {
         Notification::fake();
         $creator = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
 
         $this->actingAs($creator)
             ->postJson('/api/share/word-groups/'.$wordGroup->ensureShareToken().'/access-request')
@@ -126,7 +126,7 @@ class ShareInvitationControllerTest extends TestCase
     public function test_collection_request_creates_pending_request(): void
     {
         Notification::fake();
-        $groupCollection = GroupCollection::factory()->private()->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->create();
 
         $this->actingAs($requester = User::factory()->create())
             ->postJson('/api/share/group-collections/'.$groupCollection->ensureShareToken().'/access-request')
@@ -157,5 +157,17 @@ class ShareInvitationControllerTest extends TestCase
 
         $this->actingAs($requester)->getJson("/api/share/word-groups/{$token}")->assertJsonPath('data.status', 'accessible');
         $this->assertTrue($requester->can('addWord', $wordGroup->fresh()));
+    }
+
+    public function test_link_of_an_item_closed_to_contributions_returns_404(): void
+    {
+        $wordGroup = WordGroup::factory()->private()->closedToContributions()->create();
+        $token = $wordGroup->ensureShareToken();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->getJson("/api/share/word-groups/{$token}")->assertNotFound();
+        $this->actingAs($user)->postJson("/api/share/word-groups/{$token}/access-request")->assertNotFound();
+
+        $this->assertFalse($wordGroup->accessRequests()->exists());
     }
 }

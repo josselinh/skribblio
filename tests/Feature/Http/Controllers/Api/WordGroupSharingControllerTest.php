@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
-use App\Models\GroupCollection;
+use App\Enums\ShareType;
 use App\Models\User;
 use App\Models\WordGroup;
 use App\Models\WordGroupAccessRequest;
+use App\Notifications\ShareTypeChanged;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class WordGroupSharingControllerTest extends TestCase
@@ -16,7 +18,7 @@ class WordGroupSharingControllerTest extends TestCase
     public function test_share_link_is_generated_once_then_reused_without_touching_the_group(): void
     {
         $creator = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create(['updated_at' => now()->subWeek()]);
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create(['updated_at' => now()->subWeek()]);
 
         $firstUrl = $this->actingAs($creator)->getJson("/api/word-groups/{$wordGroup->id}/share-link")->assertOk()->json('data.url');
         $secondUrl = $this->actingAs($creator)->getJson("/api/word-groups/{$wordGroup->id}/share-link")->json('data.url');
@@ -29,7 +31,7 @@ class WordGroupSharingControllerTest extends TestCase
     public function test_regenerating_share_link_replaces_the_token(): void
     {
         $creator = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
         $oldToken = $wordGroup->ensureShareToken();
 
         $this->actingAs($creator)->postJson("/api/word-groups/{$wordGroup->id}/share-link")->assertOk();
@@ -92,7 +94,7 @@ class WordGroupSharingControllerTest extends TestCase
     public function test_member_leaves_the_group_and_can_ask_again(): void
     {
         $member = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
         $wordGroup->members()->attach($member);
         WordGroupAccessRequest::factory()->for($wordGroup, 'item')->by($member)->create(['status' => 'accepted']);
 
@@ -114,9 +116,8 @@ class WordGroupSharingControllerTest extends TestCase
     {
         $creator = User::factory()->create();
         $member = User::factory()->create();
-        $leftGroup = WordGroup::factory()->private()->createdBy($creator)->create();
-        $stillVisibleGroup = WordGroup::factory()->private()->createdBy($creator)->create();
-        GroupCollection::factory()->private()->createdBy($creator)->hasAttached($stillVisibleGroup)->create()->members()->attach($member);
+        $leftGroup = WordGroup::factory()->private()->openToContributions()->createdBy($creator)->create();
+        $stillVisibleGroup = WordGroup::factory()->openToMembersOnly()->createdBy($creator)->create();
         foreach ([$leftGroup, $stillVisibleGroup] as $wordGroup) {
             $wordGroup->members()->attach($member);
             $member->favoriteWordGroups()->attach($wordGroup);
@@ -127,5 +128,62 @@ class WordGroupSharingControllerTest extends TestCase
 
         $this->assertDatabaseMissing('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $leftGroup->id]);
         $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $stillVisibleGroup->id]);
+    }
+
+    public function test_creator_changes_the_type_of_sharing_of_a_member_who_is_notified(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create(['name' => 'Alice']);
+        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create(['name' => 'Animaux']);
+        $wordGroup->members()->attach($member = User::factory()->wantsEmails()->create());
+
+        $this->actingAs($creator)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/members/{$member->id}", ['share_type' => 'full'])
+            ->assertOk()
+            ->assertJsonPath('data.share_type', 'full');
+        $this->actingAs($creator)
+            ->getJson("/api/word-groups/{$wordGroup->id}/access")
+            ->assertJsonPath('data.members.0.share_type', 'full');
+
+        Notification::assertSentTo($member, ShareTypeChanged::class, function (ShareTypeChanged $notification) use ($member): bool {
+            $mail = $notification->toMail($member);
+
+            return $mail->subject === __('access_requests.mail.share_type_changed.subject.word_group', ['name' => 'Animaux'])
+                && in_array(__('access_requests.mail.share_type.full.word_group'), $mail->introLines, true);
+        });
+    }
+
+    public function test_setting_the_same_type_of_sharing_again_does_not_notify_the_member(): void
+    {
+        Notification::fake();
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup->members()->attach($member = User::factory()->wantsEmails()->create());
+
+        $this->actingAs($creator)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/members/{$member->id}", ['share_type' => 'partial'])
+            ->assertOk();
+
+        Notification::assertNothingSentTo($member);
+    }
+
+    public function test_changing_the_type_of_sharing_is_for_the_creator_and_members_only(): void
+    {
+        $creator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->createdBy($creator)->create();
+        $wordGroup->members()->attach($member = User::factory()->create());
+        $nonMember = User::factory()->create();
+
+        $this->actingAs($member)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/members/{$member->id}", ['share_type' => 'full'])
+            ->assertForbidden();
+        $this->actingAs($creator)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/members/{$nonMember->id}", ['share_type' => 'full'])
+            ->assertNotFound();
+        $this->actingAs($creator)
+            ->patchJson("/api/word-groups/{$wordGroup->id}/members/{$member->id}", ['share_type' => 'owner'])
+            ->assertJsonValidationErrors('share_type');
+
+        $this->assertSame(ShareType::Partial, $wordGroup->fresh()->shareTypeOf($member));
     }
 }
