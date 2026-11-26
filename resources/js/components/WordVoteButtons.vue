@@ -8,10 +8,11 @@ import type { Word, WordVote } from '@/types/models';
  * Thumbs up and down of a word with their counts. When the user may vote, clicking a thumb records
  * the vote, clicking it again removes it; the change is shown at once and reverted if the request fails.
  * Otherwise (group closed to contributions, author of the word, visitor) the same thumbs are only displayed,
- * the user's own vote still highlighted.
+ * the user's own vote still highlighted. With `readonly`, they are only displayed in any case (the edit page).
  */
 const props = defineProps<{
     word: Word;
+    readonly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -37,7 +38,7 @@ function withVote(word: Word, vote: WordVote | null): Word {
 }
 
 async function toggle(vote: WordVote): Promise<void> {
-    if (isSaving.value || !props.word.can.vote) {
+    if (isSaving.value || !props.word.can.vote || props.readonly) {
         return;
     }
     const previousWord = props.word;
@@ -69,7 +70,7 @@ function countOf(vote: WordVote): number {
     <div class="flex items-center gap-1.5 whitespace-nowrap">
         <template v-for="button in buttons" :key="button.vote">
             <button
-                v-if="word.can.vote"
+                v-if="word.can.vote && !readonly"
                 type="button"
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
                 :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-600 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'"

@@ -28,6 +28,25 @@
         "membersOnly": "Seules les personnes autorisées par le créateur de ce groupe peuvent y ajouter des mots. Demandez-lui son lien de partage pour lui proposer de contribuer.",
         "closed": "Ce groupe n’est pas ouvert aux contributions : seul son créateur peut modifier ses mots.",
         "empty": "Ce groupe ne contient encore aucun mot.",
-        "editWords": "Modifier les mots"
+        "manage": "Gérer",
+        "contribute": "Contribuer"
+    },
+    "edit": {
+        "title": {
+            "manage": "Gérer le groupe",
+            "contribute": "Contribuer au groupe"
+        },
+        "pageTitle": "{title} · {name}",
+        "back": "← {name}",
+        "forbidden": "Vous ne pouvez pas modifier ce groupe.",
+        "unsavedHint": "Enregistrez ou annulez vos modifications pour trier les mots ou changer de page.",
+        "sections": {
+            "settings": "Paramètres",
+            "words": "Mots",
+            "sharing": "Partage",
+            "deletion": "Supprimer le groupe",
+            "ownWords": "Vos mots"
+        },
+        "noOwnWords": "Vous n’avez encore ajouté aucun mot à ce groupe."
     }
 }

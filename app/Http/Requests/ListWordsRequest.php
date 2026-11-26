@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AuthorFilter;
 use App\Enums\SortDirection;
 use App\Enums\WordSort;
 use App\Models\WordGroup;
@@ -34,6 +35,7 @@ class ListWordsRequest extends FormRequest
         return [
             'sort' => ['nullable', $this->user() ? Rule::enum(WordSort::class) : Rule::enum(WordSort::class)->except(self::MEMBERS_ONLY_SORTS)],
             'direction' => ['nullable', Rule::enum(SortDirection::class)],
+            'author' => ['nullable', Rule::enum(AuthorFilter::class)->only($this->user() ? [AuthorFilter::All, AuthorFilter::Me] : [AuthorFilter::All])],
         ];
     }
 
@@ -42,7 +44,10 @@ class ListWordsRequest extends FormRequest
      */
     public function messages(): array
     {
-        return $this->user() ? [] : ['sort.enum' => __('search.login_required.word_sort')];
+        return $this->user() ? [] : [
+            'sort.enum' => __('search.login_required.word_sort'),
+            'author.enum' => __('search.login_required.author'),
+        ];
     }
 
     /**
@@ -56,6 +61,14 @@ class ListWordsRequest extends FormRequest
     public function direction(): SortDirection
     {
         return SortDirection::tryFrom((string) $this->validated('direction')) ?? $this->sort()->defaultDirection();
+    }
+
+    /**
+     * Every word by default; `me` keeps the current user's own (the edit page of a contributor).
+     */
+    public function author(): AuthorFilter
+    {
+        return AuthorFilter::tryFrom((string) $this->validated('author')) ?? AuthorFilter::All;
     }
 
     public function wordGroup(): WordGroup

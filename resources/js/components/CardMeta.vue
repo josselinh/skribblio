@@ -6,7 +6,7 @@ import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, User } from '@/types/models';
 
 /**
- * Details of a card, in the order of the page title of an item (`EditableNameVisibility`): "Créé par Bob", then
+ * Details of a card, in the order of the page title of an item (`ItemHeader`): "Créé par Bob", then
  * "Mise à jour le …". The creator's name links to their page, above the card's stretched link.
  */
 const props = defineProps<{

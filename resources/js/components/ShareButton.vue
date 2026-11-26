@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
-import { actionButtonClass } from '@/lib/actionsMenu';
+import { actionClass, type ActionAppearance } from '@/lib/actionsMenu';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
@@ -16,6 +16,8 @@ const props = defineProps<{
     kind: FavoriteKind;
     id: string;
     purpose: AccessPurpose;
+    /** Entry of the actions menu (default) or standalone button. */
+    appearance?: ActionAppearance;
 }>();
 
 const { showToast } = useToasts();
@@ -73,7 +75,7 @@ async function regenerate(): Promise<void> {
 <template>
     <button
         type="button"
-        :class="actionButtonClass"
+        :class="actionClass(appearance ?? 'menu-item')"
         aria-haspopup="dialog"
         @click="open"
     >

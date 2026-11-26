@@ -7,10 +7,13 @@ export interface WordOrder {
     direction: SortDirection;
 }
 
-/** Words of a group with their votes, in the given order (most recently added first by default). */
-export async function fetchWords(wordGroupId: string, page = 1, order?: WordOrder): Promise<WordsResponse> {
+/**
+ * Words of a group with their votes, in the given order (most recently added first by default); with `onlyMine`, only
+ * those of the current user (logged-in users only).
+ */
+export async function fetchWords(wordGroupId: string, page = 1, order?: WordOrder, onlyMine = false): Promise<WordsResponse> {
     const { data } = await http.get<WordsResponse>(`/api/word-groups/${wordGroupId}/words`, {
-        params: { page, ...order },
+        params: { page, ...order, author: onlyMine ? 'me' : undefined },
     });
 
     return data;

@@ -4,17 +4,19 @@ import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { deleteWords, updateWords, type WordRename } from '@/api/words';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import { useToasts } from '@/composables/useToasts';
 import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { Word } from '@/types/models';
 
 /**
- * Edit mode of a page of words: every word the user may update becomes a text field, saved all at once
- * (only the changed ones are sent; they are highlighted, each with a "Rétablir" button, and leaving edit mode
- * with changes asks for a confirmation), and the words they may delete get a checkbox for a bulk deletion.
- * The parent reloads the words on `deleted` (edit mode stays on, unsaved names are kept) and leaves edit
- * mode on `saved` and `cancel`.
+ * A page of words on the edit page of a group: every word the user may update becomes a text field, saved all at
+ * once (only the changed ones are sent; they are highlighted, each with a "Rétablir" button, and "Annuler" asks before
+ * discarding them), and the words they may delete get a checkbox for a bulk deletion; the votes of each word end its
+ * line, only displayed. The parent reloads the words on
+ * `saved` and `deleted` (unsaved names are kept), and is told the number of unsaved changes through `changed`, so that
+ * it can keep the user from changing page meanwhile.
  */
 const props = defineProps<{
     wordGroupId: string;
@@ -24,7 +26,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     saved: [savedCount: number];
     deleted: [deletedCount: number];
-    cancel: [];
+    changed: [changedCount: number];
 }>();
 
 const { showToast } = useToasts();
@@ -82,20 +84,23 @@ function restore(word: Word): void {
     nameErrors.value = errors;
 }
 
+watch(() => changedWords.value.length, (changedCount) => emit('changed', changedCount), { immediate: true });
+
 const isConfirmingCancel = ref(false);
 
-/** Leaving edit mode with unsaved changes asks for a confirmation. */
+/** Discarding the unsaved changes asks for a confirmation. */
 function cancel(): void {
-    if (changedWords.value.length > 0) {
-        isConfirmingCancel.value = true;
-    } else {
-        emit('cancel');
-    }
+    isConfirmingCancel.value = true;
 }
 
+/** Puts back the name of every word and forgets their errors. */
 function confirmCancel(): void {
     isConfirmingCancel.value = false;
-    emit('cancel');
+    for (const word of props.words) {
+        draftNames[word.id] = word.name;
+    }
+    nameErrors.value = {};
+    saveError.value = null;
 }
 
 function toggleAllDeletableWords(): void {
@@ -199,8 +204,8 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                 <div class="flex items-center gap-3">
                     <button
                         type="button"
-                        :disabled="isSaving"
-                        class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        :disabled="isSaving || changedWords.length === 0"
+                        class="disabled:cursor-not-allowed disabled:opacity-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                         @click="cancel"
                     >
                         {{ $t('common.cancel') }}
@@ -268,6 +273,8 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                             {{ word.name }}
                         </p>
                     </div>
+
+                    <WordVoteButtons class="mt-1.5 shrink-0" :word="word" readonly />
                 </li>
             </ul>
         </form>

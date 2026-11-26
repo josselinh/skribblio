@@ -24,7 +24,8 @@ const form = useForm({
 async function submit(): Promise<void> {
     await form.submit(async (data) => {
         const wordGroup = await createWordGroup(data);
-        await router.push({ name: 'word-groups.show', params: { id: wordGroup.id } });
+        // A new group has no word yet: its edit page lets the user add some right away.
+        await router.push({ name: 'word-groups.edit', params: { id: wordGroup.id } });
     });
 }
 </script>
