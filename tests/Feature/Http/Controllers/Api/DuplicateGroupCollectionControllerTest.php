@@ -37,7 +37,7 @@ class DuplicateGroupCollectionControllerTest extends TestCase
             ->assertJsonPath('data.name', 'Jeux (copie)')
             ->assertJsonPath('data.visibility', 'private')
             ->assertJsonPath('data.accepts_contributions', false)
-            ->assertJsonPath('data.hidden_word_groups_count', 0);
+            ->assertJsonMissingPath('data.hidden_word_groups_count');
         $copy = GroupCollection::findOrFail($response->json('data.id'));
         $this->assertTrue($copy->isCreatedBy($user));
         $copiedGroups = $copy->wordGroups()->get();
@@ -60,12 +60,12 @@ class DuplicateGroupCollectionControllerTest extends TestCase
         $publicGroup = WordGroup::factory()->public()->create();
         $groupCollection = GroupCollection::factory()->public()
             ->hasAttached($publicGroup)
-            ->hasAttached(WordGroup::factory()->private())
+            ->hasAttached(WordGroup::factory()->private()->openToContributions())
             ->create();
 
         $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
 
-        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $response->assertCreated()->assertJsonMissingPath('data.hidden_word_groups_count');
         $this->assertSame(1, GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->count());
     }
 
@@ -79,7 +79,7 @@ class DuplicateGroupCollectionControllerTest extends TestCase
 
         $response = $this->actingAs($member)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
 
-        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $response->assertCreated()->assertJsonMissingPath('data.hidden_word_groups_count');
         $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
     }
 
@@ -87,18 +87,18 @@ class DuplicateGroupCollectionControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $othersGroup = WordGroup::factory()->public()->create();
-        $ownGroup = WordGroup::factory()->private()->createdBy($user)->create();
+        $ownGroup = WordGroup::factory()->private()->openToContributions()->createdBy($user)->create();
         $groupCollection = GroupCollection::factory()->public()
             ->hasAttached($othersGroup)
             ->hasAttached($ownGroup)
-            ->hasAttached(WordGroup::factory()->private())
+            ->hasAttached(WordGroup::factory()->private()->openToContributions())
             ->create();
 
         $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate", [
             'copy_word_groups' => false,
         ]);
 
-        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $response->assertCreated()->assertJsonMissingPath('data.hidden_word_groups_count');
         $linkedGroups = GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->get();
         $this->assertEqualsCanonicalizing([$othersGroup->id, $ownGroup->id], $linkedGroups->modelKeys());
         $this->assertSame([$user->id], $linkedGroups->pluck('pivot.added_by')->unique()->values()->all());
@@ -138,11 +138,11 @@ class DuplicateGroupCollectionControllerTest extends TestCase
     public function test_copies_an_empty_collection_when_no_group_is_visible(): void
     {
         $user = User::factory()->create();
-        $groupCollection = GroupCollection::factory()->public()->create();
+        $groupCollection = GroupCollection::factory()->public()->hasAttached(WordGroup::factory()->private()->openToContributions())->create();
 
         $response = $this->actingAs($user)->postJson("/api/group-collections/{$groupCollection->id}/duplicate");
 
-        $response->assertCreated()->assertJsonPath('data.hidden_word_groups_count', 1);
+        $response->assertCreated()->assertJsonMissingPath('data.hidden_word_groups_count');
         $this->assertFalse(GroupCollection::findOrFail($response->json('data.id'))->wordGroups()->exists());
     }
 

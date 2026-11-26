@@ -23,8 +23,6 @@ export interface ExportedWordGroup {
 export interface GroupCollectionExport {
     /** Groups of the collection visible to the user, sorted by name. */
     word_groups: ExportedWordGroup[];
-    /** Groups of the collection hidden from the user (never which ones). */
-    hidden_word_groups_count: number;
 }
 
 /** Groups of a collection visible to the user, with their words. */

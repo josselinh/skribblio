@@ -144,20 +144,10 @@ export interface GroupCollection {
     };
 }
 
-/** A collection as returned by the duplication endpoint. */
-export interface DuplicatedGroupCollection extends GroupCollection {
-    /** Groups of the original hidden from the current user, and therefore not copied. */
-    hidden_word_groups_count: number;
-}
-
 /** A collection as returned by its detail endpoint. */
 export interface GroupCollectionDetail extends GroupCollection {
     /** Only the groups the current user can see. */
     word_groups: WordGroup[];
-    /** Groups of the collection hidden from the current user (private groups of other users). */
-    hidden_word_groups_count: number;
-    /** Hidden groups the current user already requested access to. */
-    hidden_word_groups_requested_count: number;
 }
 
 /** Who created the groups or collections returned by a search. */

@@ -1,6 +1,6 @@
 import { http } from '@/lib/http';
 import type { PaginatedResponse, ResourceResponse } from '@/types/api';
-import type { DuplicatedGroupCollection, GroupCollection, GroupCollectionDetail, Locale, Visibility } from '@/types/models';
+import type { GroupCollection, GroupCollectionDetail, Locale, Visibility } from '@/types/models';
 
 export interface GroupCollectionPayload {
     name: string;
@@ -46,7 +46,7 @@ export async function attachWordGroup(groupCollectionId: string, wordGroupId: st
 
 /**
  * Removes several groups from a collection at once: nothing is removed unless the user may remove every one
- * of them. Fails with a 422 when the collection would have no group left (hidden groups included).
+ * of them; the collection may be left empty.
  */
 export async function detachWordGroups(groupCollectionId: string, wordGroupIds: string[]): Promise<void> {
     await http.delete(`/api/group-collections/${groupCollectionId}/word-groups`, { data: { word_group_ids: wordGroupIds } });
@@ -54,10 +54,10 @@ export async function detachWordGroups(groupCollectionId: string, wordGroupIds: 
 
 /**
  * Copies a collection, with copies of the groups the user can see (their own groups are kept as they are),
- * into a new private collection of the current user. Tells how many hidden groups were not copied.
+ * into a new private collection of the current user. The groups hidden from the user are left out.
  */
-export async function duplicateGroupCollection(id: string, copyWordGroups = true): Promise<DuplicatedGroupCollection> {
-    const { data } = await http.post<ResourceResponse<DuplicatedGroupCollection>>(`/api/group-collections/${id}/duplicate`, {
+export async function duplicateGroupCollection(id: string, copyWordGroups = true): Promise<GroupCollection> {
+    const { data } = await http.post<ResourceResponse<GroupCollection>>(`/api/group-collections/${id}/duplicate`, {
         copy_word_groups: copyWordGroups,
     });
 

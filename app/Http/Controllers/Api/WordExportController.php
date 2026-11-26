@@ -30,7 +30,7 @@ class WordExportController extends Controller
 
     /**
      * The groups of the collection that the current user can see, sorted by name, each with its words
-     * sorted by name, and how many groups are hidden from them (never which ones). The SPA lets the user
+     * sorted by name (nothing tells that other groups are hidden from them). The SPA lets the user
      * pick which groups to export, and adds them to the export composer.
      */
     public function groupCollection(Request $request, GroupCollection $groupCollection): JsonResponse
@@ -44,7 +44,6 @@ class WordExportController extends Controller
             ->get(['word_groups.id', 'word_groups.name']);
 
         return response()->json(['data' => [
-            'hidden_word_groups_count' => $groupCollection->wordGroups()->count() - $wordGroups->count(),
             'word_groups' => $wordGroups->map(fn (WordGroup $wordGroup): array => [
                 'id' => $wordGroup->id,
                 'name' => $wordGroup->name,

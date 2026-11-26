@@ -54,12 +54,7 @@ async function duplicate(): Promise<void> {
             const copy = await duplicateGroupCollection(props.id, copiesWordGroups);
             isConfirming.value = false;
             await router.push({ name: 'group-collections.show', params: { id: copy.id } });
-            showToast(
-                t(
-                    copiesWordGroups ? 'duplication.done.groupCollection' : 'duplication.done.groupCollectionLinked',
-                    copy.hidden_word_groups_count,
-                ),
-            );
+            showToast(t(copiesWordGroups ? 'duplication.done.groupCollection' : 'duplication.done.groupCollectionLinked'));
         }
     } catch (caughtError) {
         error.value =
