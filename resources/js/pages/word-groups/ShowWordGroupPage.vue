@@ -253,7 +253,9 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
             <AddWordForm v-if="wordGroup.can.add_word" class="mt-6" :word-group-id="wordGroup.id" @added="onWordAdded" />
             <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
             <p v-else-if="!isMember && wordGroup.accepts_contributions" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                {{ auth.isAuthenticated ? $t('guest.verifyEmail') : $t('guest.contribute.wordGroup') }}
+                {{ auth.isAuthenticated
+                        ? $t('guest.verifyEmail')
+                        : $t(restrictsContributionsToMembers(wordGroup) ? 'guest.contributeMembersOnly.wordGroup' : 'guest.contribute.wordGroup') }}
             </p>
             <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
                 {{ $t('wordGroups.show.membersOnly') }}

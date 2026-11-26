@@ -6,5 +6,9 @@
         "wordGroup": "Créez un compte ou connectez-vous pour ajouter des mots à ce groupe et voter.",
         "groupCollection": "Créez un compte ou connectez-vous pour ajouter des groupes à cette collection."
     },
+    "contributeMembersOnly": {
+        "wordGroup": "Créez un compte ou connectez-vous pour voter. Pour ajouter des mots, demandez aussi au créateur de ce groupe son lien d’invitation.",
+        "groupCollection": "Créez un compte ou connectez-vous, et demandez au créateur de cette collection son lien d’invitation pour y ajouter des groupes."
+    },
     "lockedOption": "Connectez-vous pour utiliser cette option."
 }
