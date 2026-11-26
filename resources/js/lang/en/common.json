@@ -15,5 +15,6 @@
     "selectAll": "Select all",
     "deleteSelection": "Delete selection",
     "wordGroups": "Groups",
-    "groupCollections": "Collections"
+    "groupCollections": "Collections",
+    "actions": "Actions"
 }

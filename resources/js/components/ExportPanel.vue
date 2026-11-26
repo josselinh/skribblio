@@ -104,7 +104,7 @@ const linkButtonClass =
     <div>
         <button
             type="button"
-            class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
+            class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:py-2"
             :aria-expanded="isOpen"
             aria-controls="export-panel"
             @click="toggle"

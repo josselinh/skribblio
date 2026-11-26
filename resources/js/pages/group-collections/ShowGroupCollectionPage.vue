@@ -49,6 +49,9 @@ const accessPurpose = computed<AccessPurpose>(() =>
     groupCollection.value && restrictsContributionsToMembers(groupCollection.value) ? 'contribution' : 'access',
 );
 
+/** An empty collection has nothing to copy. */
+const canDuplicate = computed(() => (groupCollection.value?.can.duplicate ?? false) && (groupCollection.value?.word_groups.length ?? 0) > 0);
+
 const hiddenGroupsMessage = computed(() => {
     const count = groupCollection.value?.hidden_word_groups_count ?? 0;
 
@@ -265,6 +268,7 @@ watch(
                     :contributions-members-only="groupCollection.contributions_members_only"
                     kind="group-collections"
                     :creator="groupCollection.creator"
+                    :updated-at="groupCollection.updated_at"
                     :can-edit="groupCollection.can.update"
                     :name-label="$t('groupCollections.fields.name')"
                     :save="saveGroupCollection"
@@ -277,12 +281,11 @@ watch(
                             :name="groupCollection.name"
                         />
                     </template>
+                    <template #main-action>
+                        <ExportPanel kind="group-collections" :id="groupCollection.id" :note="exportNote" :locked="!isMember" />
+                    </template>
                     <template #actions>
-                        <DuplicateButton
-                            v-if="groupCollection.can.duplicate && groupCollection.word_groups.length > 0"
-                            kind="group-collections"
-                            :id="groupCollection.id"
-                        />
+                        <DuplicateButton v-if="canDuplicate" kind="group-collections" :id="groupCollection.id" />
                         <ShareButton
                             v-if="groupCollection.can.share"
                             kind="group-collections"
@@ -300,8 +303,6 @@ watch(
                     </template>
                 </EditableNameVisibility>
             </div>
-
-            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" :locked="!isMember" />
 
             <div
                 v-if="hiddenGroupsMessage"

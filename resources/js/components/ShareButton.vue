@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
+import { actionButtonClass } from '@/lib/actionsMenu';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
@@ -72,7 +73,7 @@ async function regenerate(): Promise<void> {
 <template>
     <button
         type="button"
-        class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800"
+        :class="actionButtonClass"
         aria-haspopup="dialog"
         @click="open"
     >

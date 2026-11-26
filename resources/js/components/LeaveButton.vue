@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { leaveItem } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
+import { dangerActionButtonClass } from '@/lib/actionsMenu';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Visibility } from '@/types/models';
 
@@ -62,7 +63,8 @@ async function confirmLeave(): Promise<void> {
 <template>
     <button
         type="button"
-        class="rounded-lg border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
+        :class="dangerActionButtonClass"
+        aria-haspopup="dialog"
         @click="askConfirmation"
     >
         {{ $t('leaving.button') }}
