@@ -21,6 +21,7 @@ function updateFavorite(isFavorite: boolean): void {
 
 <template>
     <ItemCard
+        kind="group-collections"
         :to="{ name: 'group-collections.show', params: { id: groupCollection.id } }"
         :name="groupCollection.name"
         :language="groupCollection.language"
@@ -30,7 +31,6 @@ function updateFavorite(isFavorite: boolean): void {
         :creator="groupCollection.creator"
         :count-label="groupCollection.word_groups_count === undefined ? undefined : $t('wordGroups.count', groupCollection.word_groups_count)"
         :updated-at="groupCollection.updated_at"
-        :updated-label="$t('groupCollections.card.updatedOn')"
         :is-accessible="groupCollection.is_accessible !== false"
         :inaccessible-message="groupCollection.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('groupCollections.card.becamePrivate')"
     >

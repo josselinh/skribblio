@@ -16,15 +16,11 @@ const emit = defineEmits<{
     favoriteSaved: [isFavorite: boolean];
 }>();
 
-/** Footer of a group listed by a collection: who added it (never told to guests) and when. */
-const additionKey = computed(() => {
-    const { added_by: addedBy, added_at: addedAt } = props.wordGroup;
-    if (addedBy === undefined) {
-        return 'wordGroups.card.addition.on';
-    }
-
-    return addedAt ? 'wordGroups.card.addition.byOn' : 'wordGroups.card.addition.by';
-});
+/**
+ * Footer of a group listed by a collection: "Ajouté par X", then "Le …" on the next line; guests, never told who added
+ * it, get "Ajouté le …".
+ */
+const isAdderShown = computed(() => props.wordGroup.added_by !== undefined);
 
 function updateFavorite(isFavorite: boolean): void {
     // The card's parent owns the data; it is kept in sync here so that the star reflects the change at once.
@@ -34,6 +30,7 @@ function updateFavorite(isFavorite: boolean): void {
 
 <template>
     <ItemCard
+        kind="word-groups"
         :to="{ name: 'word-groups.show', params: { id: wordGroup.id } }"
         :name="wordGroup.name"
         :language="wordGroup.language"
@@ -43,20 +40,23 @@ function updateFavorite(isFavorite: boolean): void {
         :creator="wordGroup.creator"
         :count-label="wordGroup.words_count === undefined ? undefined : $t('words.count', wordGroup.words_count)"
         :updated-at="wordGroup.updated_at"
-        :updated-label="$t('wordGroups.card.updatedOn')"
         :is-accessible="wordGroup.is_accessible !== false"
         :inaccessible-message="wordGroup.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('wordGroups.card.becamePrivate')"
     >
         <template v-if="wordGroup.added_by !== undefined || wordGroup.added_at" #footer>
-            <i18n-t :keypath="additionKey" scope="global">
-                <template #user>
-                    <UserLink v-if="wordGroup.added_by" :user="wordGroup.added_by" class="relative z-10" />
-                    <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
-                </template>
-                <template #date>
-                    <time v-if="wordGroup.added_at" :datetime="wordGroup.added_at">{{ formatDateTime(wordGroup.added_at) }}</time>
-                </template>
-            </i18n-t>
+            <p v-if="isAdderShown">
+                <i18n-t keypath="wordGroups.card.addition.by" scope="global">
+                    <template #user>
+                        <UserLink v-if="wordGroup.added_by" :user="wordGroup.added_by" class="relative z-10" />
+                        <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
+                    </template>
+                </i18n-t>
+            </p>
+            <p v-if="wordGroup.added_at">
+                <i18n-t :keypath="isAdderShown ? 'wordGroups.card.addition.date' : 'wordGroups.card.addition.on'" scope="global">
+                    <template #date><time :datetime="wordGroup.added_at">{{ formatDateTime(wordGroup.added_at) }}</time></template>
+                </i18n-t>
+            </p>
         </template>
         <template v-if="wordGroup.is_favorite !== undefined && wordGroup.access_status !== 'pending'" #favorite>
             <FavoriteButton
