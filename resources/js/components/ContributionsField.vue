@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Visibility } from '@/types/models';
 
 /**
  * "Open to contributions" checkbox of the group and collection forms. On a public item, it also lets the
- * creator open the contributions to everyone or only to the members they accept through the share link.
+ * creator open the contributions to everyone or only to the members they accept through the share link. When
+ * only invited people can contribute (private item, or members only), it says where the invitation link is:
+ * the "Partage" section of the edit page (`isCreation`: once the item is created).
  */
 const props = defineProps<{
     kind: FavoriteKind;
     visibility: Visibility;
+    isCreation?: boolean;
     error?: string;
     membersOnlyError?: string;
 }>();
@@ -20,6 +24,13 @@ const membersOnly = defineModel<boolean>('membersOnly', { required: true });
 const { t } = useI18n();
 
 const isGroup = computed(() => props.kind === 'word-groups');
+
+/** Contributors must be invited through the share link. */
+const needsInvitation = computed(() => model.value && (props.visibility === 'private' || membersOnly.value));
+
+const inviteHint = computed(() =>
+    props.isCreation ? t(`contributions.field.inviteHint.creation.${itemKey(props.kind)}`) : t('contributions.field.inviteHint.edition'),
+);
 
 const description = computed(() =>
     isGroup.value
@@ -69,5 +80,7 @@ const choices = computed(() => [
             </label>
             <p v-if="membersOnlyError" class="text-sm text-red-600 dark:text-red-400">{{ membersOnlyError }}</p>
         </fieldset>
+
+        <p v-if="needsInvitation" class="mt-2 pl-6 text-sm text-zinc-500 dark:text-zinc-400">{{ inviteHint }}</p>
     </div>
 </template>

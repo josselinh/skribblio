@@ -34,6 +34,7 @@ class CurrentUserTest extends TestCase
                     'word_group_access_requested' => false,
                     'group_collection_access_requested' => false,
                     'access_request_decided' => false,
+                    'share_type_changed' => false,
                     'word_group_favorited' => false,
                     'group_collection_favorited' => false,
                 ],

@@ -1,6 +1,6 @@
 import { http } from '@/lib/http';
 import type { PaginatedResponse, ResourceResponse } from '@/types/api';
-import type { AccessRequest, FavoriteKind, GroupCollection, ItemAccess, ShareInvitation, WordGroup } from '@/types/models';
+import type { AccessRequest, FavoriteKind, GroupCollection, ItemAccess, ShareInvitation, ShareType, WordGroup } from '@/types/models';
 
 /** Access request link of a private item, generated on first use (creator only). */
 export async function fetchShareLink(kind: FavoriteKind, id: string): Promise<string> {
@@ -22,6 +22,11 @@ export async function fetchItemAccess(kind: FavoriteKind, id: string): Promise<I
     return data.data;
 }
 
+/** Changes what a member may do (creator only). */
+export async function updateMemberShareType(kind: FavoriteKind, id: string, userId: string, shareType: ShareType): Promise<void> {
+    await http.patch(`/api/${kind}/${id}/members/${userId}`, { share_type: shareType });
+}
+
 export async function revokeAccess(kind: FavoriteKind, id: string, userId: string): Promise<void> {
     await http.delete(`/api/${kind}/${id}/members/${userId}`);
 }
@@ -38,8 +43,10 @@ export async function fetchReceivedAccessRequests(): Promise<AccessRequest[]> {
     return data.data;
 }
 
-export async function decideAccessRequest(accessRequest: AccessRequest, accept: boolean): Promise<void> {
-    await http.post(`/api/access-requests/${accessRequest.kind}/${accessRequest.id}/${accept ? 'accept' : 'refuse'}`);
+/** Accepts the request, with the type of sharing granted to the requester, or refuses it (no `shareType`). */
+export async function decideAccessRequest(accessRequest: AccessRequest, accept: boolean, shareType?: ShareType): Promise<void> {
+    const url = `/api/access-requests/${accessRequest.kind}/${accessRequest.id}/${accept ? 'accept' : 'refuse'}`;
+    await http.post(url, accept && shareType ? { share_type: shareType } : undefined);
 }
 
 export async function fetchShareInvitation(kind: FavoriteKind, token: string): Promise<ShareInvitation> {

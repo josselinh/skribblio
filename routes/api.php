@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('share-link', 'shareLink')->name('share-link.show');
             Route::post('share-link', 'regenerateShareLink')->name('share-link.regenerate');
             Route::get('access', 'access')->name('access.show');
+            Route::patch('members/{user}', 'updateMember')->name('members.update');
             Route::delete('members/{user}', 'revoke')->name('members.destroy');
             Route::delete('membership', 'leave')->name('membership.destroy');
         });
@@ -51,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('share-link', 'shareLink')->name('share-link.show');
             Route::post('share-link', 'regenerateShareLink')->name('share-link.regenerate');
             Route::get('access', 'access')->name('access.show');
+            Route::patch('members/{user}', 'updateMember')->name('members.update');
             Route::delete('members/{user}', 'revoke')->name('members.destroy');
             Route::delete('membership', 'leave')->name('membership.destroy');
             Route::post('hidden-word-groups/access-requests', 'requestHiddenWordGroups')->name('hidden-word-groups.access-requests.store');

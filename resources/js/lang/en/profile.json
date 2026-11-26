@@ -52,6 +52,7 @@
             "word_group_access_requested": "Someone asks for access to one of your groups, or to contribute to it",
             "group_collection_access_requested": "Someone asks for access to one of your collections, or to contribute to it",
             "access_request_decided": "One of your requests is accepted or refused",
+            "share_type_changed": "Your type of sharing of a group or collection changes",
             "word_group_favorited": "Someone adds one of your groups to their favorites",
             "group_collection_favorited": "Someone adds one of your collections to their favorites"
         }

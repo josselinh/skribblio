@@ -25,7 +25,7 @@ const themes: Theme[] = ['system', 'light', 'dark'];
 const emailSections: { title: string; notifications: EmailNotification[] }[] = [
     {
         title: 'profile.preferences.emails.accessRequests',
-        notifications: ['word_group_access_requested', 'group_collection_access_requested', 'access_request_decided'],
+        notifications: ['word_group_access_requested', 'group_collection_access_requested', 'access_request_decided', 'share_type_changed'],
     },
     {
         title: 'profile.preferences.emails.favorites',

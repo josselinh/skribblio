@@ -51,6 +51,7 @@ async function submit(): Promise<void> {
                 <LanguageField v-model="form.data.language" kind="group-collections" :error="form.errors.value.language" />
                 <VisibilityField v-model="form.data.visibility" :error="form.errors.value.visibility" />
                 <ContributionsField
+                    is-creation
                     v-model="form.data.accepts_contributions"
                     v-model:members-only="form.data.contributions_members_only"
                     :visibility="form.data.visibility"

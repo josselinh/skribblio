@@ -9,8 +9,8 @@
         "label": "Ouvert aux contributions",
         "who": "Qui peut contribuer ?",
         "description": {
-            "wordGroup": "Les personnes autorisées peuvent y ajouter des mots, et modifier ou supprimer les leurs. Fermé, seul vous pouvez modifier la liste ; les mots déjà ajoutés sont conservés.",
-            "groupCollection": "Les personnes autorisées peuvent y ajouter des groupes, et retirer ceux qu’elles ont ajoutés. Fermée, seul vous pouvez modifier ses groupes ; ceux déjà ajoutés sont conservés."
+            "wordGroup": "Les personnes autorisées peuvent y ajouter des mots, et modifier ou supprimer les leurs (ou tous les mots, avec un partage total). Fermé, seul vous pouvez modifier la liste ; les mots déjà ajoutés sont conservés. Privé et fermé, le groupe n’est visible que par vous : ses membres retrouvent leur accès s’il est rouvert.",
+            "groupCollection": "Les personnes autorisées peuvent y ajouter des groupes, et retirer ceux qu’elles ont ajoutés (ou tous les groupes, avec un partage total). Fermée, seul vous pouvez modifier ses groupes ; ceux déjà ajoutés sont conservés. Privée et fermée, la collection n’est visible que par vous : ses membres retrouvent leur accès si elle est rouverte."
         },
         "everyone": {
             "wordGroup": "Tous ceux qui voient le groupe",
@@ -20,6 +20,13 @@
         "membersOnly": {
             "label": "Uniquement les personnes que j’autorise",
             "description": "Tout le monde peut consulter, mais seules les personnes que vous acceptez via le lien de partage peuvent contribuer."
+        },
+        "inviteHint": {
+            "edition": "Après l’enregistrement, invitez ces personnes avec le lien de la section « Partage », juste en dessous.",
+            "creation": {
+                "wordGroup": "Une fois le groupe créé, invitez ces personnes avec le lien de la section « Partage ».",
+                "groupCollection": "Une fois la collection créée, invitez ces personnes avec le lien de la section « Partage »."
+            }
         }
     }
 }

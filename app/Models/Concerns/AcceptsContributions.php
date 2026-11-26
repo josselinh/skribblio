@@ -39,12 +39,23 @@ trait AcceptsContributions
     }
 
     /**
+     * Whether the user can change or remove every contribution, whoever made it: the creator always can, a
+     * member with a full sharing (see Shareable::sharesFullyWith()) while the item is open to them.
+     */
+    public function allowsChangingEveryContribution(User $user): bool
+    {
+        return $this->isCreatedBy($user)
+            || ($this->isContributor($user) && $this->sharesFullyWith($user));
+    }
+
+    /**
      * Whether the user can change or remove a contribution made by the given user (null when that user
-     * was deleted): the creator always can, a contributor only their own, while the item is open to them.
+     * was deleted): the creator always can, a member with a full sharing any of them and another contributor
+     * only their own, while the item is open to them.
      */
     public function allowsChangingContributionOf(User $user, ?string $contributorId): bool
     {
-        return $this->isCreatedBy($user)
+        return $this->allowsChangingEveryContribution($user)
             || ($contributorId === $user->getKey() && $this->isContributor($user));
     }
 

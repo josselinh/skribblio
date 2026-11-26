@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import { isAxiosError } from 'axios';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import { decideAccessRequest } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import ShareTypeField from '@/components/ShareTypeField.vue';
 import UserLink from '@/components/UserLink.vue';
 import { useToasts } from '@/composables/useToasts';
 import { formatDateTime } from '@/lib/format';
 import { itemKey } from '@/lib/i18n';
-import type { AccessRequest } from '@/types/models';
+import type { ValidationErrorResponse } from '@/types/api';
+import type { AccessRequest, ShareType } from '@/types/models';
 
-/** One pending access (or contribution) request with its Accept and Refuse buttons; the decision is confirmed in a notification. */
+/**
+ * One pending access (or contribution) request with its Accept and Refuse buttons; accepting asks for the type of
+ * sharing (partial by default) and the decision is confirmed in a notification.
+ */
 const props = withDefaults(
     defineProps<{
         accessRequest: AccessRequest;
@@ -34,7 +40,16 @@ const requestKeypath = computed(
 
 const isDeciding = ref(false);
 const hasFailed = ref(false);
+/** Reason given by the server for a refused decision (e.g. the item is closed to contributions). */
+const failureMessage = ref<string | null>(null);
 const isConfirmingAcceptance = ref(false);
+const shareType = ref<ShareType>('partial');
+
+function openAcceptance(): void {
+    shareType.value = 'partial';
+    hasFailed.value = false;
+    isConfirmingAcceptance.value = true;
+}
 
 const acceptanceMessage = computed(() => {
     const { requester, item, kind, purpose } = props.accessRequest;
@@ -45,13 +60,17 @@ const acceptanceMessage = computed(() => {
 async function decide(accept: boolean): Promise<void> {
     isDeciding.value = true;
     hasFailed.value = false;
+    failureMessage.value = null;
     try {
-        await decideAccessRequest(props.accessRequest, accept);
+        await decideAccessRequest(props.accessRequest, accept, accept ? shareType.value : undefined);
         isConfirmingAcceptance.value = false;
         emit('decided', props.accessRequest, accept);
         showToast(t(accept ? 'sharing.request.accepted' : 'sharing.request.refused', { name: props.accessRequest.requester.name }));
-    } catch {
+    } catch (error) {
         hasFailed.value = true;
+        failureMessage.value = isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
+            ? (error.response.data.errors.status?.[0] ?? null)
+            : null;
     } finally {
         isDeciding.value = false;
     }
@@ -83,7 +102,7 @@ async function decide(accept: boolean): Promise<void> {
                     {{ formatDateTime(accessRequest.created_at) }}
                 </time>
             </p>
-            <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">{{ $t('common.unexpectedError') }}</p>
+            <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">{{ failureMessage ?? $t('common.unexpectedError') }}</p>
         </div>
         <div class="flex gap-2">
             <button
@@ -99,7 +118,7 @@ async function decide(accept: boolean): Promise<void> {
                 :disabled="isDeciding"
                 class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                 aria-haspopup="dialog"
-                @click="isConfirmingAcceptance = true"
+                @click="openAcceptance"
             >
                 {{ $t('sharing.request.accept') }}
             </button>
@@ -113,8 +132,10 @@ async function decide(accept: boolean): Promise<void> {
             :confirm-label="$t('sharing.request.accept')"
             :processing-label="$t('sharing.accept.processing')"
             :is-processing="isDeciding"
-            :error="hasFailed ? $t('common.unexpectedError') : null"
+            :error="hasFailed ? (failureMessage ?? $t('common.unexpectedError')) : null"
             @confirm="decide(true)"
-        />
+        >
+            <ShareTypeField v-model="shareType" :kind="accessRequest.kind" />
+        </ConfirmDialog>
     </li>
 </template>

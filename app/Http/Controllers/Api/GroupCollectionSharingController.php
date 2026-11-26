@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\ManagesSharing;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateMemberRequest;
 use App\Models\GroupCollection;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -38,6 +39,14 @@ class GroupCollectionSharingController extends Controller
     public function access(GroupCollection $groupCollection): JsonResponse
     {
         return $this->accessResponse($groupCollection);
+    }
+
+    /**
+     * Changes the type of sharing of a member.
+     */
+    public function updateMember(UpdateMemberRequest $request, GroupCollection $groupCollection, User $user): JsonResponse
+    {
+        return $this->updateMemberResponse($request);
     }
 
     public function revoke(GroupCollection $groupCollection, User $user): Response

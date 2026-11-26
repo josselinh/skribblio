@@ -4,7 +4,7 @@ import ModalDialog from '@/components/ModalDialog.vue';
 /**
  * Modal confirmation of an action, built on `ModalDialog`: destructive by default (red confirm button), or
  * neutral with `tone="primary"` (e.g. granting access). "Annuler" gets the focus; nothing closes it while
- * `isProcessing`. Emits `confirm`; the parent closes it.
+ * `isProcessing`. Emits `confirm`; the parent closes it. The default slot adds content (e.g. a choice) under the message.
  */
 const isOpen = defineModel<boolean>('open', { required: true });
 
@@ -28,6 +28,7 @@ const emit = defineEmits<{ confirm: [] }>();
 <template>
     <ModalDialog v-model:open="isOpen" :title="title" role="alertdialog" :is-dismissible="!isProcessing">
         <p>{{ message }}</p>
+        <slot />
         <p v-if="error" role="alert" class="mt-3 text-red-600 dark:text-red-400">{{ error }}</p>
 
         <template #actions>

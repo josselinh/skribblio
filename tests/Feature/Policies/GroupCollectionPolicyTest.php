@@ -134,4 +134,18 @@ class GroupCollectionPolicyTest extends TestCase
         $this->assertFalse($creator->can('leave', $groupCollection));
         $this->assertFalse(User::factory()->create()->can('leave', $groupCollection));
     }
+
+    public function test_member_with_a_full_sharing_removes_groups_added_by_others(): void
+    {
+        $creator = User::factory()->create();
+        $groupCollection = GroupCollection::factory()->openToMembersOnly()->createdBy($creator)->create();
+        $groupCollection->members()->attach($fullMember = User::factory()->create(), ['share_type' => 'full']);
+        $groupCollection->members()->attach($partialMember = User::factory()->create());
+        $wordGroup = WordGroup::factory()->public()->create();
+        $groupCollection->wordGroups()->attach($wordGroup, ['added_by' => $creator->id]);
+
+        $this->assertTrue($fullMember->can('detachWordGroup', [$groupCollection, $wordGroup]));
+        $this->assertFalse($partialMember->can('detachWordGroup', [$groupCollection, $wordGroup]));
+        $this->assertFalse($fullMember->can('update', $groupCollection));
+    }
 }

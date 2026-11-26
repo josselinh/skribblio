@@ -16,4 +16,5 @@ return [
     'accepts_contributions' => 'open to contributions',
     'contributions_members_only' => 'contributions from members only',
     'copy_word_groups' => 'copy the groups',
+    'share_type' => 'type of sharing',
 ];
