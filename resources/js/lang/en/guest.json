@@ -6,5 +6,9 @@
         "wordGroup": "Sign up or log in to add words to this group and vote.",
         "groupCollection": "Sign up or log in to add groups to this collection."
     },
+    "contributeMembersOnly": {
+        "wordGroup": "Sign up or log in to vote. To add words, also ask the creator of this group for their invite link.",
+        "groupCollection": "Sign up or log in, and ask the creator of this collection for their invite link to add groups to it."
+    },
     "lockedOption": "Log in to use this option."
 }

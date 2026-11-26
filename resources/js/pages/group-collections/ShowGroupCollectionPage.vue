@@ -370,7 +370,9 @@ watch(
 
                 <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
                 <p v-else-if="!isMember && groupCollection.accepts_contributions" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                    {{ auth.isAuthenticated ? $t('guest.verifyEmail') : $t('guest.contribute.groupCollection') }}
+                    {{ auth.isAuthenticated
+                        ? $t('guest.verifyEmail')
+                        : $t(restrictsContributionsToMembers(groupCollection) ? 'guest.contributeMembersOnly.groupCollection' : 'guest.contribute.groupCollection') }}
                 </p>
                 <p v-else-if="restrictsContributionsToMembers(groupCollection)" class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                     {{ $t('groupCollections.show.membersOnly') }}
