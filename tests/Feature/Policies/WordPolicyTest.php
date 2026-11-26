@@ -53,40 +53,21 @@ class WordPolicyTest extends TestCase
         $this->assertTrue($groupCreator->can($ability, $word));
     }
 
-    public function test_whoever_can_see_an_open_group_can_vote_except_the_author_of_the_word(): void
+    public function test_whoever_can_see_the_group_votes_open_or_closed_author_included(): void
     {
-        $groupCreator = User::factory()->create();
         $author = User::factory()->create();
-        $word = Word::factory()
-            ->for(WordGroup::factory()->public()->openToContributions()->createdBy($groupCreator))
-            ->createdBy($author)
-            ->create();
+        $openWord = Word::factory()->for(WordGroup::factory()->public()->openToContributions())->createdBy($author)->create();
+        $closedWord = Word::factory()->for(WordGroup::factory()->public()->closedToContributions())->createdBy($author)->create();
 
-        $this->assertTrue(User::factory()->create()->can('vote', $word));
-        $this->assertTrue($groupCreator->can('vote', $word));
-        $this->assertFalse($author->can('vote', $word));
+        $this->assertTrue(User::factory()->create()->can('vote', $openWord));
+        $this->assertTrue(User::factory()->create()->can('vote', $closedWord));
+        $this->assertTrue($author->can('vote', $openWord));
     }
 
-    public function test_nobody_can_vote_once_the_group_is_closed(): void
+    public function test_users_who_cannot_see_the_group_cannot_vote(): void
     {
-        $groupCreator = User::factory()->create();
-        $word = Word::factory()
-            ->for(WordGroup::factory()->public()->closedToContributions()->createdBy($groupCreator))
-            ->createdBy(User::factory()->create())
-            ->create();
+        $word = Word::factory()->for(WordGroup::factory()->private()->openToContributions())->create();
 
-        $this->assertFalse(User::factory()->create()->can('vote', $word));
-        $this->assertFalse($groupCreator->can('vote', $word));
-    }
-
-    public function test_only_members_can_vote_in_an_open_private_group(): void
-    {
-        $member = User::factory()->create();
-        $wordGroup = WordGroup::factory()->private()->openToContributions()->create();
-        $wordGroup->members()->attach($member);
-        $word = Word::factory()->for($wordGroup)->create();
-
-        $this->assertTrue($member->can('vote', $word));
         $this->assertFalse(User::factory()->create()->can('vote', $word));
     }
 
@@ -104,5 +85,38 @@ class WordPolicyTest extends TestCase
 
         $this->assertTrue(User::factory()->create()->can('vote', $word));
         $this->assertTrue($wordGroup->creator->can('vote', $word));
+    }
+
+    #[TestWith(['update'])]
+    #[TestWith(['delete'])]
+    public function test_member_with_a_full_sharing_manages_every_word_while_the_group_is_open(string $ability): void
+    {
+        $groupCreator = User::factory()->create();
+        $wordGroup = WordGroup::factory()->private()->openToContributions()->createdBy($groupCreator)->create();
+        $wordGroup->members()->attach($fullMember = User::factory()->create(), ['share_type' => 'full']);
+        $wordGroup->members()->attach($partialMember = User::factory()->create(), ['share_type' => 'partial']);
+        $word = Word::factory()->for($wordGroup)->createdBy($groupCreator)->create();
+
+        $this->assertTrue($fullMember->can($ability, $word));
+        $this->assertTrue($fullMember->can('manageContributions', $wordGroup));
+        $this->assertFalse($partialMember->can($ability, $word));
+        $this->assertFalse($partialMember->can('manageContributions', $wordGroup));
+
+        $wordGroup->update(['accepts_contributions' => false]);
+
+        $this->assertFalse($fullMember->can($ability, $word->fresh()));
+    }
+
+    public function test_full_sharing_no_longer_applies_once_the_group_is_open_to_everyone(): void
+    {
+        $wordGroup = WordGroup::factory()->openToMembersOnly()->create();
+        $wordGroup->members()->attach($member = User::factory()->create(), ['share_type' => 'full']);
+        $word = Word::factory()->for($wordGroup)->createdBy($wordGroup->creator)->create();
+
+        $this->assertTrue($member->can('update', $word));
+
+        $wordGroup->update(['contributions_members_only' => false]);
+
+        $this->assertFalse($member->can('update', $word->fresh()));
     }
 }

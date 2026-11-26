@@ -62,14 +62,14 @@ class WordVoteControllerTest extends TestCase
         $this->assertDatabaseCount('word_votes', 0);
     }
 
-    public function test_update_returns_403_for_the_author_of_the_word(): void
+    public function test_author_votes_for_their_own_word(): void
     {
         $author = User::factory()->create();
         $word = Word::factory()->for(WordGroup::factory()->public()->openToContributions())->createdBy($author)->create();
 
-        $this->actingAs($author)->putJson("/api/words/{$word->id}/vote", ['vote' => 'up'])->assertForbidden();
+        $this->actingAs($author)->putJson("/api/words/{$word->id}/vote", ['vote' => 'up'])->assertOk();
 
-        $this->assertDatabaseCount('word_votes', 0);
+        $this->assertDatabaseHas('word_votes', ['word_id' => $word->id, 'user_id' => $author->id, 'value' => 1]);
     }
 
     public function test_update_returns_404_for_a_word_of_a_private_group_of_another_user(): void
@@ -96,7 +96,7 @@ class WordVoteControllerTest extends TestCase
         $this->assertDatabaseMissing('word_votes', ['word_id' => $word->id, 'user_id' => $user->id]);
     }
 
-    public function test_votes_are_kept_but_cannot_be_removed_once_the_group_is_closed(): void
+    public function test_votes_stay_open_once_the_group_is_closed_to_contributions(): void
     {
         $user = User::factory()->create();
         $wordGroup = WordGroup::factory()->public()->openToContributions()->create();
@@ -104,8 +104,8 @@ class WordVoteControllerTest extends TestCase
         $word->voteFor($user, WordVote::Up);
         $wordGroup->update(['accepts_contributions' => false]);
 
-        $this->actingAs($user)->deleteJson("/api/words/{$word->id}/vote")->assertForbidden();
+        $this->actingAs($user)->deleteJson("/api/words/{$word->id}/vote")->assertOk();
 
-        $this->assertDatabaseHas('word_votes', ['word_id' => $word->id, 'user_id' => $user->id]);
+        $this->assertDatabaseMissing('word_votes', ['word_id' => $word->id, 'user_id' => $user->id]);
     }
 }
