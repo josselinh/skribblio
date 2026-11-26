@@ -425,7 +425,7 @@ watch(
 
                 <ul
                     v-if="groupCollection.word_groups.length > 0"
-                    class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
                     :class="{ 'opacity-60': isUpdatingGroups }"
                 >
                     <li v-for="wordGroup in groupCollection.word_groups" :key="wordGroup.id" class="relative">

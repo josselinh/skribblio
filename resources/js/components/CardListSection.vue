@@ -58,7 +58,7 @@ defineSlots<{
             </slot>
         </div>
         <template v-else-if="result">
-            <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" :class="{ 'opacity-60': isLoading }">
+            <ul class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" :class="{ 'opacity-60': isLoading }">
                 <li v-for="item in result.data" :key="item.id">
                     <slot name="item" :item="item" />
                 </li>
