@@ -11,6 +11,7 @@ import ExportPanel from '@/components/ExportPanel.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemHeader from '@/components/ItemHeader.vue';
 import LeaveButton from '@/components/LeaveButton.vue';
+import PendingAccessRequests from '@/components/PendingAccessRequests.vue';
 import PaginationNav from '@/components/PaginationNav.vue';
 import WordListItem from '@/components/WordListItem.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
@@ -23,7 +24,7 @@ import type { WordsResponse } from '@/types/api';
 import type { Word, WordGroup, WordSort } from '@/types/models';
 
 /**
- * Page of a group, made for reading: its title, the export, the actions that do not change it (duplicate, add to a
+ * Page of a group, made for reading: its title, the pending access requests (creator only), the export, the actions that do not change it (duplicate, add to a
  * collection, leave) and its words with their votes. Changing it happens on its edit page (`EditWordGroupPage`),
  * reached through "Gérer" (creator) or "Contribuer" (contributors).
  */
@@ -127,6 +128,8 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                     />
                 </template>
             </ItemHeader>
+
+            <PendingAccessRequests v-if="wordGroup.can.manage_access" class="mt-4" kind="word-groups" :id="wordGroup.id" />
 
             <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id">
                 <template #actions>

@@ -12,6 +12,7 @@ import ExportPanel from '@/components/ExportPanel.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemHeader from '@/components/ItemHeader.vue';
 import LeaveButton from '@/components/LeaveButton.vue';
+import PendingAccessRequests from '@/components/PendingAccessRequests.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
@@ -21,7 +22,7 @@ import { useAuthStore } from '@/stores/auth';
 import type { GroupCollectionDetail } from '@/types/models';
 
 /**
- * Page of a collection, made for reading: its title, the export, the actions that do not change it (duplicate, leave),
+ * Page of a collection, made for reading: its title, the pending access requests (creator only), the export, the actions that do not change it (duplicate, leave),
  * the groups hidden from the user (with an access request) and its groups. Changing it happens on its edit page
  * (`EditGroupCollectionPage`), reached through "Gérer" (creator) or "Contribuer" (contributors).
  */
@@ -158,6 +159,8 @@ watch(
                     />
                 </template>
             </ItemHeader>
+
+            <PendingAccessRequests v-if="groupCollection.can.manage_access" class="mt-4" kind="group-collections" :id="groupCollection.id" />
 
             <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :note="exportNote" :locked="!isMember">
                 <template #actions>
