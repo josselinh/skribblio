@@ -80,7 +80,7 @@ trait ManagesSharing
 
     /**
      * The current user gives up their membership, as if the creator had revoked it (they can ask again
-     * through the share link), and loses their favorites on what they can no longer see.
+     * through the share link). Their favorites are kept, hidden while they cannot see the item.
      */
     protected function leaveResponse(WordGroup|GroupCollection $item, User $user): Response
     {

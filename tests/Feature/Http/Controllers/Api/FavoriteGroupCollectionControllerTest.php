@@ -80,7 +80,7 @@ class FavoriteGroupCollectionControllerTest extends TestCase
         $this->assertSame(0, $user->favoriteGroupCollections()->count());
     }
 
-    public function test_index_lists_favorites_most_recently_added_first_and_flags_items_that_became_private(): void
+    public function test_index_lists_favorites_most_recently_added_first_and_hides_items_that_became_private_without_removing_them(): void
     {
         $user = User::factory()->create();
         $olderFavorite = GroupCollection::factory()->public()->create();
@@ -93,9 +93,9 @@ class FavoriteGroupCollectionControllerTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/favorites/group-collections');
 
         $response->assertOk()
-            ->assertJsonPath('data.*.id', [$newerFavorite->id, $olderFavorite->id])
-            ->assertJsonPath('data.*.is_accessible', [true, false])
-            ->assertJsonPath('data.*.is_favorite', [true, true]);
+            ->assertJsonPath('data.*.id', [$newerFavorite->id])
+            ->assertJsonPath('data.*.is_favorite', [true]);
+        $this->assertTrue($user->favoriteGroupCollections()->whereKey($olderFavorite->id)->exists());
     }
 
     public function test_own_list_flags_favorites(): void

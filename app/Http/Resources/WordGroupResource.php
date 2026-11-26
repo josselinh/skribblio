@@ -15,8 +15,7 @@ class WordGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array. `can` tells the SPA which actions the current user may perform;
-     * `creator` (never for guests: the names of the users are only shown to logged-in users), `words_count` and `is_favorite` are only included when loaded; `is_accessible` only in the
-     * favorites list, where groups that became private are flagged with `false`; `can.remove_from_collection`
+     * `creator` (never for guests: the names of the users are only shown to logged-in users), `words_count` and `is_favorite` are only included when loaded; `can.remove_from_collection`
      * only when listed through a collection, like `added_at` (when it was added to the collection) and `added_by` (who added it,
      * null once that user was deleted; never for guests, and only when loaded).
      *
@@ -41,8 +40,6 @@ class WordGroupResource extends JsonResource
             'added_at' => $this->whenPivotLoaded('groups_collections', fn (): ?string => $this->pivot->created_at?->toIso8601String()),
             'words_count' => $this->whenCounted('words'),
             'is_favorite' => $this->whenHas('is_favorite', fn (mixed $isFavorite): bool => (bool) $isFavorite),
-            'is_accessible' => $this->whenHas('is_accessible'),
-            'access_status' => $this->whenHas('access_status'),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'can' => [

@@ -9,8 +9,7 @@
             "by": "Added by {user}",
             "on": "Added on {date}",
             "date": "On {date}"
-        },
-        "becamePrivate": "This group became private: you no longer have access to it."
+        }
     },
     "create": {
         "title": "New group",

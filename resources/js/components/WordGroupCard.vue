@@ -40,8 +40,6 @@ function updateFavorite(isFavorite: boolean): void {
         :creator="wordGroup.creator"
         :count-label="wordGroup.words_count === undefined ? undefined : $t('words.count', wordGroup.words_count)"
         :updated-at="wordGroup.updated_at"
-        :is-accessible="wordGroup.is_accessible !== false"
-        :inaccessible-message="wordGroup.access_status === 'pending' ? $t('sharing.pendingRequest') : $t('wordGroups.card.becamePrivate')"
     >
         <template v-if="wordGroup.added_by !== undefined || wordGroup.added_at" #footer>
             <p v-if="isAdderShown">
@@ -58,7 +56,7 @@ function updateFavorite(isFavorite: boolean): void {
                 </i18n-t>
             </p>
         </template>
-        <template v-if="wordGroup.is_favorite !== undefined && wordGroup.access_status !== 'pending'" #favorite>
+        <template v-if="wordGroup.is_favorite !== undefined" #favorite>
             <FavoriteButton
                 kind="word-groups"
                 :id="wordGroup.id"

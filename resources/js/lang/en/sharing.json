@@ -1,5 +1,4 @@
 {
-    "pendingRequest": "Access request pending.",
     "request": {
         "access": {
             "withoutItem": "{user} is asking for access",

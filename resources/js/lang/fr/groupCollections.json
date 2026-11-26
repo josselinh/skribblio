@@ -1,7 +1,4 @@
 {
-    "card": {
-        "becamePrivate": "Cette collection est devenue privée : vous n’y avez plus accès."
-    },
     "create": {
         "title": "Nouvelle collection",
         "submit": "Créer la collection"

@@ -21,24 +21,21 @@ class FavoriteWordGroupController extends Controller
     private const int PER_PAGE = 12;
 
     /**
-     * List the favorite groups, most recently favorited first. Groups that became private are still
-     * listed, flagged with `is_accessible: false`, so that the user can see and remove them.
+     * List the favorite groups, most recently favorited first. Groups the user can no longer see (made private,
+     * access revoked) are left out, but stay in the favorites: they show again once the user regains access.
      */
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
 
         $wordGroups = $user->favoriteWordGroups()
+            ->visibleTo($user)
             ->with('creator')
             ->withCount('words')
             ->orderByPivot('created_at', 'desc')
             ->latest('word_groups.id')
-            ->paginate(self::PER_PAGE);
-
-        $wordGroups->getCollection()->each(fn (WordGroup $wordGroup) => $wordGroup->forceFill([
-            'is_favorite' => true,
-            'is_accessible' => $wordGroup->isVisibleTo($user),
-        ]));
+            ->paginate(self::PER_PAGE)
+            ->through(fn (WordGroup $wordGroup) => $wordGroup->forceFill(['is_favorite' => true]));
 
         return WordGroupResource::collection($wordGroups);
     }

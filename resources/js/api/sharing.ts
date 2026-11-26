@@ -61,14 +61,14 @@ export async function requestAccess(kind: FavoriteKind, token: string): Promise<
     return data.data;
 }
 
-/** Private groups shared with the current user, and those requested from a share link. */
+/** Private groups shared with the current user (accepted requests only). */
 export async function fetchSharedWordGroups(page = 1): Promise<PaginatedResponse<WordGroup>> {
     const { data } = await http.get<PaginatedResponse<WordGroup>>('/api/shared/word-groups', { params: { page } });
 
     return data;
 }
 
-/** Private collections shared with the current user, and those requested from a share link. */
+/** Private collections shared with the current user (accepted requests only). */
 export async function fetchSharedGroupCollections(page = 1): Promise<PaginatedResponse<GroupCollection>> {
     const { data } = await http.get<PaginatedResponse<GroupCollection>>('/api/shared/group-collections', {
         params: { page },

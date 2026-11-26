@@ -5,7 +5,6 @@ namespace Tests\Feature\Http\Controllers\Api;
 use App\Enums\ShareType;
 use App\Models\GroupCollection;
 use App\Models\User;
-use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,32 +43,17 @@ class GroupCollectionSharingControllerTest extends TestCase
             ->assertJsonPath('message', 'Vous n’êtes pas membre de cette collection.');
     }
 
-    public function test_leaving_a_private_collection_removes_it_from_favorites_but_not_its_groups(): void
-    {
-        $creator = User::factory()->create();
-        $member = User::factory()->create();
-        $publicGroup = WordGroup::factory()->public()->createdBy($creator)->create();
-        $groupCollection = GroupCollection::factory()->private()->openToContributions()->createdBy($creator)->hasAttached($publicGroup)->create();
-        $groupCollection->members()->attach($member);
-        $member->favoriteGroupCollections()->attach($groupCollection);
-        $member->favoriteWordGroups()->attach($publicGroup);
-
-        $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
-
-        $this->assertDatabaseMissing('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
-        $this->assertDatabaseHas('favorite_word_groups', ['user_id' => $member->id, 'word_group_id' => $publicGroup->id]);
-    }
-
-    public function test_leaving_a_public_collection_keeps_it_in_favorites(): void
+    public function test_leaving_a_private_collection_keeps_its_favorite_but_hides_it(): void
     {
         $member = User::factory()->create();
-        $groupCollection = GroupCollection::factory()->openToMembersOnly()->create();
+        $groupCollection = GroupCollection::factory()->private()->openToContributions()->create();
         $groupCollection->members()->attach($member);
         $member->favoriteGroupCollections()->attach($groupCollection);
 
         $this->actingAs($member)->deleteJson("/api/group-collections/{$groupCollection->id}/membership")->assertNoContent();
 
         $this->assertDatabaseHas('favorite_group_collections', ['user_id' => $member->id, 'group_collection_id' => $groupCollection->id]);
+        $this->actingAs($member)->getJson('/api/favorites/group-collections')->assertJsonCount(0, 'data');
     }
 
     public function test_creator_changes_the_type_of_sharing_of_a_collection_member(): void
