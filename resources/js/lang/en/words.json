@@ -1,6 +1,7 @@
 {
     "list": {
-        "updatedOn": "updated on {date}"
+        "updatedOn": "updated {date}",
+        "addedOn": "added {date}"
     },
     "count": "{n} word | {n} words",
     "sort": {

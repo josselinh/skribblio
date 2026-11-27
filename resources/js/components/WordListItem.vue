@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import RelativeTime from '@/components/RelativeTime.vue';
 import UserLink from '@/components/UserLink.vue';
 import WordVoteButtons from '@/components/WordVoteButtons.vue';
-import { formatDateTime } from '@/lib/format';
 import type { Word } from '@/types/models';
 
 /** A word of a group, read-only: renaming and deleting happen in `WordListEditor`. */
@@ -29,11 +29,13 @@ const emit = defineEmits<{
                 <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
                 <template v-if="word.created_at"> · </template>
             </template>
-            <time v-if="word.created_at" :datetime="word.created_at">{{ formatDateTime(word.created_at) }}</time>
+            <i18n-t v-if="word.created_at" keypath="words.list.addedOn" scope="global">
+                <template #date><RelativeTime :date="word.created_at" /></template>
+            </i18n-t>
             <template v-if="word.updated_at && word.updated_at !== word.created_at">
                 ·
                 <i18n-t keypath="words.list.updatedOn" scope="global">
-                    <template #date><time :datetime="word.updated_at">{{ formatDateTime(word.updated_at) }}</time></template>
+                    <template #date><RelativeTime :date="word.updated_at" /></template>
                 </i18n-t>
             </template>
         </p>

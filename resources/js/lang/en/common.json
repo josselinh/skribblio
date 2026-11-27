@@ -16,5 +16,9 @@
     "deleteSelection": "Delete selection",
     "wordGroups": "Groups",
     "groupCollections": "Collections",
-    "actions": "Actions"
+    "actions": "Actions",
+    "time": {
+        "justNow": "just now",
+        "onDate": "on {date}"
+    }
 }

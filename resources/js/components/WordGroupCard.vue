@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import RelativeTime from '@/components/RelativeTime.vue';
 import UserLink from '@/components/UserLink.vue';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
-import { formatDateTime } from '@/lib/format';
 import type { WordGroup } from '@/types/models';
 
 const props = defineProps<{
@@ -51,8 +51,9 @@ function updateFavorite(isFavorite: boolean): void {
                 </i18n-t>
             </p>
             <p v-if="wordGroup.added_at">
-                <i18n-t :keypath="isAdderShown ? 'wordGroups.card.addition.date' : 'wordGroups.card.addition.on'" scope="global">
-                    <template #date><time :datetime="wordGroup.added_at">{{ formatDateTime(wordGroup.added_at) }}</time></template>
+                <RelativeTime v-if="isAdderShown" :date="wordGroup.added_at" capitalized />
+                <i18n-t v-else keypath="wordGroups.card.addition.on" scope="global">
+                    <template #date><RelativeTime :date="wordGroup.added_at" /></template>
                 </i18n-t>
             </p>
         </template>

@@ -5,10 +5,10 @@ import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import { decideAccessRequest } from '@/api/sharing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import RelativeTime from '@/components/RelativeTime.vue';
 import ShareTypeField from '@/components/ShareTypeField.vue';
 import UserLink from '@/components/UserLink.vue';
 import { useToasts } from '@/composables/useToasts';
-import { formatDateTime } from '@/lib/format';
 import { itemKey } from '@/lib/i18n';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessRequest, ShareType } from '@/types/models';
@@ -98,9 +98,7 @@ async function decide(accept: boolean): Promise<void> {
                 <template v-if="accessRequest.via_group_collection">
                     {{ $t('sharing.request.viaCollection', { name: accessRequest.via_group_collection.name }) }} ·
                 </template>
-                <time v-if="accessRequest.created_at" :datetime="accessRequest.created_at">
-                    {{ formatDateTime(accessRequest.created_at) }}
-                </time>
+                <RelativeTime v-if="accessRequest.created_at" :date="accessRequest.created_at" :capitalized="!accessRequest.via_group_collection" />
             </p>
             <p v-if="hasFailed" role="alert" class="text-red-600 dark:text-red-400">{{ failureMessage ?? $t('common.unexpectedError') }}</p>
         </div>

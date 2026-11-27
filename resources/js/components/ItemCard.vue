@@ -9,7 +9,7 @@ import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
 /**
  * Card of a group or a collection, in the order of an item's page title: the title in a tinted header (next to the
- * favorite star), the badges with the count (`CountBadge`) right after the language, then "Créé par X" and "Mise à jour le …" (`CardMeta`), and an optional `footer` slot describing the item's place in its context (who added a group to a collection),
+ * favorite star), the badges with the count (`CountBadge`) right after the language, then "Créé par X" and "Mise à jour il y a 3 jours" (`CardMeta`), and an optional `footer` slot describing the item's place in its context (who added a group to a collection),
  * separated from what describes the item itself. The footer keeps the right column free, under the favorite
  * star, for a selection checkbox laid over the card. The title's link is stretched over the whole card, so
  * that the card is clickable while other links (the creator's name, the footer's) and the favorite star stay

@@ -16,5 +16,9 @@
     "deleteSelection": "删除所选",
     "wordGroups": "词组",
     "groupCollections": "合集",
-    "actions": "操作"
+    "actions": "操作",
+    "time": {
+        "justNow": "刚刚",
+        "onDate": "{date}"
+    }
 }

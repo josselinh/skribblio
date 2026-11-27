@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n';
 import { fetchItemAccess, revokeAccess, updateMemberShareType } from '@/api/sharing';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import RelativeTime from '@/components/RelativeTime.vue';
 import { useToasts } from '@/composables/useToasts';
-import { formatDateTime } from '@/lib/format';
 import type { InactiveSharingReason } from '@/lib/contributions';
 import { itemKey } from '@/lib/i18n';
 import type { AccessPurpose, FavoriteKind, ItemAccess, ItemMember, ShareType } from '@/types/models';
@@ -180,7 +180,7 @@ watch(() => props.id, load, { immediate: true });
                             <p class="font-medium">{{ member.name }}</p>
                             <p v-if="member.granted_at" class="text-zinc-500 dark:text-zinc-400">
                                 <i18n-t keypath="sharing.management.since" scope="global">
-                                    <template #date><time :datetime="member.granted_at">{{ formatDateTime(member.granted_at) }}</time></template>
+                                    <template #date><RelativeTime :date="member.granted_at" /></template>
                                 </i18n-t>
                             </p>
                         </div>

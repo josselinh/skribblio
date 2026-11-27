@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import RelativeTime from '@/components/RelativeTime.vue';
 import UserLink from '@/components/UserLink.vue';
-import { formatDateTime } from '@/lib/format';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, User } from '@/types/models';
 
 /**
  * Details of a card, in the order of the page title of an item (`ItemHeader`): "Créé par Bob", then
- * "Mise à jour le …". The creator's name links to their page, above the card's stretched link.
+ * "Mise à jour il y a 3 jours". The creator's name links to their page, above the card's stretched link.
  */
 const props = defineProps<{
     kind: FavoriteKind;
@@ -27,7 +27,7 @@ const item = computed(() => itemKey(props.kind));
         </p>
         <p v-if="updatedAt" class="text-zinc-500 dark:text-zinc-400">
             <i18n-t keypath="editing.updatedOn" scope="global">
-                <template #date><time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time></template>
+                <template #date><RelativeTime :date="updatedAt" /></template>
             </i18n-t>
         </p>
     </div>

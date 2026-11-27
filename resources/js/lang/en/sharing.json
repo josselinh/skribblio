@@ -45,7 +45,7 @@
             "contribution": "People allowed to contribute"
         },
         "noMembers": "Nobody but you for now. Send the invitation link to receive requests.",
-        "since": "Since {date}"
+        "since": "Access granted {date}"
     },
     "revoke": {
         "button": "Remove",
