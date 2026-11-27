@@ -6,7 +6,7 @@
     "count": "{n} 个词组",
     "card": {
         "addition": {
-            "by": "由 {user} 添加",
+            "by": "由 {user} 添加于 {date}",
             "on": "添加于 {date}"
         }
     },
