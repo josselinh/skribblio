@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import AppIcon from '@/components/AppIcon.vue';
 import { useAuthStore } from '@/stores/auth';
 
 /** Header button with the user's initials and pseudo, opening a menu: the pages of the account and logout. */
@@ -10,9 +11,9 @@ const router = useRouter();
 const isOpen = ref(false);
 
 const accountLinks = [
-    { name: 'profile', label: 'layout.userMenu.profile' },
-    { name: 'security', label: 'layout.userMenu.security' },
-    { name: 'preferences', label: 'layout.userMenu.preferences' },
+    { name: 'profile', label: 'layout.userMenu.profile', icon: 'profile' },
+    { name: 'security', label: 'layout.userMenu.security', icon: 'security' },
+    { name: 'preferences', label: 'layout.userMenu.preferences', icon: 'preferences' },
 ] as const;
 
 const initials = computed(() =>
@@ -76,17 +77,19 @@ async function logout(): Promise<void> {
                 :key="link.name"
                 :to="{ name: link.name }"
                 role="menuitem"
-                class="block px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
+                class="flex items-center gap-2.5 px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="close"
             >
+                <AppIcon :name="link.icon" class="text-zinc-500 dark:text-zinc-400" />
                 {{ $t(link.label) }}
             </RouterLink>
             <button
                 type="button"
                 role="menuitem"
-                class="block w-full border-t border-zinc-100 dark:border-zinc-800 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
+                class="flex w-full items-center gap-2.5 border-t border-zinc-100 dark:border-zinc-800 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:bg-zinc-50 dark:focus:bg-zinc-800 focus:outline-none"
                 @click="logout"
             >
+                <AppIcon name="leave" class="text-zinc-500 dark:text-zinc-400" />
                 {{ $t('layout.userMenu.logout') }}
             </button>
         </div>

@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { attachWordGroup, detachWordGroups, fetchGroupCollection, updateGroupCollection } from '@/api/groupCollections';
+import AppIcon from '@/components/AppIcon.vue';
 import AccessManagement from '@/components/AccessManagement.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -331,10 +332,11 @@ const headingClass = 'text-lg font-semibold';
                             <button
                                 type="button"
                                 :disabled="selectedWordGroupIds.length === 0 || isUpdatingGroups"
-                                class="font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                class="inline-flex items-center gap-1.5 font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
                                 aria-haspopup="dialog"
                                 @click="askRemovalConfirmation"
                             >
+                                <AppIcon name="delete" />
                                 {{ $t('common.deleteSelection') }}
                             </button>
                         </div>

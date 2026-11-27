@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { leaveItem } from '@/api/sharing';
+import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import { dangerButtonClass } from '@/lib/buttons';
@@ -67,6 +68,7 @@ async function confirmLeave(): Promise<void> {
         aria-haspopup="dialog"
         @click="askConfirmation"
     >
+        <AppIcon name="leave" />
         {{ $t('leaving.button') }}
     </button>
 

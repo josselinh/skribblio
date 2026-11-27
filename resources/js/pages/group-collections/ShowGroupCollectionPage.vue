@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { fetchGroupCollection } from '@/api/groupCollections';
+import AppIcon from '@/components/AppIcon.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import DuplicateButton from '@/components/DuplicateButton.vue';
 import ExportPanel from '@/components/ExportPanel.vue';
@@ -117,6 +118,7 @@ watch(
                         :to="{ name: 'group-collections.edit', params: { id: groupCollection.id } }"
                         :class="secondaryButtonClass"
                     >
+                        <AppIcon :name="groupCollection.can.update ? 'manage' : 'contribute'" />
                         {{ groupCollection.can.update ? $t('groupCollections.show.manage') : $t('groupCollections.show.contribute') }}
                     </RouterLink>
                     <DuplicateButton v-if="canDuplicate" kind="group-collections" :id="groupCollection.id" />

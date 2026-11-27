@@ -4,6 +4,7 @@ import { computed, ref, shallowRef, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { attachWordGroup } from '@/api/groupCollections';
 import { fetchCollectionTargets } from '@/api/wordGroups';
+import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { secondaryButtonClass } from '@/lib/buttons';
 import ModalDialog from '@/components/ModalDialog.vue';
@@ -182,6 +183,7 @@ const hint = computed(() => {
             aria-haspopup="dialog"
             @click="askConfirmation"
         >
+            <AppIcon name="add-to-collection" />
             <span class="truncate">{{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}</span>
         </button>
         <button
@@ -203,6 +205,7 @@ const hint = computed(() => {
         aria-haspopup="dialog"
         @click="openPicker"
     >
+        <AppIcon name="add-to-collection" />
         {{ $t('addToCollection.button') }}
     </button>
 
@@ -222,14 +225,17 @@ const hint = computed(() => {
         <p>{{ $t(`addToCollection.picker.languageHint.${wordGroup.language}`) }}</p>
 
         <label :for="searchId" class="sr-only">{{ $t('addToCollection.picker.searchLabel') }}</label>
-        <input
-            :id="searchId"
-            v-model="query"
-            type="search"
-            autocomplete="off"
-            :placeholder="$t('addToCollection.picker.searchPlaceholder')"
-            class="mt-3 block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
-        />
+        <div class="relative mt-3">
+            <AppIcon name="search" class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
+            <input
+                :id="searchId"
+                v-model="query"
+                type="search"
+                autocomplete="off"
+                :placeholder="$t('addToCollection.picker.searchPlaceholder')"
+                class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-2 pr-3 pl-9 text-sm text-zinc-900 dark:text-zinc-100 shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
+            />
+        </div>
 
         <p v-if="hint" class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{{ hint }}</p>
 

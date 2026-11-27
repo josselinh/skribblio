@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { deleteGroupCollection } from '@/api/groupCollections';
 import { deleteWordGroup } from '@/api/wordGroups';
+import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import { dangerButtonClass } from '@/lib/buttons';
@@ -62,6 +63,7 @@ async function confirmDelete(): Promise<void> {
         aria-haspopup="dialog"
         @click="askConfirmation"
     >
+        <AppIcon name="delete" />
         {{ $t('deletion.button') }}
     </button>
 
