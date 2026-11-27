@@ -45,4 +45,20 @@ class RegistrationTest extends TestCase
         ]);
         $this->assertGuest();
     }
+
+    public function test_registration_rejects_a_pseudo_already_taken_regardless_of_case(): void
+    {
+        User::factory()->create(['name' => 'Alice']);
+
+        $this->postJson('/register', [
+            'name' => 'alice',
+            'email' => 'alice@example.com',
+            'password' => 'a-strong-password',
+            'password_confirmation' => 'a-strong-password',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name' => 'La valeur du champ pseudo est déjà utilisée.']);
+
+        $this->assertGuest();
+    }
 }
