@@ -16,6 +16,7 @@ import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { cardGridItemClass } from '@/lib/cards';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
+import { listPanelHeaderClass } from '@/lib/sections';
 import { useAuthStore } from '@/stores/auth';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
@@ -238,7 +239,9 @@ const headingClass = 'text-lg font-semibold';
 
             <template v-else>
                 <section v-if="isCreator" :class="sectionClass" aria-labelledby="settings-heading">
-                    <h2 id="settings-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.settings') }}</h2>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="settings-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.settings') }}</h2>
+                    </div>
                     <NameVisibilityForm
                         :key="groupCollection.id"
                         class="mt-4"
@@ -261,7 +264,7 @@ const headingClass = 'text-lg font-semibold';
                     :class="sectionClass"
                     aria-labelledby="sharing-heading"
                 >
-                    <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div :class="listPanelHeaderClass">
                         <h2 id="sharing-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.sharing') }}</h2>
                         <ShareButton
                             v-if="isInvitationOffered"
@@ -282,9 +285,12 @@ const headingClass = 'text-lg font-semibold';
                 </section>
 
                 <section :class="sectionClass" aria-labelledby="groups-heading">
-                    <h2 id="groups-heading" :class="headingClass">
-                        {{ managesEveryGroup ? $t('groupCollections.edit.sections.groups') : $t('groupCollections.edit.sections.ownGroups') }}
-                    </h2>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="groups-heading" :class="headingClass">
+                            {{ managesEveryGroup ? $t('groupCollections.edit.sections.groups') : $t('groupCollections.edit.sections.ownGroups') }}
+                            <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ listedWordGroups.length }})</span>
+                        </h2>
+                    </div>
 
                     <div v-if="groupCollection.can.add_word_group" class="mt-4">
                         <label for="add-word-group" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -383,8 +389,10 @@ const headingClass = 'text-lg font-semibold';
                 </section>
 
                 <section v-if="groupCollection.can.delete" :class="sectionClass" aria-labelledby="deletion-heading">
-                    <h2 id="deletion-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.deletion') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('deletion.warning.groupCollection') }}</p>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="deletion-heading" :class="headingClass">{{ $t('groupCollections.edit.sections.deletion') }}</h2>
+                    </div>
+                    <p class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('deletion.warning.groupCollection') }}</p>
                     <div class="mt-4">
                         <DeleteButton kind="group-collections" :id="groupCollection.id" />
                     </div>
