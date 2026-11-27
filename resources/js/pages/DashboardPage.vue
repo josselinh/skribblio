@@ -6,6 +6,7 @@ import { fetchFavoriteGroupCollections, fetchFavoriteWordGroups } from '@/api/fa
 import { fetchMyGroupCollections } from '@/api/groupCollections';
 import { fetchReceivedAccessRequests, fetchSharedGroupCollections, fetchSharedWordGroups } from '@/api/sharing';
 import { fetchMyWordGroups } from '@/api/wordGroups';
+import AppIcon from '@/components/AppIcon.vue';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
@@ -103,7 +104,7 @@ function hasAnswered(list: ReturnType<typeof usePaginatedList>): boolean {
 }
 
 const buttonClass =
-    'inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700';
+    'inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700';
 </script>
 
 <template>
@@ -224,7 +225,10 @@ const buttonClass =
                 @retry="wordGroups.reload"
             >
                 <template #actions>
-                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">{{ $t('dashboard.wordGroups.create') }}</RouterLink>
+                    <RouterLink :to="{ name: 'word-groups.create' }" :class="buttonClass">
+                        <AppIcon name="plus" />
+                        {{ $t('dashboard.wordGroups.create') }}
+                    </RouterLink>
                 </template>
                 <template #empty>
                     <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
@@ -255,6 +259,7 @@ const buttonClass =
             >
                 <template #actions>
                     <RouterLink :to="{ name: 'group-collections.create' }" :class="buttonClass">
+                        <AppIcon name="plus" />
                         {{ $t('dashboard.groupCollections.create') }}
                     </RouterLink>
                 </template>

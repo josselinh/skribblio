@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T extends SearchableItem">
 import { ref, shallowRef, watch } from 'vue';
+import AppIcon from '@/components/AppIcon.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import type { User, Visibility } from '@/types/models';
 
@@ -92,6 +93,7 @@ function select(item: T): void {
 
 <template>
     <div class="relative" @focusout="onFocusOut">
+        <AppIcon name="search" class="pointer-events-none absolute top-2.5 left-3 text-zinc-400 dark:text-zinc-500" />
         <input
             :id="inputId"
             v-model="query"
@@ -103,7 +105,7 @@ function select(item: T): void {
             :aria-expanded="isOpen"
             :aria-invalid="invalid ? true : undefined"
             :disabled="disabled"
-            class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none disabled:opacity-60 aria-invalid:border-red-500"
+            class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-2 pr-3 pl-9 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none disabled:opacity-60 aria-invalid:border-red-500"
             @focus="open"
             @keydown.esc="close"
         />

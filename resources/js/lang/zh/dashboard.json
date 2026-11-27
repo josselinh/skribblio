@@ -9,13 +9,13 @@
     "receivedRequests": "收到的访问请求",
     "wordGroups": {
         "title": "我的词组",
-        "create": "+ 新建词组",
+        "create": "新建词组",
         "empty": "你还没有创建任何词组。",
         "createFirst": "创建我的第一个词组"
     },
     "groupCollections": {
         "title": "我的合集",
-        "create": "+ 新建合集",
+        "create": "新建合集",
         "empty": "你还没有创建任何合集。",
         "createFirst": "创建我的第一个合集"
     },

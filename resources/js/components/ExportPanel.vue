@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { fetchGroupCollectionExport, fetchWordGroupExport, type ExportedWord, type ExportedWordGroup } from '@/api/exports';
 import { useI18n } from 'vue-i18n';
+import AppIcon from '@/components/AppIcon.vue';
 import WordListExport from '@/components/WordListExport.vue';
 import { useToasts } from '@/composables/useToasts';
 import { intlLocale } from '@/lib/i18n';
@@ -111,6 +112,7 @@ const linkButtonClass =
                 aria-controls="export-panel"
                 @click="toggle"
             >
+                <AppIcon name="export" />
                 {{ $t('exports.panel.button') }}
                 <!-- Points down while the panel is closed, up once it is open under the button. -->
                 <svg

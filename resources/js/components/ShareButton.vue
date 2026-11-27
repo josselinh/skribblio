@@ -3,7 +3,9 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchShareLink, regenerateShareLink } from '@/api/sharing';
 import { primaryButtonClass, secondaryButtonClass } from '@/lib/buttons';
+import AppIcon from '@/components/AppIcon.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
+import { useCopiedFeedback } from '@/composables/useCopiedFeedback';
 import { useToasts } from '@/composables/useToasts';
 import type { AccessPurpose, FavoriteKind } from '@/types/models';
 
@@ -50,12 +52,15 @@ async function open(): Promise<void> {
     }
 }
 
+const { isCopied, showCopied } = useCopiedFeedback();
+
 async function copy(): Promise<void> {
     if (!url.value) {
         return;
     }
     try {
         await navigator.clipboard.writeText(url.value);
+        showCopied();
         showToast(t('sharing.link.copied'));
     } catch {
         showToast(t('sharing.link.copyFailed'), 'error', 6000);
@@ -78,6 +83,7 @@ async function regenerate(): Promise<void> {
         aria-haspopup="dialog"
         @click="open"
     >
+        <AppIcon name="invite" />
         {{ $t('sharing.invite.button') }}
     </button>
 
@@ -101,9 +107,10 @@ async function regenerate(): Promise<void> {
                 type="button"
                 autofocus
                 :disabled="!url || isBusy"
-                class="shrink-0 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:py-2"
+                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:py-2"
                 @click="copy"
             >
+                <AppIcon :name="isCopied ? 'check' : 'copy'" />
                 {{ $t('common.copy') }}
             </button>
         </div>
@@ -124,9 +131,10 @@ async function regenerate(): Promise<void> {
             v-else
             type="button"
             :disabled="!url || isBusy"
-            class="mt-4 text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100 disabled:opacity-60"
+            class="mt-4 inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100 disabled:opacity-60"
             @click="isConfirmingRegeneration = true"
         >
+            <AppIcon name="regenerate" />
             {{ $t('sharing.link.regenerate') }}
         </button>
 

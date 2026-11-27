@@ -9,13 +9,13 @@
     "receivedRequests": "Demandes d'accès reçues",
     "wordGroups": {
         "title": "Mes groupes",
-        "create": "+ Nouveau groupe",
+        "create": "Nouveau groupe",
         "empty": "Vous n'avez encore créé aucun groupe.",
         "createFirst": "Créer mon premier groupe"
     },
     "groupCollections": {
         "title": "Mes collections",
-        "create": "+ Nouvelle collection",
+        "create": "Nouvelle collection",
         "empty": "Vous n'avez encore créé aucune collection.",
         "createFirst": "Créer ma première collection"
     },

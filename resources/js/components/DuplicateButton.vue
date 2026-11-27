@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { duplicateGroupCollection } from '@/api/groupCollections';
 import { duplicateWordGroup } from '@/api/wordGroups';
+import AppIcon from '@/components/AppIcon.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
 import { secondaryButtonClass } from '@/lib/buttons';
@@ -74,6 +75,7 @@ async function duplicate(): Promise<void> {
         aria-haspopup="dialog"
         @click="askConfirmation"
     >
+        <AppIcon name="duplicate" />
         {{ $t('duplication.button') }}
     </button>
 

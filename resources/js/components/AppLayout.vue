@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
+import AppIcon from '@/components/AppIcon.vue';
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import UserMenu from '@/components/UserMenu.vue';
@@ -45,13 +46,16 @@ async function search(): Promise<void> {
                     @submit.prevent="search"
                 >
                     <label for="header-search" class="sr-only">{{ $t('layout.header.searchLabel') }}</label>
-                    <input
-                        id="header-search"
-                        v-model="searchQuery"
-                        type="search"
-                        :placeholder="$t('layout.header.searchPlaceholder')"
-                        class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
-                    />
+                    <div class="relative">
+                        <AppIcon name="search" class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
+                        <input
+                            id="header-search"
+                            v-model="searchQuery"
+                            type="search"
+                            :placeholder="$t('layout.header.searchPlaceholder')"
+                            class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 py-1.5 pr-3 pl-8 text-sm focus:border-brand-500 dark:focus:border-brand-400 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
+                        />
+                    </div>
                 </form>
                 <!-- Kept on the right when the header wraps on phones, so that its menu, aligned on its right edge, stays on screen. -->
                 <UserMenu v-if="auth.isAuthenticated" class="ml-auto" />

@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ExportedWord } from '@/api/exports';
+import AppIcon from '@/components/AppIcon.vue';
+import { useCopiedFeedback } from '@/composables/useCopiedFeedback';
 import { useToasts } from '@/composables/useToasts';
 import { intlLocale } from '@/lib/i18n';
 import {
@@ -91,9 +93,12 @@ watch(
     { immediate: true },
 );
 
+const { isCopied, showCopied } = useCopiedFeedback();
+
 async function copy(): Promise<void> {
     try {
         await navigator.clipboard.writeText(exportedList.value);
+        showCopied();
         showToast(t('exports.list.copied'));
     } catch {
         showToast(t('exports.list.copyFailed'), 'error', 6000);
@@ -141,9 +146,10 @@ const secondaryButtonClass =
             <button
                 type="button"
                 :disabled="isLoading"
-                class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
+                class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                 @click="copy"
             >
+                <AppIcon :name="isCopied ? 'check' : 'copy'" />
                 {{ $t('common.copy') }}
             </button>
         </div>
@@ -160,9 +166,10 @@ const secondaryButtonClass =
             <p>{{ $t('exports.list.tooManyCharacters', { max: numberFormat.format(SKRIBBL_MAX_CHARACTERS) }) }}</p>
             <button
                 type="button"
-                class="rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                class="inline-flex items-center gap-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40"
                 @click="draw"
             >
+                <AppIcon name="shuffle" />
                 {{ $t('exports.list.draw') }}
             </button>
         </div>
@@ -180,7 +187,10 @@ const secondaryButtonClass =
                 }}
             </p>
             <div class="flex gap-2">
-                <button type="button" :class="secondaryButtonClass" @click="draw">{{ $t('exports.list.drawAgain') }}</button>
+                <button type="button" :class="secondaryButtonClass" @click="draw">
+                    <AppIcon name="shuffle" />
+                    {{ $t('exports.list.drawAgain') }}
+                </button>
                 <button type="button" :class="secondaryButtonClass" @click="drawnWords = null">
                     {{ $t('exports.list.undraw') }}
                 </button>
@@ -230,9 +240,10 @@ const secondaryButtonClass =
             <button
                 v-if="shouldShuffle && !drawnWords"
                 type="button"
-                class="text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100"
+                class="inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 underline hover:text-zinc-900 dark:hover:text-zinc-100"
                 @click="reshuffle"
             >
+                <AppIcon name="shuffle" />
                 {{ $t('exports.list.reshuffle') }}
             </button>
         </fieldset>

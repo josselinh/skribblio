@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, type LocationQueryRaw } from 'vue-router';
 import { fetchGroupCollectionSearchResults, fetchWordGroupSearchResults } from '@/api/search';
+import AppIcon from '@/components/AppIcon.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import CardListSection from '@/components/CardListSection.vue';
@@ -194,13 +195,16 @@ const pillClass = (isActive: boolean) =>
         <form role="search" class="mt-4" @submit.prevent="updateQuery({ q: searchInput.trim() || undefined })">
             <label for="search" class="sr-only">{{ $t('layout.header.searchLabel') }}</label>
             <div class="flex gap-2">
-                <input
-                    id="search"
-                    v-model="searchInput"
-                    type="search"
-                    :placeholder="$t('search.placeholder')"
-                    class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
-                />
+                <div class="relative w-full">
+                    <AppIcon name="search" class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
+                    <input
+                        id="search"
+                        v-model="searchInput"
+                        type="search"
+                        :placeholder="$t('search.placeholder')"
+                        class="block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-2 pr-3 pl-9 text-sm shadow-xs focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
+                    />
+                </div>
                 <button
                     type="submit"
                     class="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"

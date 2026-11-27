@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios';
 import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { deleteWords, updateWords, type WordRename } from '@/api/words';
+import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -196,9 +197,10 @@ const checkboxClass = 'size-4 pointer-coarse:size-5 shrink-0 rounded border-zinc
                         v-if="deletableWords.length > 0"
                         type="button"
                         :disabled="selectedWordIds.length === 0"
-                        class="font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="inline-flex items-center gap-1.5 font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
                         @click="askDeleteConfirmation"
                     >
+                        <AppIcon name="delete" />
                         {{ $t('common.deleteSelection') }}
                     </button>
                 </div>

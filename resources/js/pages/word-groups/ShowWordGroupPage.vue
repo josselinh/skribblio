@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { fetchWordGroup } from '@/api/wordGroups';
 import { fetchWords } from '@/api/words';
+import AppIcon from '@/components/AppIcon.vue';
 import AddToCollectionButton from '@/components/AddToCollectionButton.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import DuplicateButton from '@/components/DuplicateButton.vue';
@@ -141,6 +142,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         :to="{ name: 'word-groups.edit', params: { id: wordGroup.id } }"
                         :class="secondaryButtonClass"
                     >
+                        <AppIcon :name="wordGroup.can.update ? 'manage' : 'contribute'" />
                         {{ wordGroup.can.update ? $t('wordGroups.show.manage') : $t('wordGroups.show.contribute') }}
                     </RouterLink>
                     <DuplicateButton v-if="wordGroup.can.duplicate" kind="word-groups" :id="wordGroup.id" />
