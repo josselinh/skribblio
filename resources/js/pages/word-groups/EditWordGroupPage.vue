@@ -17,6 +17,7 @@ import WordSortControl from '@/components/WordSortControl.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
+import { listPanelHeaderClass } from '@/lib/sections';
 import type { WordsResponse } from '@/types/api';
 import type { AccessPurpose, WordGroup } from '@/types/models';
 
@@ -196,7 +197,9 @@ const headingClass = 'text-lg font-semibold';
 
             <template v-else>
                 <section v-if="isCreator" :class="sectionClass" aria-labelledby="settings-heading">
-                    <h2 id="settings-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.settings') }}</h2>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="settings-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.settings') }}</h2>
+                    </div>
                     <NameVisibilityForm
                         :key="wordGroup.id"
                         class="mt-4"
@@ -219,7 +222,7 @@ const headingClass = 'text-lg font-semibold';
                     :class="sectionClass"
                     aria-labelledby="sharing-heading"
                 >
-                    <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div :class="listPanelHeaderClass">
                         <h2 id="sharing-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.sharing') }}</h2>
                         <ShareButton
                             v-if="isInvitationOffered"
@@ -240,9 +243,12 @@ const headingClass = 'text-lg font-semibold';
                 </section>
 
                 <section :class="sectionClass" aria-labelledby="words-heading">
-                    <h2 id="words-heading" :class="headingClass">
-                        {{ managesEveryWord ? $t('wordGroups.edit.sections.words') : $t('wordGroups.edit.sections.ownWords') }}
-                    </h2>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="words-heading" :class="headingClass">
+                            {{ managesEveryWord ? $t('wordGroups.edit.sections.words') : $t('wordGroups.edit.sections.ownWords') }}
+                            <span v-if="words" class="font-normal text-zinc-500 dark:text-zinc-400">({{ words.meta.total }})</span>
+                        </h2>
+                    </div>
                     <AddWordForm v-if="wordGroup.can.add_word" class="mt-4" :word-group-id="wordGroup.id" @added="onWordAdded" />
 
                     <p v-if="haveWordsFailed" class="mt-6 text-red-600 dark:text-red-400">
@@ -255,10 +261,8 @@ const headingClass = 'text-lg font-semibold';
                     </p>
 
                     <template v-else-if="words">
-                        <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                            <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('words.count', words.meta.total) }}</p>
+                        <div v-if="unsavedCount === 0" class="mt-6 flex justify-end">
                             <WordSortControl
-                                v-if="unsavedCount === 0"
                                 :sort="order.sort"
                                 :direction="order.direction"
                                 :default-directions="WORD_SORT_DEFAULT_DIRECTIONS"
@@ -268,8 +272,7 @@ const headingClass = 'text-lg font-semibold';
                             />
                         </div>
                         <WordListEditor
-                            class="mt-2"
-                            :class="{ 'opacity-60': areWordsLoading }"
+                            :class="[unsavedCount === 0 ? 'mt-2' : 'mt-6', { 'opacity-60': areWordsLoading }]"
                             :word-group-id="wordGroup.id"
                             :words="words.data"
                             @saved="onWordsSaved"
@@ -284,8 +287,10 @@ const headingClass = 'text-lg font-semibold';
                 </section>
 
                 <section v-if="wordGroup.can.delete" :class="sectionClass" aria-labelledby="deletion-heading">
-                    <h2 id="deletion-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.deletion') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('deletion.warning.wordGroup') }}</p>
+                    <div :class="listPanelHeaderClass">
+                        <h2 id="deletion-heading" :class="headingClass">{{ $t('wordGroups.edit.sections.deletion') }}</h2>
+                    </div>
+                    <p class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('deletion.warning.wordGroup') }}</p>
                     <div class="mt-4">
                         <DeleteButton kind="word-groups" :id="wordGroup.id" />
                     </div>
