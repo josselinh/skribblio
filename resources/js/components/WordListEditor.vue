@@ -170,7 +170,7 @@ async function confirmDelete(): Promise<void> {
     }
 }
 
-const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400';
+const checkboxClass = 'size-4 pointer-coarse:size-5 shrink-0 rounded border-zinc-300 dark:border-zinc-700 accent-brand-600 dark:accent-brand-400';
 </script>
 
 <template>

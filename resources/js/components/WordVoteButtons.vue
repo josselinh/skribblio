@@ -79,7 +79,7 @@ function emojiClass(vote: WordVote): string {
             <button
                 v-if="word.can.vote && !readonly"
                 type="button"
-                class="group inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+                class="group touch-target inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
                 :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-600 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'"
                 :aria-pressed="word.my_vote === button.vote"
                 :aria-label="$t('words.votes.buttonLabel', { vote: button.label, word: word.name, count: countOf(button.vote) })"

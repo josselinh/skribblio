@@ -55,7 +55,7 @@ async function toggle(): Promise<void> {
 <template>
     <button
         type="button"
-        class="rounded-md p-1 text-lg leading-none transition hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+        class="touch-target rounded-md p-1 text-lg leading-none transition hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
         :class="isFavorite ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'"
         :aria-pressed="isFavorite"
         :aria-label="isFavorite ? $t('favorites.removeNamed', { name }) : $t('favorites.addNamed', { name })"
