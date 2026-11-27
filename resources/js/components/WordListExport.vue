@@ -115,12 +115,13 @@ const secondaryButtonClass =
         </p>
         <p v-if="note" class="mt-1 text-sm text-amber-700 dark:text-amber-400">{{ note }}</p>
 
+        <!-- As tall as the list, from 2 lines to about 12 (then it scrolls); browsers without field-sizing keep 6 rows. -->
         <textarea
             id="export-list"
             readonly
             rows="6"
             :value="exportedList"
-            class="mt-2 block w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 font-mono text-sm"
+            class="mt-2 block max-h-72 min-h-16 w-full field-sizing-content rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 font-mono text-sm"
             :class="{ 'opacity-60': isLoading }"
             @focus="($event.target as HTMLTextAreaElement).select()"
         ></textarea>
