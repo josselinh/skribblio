@@ -14,6 +14,7 @@ import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
+import { itemCrumb, useBreadcrumb } from '@/lib/breadcrumb';
 import { cardGridItemClass } from '@/lib/cards';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
 import { listPanelHeaderClass } from '@/lib/sections';
@@ -45,6 +46,10 @@ const canEdit = computed(
     () => groupCollection.value !== null && (groupCollection.value.can.update || groupCollection.value.can.add_word_group),
 );
 const title = computed(() => (isCreator.value ? t('groupCollections.edit.title.manage') : t('groupCollections.edit.title.contribute')));
+useBreadcrumb(
+    () => (groupCollection.value ? title.value : null),
+    () => (groupCollection.value ? itemCrumb('group-collections.show', groupCollection.value.id, groupCollection.value.name) : null),
+);
 usePageTitle(() =>
     groupCollection.value ? t('groupCollections.edit.pageTitle', { title: title.value, name: groupCollection.value.name }) : null,
 );
@@ -227,13 +232,7 @@ const headingClass = 'text-lg font-semibold';
         </p>
 
         <template v-else-if="groupCollection">
-            <RouterLink
-                :to="{ name: 'group-collections.show', params: { id: groupCollection.id } }"
-                class="mt-2 inline-block max-w-full truncate text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
-            >
-                {{ $t('groupCollections.edit.back', { name: groupCollection.name }) }}
-            </RouterLink>
-            <h1 class="mt-1 text-2xl font-semibold">{{ title }}</h1>
+            <h1 class="text-2xl font-semibold">{{ title }}</h1>
 
             <p v-if="!canEdit" class="mt-4 text-zinc-500 dark:text-zinc-400">{{ $t('groupCollections.edit.forbidden') }}</p>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
+import AppBreadcrumb from '@/components/AppBreadcrumb.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import UserMenu from '@/components/UserMenu.vue';
 import { rememberPendingRedirect } from '@/lib/pendingRedirect';
@@ -69,6 +70,7 @@ async function search(): Promise<void> {
             </div>
         </header>
         <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+            <AppBreadcrumb />
             <slot />
         </main>
         <AppFooter />

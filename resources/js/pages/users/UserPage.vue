@@ -8,6 +8,7 @@ import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePaginatedList } from '@/composables/usePaginatedList';
+import { useBreadcrumb } from '@/lib/breadcrumb';
 import { useAuthStore } from '@/stores/auth';
 import type { User } from '@/types/models';
 
@@ -23,6 +24,7 @@ const isOwnPage = computed(() => userId.value === auth.user?.id);
 
 const user = ref<Pick<User, 'id' | 'name'> | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
+useBreadcrumb(() => user.value?.name);
 
 async function loadUser(): Promise<void> {
     status.value = 'loading';

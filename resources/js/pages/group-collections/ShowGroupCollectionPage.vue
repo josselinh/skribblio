@@ -12,6 +12,7 @@ import LeaveButton from '@/components/LeaveButton.vue';
 import PendingAccessRequests from '@/components/PendingAccessRequests.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
+import { useBreadcrumb } from '@/lib/breadcrumb';
 import { secondaryButtonClass } from '@/lib/buttons';
 import { cardGridItemClass } from '@/lib/cards';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
@@ -36,6 +37,7 @@ const groupCollectionId = computed(() => String(route.params.id));
 const groupCollection = ref<GroupCollectionDetail | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 usePageTitle(() => groupCollection.value?.name);
+useBreadcrumb(() => groupCollection.value?.name);
 
 /** Whether the user can change something: everything for the creator, the groups for a contributor. */
 const canEdit = computed(

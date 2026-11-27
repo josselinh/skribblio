@@ -29,7 +29,6 @@
             "contribute": "Contribuer au groupe"
         },
         "pageTitle": "{title} · {name}",
-        "back": "← {name}",
         "forbidden": "Vous ne pouvez pas modifier ce groupe.",
         "unsavedHint": "Enregistrez ou annulez vos modifications pour trier les mots ou changer de page.",
         "sections": {

@@ -17,6 +17,7 @@ import WordListItem from '@/components/WordListItem.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
+import { useBreadcrumb } from '@/lib/breadcrumb';
 import { secondaryButtonClass } from '@/lib/buttons';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
@@ -48,6 +49,7 @@ const currentPage = computed(() => {
 const wordGroup = ref<WordGroup | null>(null);
 const groupStatus = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 usePageTitle(() => wordGroup.value?.name);
+useBreadcrumb(() => wordGroup.value?.name);
 
 /** Whether the user can change something: everything for the creator, the words for a contributor. */
 const canEdit = computed(() => wordGroup.value !== null && (wordGroup.value.can.update || wordGroup.value.can.add_word));

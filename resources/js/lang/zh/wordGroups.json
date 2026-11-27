@@ -29,7 +29,6 @@
             "contribute": "为词组做贡献"
         },
         "pageTitle": "{title} · {name}",
-        "back": "← {name}",
         "forbidden": "你无法编辑此词组。",
         "unsavedHint": "请先保存或取消你的修改，再对词语排序或翻页。",
         "sections": {
