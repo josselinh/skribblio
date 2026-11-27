@@ -177,7 +177,7 @@ function seeAll(listType: Exclude<TypeFilter, 'all'>, total: number | undefined,
 
 const pillClass = (isActive: boolean) =>
     [
-        'cursor-pointer rounded-full border px-3 py-1 text-sm transition',
+        'touch-target cursor-pointer rounded-full border px-3 py-1 text-sm transition',
         isActive ? 'border-brand-600 bg-brand-600 text-white' : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800',
     ].join(' ');
 </script>
@@ -234,7 +234,7 @@ const pillClass = (isActive: boolean) =>
             class="mt-4 flex-col gap-3 sm:flex sm:flex-row sm:flex-wrap sm:gap-x-8"
             :class="areFiltersOpen ? 'flex' : 'hidden'"
         >
-            <fieldset class="flex flex-wrap items-center gap-2">
+            <fieldset class="flex flex-wrap items-center gap-2 pointer-coarse:gap-y-3">
                 <legend class="sr-only">{{ $t('search.filters.type') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.typePrefix') }}</span>
                 <label v-for="option in typeOptions" :key="option.value" :class="pillClass(type === option.value)">
@@ -248,7 +248,7 @@ const pillClass = (isActive: boolean) =>
                     {{ option.label }}
                 </label>
             </fieldset>
-            <fieldset class="flex flex-wrap items-center gap-2">
+            <fieldset class="flex flex-wrap items-center gap-2 pointer-coarse:gap-y-3">
                 <legend class="sr-only">{{ $t('languages.filter.label') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('languages.filter.prefix') }}</span>
                 <label v-for="option in languageOptions" :key="option.value" :class="pillClass(language === option.value)">
@@ -262,7 +262,7 @@ const pillClass = (isActive: boolean) =>
                     {{ option.label }}
                 </label>
             </fieldset>
-            <fieldset v-if="isMember" class="flex flex-wrap items-center gap-2">
+            <fieldset v-if="isMember" class="flex flex-wrap items-center gap-2 pointer-coarse:gap-y-3">
                 <legend class="sr-only">{{ $t('search.filters.author') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.authorPrefix') }}</span>
                 <label v-for="option in authorOptions" :key="option.value" :class="pillClass(author === option.value)">
@@ -276,7 +276,7 @@ const pillClass = (isActive: boolean) =>
                     {{ option.label }}
                 </label>
             </fieldset>
-            <fieldset class="flex flex-wrap items-center gap-2">
+            <fieldset class="flex flex-wrap items-center gap-2 pointer-coarse:gap-y-3">
                 <legend class="sr-only">{{ $t('search.filters.sort') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
                 <template v-for="option in sortOptions" :key="option.value">

@@ -45,14 +45,15 @@ function onLockedSortClick(): void {
 
 const pillClass = (isActive: boolean) =>
     [
-        'cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition has-focus-visible:outline-2 has-focus-visible:outline-brand-600 dark:has-focus-visible:outline-brand-400',
+        'touch-target cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition has-focus-visible:outline-2 has-focus-visible:outline-brand-600 dark:has-focus-visible:outline-brand-400',
         isActive ? 'border-brand-600 bg-brand-600 text-white' : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800',
     ].join(' ');
 </script>
 
 <template>
-    <div class="flex flex-wrap items-center gap-2">
-        <fieldset class="flex flex-wrap items-center gap-1.5">
+    <!-- On touch screens, the rows are spaced so that a pill's hit area never covers the pill of the next row. -->
+    <div class="flex flex-wrap items-center gap-2 pointer-coarse:gap-y-4">
+        <fieldset class="flex flex-wrap items-center gap-1.5 pointer-coarse:gap-y-3">
             <legend class="sr-only">{{ $t('words.sort.legend') }}</legend>
             <span class="text-xs text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
             <template v-for="option in options" :key="option.value">
