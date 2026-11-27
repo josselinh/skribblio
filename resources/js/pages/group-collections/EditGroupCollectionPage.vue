@@ -17,7 +17,7 @@ import { useToasts } from '@/composables/useToasts';
 import { itemCrumb, useBreadcrumb } from '@/lib/breadcrumb';
 import { cardGridItemClass } from '@/lib/cards';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
-import { listPanelHeaderClass } from '@/lib/sections';
+import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
 import { useAuthStore } from '@/stores/auth';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { AccessPurpose, GroupCollectionDetail, WordGroup } from '@/types/models';
@@ -212,7 +212,7 @@ watch(
     { immediate: true },
 );
 
-const sectionClass = 'mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xs sm:p-6';
+const sectionClass = `mt-6 ${listPanelClass}`;
 const headingClass = 'text-lg font-semibold';
 </script>
 

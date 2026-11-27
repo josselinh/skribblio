@@ -1,8 +1,10 @@
 /**
  * Panel holding a list of a page (cards of the dashboard and the Explorer, groups of a collection, words of a
- * group), like the sections of the edit pages, so that each list stands apart from the next.
+ * group) or a section of an edit page, so that each stands apart from the next. On phones it spans the whole
+ * width of the screen, without side borders, so that its content keeps the width of the page.
  */
-export const listPanelClass = 'rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xs sm:p-6';
+export const listPanelClass =
+    '-mx-4 border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-5 shadow-xs sm:mx-0 sm:rounded-xl sm:border sm:p-6';
 
 /**
  * Header of a list panel, underlined across it: the title with its total on the left, optional actions (a button,
