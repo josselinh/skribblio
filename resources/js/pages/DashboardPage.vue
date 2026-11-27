@@ -106,9 +106,10 @@ const buttonClass =
 
 <template>
     <AppLayout>
-        <h1 class="sr-only">{{ $t('layout.header.dashboard') }}</h1>
+        <h1 class="text-2xl font-semibold">{{ $t('layout.header.dashboard') }}</h1>
+        <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.description') }}</p>
 
-        <div class="space-y-12">
+        <div class="mt-6 space-y-12">
             <div
                 v-if="isNewcomer"
                 class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-5"
