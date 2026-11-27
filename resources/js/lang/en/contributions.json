@@ -9,8 +9,23 @@
         "label": "Open to contributions",
         "who": "Who can contribute?",
         "description": {
-            "wordGroup": "Allowed people can add words to it, and edit or delete their own (or every word, with a full sharing). When closed, only you can change the list; the words already added are kept. When private and closed, the group is only visible to you: its members get their access back if it is reopened.",
-            "groupCollection": "Allowed people can add groups to it, and remove the ones they added (or every group, with a full sharing). When closed, only you can change its groups; the ones already added are kept. When private and closed, the collection is only visible to you: its members get their access back if it is reopened."
+            "wordGroup": "Let other people add words to this group.",
+            "groupCollection": "Let other people add groups to this collection."
+        },
+        "learnMore": "Learn more",
+        "help": {
+            "contributors": {
+                "wordGroup": "Allowed people can add words, and edit or delete their own. With a full sharing, they can edit and delete every word.",
+                "groupCollection": "Allowed people can add groups, and remove the ones they added. With a full sharing, they can remove every group."
+            },
+            "closed": {
+                "wordGroup": "When closed, only you can change the list; the words already added are kept.",
+                "groupCollection": "When closed, only you can change its groups; the ones already added are kept."
+            },
+            "privateClosed": {
+                "wordGroup": "When private and closed, the group is only visible to you: its members get their access back if it is reopened.",
+                "groupCollection": "When private and closed, the collection is only visible to you: its members get their access back if it is reopened."
+            }
         },
         "everyone": {
             "wordGroup": "Everyone who can see the group",

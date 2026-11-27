@@ -9,8 +9,23 @@
         "label": "Ouvert aux contributions",
         "who": "Qui peut contribuer ?",
         "description": {
-            "wordGroup": "Les personnes autorisées peuvent y ajouter des mots, et modifier ou supprimer les leurs (ou tous les mots, avec un partage total). Fermé, seul vous pouvez modifier la liste ; les mots déjà ajoutés sont conservés. Privé et fermé, le groupe n’est visible que par vous : ses membres retrouvent leur accès s’il est rouvert.",
-            "groupCollection": "Les personnes autorisées peuvent y ajouter des groupes, et retirer ceux qu’elles ont ajoutés (ou tous les groupes, avec un partage total). Fermée, seul vous pouvez modifier ses groupes ; ceux déjà ajoutés sont conservés. Privée et fermée, la collection n’est visible que par vous : ses membres retrouvent leur accès si elle est rouverte."
+            "wordGroup": "Permettez à d’autres personnes d’ajouter des mots à ce groupe.",
+            "groupCollection": "Permettez à d’autres personnes d’ajouter des groupes à cette collection."
+        },
+        "learnMore": "En savoir plus",
+        "help": {
+            "contributors": {
+                "wordGroup": "Les personnes autorisées peuvent ajouter des mots, et modifier ou supprimer les leurs. Avec un partage total, elles peuvent modifier et supprimer tous les mots.",
+                "groupCollection": "Les personnes autorisées peuvent ajouter des groupes, et retirer ceux qu’elles ont ajoutés. Avec un partage total, elles peuvent retirer tous les groupes."
+            },
+            "closed": {
+                "wordGroup": "Fermé, vous seul pouvez modifier la liste ; les mots déjà ajoutés sont conservés.",
+                "groupCollection": "Fermée, vous seul pouvez modifier ses groupes ; ceux déjà ajoutés sont conservés."
+            },
+            "privateClosed": {
+                "wordGroup": "Privé et fermé, le groupe n’est visible que par vous : ses membres retrouvent leur accès s’il est rouvert.",
+                "groupCollection": "Privée et fermée, la collection n’est visible que par vous : ses membres retrouvent leur accès si elle est rouverte."
+            }
         },
         "everyone": {
             "wordGroup": "Tous ceux qui voient le groupe",
