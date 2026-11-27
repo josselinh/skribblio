@@ -190,7 +190,7 @@ watch(() => props.id, load, { immediate: true });
                                 :aria-label="$t('sharing.shareType.memberLabel', { name: member.name })"
                                 class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1 text-sm text-zinc-900 dark:text-zinc-100 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-1 focus:ring-brand-500 dark:focus:ring-brand-400 focus:outline-none"
                                 aria-haspopup="dialog"
-                                @change="askShareTypeChange(member, $event)"
+                                @input="askShareTypeChange(member, $event)"
                             >
                                 <option v-for="shareType in shareTypes" :key="shareType" :value="shareType">
                                     {{ $t(`sharing.shareType.${shareType}.label`) }}
