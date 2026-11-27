@@ -23,7 +23,7 @@ usePageTitle(() => t('profile.preferences.title'));
 const { locale, changeLocale } = useLocaleChoice();
 
 const themes: Theme[] = ['system', 'light', 'dark'];
-const styles: Style[] = ['sober', 'colorful'];
+const styles: Style[] = ['colorful', 'sober'];
 
 /** Emails grouped by subject, in the order they are listed. */
 const emailSections: { title: string; notifications: EmailNotification[] }[] = [
@@ -38,7 +38,7 @@ const emailSections: { title: string; notifications: EmailNotification[] }[] = [
 ];
 
 const theme = ref<Theme>(auth.user?.theme ?? 'system');
-const style = ref<Style>(auth.user?.style ?? 'sober');
+const style = ref<Style>(auth.user?.style ?? 'colorful');
 const contentLocale = ref<Locale>(auth.user?.content_locale ?? 'fr');
 
 async function changeContentLocale(newLocale: Locale): Promise<void> {
@@ -70,7 +70,7 @@ async function changeTheme(newTheme: Theme): Promise<void> {
 }
 
 async function changeStyle(newStyle: Style): Promise<void> {
-    const previousStyle = auth.user?.style ?? 'sober';
+    const previousStyle = auth.user?.style ?? 'colorful';
     style.value = newStyle;
     applyStyle(newStyle);
     try {
