@@ -18,7 +18,7 @@ import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
 import { itemCrumb, useBreadcrumb } from '@/lib/breadcrumb';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
-import { listPanelHeaderClass } from '@/lib/sections';
+import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
 import type { WordsResponse } from '@/types/api';
 import type { AccessPurpose, WordGroup } from '@/types/models';
 
@@ -170,7 +170,7 @@ watch([currentPage, order, managesEveryWord], () => {
     }
 });
 
-const sectionClass = 'mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xs sm:p-6';
+const sectionClass = `mt-6 ${listPanelClass}`;
 const headingClass = 'text-lg font-semibold';
 </script>
 
