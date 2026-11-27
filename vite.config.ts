@@ -14,9 +14,13 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
-                /* Rounded font of the "Coloré" style. */
+                /*
+                 * Rounded font of the "Coloré" style. Not preloaded: browsers only download a declared font once some
+                 * text uses it, so that the sober style does not fetch it.
+                 */
                 bunny('Fredoka', {
                     weights: [400, 500, 600, 700],
+                    preload: false,
                 }),
             ],
         }),
