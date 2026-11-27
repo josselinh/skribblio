@@ -1,7 +1,6 @@
 {
     "list": {
-        "updatedOn": "更新于 {date}",
-        "addedOn": "添加于 {date}"
+        "updatedOn": "更新于 {date}"
     },
     "count": "{n} 个词语",
     "sort": {

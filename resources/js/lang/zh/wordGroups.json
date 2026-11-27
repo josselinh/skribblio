@@ -4,12 +4,6 @@
         "empty": "未找到词组。"
     },
     "count": "{n} 个词组",
-    "card": {
-        "addition": {
-            "by": "由 {user} 添加于 {date}",
-            "on": "添加于 {date}"
-        }
-    },
     "create": {
         "title": "新建词组",
         "submit": "创建词组"

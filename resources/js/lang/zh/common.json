@@ -1,6 +1,10 @@
 {
     "appName": "Skribblio Tools",
     "byUser": "由 {user} 创建",
+    "addition": {
+        "by": "由 {user} 添加于 {date}",
+        "on": "添加于 {date}"
+    },
     "deletedAccount": "已删除的账号",
     "cancel": "取消",
     "loading": "加载中…",
