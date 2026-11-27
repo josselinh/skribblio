@@ -52,6 +52,17 @@ class ProfileTest extends TestCase
             ->assertJsonValidationErrors(['email' => 'La valeur du champ adresse e-mail est déjà utilisée.']);
     }
 
+    public function test_rejects_pseudo_of_another_user_with_422(): void
+    {
+        User::factory()->create(['name' => 'Alice']);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->putJson('/user/profile-information', ['name' => 'Alice', 'email' => $user->email])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name' => 'La valeur du champ pseudo est déjà utilisée.']);
+    }
+
     public function test_password_change_requires_the_current_password(): void
     {
         $user = User::factory()->create();
