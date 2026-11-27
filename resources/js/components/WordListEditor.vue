@@ -265,9 +265,10 @@ const checkboxClass = 'size-4 pointer-coarse:size-5 shrink-0 rounded border-zinc
             <!-- Sticks to the bottom of the screen while there are changes, so that saving stays at hand under the list. -->
             <div
                 v-if="changedWords.length > 0 || isSaving"
-                class="sticky bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-brand-200 dark:border-brand-800 bg-white/95 dark:bg-zinc-900/95 px-4 py-2 text-sm shadow-lg backdrop-blur"
+                class="sticky bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 mt-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-2 rounded-xl border border-brand-200 dark:border-brand-800 bg-white/95 dark:bg-zinc-900/95 px-4 py-2 text-sm shadow-lg backdrop-blur"
             >
-                <p class="text-zinc-600 dark:text-zinc-400">{{ $t('words.editor.unsaved', changedWords.length) }}</p>
+                <!-- Phones only get the buttons, on one line: "Enregistrer (N)" already gives the number of changes. -->
+                <p class="mr-auto hidden text-zinc-600 sm:block dark:text-zinc-400">{{ $t('words.editor.unsaved', changedWords.length) }}</p>
                 <div class="flex items-center gap-3">
                     <button
                         type="button"
