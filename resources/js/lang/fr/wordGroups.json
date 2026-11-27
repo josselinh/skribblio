@@ -4,12 +4,6 @@
         "empty": "Aucun groupe trouvé."
     },
     "count": "{n} groupe | {n} groupes",
-    "card": {
-        "addition": {
-            "by": "Ajouté par {user}, {date}",
-            "on": "Ajouté {date}"
-        }
-    },
     "create": {
         "title": "Nouveau groupe",
         "submit": "Créer le groupe"

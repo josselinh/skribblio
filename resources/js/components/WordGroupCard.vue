@@ -43,7 +43,7 @@ function updateFavorite(isFavorite: boolean): void {
     >
         <template v-if="wordGroup.added_by !== undefined || wordGroup.added_at" #footer>
             <p v-if="isAdderShown">
-                <i18n-t keypath="wordGroups.card.addition.by" scope="global">
+                <i18n-t keypath="common.addition.by" scope="global">
                     <template #user>
                         <UserLink v-if="wordGroup.added_by" :user="wordGroup.added_by" class="relative z-10" />
                         <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
@@ -52,7 +52,7 @@ function updateFavorite(isFavorite: boolean): void {
                 </i18n-t>
             </p>
             <p v-else-if="wordGroup.added_at">
-                <i18n-t keypath="wordGroups.card.addition.on" scope="global">
+                <i18n-t keypath="common.addition.on" scope="global">
                     <template #date><RelativeTime :date="wordGroup.added_at" /></template>
                 </i18n-t>
             </p>

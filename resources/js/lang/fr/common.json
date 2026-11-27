@@ -1,6 +1,10 @@
 {
     "appName": "Skribblio Tools",
     "byUser": "par {user}",
+    "addition": {
+        "by": "Ajouté par {user}, {date}",
+        "on": "Ajouté {date}"
+    },
     "deletedAccount": "Compte supprimé",
     "cancel": "Annuler",
     "loading": "Chargement…",
