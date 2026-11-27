@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useToasts } from '@/composables/useToasts';
 import type { SortDirection, WordSort } from '@/types/models';
 
 /**
- * Order of a group's words: one pill per criterion (a drop-down list on phones, so that it fits on one line), then
- * a button that reverses the direction.
+ * Order of a group's words: one pill per criterion, then a button that reverses the direction.
  * Choosing a criterion sorts in its natural direction.
  * A locked criterion (for visitors) stays visible but only shows a notification asking to log in.
  */
@@ -43,20 +42,6 @@ function onLockedSortClick(): void {
     showToast(t('guest.lockedOption'), 'info', LOCKED_OPTION_TOAST_MS);
 }
 
-const selectId = useId();
-
-/** A locked criterion chosen in the drop-down list goes back to the current one. */
-function onSelect(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const value = select.value as WordSort;
-    if (props.lockedSorts.includes(value)) {
-        select.value = props.sort;
-        onLockedSortClick();
-        return;
-    }
-    emit('sort', value, props.defaultDirections[value]);
-}
-
 
 const pillClass = (isActive: boolean) =>
     [
@@ -67,18 +52,7 @@ const pillClass = (isActive: boolean) =>
 
 <template>
     <div class="flex flex-wrap items-center gap-2">
-        <div class="flex items-center gap-1.5 sm:hidden">
-            <label :for="selectId" class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('words.sort.prefix') }}</label>
-            <select
-                :id="selectId"
-                :value="sort"
-                class="rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-1.5 pr-7 pl-3 text-sm"
-                @input="onSelect"
-            >
-                <option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option>
-            </select>
-        </div>
-        <fieldset class="hidden flex-wrap items-center gap-1.5 sm:flex">
+        <fieldset class="flex flex-wrap items-center gap-1.5">
             <legend class="sr-only">{{ $t('words.sort.legend') }}</legend>
             <span class="text-xs text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('words.sort.prefix') }}</span>
             <template v-for="option in options" :key="option.value">
