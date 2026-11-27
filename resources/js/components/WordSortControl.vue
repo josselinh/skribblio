@@ -72,7 +72,7 @@ const pillClass = (isActive: boolean) =>
             <select
                 :id="selectId"
                 :value="sort"
-                class="rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-1.5 pr-6 pl-2.5 text-xs"
+                class="rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 py-1.5 pr-7 pl-3 text-sm"
                 @input="onSelect"
             >
                 <option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option>
