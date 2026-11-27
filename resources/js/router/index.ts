@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { trackBreadcrumb } from '@/lib/breadcrumb';
 import { trackNavigationProgress } from '@/lib/navigationProgress';
 import { consumePendingRedirect, rememberPendingRedirect } from '@/lib/pendingRedirect';
+import { scrollBehavior } from '@/lib/scroll';
 import { useAuthStore } from '@/stores/auth';
 
 declare module 'vue-router' {
@@ -22,6 +23,7 @@ declare module 'vue-router' {
 
 export const router = createRouter({
     history: createWebHistory(),
+    scrollBehavior,
     routes: [
         {
             /* Redirected by the guard: to the dashboard for logged-in users, to the Explorer for visitors. */
