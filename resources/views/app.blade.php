@@ -6,6 +6,14 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        {{-- Installable as a web app; the theme colour follows the header, kept in sync by resources/js/lib/theme.ts. --}}
+        <link rel="manifest" href="/manifest.webmanifest">
+        <link rel="icon" href="/favicon.ico" sizes="48x48">
+        <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <meta name="apple-mobile-web-app-title" content="Skribblio">
+        <meta name="theme-color" content="#ffffff">
+
         {{-- Applies the theme, the style and the language before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
         <script>
             (() => {
