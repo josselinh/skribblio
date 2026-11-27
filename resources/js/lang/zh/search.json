@@ -2,14 +2,15 @@
     "title": "探索",
     "resultsFor": "“{q}”的搜索结果",
     "catalogueDescription": "发现其他用户共享的词组和合集，或按名称搜索。",
-    "placeholder": "词组或合集的名称…",
+    "placeholder": "按名称搜索…",
     "submit": "搜索",
     "filters": {
         "type": "类型",
         "typePrefix": "类型：",
         "author": "创建者",
         "authorPrefix": "创建者：",
-        "sort": "排序方式"
+        "sort": "排序方式",
+        "toggle": "筛选"
     },
     "types": {
         "all": "全部",

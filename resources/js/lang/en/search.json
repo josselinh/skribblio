@@ -2,14 +2,15 @@
     "title": "Explore",
     "resultsFor": "Results for “{q}”",
     "catalogueDescription": "Discover the groups and collections shared by other users, or search for one by its name.",
-    "placeholder": "Name of a group or a collection…",
+    "placeholder": "Search by name…",
     "submit": "Search",
     "filters": {
         "type": "Type",
         "typePrefix": "Type:",
         "author": "Created by",
         "authorPrefix": "Created by:",
-        "sort": "Sort by"
+        "sort": "Sort by",
+        "toggle": "Filters"
     },
     "types": {
         "all": "All",
