@@ -11,6 +11,7 @@ import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
 import { useToasts } from '@/composables/useToasts';
 import type { AccessRequest, FavoriteKind } from '@/types/models';
@@ -19,6 +20,7 @@ const route = useRoute();
 const router = useRouter();
 const { showToast } = useToasts();
 const { t } = useI18n();
+usePageTitle(() => t('layout.header.dashboard'));
 
 const favoriteWordGroups = usePaginatedList(fetchFavoriteWordGroups, 'favorite_groups_page');
 const favoriteGroupCollections = usePaginatedList(fetchFavoriteGroupCollections, 'favorite_collections_page');
