@@ -2,12 +2,12 @@
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import PaginationNav from '@/components/PaginationNav.vue';
 import { cardGridItemClass } from '@/lib/cards';
+import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
 import type { PaginatedResponse } from '@/types/api';
 
 /**
- * Section listing groups or collections as cards, in a panel like the sections of the edit pages so that each list
- * stands apart from the next: a header underlined across the panel, with the title and the total on the left and
- * optional actions at the end,
+ * Section listing groups or collections as cards, in a list panel (`@/lib/sections`): a header with the title and
+ * the total on the left and optional actions at the end,
  * the cards rendered through the `item` slot, then a "see all" link (preview) and/or the pagination.
  * Used by the dashboard and the search page.
  */
@@ -41,11 +41,8 @@ defineSlots<{
 </script>
 
 <template>
-    <section
-        :aria-labelledby="`${sectionId}-title`"
-        class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xs sm:p-6"
-    >
-        <div class="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-200 pb-3 dark:border-zinc-800">
+    <section :aria-labelledby="`${sectionId}-title`" :class="listPanelClass">
+        <div :class="listPanelHeaderClass">
             <h2 :id="`${sectionId}-title`" class="text-lg font-semibold">
                 {{ title }}
                 <span v-if="result" class="font-normal text-zinc-500 dark:text-zinc-400">({{ result.meta.total }})</span>
