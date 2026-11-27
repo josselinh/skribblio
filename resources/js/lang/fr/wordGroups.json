@@ -7,8 +7,7 @@
     "card": {
         "addition": {
             "by": "Ajouté par {user}",
-            "on": "Ajouté le {date}",
-            "date": "Le {date}"
+            "on": "Ajouté {date}"
         }
     },
     "create": {

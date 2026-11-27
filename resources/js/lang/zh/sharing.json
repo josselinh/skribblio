@@ -45,7 +45,7 @@
             "contribution": "被允许贡献的人"
         },
         "noMembers": "目前只有你。发送邀请链接即可收到请求。",
-        "since": "自 {date} 起"
+        "since": "授权于 {date}"
     },
     "revoke": {
         "button": "移除",

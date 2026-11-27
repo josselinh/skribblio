@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import LanguageBadge from '@/components/LanguageBadge.vue';
+import RelativeTime from '@/components/RelativeTime.vue';
 import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
-import { formatDateTime } from '@/lib/format';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 
@@ -52,7 +52,7 @@ const isMembersOnly = computed(() => props.contributionsMembersOnly && props.vis
                 </p>
                 <p v-if="updatedAt" class="text-zinc-500 dark:text-zinc-400">
                     <i18n-t keypath="editing.updatedOn" scope="global">
-                        <template #date><time :datetime="updatedAt">{{ formatDateTime(updatedAt) }}</time></template>
+                        <template #date><RelativeTime :date="updatedAt" /></template>
                     </i18n-t>
                 </p>
             </div>

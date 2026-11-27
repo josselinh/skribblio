@@ -45,7 +45,7 @@
             "contribution": "Personnes autorisées à contribuer"
         },
         "noMembers": "Personne d'autre que vous pour l'instant. Envoyez le lien d'invitation pour recevoir des demandes.",
-        "since": "Depuis le {date}"
+        "since": "Accès accordé {date}"
     },
     "revoke": {
         "button": "Retirer",

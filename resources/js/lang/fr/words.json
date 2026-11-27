@@ -1,6 +1,7 @@
 {
     "list": {
-        "updatedOn": "modifié le {date}"
+        "updatedOn": "modifié {date}",
+        "addedOn": "ajouté {date}"
     },
     "count": "{n} mot | {n} mots",
     "sort": {

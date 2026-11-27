@@ -7,8 +7,7 @@
     "card": {
         "addition": {
             "by": "由 {user} 添加",
-            "on": "添加于 {date}",
-            "date": "于 {date}"
+            "on": "添加于 {date}"
         }
     },
     "create": {
