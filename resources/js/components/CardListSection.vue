@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T extends { id: string }">
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import PaginationNav from '@/components/PaginationNav.vue';
+import { cardGridItemClass } from '@/lib/cards';
 import type { PaginatedResponse } from '@/types/api';
 
 /**
@@ -59,7 +60,7 @@ defineSlots<{
         </div>
         <template v-else-if="result">
             <ul class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" :class="{ 'opacity-60': isLoading }">
-                <li v-for="item in result.data" :key="item.id">
+                <li v-for="item in result.data" :key="item.id" :class="cardGridItemClass">
                     <slot name="item" :item="item" />
                 </li>
             </ul>

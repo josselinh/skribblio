@@ -14,6 +14,7 @@ import WordGroupCard from '@/components/WordGroupCard.vue';
 import WordGroupSearch from '@/components/WordGroupSearch.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
+import { cardGridItemClass } from '@/lib/cards';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
 import { useAuthStore } from '@/stores/auth';
 import type { ValidationErrorResponse } from '@/types/api';
@@ -337,7 +338,7 @@ const headingClass = 'text-lg font-semibold';
                             class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
                             :class="{ 'opacity-60': isUpdatingGroups }"
                         >
-                            <li v-for="wordGroup in listedWordGroups" :key="wordGroup.id" class="relative">
+                            <li v-for="wordGroup in listedWordGroups" :key="wordGroup.id" class="relative" :class="cardGridItemClass">
                                 <WordGroupCard
                                     :word-group="wordGroup"
                                     :class="{ 'opacity-50': !wordGroup.can.remove_from_collection }"
