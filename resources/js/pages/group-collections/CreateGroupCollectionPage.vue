@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { createGroupCollection } from '@/api/groupCollections';
 import AppLayout from '@/components/AppLayout.vue';
@@ -8,8 +9,12 @@ import LanguageField from '@/components/LanguageField.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import VisibilityField from '@/components/VisibilityField.vue';
 import { useForm } from '@/composables/useForm';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { preferredContentLanguage } from '@/lib/contentLanguage';
 import type { Visibility } from '@/types/models';
+
+const { t } = useI18n();
+usePageTitle(() => t('groupCollections.create.title'));
 
 /** Creates an empty collection; its groups are added afterwards, on its page. */
 const router = useRouter();

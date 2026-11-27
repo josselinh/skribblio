@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
+import { usePageTitle } from '@/composables/usePageTitle';
+
+const { t } = useI18n();
+usePageTitle(() => t('layout.notFound.title'));
 </script>
 
 <template>

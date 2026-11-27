@@ -4,12 +4,14 @@ import AccountNav from '@/components/AccountNav.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import FormField from '@/components/FormField.vue';
 import { useForm } from '@/composables/useForm';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore();
 const { showToast } = useToasts();
 const { t } = useI18n();
+usePageTitle(() => t('profile.security.title'));
 
 const passwordForm = useForm({ current_password: '', password: '', password_confirmation: '' });
 

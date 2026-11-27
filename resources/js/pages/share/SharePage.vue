@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { fetchShareInvitation, requestAccess } from '@/api/sharing';
 import AppLayout from '@/components/AppLayout.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, ShareInvitation } from '@/types/models';
 
@@ -36,6 +37,7 @@ const itemRoute = computed(() =>
 );
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 const isRequesting = ref(false);
+usePageTitle(() => (status.value === 'not-found' ? t('sharing.invitation.invalid.title') : invitation.value?.name));
 const requestFailed = ref(false);
 
 /** When the user already has access, opens the item directly. */

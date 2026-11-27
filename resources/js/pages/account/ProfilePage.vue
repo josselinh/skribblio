@@ -7,6 +7,7 @@ import AppLayout from '@/components/AppLayout.vue';
 import FormField from '@/components/FormField.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useForm } from '@/composables/useForm';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { useAuthStore } from '@/stores/auth';
 
@@ -14,6 +15,7 @@ const auth = useAuthStore();
 const router = useRouter();
 const { showToast } = useToasts();
 const { t } = useI18n();
+usePageTitle(() => t('profile.title'));
 
 const profileForm = useForm({ name: auth.user?.name ?? '', email: auth.user?.email ?? '' });
 

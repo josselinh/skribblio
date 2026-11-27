@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { isAxiosError } from 'axios';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { fetchUser, fetchUserGroupCollections, fetchUserWordGroups } from '@/api/users';
 import AppLayout from '@/components/AppLayout.vue';
 import CardListSection from '@/components/CardListSection.vue';
 import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
 import { useBreadcrumb } from '@/lib/breadcrumb';
 import { useAuthStore } from '@/stores/auth';
@@ -18,6 +20,7 @@ import type { User } from '@/types/models';
  */
 const route = useRoute();
 const auth = useAuthStore();
+const { t } = useI18n();
 
 const userId = computed(() => String(route.params.id));
 const isOwnPage = computed(() => userId.value === auth.user?.id);
@@ -25,6 +28,7 @@ const isOwnPage = computed(() => userId.value === auth.user?.id);
 const user = ref<Pick<User, 'id' | 'name'> | null>(null);
 const status = ref<'loading' | 'loaded' | 'not-found' | 'failed'>('loading');
 useBreadcrumb(() => user.value?.name);
+usePageTitle(() => (status.value === 'not-found' ? t('users.notFound') : user.value?.name));
 
 async function loadUser(): Promise<void> {
     status.value = 'loading';
