@@ -1,7 +1,7 @@
 /** Colour theme of the interface: the system's one, or forced light or dark. */
 export type Theme = 'system' | 'light' | 'dark';
 
-/** Visual style of the interface, combined with the theme: sober, or colourful (rounded font, vivid colours). */
+/** Visual style of the interface, combined with the theme: colourful by default (rounded font, vivid colours), or sober. */
 export type Style = 'sober' | 'colorful';
 
 /** A language of the content (the words of a group, the groups of a collection). */

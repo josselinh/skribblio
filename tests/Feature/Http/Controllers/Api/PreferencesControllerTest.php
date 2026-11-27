@@ -58,13 +58,13 @@ class PreferencesControllerTest extends TestCase
         $user = User::factory()->create(['theme' => Theme::Dark]);
 
         $this->actingAs($user)
-            ->patchJson('/api/user/preferences', ['style' => 'colorful'])
+            ->patchJson('/api/user/preferences', ['style' => 'sober'])
             ->assertOk()
-            ->assertJsonPath('data.style', 'colorful')
+            ->assertJsonPath('data.style', 'sober')
             ->assertJsonPath('data.theme', 'dark');
 
         $user->refresh();
-        $this->assertSame(Style::Colorful, $user->style);
+        $this->assertSame(Style::Sober, $user->style);
         $this->assertSame(Theme::Dark, $user->theme);
     }
 
@@ -130,6 +130,6 @@ class PreferencesControllerTest extends TestCase
             ]);
 
         $this->assertSame(Theme::System, $user->fresh()->theme);
-        $this->assertSame(Style::Sober, $user->fresh()->style);
+        $this->assertSame(Style::Colorful, $user->fresh()->style);
     }
 }

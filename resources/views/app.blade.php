@@ -10,11 +10,11 @@
         <script>
             (() => {
                 let theme = 'system';
-                let style = 'sober';
+                let style = 'colorful';
                 let locale = null;
                 try {
                     theme = localStorage.getItem('theme') ?? 'system';
-                    style = localStorage.getItem('style') ?? 'sober';
+                    style = localStorage.getItem('style') ?? 'colorful';
                     locale = localStorage.getItem('locale');
                 } catch {}
                 if (style === 'colorful') {
