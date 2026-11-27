@@ -5,7 +5,8 @@ import { cardGridItemClass } from '@/lib/cards';
 import type { PaginatedResponse } from '@/types/api';
 
 /**
- * Section listing groups or collections as cards: a title with the total, optional header actions,
+ * Section listing groups or collections as cards: a header underlined across the page, with the title and the total
+ * on the left and optional actions at the end,
  * the cards rendered through the `item` slot, then a "see all" link (preview) and/or the pagination.
  * Used by the dashboard and the search page.
  */
@@ -40,7 +41,7 @@ defineSlots<{
 
 <template>
     <section :aria-labelledby="`${sectionId}-title`">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-200 pb-3 dark:border-zinc-800">
             <h2 :id="`${sectionId}-title`" class="text-lg font-semibold">
                 {{ title }}
                 <span v-if="result" class="font-normal text-zinc-500 dark:text-zinc-400">({{ result.meta.total }})</span>
