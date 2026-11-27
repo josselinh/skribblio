@@ -32,6 +32,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.ts'])
     </head>
     <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-        <div id="app"></div>
+        {{-- Same bar as resources/js/components/NavigationProgress.vue, until the application replaces it. --}}
+        <div id="app">
+            <div aria-hidden="true" class="pointer-events-none fixed inset-x-0 top-0 z-50 h-1 overflow-hidden">
+                <div class="h-full w-1/3 animate-navigation-progress bg-brand-300 dark:bg-brand-400 motion-reduce:w-full motion-reduce:animate-none"></div>
+            </div>
+        </div>
     </body>
 </html>
