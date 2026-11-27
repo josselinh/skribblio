@@ -6,7 +6,7 @@
     "count": "{n} groupe | {n} groupes",
     "card": {
         "addition": {
-            "by": "Ajouté par {user}",
+            "by": "Ajouté par {user}, {date}",
             "on": "Ajouté {date}"
         }
     },

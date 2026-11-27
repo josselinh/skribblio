@@ -17,8 +17,8 @@ const emit = defineEmits<{
 }>();
 
 /**
- * Footer of a group listed by a collection: "Ajouté par X", then "Le …" on the next line; guests, never told who added
- * it, get "Ajouté le …".
+ * Footer of a group listed by a collection, on one line: "Ajouté par X, il y a 3 jours"; guests, never told who added
+ * it, get "Ajouté il y a 3 jours".
  */
 const isAdderShown = computed(() => props.wordGroup.added_by !== undefined);
 
@@ -48,11 +48,11 @@ function updateFavorite(isFavorite: boolean): void {
                         <UserLink v-if="wordGroup.added_by" :user="wordGroup.added_by" class="relative z-10" />
                         <span v-else class="italic">{{ $t('common.deletedAccount') }}</span>
                     </template>
+                    <template #date><RelativeTime v-if="wordGroup.added_at" :date="wordGroup.added_at" /></template>
                 </i18n-t>
             </p>
-            <p v-if="wordGroup.added_at">
-                <RelativeTime v-if="isAdderShown" :date="wordGroup.added_at" capitalized />
-                <i18n-t v-else keypath="wordGroups.card.addition.on" scope="global">
+            <p v-else-if="wordGroup.added_at">
+                <i18n-t keypath="wordGroups.card.addition.on" scope="global">
                     <template #date><RelativeTime :date="wordGroup.added_at" /></template>
                 </i18n-t>
             </p>
