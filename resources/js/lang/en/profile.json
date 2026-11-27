@@ -44,6 +44,18 @@
             "light": "Light",
             "dark": "Dark"
         },
+        "style": {
+            "title": "Style",
+            "description": "How the interface looks. It combines with the light or dark theme.",
+            "sober": {
+                "label": "Sober",
+                "description": "Clean and understated, in neutral colours."
+            },
+            "colorful": {
+                "label": "Colourful",
+                "description": "Rounded font, vivid colours and sticker-like cards."
+            }
+        },
         "emails": {
             "title": "Emails",
             "description": "Choose which emails you receive. The ones about your account (address confirmation, forgotten password) are always sent.",

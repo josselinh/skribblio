@@ -8,6 +8,7 @@ declare(strict_types=1);
 return [
     'pseudo' => '昵称',
     'theme' => '主题',
+    'style' => '风格',
     'content_locale' => '列表语言',
     'language' => '语言',
     'locale' => '语言',

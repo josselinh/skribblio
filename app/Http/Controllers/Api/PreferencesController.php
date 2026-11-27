@@ -9,7 +9,7 @@ use App\Http\Resources\UserResource;
 class PreferencesController extends Controller
 {
     /**
-     * Updates the current user's theme, interface language, content language and email preferences, keeping the kinds of emails not given.
+     * Updates the current user's theme, style, interface language, content language and email preferences, keeping the kinds of emails not given.
      */
     public function update(UpdatePreferencesRequest $request): UserResource
     {
@@ -18,6 +18,9 @@ class PreferencesController extends Controller
 
         if (array_key_exists('theme', $validated)) {
             $user->theme = $validated['theme'];
+        }
+        if (array_key_exists('style', $validated)) {
+            $user->style = $validated['style'];
         }
         if (array_key_exists('locale', $validated)) {
             $user->locale = $validated['locale'];

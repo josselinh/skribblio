@@ -80,3 +80,121 @@
         cursor: pointer;
     }
 }
+
+/*
+ * "Coloré" style, an original playful look chosen in the preferences (class `style-colorful` on the root element,
+ * set by `@/lib/theme` and, before the first paint, by `app.blade.php`):
+ * a rounded font, neutrals tinted with plum, a vivid violet accent, rounder corners, and panels, cards and buttons
+ * outlined like stickers with an offset shadow, on a dotted paper background. It redefines the theme variables, so
+ * that the components keep their classes; it combines with the light and dark themes.
+ */
+.style-colorful {
+    --font-sans: 'Fredoka', ui-rounded, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: oklch(0.97 0.025 300);
+    --color-brand-100: oklch(0.94 0.05 300);
+    --color-brand-200: oklch(0.88 0.09 300);
+    --color-brand-300: oklch(0.8 0.14 300);
+    --color-brand-400: oklch(0.7 0.19 300);
+    --color-brand-500: oklch(0.61 0.22 300);
+    --color-brand-600: oklch(0.53 0.22 300);
+    --color-brand-700: oklch(0.46 0.2 300);
+    --color-brand-800: oklch(0.39 0.16 300);
+    --color-brand-900: oklch(0.33 0.12 300);
+    --color-brand-950: oklch(0.25 0.09 300);
+
+    --color-zinc-50: oklch(0.982 0.012 85);
+    --color-zinc-100: oklch(0.955 0.02 300);
+    --color-zinc-200: oklch(0.9 0.025 300);
+    --color-zinc-300: oklch(0.83 0.03 300);
+    --color-zinc-400: oklch(0.7 0.035 300);
+    --color-zinc-500: oklch(0.56 0.04 300);
+    --color-zinc-600: oklch(0.46 0.045 300);
+    --color-zinc-700: oklch(0.38 0.045 300);
+    --color-zinc-800: oklch(0.29 0.04 300);
+    --color-zinc-900: oklch(0.22 0.035 300);
+    --color-zinc-950: oklch(0.16 0.03 300);
+
+    --radius-md: 0.5rem;
+    --radius-lg: 0.875rem;
+    --radius-xl: 1.25rem;
+
+    /* Outline and offset shadow of the stickers. */
+    --sticker-ink: var(--color-zinc-900);
+}
+
+.dark.style-colorful {
+    --sticker-ink: oklch(0.5 0.14 300);
+}
+
+.style-colorful body {
+    background-image: radial-gradient(color-mix(in oklch, var(--color-brand-300) 45%, transparent) 1px, transparent 1.5px);
+    background-size: 20px 20px;
+}
+
+.dark.style-colorful body {
+    background-image: radial-gradient(color-mix(in oklch, var(--color-brand-700) 45%, transparent) 1px, transparent 1.5px);
+}
+
+/* Panels, cards and lists (they carry a light shadow in the sober style) become stickers. */
+.style-colorful :is(.shadow-xs, .shadow-sm) {
+    border-width: 2px;
+    border-color: var(--sticker-ink);
+    --tw-shadow: 4px 4px 0 0 var(--sticker-ink);
+}
+
+.style-colorful .shadow-lg {
+    --tw-shadow: 6px 6px 0 0 var(--sticker-ink);
+}
+
+/* Primary buttons: a thick outline and a small shadow that the press flattens. */
+.style-colorful :is(button, a).bg-brand-600 {
+    border: 2px solid var(--sticker-ink);
+    box-shadow: 2px 2px 0 0 var(--sticker-ink);
+    font-weight: 600;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.style-colorful :is(button, a).bg-brand-600:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.style-colorful :is(h1, h2, h3) {
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+/* The title strips of the cards of a grid take turns between four pastel colours. */
+.style-colorful li:nth-child(4n + 1) .card-strip {
+    background-color: oklch(0.95 0.07 95);
+}
+
+.style-colorful li:nth-child(4n + 2) .card-strip {
+    background-color: oklch(0.94 0.06 165);
+}
+
+.style-colorful li:nth-child(4n + 3) .card-strip {
+    background-color: oklch(0.93 0.06 350);
+}
+
+.style-colorful li:nth-child(4n + 4) .card-strip {
+    background-color: oklch(0.93 0.05 235);
+}
+
+.dark.style-colorful li:nth-child(4n + 1) .card-strip {
+    background-color: oklch(0.34 0.06 95);
+}
+
+.dark.style-colorful li:nth-child(4n + 2) .card-strip {
+    background-color: oklch(0.33 0.06 165);
+}
+
+.dark.style-colorful li:nth-child(4n + 3) .card-strip {
+    background-color: oklch(0.33 0.07 350);
+}
+
+.dark.style-colorful li:nth-child(4n + 4) .card-strip {
+    background-color: oklch(0.33 0.06 235);
+}

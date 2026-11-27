@@ -6,15 +6,20 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        {{-- Applies the theme and the language before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
+        {{-- Applies the theme, the style and the language before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
         <script>
             (() => {
                 let theme = 'system';
+                let style = 'sober';
                 let locale = null;
                 try {
                     theme = localStorage.getItem('theme') ?? 'system';
+                    style = localStorage.getItem('style') ?? 'sober';
                     locale = localStorage.getItem('locale');
                 } catch {}
+                if (style === 'colorful') {
+                    document.documentElement.classList.add('style-colorful');
+                }
                 if (theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                 }
