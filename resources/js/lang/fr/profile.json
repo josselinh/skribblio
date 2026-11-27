@@ -44,6 +44,18 @@
             "light": "Clair",
             "dark": "Foncé"
         },
+        "style": {
+            "title": "Style",
+            "description": "L’apparence de l’interface. Elle se combine avec le thème clair ou foncé.",
+            "sober": {
+                "label": "Sobre",
+                "description": "Épuré et discret, aux couleurs neutres."
+            },
+            "colorful": {
+                "label": "Coloré",
+                "description": "Police ronde, couleurs vives et cartes façon autocollants."
+            }
+        },
         "emails": {
             "title": "Emails",
             "description": "Choisissez les emails que vous recevez. Ceux qui concernent votre compte (confirmation d’adresse, mot de passe oublié) sont toujours envoyés.",

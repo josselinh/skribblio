@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers\Api;
 use App\Enums\EmailNotification;
 use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
+use App\Enums\Style;
 use App\Enums\Theme;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,6 +51,21 @@ class PreferencesControllerTest extends TestCase
         $this->assertTrue($user->wantsEmail(EmailNotification::AccessRequestDecided));
         $this->assertTrue($user->wantsEmail(EmailNotification::WordGroupFavorited));
         $this->assertFalse($user->wantsEmail(EmailNotification::GroupCollectionFavorited));
+    }
+
+    public function test_updates_the_style_without_changing_the_theme(): void
+    {
+        $user = User::factory()->create(['theme' => Theme::Dark]);
+
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['style' => 'colorful'])
+            ->assertOk()
+            ->assertJsonPath('data.style', 'colorful')
+            ->assertJsonPath('data.theme', 'dark');
+
+        $user->refresh();
+        $this->assertSame(Style::Colorful, $user->style);
+        $this->assertSame(Theme::Dark, $user->theme);
     }
 
     public function test_updates_the_interface_and_content_languages_independently(): void
@@ -99,19 +115,21 @@ class PreferencesControllerTest extends TestCase
         $this->assertFalse($user->fresh()->wantsEmail(EmailNotification::WordGroupFavorited));
     }
 
-    public function test_rejects_unknown_theme_and_unknown_email_with_422(): void
+    public function test_rejects_unknown_theme_style_and_email_with_422(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->patchJson('/api/user/preferences', ['theme' => 'pink', 'locale' => 'de', 'email_notifications' => ['newsletter' => true]])
+            ->patchJson('/api/user/preferences', ['theme' => 'pink', 'style' => 'neon', 'locale' => 'de', 'email_notifications' => ['newsletter' => true]])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
                 'theme' => 'Le champ thème sélectionné est invalide.',
+                'style' => 'Le champ style sélectionné est invalide.',
                 'locale' => 'Le champ langue sélectionné est invalide.',
                 'email_notifications',
             ]);
 
         $this->assertSame(Theme::System, $user->fresh()->theme);
+        $this->assertSame(Style::Sober, $user->fresh()->style);
     }
 }

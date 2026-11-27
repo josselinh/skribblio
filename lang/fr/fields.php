@@ -8,6 +8,7 @@ declare(strict_types=1);
 return [
     'pseudo' => 'pseudo',
     'theme' => 'thème',
+    'style' => 'style',
     'content_locale' => 'langue des listes',
     'language' => 'langue',
     'locale' => 'langue',

@@ -4,8 +4,8 @@ import { computed, ref } from 'vue';
 import { ensureCsrfCookie, http } from '@/lib/http';
 import { setLocale } from '@/lib/i18n';
 import type { MessageResponse, ResourceResponse } from '@/types/api';
-import { applyTheme } from '@/lib/theme';
-import type { EmailNotification, InterfaceLocale, Locale, Theme, User } from '@/types/models';
+import { applyStyle, applyTheme } from '@/lib/theme';
+import type { EmailNotification, InterfaceLocale, Locale, Style, Theme, User } from '@/types/models';
 
 export interface LoginPayload {
     email: string;
@@ -33,6 +33,7 @@ export interface UpdatePasswordPayload {
 
 export interface PreferencesPayload {
     theme?: Theme;
+    style?: Style;
     locale?: InterfaceLocale;
     content_locale?: Locale;
     email_notifications?: Partial<Record<EmailNotification, boolean>>;
@@ -53,11 +54,12 @@ export const useAuthStore = defineStore('auth', () => {
     const isVerified = computed(() => user.value?.email_verified_at != null);
 
     /**
-     * Stores the user and applies their theme and language (a visitor keeps the ones last used on this device).
+     * Stores the user and applies their theme, style and language (a visitor keeps the ones last used on this device).
      */
     function setUser(newUser: User): void {
         user.value = newUser;
         applyTheme(newUser.theme);
+        applyStyle(newUser.style);
         setLocale(newUser.locale);
     }
 

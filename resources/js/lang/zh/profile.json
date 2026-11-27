@@ -44,6 +44,18 @@
             "light": "浅色",
             "dark": "深色"
         },
+        "style": {
+            "title": "风格",
+            "description": "界面的外观，可与浅色或深色主题搭配使用。",
+            "sober": {
+                "label": "简洁",
+                "description": "简约低调，采用中性色调。"
+            },
+            "colorful": {
+                "label": "多彩",
+                "description": "圆润字体、鲜艳色彩和贴纸风格的卡片。"
+            }
+        },
         "emails": {
             "title": "邮件",
             "description": "选择你要接收的邮件。与账号相关的邮件（地址确认、忘记密码）始终会发送。",

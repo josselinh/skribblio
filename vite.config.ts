@@ -14,6 +14,10 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                /* Rounded font of the "Coloré" style. */
+                bunny('Fredoka', {
+                    weights: [400, 500, 600, 700],
+                }),
             ],
         }),
         vue({

@@ -1,4 +1,4 @@
-import type { Theme } from '@/types/models';
+import type { Style, Theme } from '@/types/models';
 
 /**
  * Applies the colour theme: the `dark` class on the root element drives every `dark:` variant. The user's choice
@@ -39,3 +39,18 @@ export function applyTheme(theme: Theme): void {
 
 darkSchemeQuery.addEventListener('change', render);
 render();
+
+/**
+ * Applies the visual style: the `style-colorful` class on the root element switches to the "Coloré" look of
+ * `app.css`. Like the theme, it is saved on the account and remembered on this device for `app.blade.php`.
+ */
+export const STYLE_STORAGE_KEY = 'style';
+
+export function applyStyle(style: Style): void {
+    try {
+        localStorage.setItem(STYLE_STORAGE_KEY, style);
+    } catch {
+        // Storage unavailable.
+    }
+    document.documentElement.classList.toggle('style-colorful', style === 'colorful');
+}

@@ -39,7 +39,8 @@ defineProps<{
         <article
             class="relative row-span-4 grid grid-rows-subgrid overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs transition hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm has-[h3_a:focus-visible]:outline-2 has-[h3_a:focus-visible]:outline-brand-600 dark:has-[h3_a:focus-visible]:outline-brand-400"
         >
-            <header class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/70 py-3 pr-12 pl-4">
+            <!-- `card-strip`: tinted in turn by the "Coloré" style (app.css). -->
+            <header class="card-strip border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/70 py-3 pr-12 pl-4">
                 <h3 class="truncate font-medium" :title="name">
                     <RouterLink :to="to" class="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none">
                         {{ name }}

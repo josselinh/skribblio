@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\EmailNotification;
 use App\Enums\InterfaceLocale;
 use App\Enums\Locale;
+use App\Enums\Style;
 use App\Enums\Theme;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -19,7 +20,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'theme', 'locale', 'content_locale', 'email_notifications'])]
+#[Fillable(['name', 'email', 'password', 'theme', 'style', 'locale', 'content_locale', 'email_notifications'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
@@ -47,6 +48,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'theme' => Theme::class,
+            'style' => Style::class,
             'locale' => InterfaceLocale::class,
             'content_locale' => Locale::class,
             'email_notifications' => 'array',

@@ -8,9 +8,9 @@ import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { CONTENT_LOCALES } from '@/lib/contentLanguage';
 import { LOCALES } from '@/lib/i18n';
-import { applyTheme } from '@/lib/theme';
+import { applyStyle, applyTheme } from '@/lib/theme';
 import { useAuthStore } from '@/stores/auth';
-import type { EmailNotification, Locale, Theme } from '@/types/models';
+import type { EmailNotification, Locale, Style, Theme } from '@/types/models';
 
 /**
  * The user's preferences, each saved as soon as it changes (optimistic, reverted on failure): the interface's
@@ -23,6 +23,7 @@ usePageTitle(() => t('profile.preferences.title'));
 const { locale, changeLocale } = useLocaleChoice();
 
 const themes: Theme[] = ['system', 'light', 'dark'];
+const styles: Style[] = ['sober', 'colorful'];
 
 /** Emails grouped by subject, in the order they are listed. */
 const emailSections: { title: string; notifications: EmailNotification[] }[] = [
@@ -37,6 +38,7 @@ const emailSections: { title: string; notifications: EmailNotification[] }[] = [
 ];
 
 const theme = ref<Theme>(auth.user?.theme ?? 'system');
+const style = ref<Style>(auth.user?.style ?? 'sober');
 const contentLocale = ref<Locale>(auth.user?.content_locale ?? 'fr');
 
 async function changeContentLocale(newLocale: Locale): Promise<void> {
@@ -63,6 +65,20 @@ async function changeTheme(newTheme: Theme): Promise<void> {
     } catch {
         theme.value = previousTheme;
         applyTheme(previousTheme);
+        showToast(t('profile.preferences.failed'), 'error');
+    }
+}
+
+async function changeStyle(newStyle: Style): Promise<void> {
+    const previousStyle = auth.user?.style ?? 'sober';
+    style.value = newStyle;
+    applyStyle(newStyle);
+    try {
+        await auth.updatePreferences({ style: newStyle });
+        showToast(t('profile.preferences.saved'));
+    } catch {
+        style.value = previousStyle;
+        applyStyle(previousStyle);
         showToast(t('profile.preferences.failed'), 'error');
     }
 }
@@ -130,6 +146,24 @@ async function toggleEmail(notification: EmailNotification, isWanted: boolean): 
                     >
                         <input type="radio" name="theme" :value="choice" :checked="theme === choice" @change="changeTheme(choice)" />
                         <span class="text-sm font-medium">{{ $t(`profile.preferences.theme.${choice}`) }}</span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="mt-6 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm" aria-labelledby="style-title">
+                <h2 id="style-title" class="text-lg font-semibold">{{ $t('profile.preferences.style.title') }}</h2>
+                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $t('profile.preferences.style.description') }}</p>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="style-title">
+                    <label
+                        v-for="choice in styles"
+                        :key="choice"
+                        class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
+                    >
+                        <input type="radio" name="style" class="mt-1" :value="choice" :checked="style === choice" @change="changeStyle(choice)" />
+                        <span>
+                            <span class="block text-sm font-medium">{{ $t(`profile.preferences.style.${choice}.label`) }}</span>
+                            <span class="block text-sm text-zinc-500 dark:text-zinc-400">{{ $t(`profile.preferences.style.${choice}.description`) }}</span>
+                        </span>
                     </label>
                 </div>
             </section>
