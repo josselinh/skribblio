@@ -63,6 +63,7 @@
         "saveFailed": "无法保存修改。请刷新页面后重试。",
         "deleteFailed": "无法删除这些词语。请刷新页面后重试。",
         "selected": "已选择 {n} 个词语",
+        "unsaved": "{n} 处修改未保存",
         "saveCount": "保存（{count}）",
         "selectWord": "选择“{name}”",
         "wordLabel": "词语“{name}”",
