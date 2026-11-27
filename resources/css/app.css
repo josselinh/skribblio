@@ -22,6 +22,18 @@
     --color-brand-800: oklch(0.36 0.06 250);
     --color-brand-900: oklch(0.3 0.05 250);
     --color-brand-950: oklch(0.24 0.04 250);
+
+    /* Segment crossing the bar of `NavigationProgress` (and of its placeholder in app.blade.php). */
+    --animate-navigation-progress: navigation-progress 1.2s ease-in-out infinite;
+
+    @keyframes navigation-progress {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(300%);
+        }
+    }
 }
 
 @layer base {
