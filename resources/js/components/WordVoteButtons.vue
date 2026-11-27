@@ -9,6 +9,8 @@ import type { Word, WordVote } from '@/types/models';
  * the vote, clicking it again removes it; the change is shown at once and reverted if the request fails.
  * Otherwise (group closed to contributions, author of the word, visitor) the same thumbs are only displayed,
  * the user's own vote still highlighted. With `readonly`, they are only displayed in any case (the edit page).
+ * A thumb nobody chose stays discreet (grey emoji), so that a list of words without votes is not a column of
+ * yellow thumbs; it gets its colour back on hover when it can be clicked.
  */
 const props = defineProps<{
     word: Word;
@@ -64,6 +66,11 @@ const buttons: { vote: WordVote; emoji: string; label: string; activeClass: stri
 function countOf(vote: WordVote): number {
     return vote === 'up' ? props.word.upvotes_count : props.word.downvotes_count;
 }
+
+/** Grey emoji for a thumb without any vote, coloured back on hover of a clickable one (`group`). */
+function emojiClass(vote: WordVote): string {
+    return countOf(vote) === 0 ? 'opacity-40 grayscale group-hover:opacity-100 group-hover:grayscale-0' : '';
+}
 </script>
 
 <template>
@@ -72,14 +79,14 @@ function countOf(vote: WordVote): number {
             <button
                 v-if="word.can.vote && !readonly"
                 type="button"
-                class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+                class="group inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums ring-1 transition focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
                 :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-600 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'"
                 :aria-pressed="word.my_vote === button.vote"
                 :aria-label="$t('words.votes.buttonLabel', { vote: button.label, word: word.name, count: countOf(button.vote) })"
                 :title="hasFailed ? $t('words.votes.failed') : button.label"
                 @click="toggle(button.vote)"
             >
-                <span aria-hidden="true">{{ button.emoji }}</span>
+                <span aria-hidden="true" class="transition" :class="emojiClass(button.vote)">{{ button.emoji }}</span>
                 {{ countOf(button.vote) }}
             </button>
             <span
@@ -88,7 +95,7 @@ function countOf(vote: WordVote): number {
                 :class="word.my_vote === button.vote ? button.activeClass : 'text-zinc-500 dark:text-zinc-400 ring-zinc-200 dark:ring-zinc-700'"
                 :title="button.label"
             >
-                <span aria-hidden="true">{{ button.emoji }}</span>
+                <span aria-hidden="true" class="transition" :class="emojiClass(button.vote)">{{ button.emoji }}</span>
                 <span class="sr-only">{{ $t('words.votes.countLabel', { vote: button.label }) }}</span>
                 {{ countOf(button.vote) }}
             </span>
