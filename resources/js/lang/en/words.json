@@ -63,6 +63,7 @@
         "saveFailed": "The changes could not be saved. Reload the page and try again.",
         "deleteFailed": "These words could not be deleted. Reload the page and try again.",
         "selected": "{n} word selected | {n} words selected",
+        "unsaved": "{n} unsaved change | {n} unsaved changes",
         "saveCount": "Save ({count})",
         "selectWord": "Select “{name}”",
         "wordLabel": "Word “{name}”",

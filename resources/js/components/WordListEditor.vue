@@ -177,7 +177,8 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
     <div>
         <form novalidate @submit.prevent="save">
             <div
-                class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-4 py-2 text-sm"
+                v-if="deletableWords.length > 0"
+                class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-4 py-2 text-sm"
             >
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                     <label v-if="deletableWords.length > 0" class="flex items-center gap-2">
@@ -201,28 +202,11 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                         {{ $t('common.deleteSelection') }}
                     </button>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button
-                        type="button"
-                        :disabled="isSaving || changedWords.length === 0"
-                        class="disabled:cursor-not-allowed disabled:opacity-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-                        @click="cancel"
-                    >
-                        {{ $t('common.cancel') }}
-                    </button>
-                    <button
-                        type="submit"
-                        :disabled="isSaving || changedWords.length === 0"
-                        class="rounded-lg bg-brand-600 px-3 py-1.5 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        {{ isSaving ? $t('common.saving') : changedWords.length > 0 ? $t('words.editor.saveCount', { count: changedWords.length }) : $t('common.save') }}
-                    </button>
-                </div>
             </div>
-            <p v-if="saveError" role="alert" class="mt-2 text-sm text-red-600 dark:text-red-400">{{ saveError }}</p>
     
             <ul
-                class="mt-2 overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
+                :class="{ 'mt-2': deletableWords.length > 0 }"
+                class="overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
             >
                 <li
                     v-for="word in words"
@@ -277,6 +261,32 @@ const checkboxClass = 'size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-
                     <WordVoteButtons class="mt-1.5 shrink-0" :word="word" readonly />
                 </li>
             </ul>
+
+            <!-- Sticks to the bottom of the screen while there are changes, so that saving stays at hand under the list. -->
+            <div
+                v-if="changedWords.length > 0 || isSaving"
+                class="sticky bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-10 mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-brand-200 dark:border-brand-800 bg-white/95 dark:bg-zinc-900/95 px-4 py-2 text-sm shadow-lg backdrop-blur"
+            >
+                <p class="text-zinc-600 dark:text-zinc-400">{{ $t('words.editor.unsaved', changedWords.length) }}</p>
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        :disabled="isSaving || changedWords.length === 0"
+                        class="disabled:cursor-not-allowed disabled:opacity-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        @click="cancel"
+                    >
+                        {{ $t('common.cancel') }}
+                    </button>
+                    <button
+                        type="submit"
+                        :disabled="isSaving || changedWords.length === 0"
+                        class="rounded-lg bg-brand-600 px-3 py-1.5 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {{ isSaving ? $t('common.saving') : changedWords.length > 0 ? $t('words.editor.saveCount', { count: changedWords.length }) : $t('common.save') }}
+                    </button>
+                </div>
+                <p v-if="saveError" role="alert" class="w-full text-red-600 dark:text-red-400">{{ saveError }}</p>
+            </div>
         </form>
 
         <ConfirmDialog

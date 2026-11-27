@@ -63,6 +63,7 @@
         "saveFailed": "Impossible d’enregistrer les modifications. Rechargez la page et réessayez.",
         "deleteFailed": "Impossible de supprimer ces mots. Rechargez la page et réessayez.",
         "selected": "{n} mot sélectionné | {n} mots sélectionnés",
+        "unsaved": "{n} modification non enregistrée | {n} modifications non enregistrées",
         "saveCount": "Enregistrer ({count})",
         "selectWord": "Sélectionner « {name} »",
         "wordLabel": "Mot « {name} »",
