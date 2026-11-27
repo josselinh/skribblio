@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers\Api;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
+use App\Models\Word;
 use App\Models\WordGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -91,7 +92,7 @@ class GroupCollectionControllerTest extends TestCase
         $groupCollection = GroupCollection::factory()->createdBy($creator)
             ->hasAttached([
                 WordGroup::factory()->private()->createdBy($creator)->create(['name' => 'B']),
-                WordGroup::factory()->public()->create(['name' => 'A']),
+                WordGroup::factory()->public()->has(Word::factory()->count(3))->create(['name' => 'A']),
             ])
             ->create();
 
@@ -99,6 +100,7 @@ class GroupCollectionControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('data.word_groups.*.name', ['A', 'B'])
+            ->assertJsonPath('data.word_groups.*.words_count', [3, 0])
             ->assertJsonMissingPath('data.hidden_word_groups_count')
             ->assertJsonPath('data.can.update', true);
     }

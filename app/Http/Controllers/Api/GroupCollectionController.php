@@ -64,6 +64,7 @@ class GroupCollectionController extends Controller
         $visibleWordGroups = $groupCollection->wordGroups()
             ->visibleTo($request->user())
             ->with('creator')
+            ->withCount('words')
             ->withIsFavorite($request->user())
             ->orderBy('name')
             ->get();
