@@ -13,6 +13,7 @@ import PendingAccessRequests from '@/components/PendingAccessRequests.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { secondaryButtonClass } from '@/lib/buttons';
+import { cardGridItemClass } from '@/lib/cards';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
 import { useAuthStore } from '@/stores/auth';
 import type { GroupCollectionDetail } from '@/types/models';
@@ -155,7 +156,7 @@ watch(
                 </p>
 
                 <ul v-if="groupCollection.word_groups.length > 0" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <li v-for="wordGroup in groupCollection.word_groups" :key="wordGroup.id">
+                    <li v-for="wordGroup in groupCollection.word_groups" :key="wordGroup.id" :class="cardGridItemClass">
                         <WordGroupCard :word-group="wordGroup" />
                     </li>
                 </ul>
