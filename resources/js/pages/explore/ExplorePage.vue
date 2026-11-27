@@ -88,6 +88,19 @@ const sort = computed(() =>
     queryValue<SearchSort>('sort', (['recent', 'popular', 'largest', 'name'] as const).filter((value) => !isSortLocked(value)), DEFAULT_SORT),
 );
 
+/** Filters set to another value than their default, counted on the "Filtres" button of phones. */
+const changedFiltersCount = computed(
+    () =>
+        [
+            type.value !== 'all',
+            language.value !== defaultLanguage.value,
+            author.value !== (isMember.value ? defaultAuthor(q.value) : 'all'),
+            sort.value !== DEFAULT_SORT,
+        ].filter(Boolean).length,
+);
+/** On phones, the filters are folded under a "Filtres" button so that the results come first. */
+const areFiltersOpen = ref(false);
+
 usePageTitle(() => (q.value ? t('search.resultsFor', { q: q.value }) : t('search.title')));
 
 const searchInput = ref(q.value);
@@ -197,7 +210,30 @@ const pillClass = (isActive: boolean) =>
             </div>
         </form>
 
-        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8">
+        <button
+            type="button"
+            class="mt-3 inline-flex items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-3 py-1.5 text-sm font-medium sm:hidden"
+            :aria-expanded="areFiltersOpen"
+            aria-controls="explore-filters"
+            @click="areFiltersOpen = !areFiltersOpen"
+        >
+            {{ $t('search.filters.toggle') }}
+            <span
+                v-if="changedFiltersCount > 0"
+                class="inline-flex min-w-5 justify-center rounded-full bg-brand-600 px-1.5 text-xs text-white"
+            >
+                {{ changedFiltersCount }}
+            </span>
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4 transition-transform motion-reduce:transition-none" :class="{ 'rotate-180': areFiltersOpen }">
+                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+        </button>
+
+        <div
+            id="explore-filters"
+            class="mt-4 flex-col gap-3 sm:flex sm:flex-row sm:flex-wrap sm:gap-x-8"
+            :class="areFiltersOpen ? 'flex' : 'hidden'"
+        >
             <fieldset class="flex flex-wrap items-center gap-2">
                 <legend class="sr-only">{{ $t('search.filters.type') }}</legend>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400" aria-hidden="true">{{ $t('search.filters.typePrefix') }}</span>
