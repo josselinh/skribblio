@@ -13,6 +13,7 @@ Skribblio Tools lets users build custom word lists (alone or collaboratively) an
 - **Authentication**: Sanctum in SPA mode (session cookie + CSRF, `statefulApi()` in `bootstrap/app.php`) with **Fortify headless** (`'views' => false`). Fortify features enabled: registration, password reset, email verification, profile update, password update. Two-factor auth and passkeys are intentionally disabled.
 - Fortify endpoints live at the root (`/login`, `/register`, `/logout`, `/forgot-password`, `/reset-password`, `/email/verification-notification`); the app's API lives under `/api`.
 - After authentication, users land on `/dashboard` (Fortify `home` is `/dashboard`).
+- **Maintenance** (`php artisan down`): page loads get `resources/views/errors/503.blade.php`, self-contained (inline CSS, no build assets), in the browser's language (`Accept-Language`, as the maintenance middleware runs before `SetLocale`; texts in `lang/*/maintenance.php`) and the device's theme; an SPA already open gets JSON 503s, and the axios interceptor of `app.ts` then shows the `common.maintenance` toast once instead of leaving only the generic errors. Tests use the `array` maintenance driver (the `file` one would also put the development server down).
 
 ## Domain model
 
