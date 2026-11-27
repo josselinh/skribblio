@@ -15,6 +15,7 @@ import { usePageTitle } from '@/composables/usePageTitle';
 import { secondaryButtonClass } from '@/lib/buttons';
 import { cardGridItemClass } from '@/lib/cards';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
 import { useAuthStore } from '@/stores/auth';
 import type { GroupCollectionDetail } from '@/types/models';
 
@@ -128,10 +129,12 @@ watch(
                 </template>
             </ExportPanel>
 
-            <section class="mt-8" aria-labelledby="collection-groups-title">
-                <h2 id="collection-groups-title" class="text-lg font-semibold">
-                    {{ $t('common.wordGroups') }} <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ groupCollection.word_groups.length }})</span>
-                </h2>
+            <section class="mt-8" :class="listPanelClass" aria-labelledby="collection-groups-title">
+                <div :class="listPanelHeaderClass">
+                    <h2 id="collection-groups-title" class="text-lg font-semibold">
+                        {{ $t('common.wordGroups') }} <span class="font-normal text-zinc-500 dark:text-zinc-400">({{ groupCollection.word_groups.length }})</span>
+                    </h2>
+                </div>
 
                 <template v-if="!groupCollection.can.add_word_group">
                     <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->

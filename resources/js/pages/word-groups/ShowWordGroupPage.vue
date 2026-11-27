@@ -19,6 +19,7 @@ import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
 import { secondaryButtonClass } from '@/lib/buttons';
 import { restrictsContributionsToMembers } from '@/lib/contributions';
+import { listPanelClass, listPanelHeaderClass } from '@/lib/sections';
 import { useAuthStore } from '@/stores/auth';
 import type { WordsResponse } from '@/types/api';
 import type { Word, WordGroup, WordSort } from '@/types/models';
@@ -153,34 +154,14 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                 </template>
             </ExportPanel>
 
-            <template v-if="!wordGroup.can.add_word">
-                <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
-                <p v-if="!isMember && wordGroup.accepts_contributions" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                    {{ auth.isAuthenticated
-                            ? $t('guest.verifyEmail')
-                            : $t(restrictsContributionsToMembers(wordGroup) ? 'guest.contributeMembersOnly.wordGroup' : 'guest.contribute.wordGroup') }}
-                </p>
-                <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                    {{ $t('wordGroups.show.membersOnly') }}
-                </p>
-                <p v-else class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
-                    {{ $t('wordGroups.show.closed') }}
-                </p>
-            </template>
-
-            <p v-if="haveWordsFailed" class="mt-6 text-red-600 dark:text-red-400">
-                {{ $t('exports.panel.loadFailed') }}
-                <button type="button" class="underline" @click="loadWords">{{ $t('common.retry') }}</button>
-            </p>
-
-            <p v-else-if="words && words.meta.total === 0" class="mt-6 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400">
-                {{ $t('wordGroups.show.empty') }}
-            </p>
-
-            <template v-else-if="words">
-                <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('words.count', words.meta.total) }}</p>
+            <section class="mt-8" :class="listPanelClass" aria-labelledby="group-words-title">
+                <div :class="listPanelHeaderClass">
+                    <h2 id="group-words-title" class="text-lg font-semibold">
+                        {{ $t('common.words') }}
+                        <span v-if="words" class="font-normal text-zinc-500 dark:text-zinc-400">({{ words.meta.total }})</span>
+                    </h2>
                     <WordSortControl
+                        v-if="words && words.meta.total > 0"
                         :sort="order.sort"
                         :direction="order.direction"
                         :default-directions="WORD_SORT_DEFAULT_DIRECTIONS"
@@ -189,19 +170,46 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         @sort="sortWords"
                     />
                 </div>
-                <ul
-                    class="mt-2 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
-                    :class="{ 'opacity-60': areWordsLoading }"
-                >
-                    <WordListItem
-                        v-for="word in words.data"
-                        :key="word.id"
-                        :word="word"
-                        @updated="onWordUpdated"
-                    />
-                </ul>
-                <PaginationNav class="mt-4" :current-page="words.meta.current_page" :last-page="words.meta.last_page" />
-            </template>
+
+                <template v-if="!wordGroup.can.add_word">
+                    <!-- Plain text like the other contribution messages: the header has the links to log in and register. -->
+                    <p v-if="!isMember && wordGroup.accepts_contributions" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        {{ auth.isAuthenticated
+                                ? $t('guest.verifyEmail')
+                                : $t(restrictsContributionsToMembers(wordGroup) ? 'guest.contributeMembersOnly.wordGroup' : 'guest.contribute.wordGroup') }}
+                    </p>
+                    <p v-else-if="restrictsContributionsToMembers(wordGroup)" class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        {{ $t('wordGroups.show.membersOnly') }}
+                    </p>
+                    <p v-else class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        {{ $t('wordGroups.show.closed') }}
+                    </p>
+                </template>
+
+                <p v-if="haveWordsFailed" class="mt-4 text-red-600 dark:text-red-400">
+                    {{ $t('exports.panel.loadFailed') }}
+                    <button type="button" class="underline" @click="loadWords">{{ $t('common.retry') }}</button>
+                </p>
+
+                <p v-else-if="words && words.meta.total === 0" class="mt-4 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-zinc-500 dark:text-zinc-400">
+                    {{ $t('wordGroups.show.empty') }}
+                </p>
+
+                <template v-else-if="words">
+                    <ul
+                        class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs"
+                        :class="{ 'opacity-60': areWordsLoading }"
+                    >
+                        <WordListItem
+                            v-for="word in words.data"
+                            :key="word.id"
+                            :word="word"
+                            @updated="onWordUpdated"
+                        />
+                    </ul>
+                    <PaginationNav class="mt-4" :current-page="words.meta.current_page" :last-page="words.meta.last_page" />
+                </template>
+            </section>
         </template>
     </AppLayout>
 </template>
