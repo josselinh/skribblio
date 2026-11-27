@@ -104,7 +104,7 @@ const pillClass = (isActive: boolean) =>
         </fieldset>
         <button
             type="button"
-            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs text-brand-700 dark:text-brand-300 hover:underline focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+            class="touch-target inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs text-brand-700 dark:text-brand-300 hover:underline focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
             :title="$t('words.sort.reverse')"
             @click="emit('sort', sort, direction === 'asc' ? 'desc' : 'asc')"
         >

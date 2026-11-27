@@ -36,6 +36,26 @@
     }
 }
 
+/*
+ * On touch screens, gives a small control (a vote, the star, a sort button) a hit area of at least 44 pixels around
+ * it, without changing how it looks. The control must not clip its overflow.
+ */
+@utility touch-target {
+    @media (pointer: coarse) {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: max(100%, 44px);
+            height: max(100%, 44px);
+            transform: translate(-50%, -50%);
+        }
+    }
+}
+
 @layer base {
     /*
      * The colour scheme gives native controls and scrollbars the theme chosen by the user (`dark` class, see

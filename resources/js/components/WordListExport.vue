@@ -100,7 +100,7 @@ async function copy(): Promise<void> {
     }
 }
 
-const checkboxClass = 'size-4 rounded border-zinc-300 dark:border-zinc-700';
+const checkboxClass = 'size-4 pointer-coarse:size-5 rounded border-zinc-300 dark:border-zinc-700';
 const stepButtonClass =
     'inline-flex size-6 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm leading-none hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:cursor-default disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400';
 const secondaryButtonClass =
