@@ -40,7 +40,6 @@
             "contribute": "Contribuer à la collection"
         },
         "pageTitle": "{title} · {name}",
-        "back": "← {name}",
         "forbidden": "Vous ne pouvez pas modifier cette collection.",
         "noOwnGroups": "Vous n’avez encore ajouté aucun groupe à cette collection.",
         "sections": {

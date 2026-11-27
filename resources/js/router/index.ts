@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { trackBreadcrumb } from '@/lib/breadcrumb';
 import { trackNavigationProgress } from '@/lib/navigationProgress';
 import { consumePendingRedirect, rememberPendingRedirect } from '@/lib/pendingRedirect';
 import { useAuthStore } from '@/stores/auth';
@@ -146,6 +147,7 @@ export const router = createRouter({
 });
 
 trackNavigationProgress(router);
+trackBreadcrumb(router);
 
 router.beforeEach(async (to) => {
     const auth = useAuthStore();

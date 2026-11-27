@@ -16,6 +16,7 @@ import WordListEditor from '@/components/WordListEditor.vue';
 import WordSortControl from '@/components/WordSortControl.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { useWordOrder, WORD_SORT_DEFAULT_DIRECTIONS } from '@/composables/useWordOrder';
+import { itemCrumb, useBreadcrumb } from '@/lib/breadcrumb';
 import { inactiveSharingReason, isShareable, restrictsContributionsToMembers } from '@/lib/contributions';
 import { listPanelHeaderClass } from '@/lib/sections';
 import type { WordsResponse } from '@/types/api';
@@ -45,6 +46,10 @@ const isCreator = computed(() => wordGroup.value?.can.update ?? false);
 const managesEveryWord = computed(() => wordGroup.value?.can.manage_contributions ?? false);
 const canEdit = computed(() => wordGroup.value !== null && (wordGroup.value.can.update || wordGroup.value.can.add_word));
 const title = computed(() => (isCreator.value ? t('wordGroups.edit.title.manage') : t('wordGroups.edit.title.contribute')));
+useBreadcrumb(
+    () => (wordGroup.value ? title.value : null),
+    () => (wordGroup.value ? itemCrumb('word-groups.show', wordGroup.value.id, wordGroup.value.name) : null),
+);
 usePageTitle(() => (wordGroup.value ? t('wordGroups.edit.pageTitle', { title: title.value, name: wordGroup.value.name }) : null));
 /** A contributor only lists their own words: sorting them by author would be pointless. */
 const { order, sortWords } = useWordOrder(() => (managesEveryWord.value ? [] : ['author']));
@@ -185,13 +190,7 @@ const headingClass = 'text-lg font-semibold';
         </p>
 
         <template v-else-if="wordGroup">
-            <RouterLink
-                :to="{ name: 'word-groups.show', params: { id: wordGroup.id } }"
-                class="mt-2 inline-block max-w-full truncate text-sm font-medium text-brand-700 dark:text-brand-300 hover:underline"
-            >
-                {{ $t('wordGroups.edit.back', { name: wordGroup.name }) }}
-            </RouterLink>
-            <h1 class="mt-1 text-2xl font-semibold">{{ title }}</h1>
+            <h1 class="text-2xl font-semibold">{{ title }}</h1>
 
             <p v-if="!canEdit" class="mt-4 text-zinc-500 dark:text-zinc-400">{{ $t('wordGroups.edit.forbidden') }}</p>
 

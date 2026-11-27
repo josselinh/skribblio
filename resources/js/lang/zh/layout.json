@@ -36,5 +36,8 @@
         "fr": "Français",
         "en": "English",
         "zh": "中文"
+    },
+    "breadcrumb": {
+        "label": "导航路径"
     }
 }

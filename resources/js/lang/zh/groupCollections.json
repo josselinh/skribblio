@@ -40,7 +40,6 @@
             "contribute": "为合集做贡献"
         },
         "pageTitle": "{title} · {name}",
-        "back": "← {name}",
         "forbidden": "你无法编辑此合集。",
         "noOwnGroups": "你还没有向此合集添加任何词组。",
         "sections": {
