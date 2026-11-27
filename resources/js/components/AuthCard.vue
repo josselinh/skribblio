@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 import AppFooter from '@/components/AppFooter.vue';
+import { usePageTitle } from '@/composables/usePageTitle';
 
-defineProps<{
+const props = defineProps<{
     title: string;
     description?: string;
 }>();
+
+/** The card's title is the page's: it names the browser tab of every authentication page. */
+usePageTitle(() => props.title);
 </script>
 
 <template>

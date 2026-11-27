@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import AccountNav from '@/components/AccountNav.vue';
 import AppLayout from '@/components/AppLayout.vue';
 import { useLocaleChoice } from '@/composables/useLocaleChoice';
+import { usePageTitle } from '@/composables/usePageTitle';
 import { useToasts } from '@/composables/useToasts';
 import { CONTENT_LOCALES } from '@/lib/contentLanguage';
 import { LOCALES } from '@/lib/i18n';
@@ -18,6 +19,7 @@ import type { EmailNotification, Locale, Theme } from '@/types/models';
 const auth = useAuthStore();
 const { showToast } = useToasts();
 const { t } = useI18n();
+usePageTitle(() => t('profile.preferences.title'));
 const { locale, changeLocale } = useLocaleChoice();
 
 const themes: Theme[] = ['system', 'light', 'dark'];
