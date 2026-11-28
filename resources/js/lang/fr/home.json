@@ -1,0 +1,54 @@
+{
+    "hero": {
+        "title": "Des listes de mots pour Skribbl.io, prêtes à jouer ou à construire ensemble",
+        "subtitle": "Trouvez une liste toute faite et copiez-la en un clic, ou créez la vôtre avec vos amis.",
+        "explore": "Explorer les listes",
+        "howItWorks": "Comment ça marche ?"
+    },
+    "steps": {
+        "title": "Comment ça marche",
+        "find": {
+            "title": "Trouvez ou créez",
+            "description": "Parcourez les listes partagées par la communauté, ou créez la vôtre sur le thème de votre choix."
+        },
+        "together": {
+            "title": "Complétez-la à plusieurs",
+            "description": "Ouvrez votre liste aux contributions : vos amis ajoutent des mots et votent pour les meilleurs."
+        },
+        "play": {
+            "title": "Copiez et jouez",
+            "description": "Exportez la liste en un clic et collez-la dans les mots personnalisés de votre partie Skribbl.io."
+        }
+    },
+    "latest": {
+        "title": "Dernières listes partagées",
+        "empty": "Aucune liste n’a encore été partagée dans cette langue."
+    },
+    "faq": {
+        "title": "Questions fréquentes",
+        "customWords": {
+            "question": "Comment jouer avec mes propres mots sur Skribbl.io ?",
+            "answer": "Créez une partie privée sur Skribbl.io : ses paramètres ont un champ de mots personnalisés, séparés par des virgules. Exportez une liste ici, copiez-la et collez-la dans ce champ. Cochez l’option qui n’utilise que vos mots si vous ne voulez pas de ceux de Skribbl.io."
+        },
+        "limits": {
+            "question": "Combien de mots faut-il ?",
+            "answer": "Skribbl.io demande au moins {min} mots, de {length} caractères au plus, et une liste de {max} caractères au maximum. L’export vous prévient quand une liste ne respecte pas ces limites, et peut tirer au hasard une sélection qui y tient."
+        },
+        "account": {
+            "question": "Faut-il un compte ?",
+            "answer": "Non pour parcourir les listes publiques et exporter les groupes de mots. Un compte gratuit permet de créer vos listes, de contribuer à celles des autres, de voter, de garder vos favoris et d’exporter des collections entières."
+        },
+        "together": {
+            "question": "Peut-on créer une liste à plusieurs ?",
+            "answer": "Oui : ouvrez-la aux contributions. Une liste publique peut accueillir les mots de tout le monde ou seulement de ceux que vous invitez, et une liste privée se partage avec un lien d’invitation. Les votes aident à repérer les meilleurs mots, et l’export peut laisser de côté ceux qui sont mal notés."
+        },
+        "free": {
+            "question": "Est-ce gratuit ?",
+            "answer": "Oui, entièrement gratuit et open source. Skribblio Tools est un projet indépendant, sans lien avec Skribbl.io."
+        },
+        "languages": {
+            "question": "Dans quelles langues sont les listes ?",
+            "answer": "Les listes de mots sont en anglais, en français ou en allemand, une seule langue par liste. L’interface est disponible en anglais, en français et en chinois."
+        }
+    }
+}

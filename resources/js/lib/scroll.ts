@@ -29,3 +29,9 @@ export function scrollToList(list: Element): void {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: window.scrollY + top - LIST_TOP_MARGIN_PX, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
+
+/** Scrolls a section of the page into view, e.g. from a button leading to it ("Comment ça marche"). */
+export function scrollToSection(section: Element): void {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    section.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+}
