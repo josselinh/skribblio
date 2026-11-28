@@ -27,7 +27,7 @@ export const router = createRouter({
     scrollBehavior,
     routes: [
         {
-            /* The home page of visitors; logged-in users are redirected to the dashboard by the guard. */
+            /* The home page, for visitors and logged-in users alike. */
             path: '/',
             name: 'home',
             component: () => import('@/pages/HomePage.vue'),
@@ -156,10 +156,6 @@ trackPageTransitions(router);
 router.beforeEach(async (to) => {
     const auth = useAuthStore();
     await auth.ensureLoaded();
-
-    if (to.name === 'home' && auth.isAuthenticated) {
-        return { name: 'dashboard' };
-    }
 
     if ((to.meta.requiresAuth || to.meta.requiresVerified) && !auth.isAuthenticated) {
         if (to.name === 'share') {

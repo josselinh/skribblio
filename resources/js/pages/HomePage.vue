@@ -14,33 +14,37 @@ import { preferredContentLanguage } from '@/lib/contentLanguage';
 import { intlLocale } from '@/lib/i18n';
 import { scrollToSection } from '@/lib/scroll';
 import { SKRIBBL_MAX_CHARACTERS, SKRIBBL_MAX_WORD_LENGTH, SKRIBBL_MIN_WORDS } from '@/lib/skribbl';
+import { useAuthStore } from '@/stores/auth';
 
 /**
- * Home page of visitors (logged-in users go to the dashboard): what the site does, how it works, the latest groups
- * shared in the visitor's language, then the questions people ask before using it, also read by search engines.
- * The header already has the links to log in and register.
+ * Home page, for visitors and logged-in users alike: what the site does, how it works, the latest groups shared in
+ * the language of the lists (`preferredContentLanguage()`), then the questions people ask before using it, also
+ * read by search engines. The header already has the links to log in and register.
  */
 const PREVIEW_SIZE = 6;
 const STEPS = ['find', 'together', 'play'] as const;
 const QUESTIONS = ['customWords', 'limits', 'account', 'together', 'free', 'languages'] as const;
 
 const { t } = useI18n();
+const auth = useAuthStore();
 usePageTitle(null);
 
 /** Reloaded when the visitor switches the interface language, which changes the language of the lists. */
 const language = computed(() => preferredContentLanguage());
+/** What others share, as in the Explorer's catalogue: a logged-in user's own groups, private ones included, are left out. */
+const author = computed(() => (auth.isVerified ? 'others' : 'all'));
 const latestWordGroups = usePaginatedList(
     () =>
         fetchWordGroupSearchResults({
             q: '',
-            author: 'all',
+            author: author.value,
             language: language.value,
             sort: 'recent',
             page: 1,
             perPage: PREVIEW_SIZE,
         }),
     'page',
-    [language],
+    [language, author],
 );
 
 const seeAllWordGroups = computed(() => {
