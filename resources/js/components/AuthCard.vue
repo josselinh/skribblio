@@ -16,9 +16,9 @@ usePageTitle(() => props.title);
     <div class="flex min-h-screen flex-col">
         <main class="flex flex-1 items-center justify-center px-4 py-12">
             <div class="w-full max-w-sm">
-                <!-- Leads to the Explorer, open to visitors, like the app name in the header. -->
+                <!-- Leads to the home page, like the app name in the header. -->
                 <p class="mb-8 text-center text-lg font-semibold tracking-tight">
-                    <RouterLink :to="{ name: 'explore' }" class="rounded-sm hover:text-brand-700 dark:hover:text-brand-300 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400">
+                    <RouterLink :to="{ name: 'home' }" class="rounded-sm hover:text-brand-700 dark:hover:text-brand-300 focus-visible:outline-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400">
                         {{ $t('common.appName') }}
                     </RouterLink>
                 </p>
