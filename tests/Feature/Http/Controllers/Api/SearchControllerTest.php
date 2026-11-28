@@ -145,6 +145,20 @@ class SearchControllerTest extends TestCase
             ->assertJsonPath('data.*.id', [$startsA->id, $startsZ->id, $containsA->id]);
     }
 
+    public function test_word_groups_sort_in_the_direction_given(): void
+    {
+        $user = User::factory()->create();
+        $oldGroup = WordGroup::factory()->public()->create(['name' => 'Animaux', 'updated_at' => now()->subWeek()]);
+        $recentGroup = WordGroup::factory()->public()->create(['name' => 'Zoo', 'updated_at' => now()]);
+
+        $this->actingAs($user)
+            ->getJson('/api/search/word-groups?direction=asc')
+            ->assertJsonPath('data.*.id', [$oldGroup->id, $recentGroup->id]);
+        $this->actingAs($user)
+            ->getJson('/api/search/word-groups?sort=name&direction=desc')
+            ->assertJsonPath('data.*.id', [$recentGroup->id, $oldGroup->id]);
+    }
+
     public function test_group_collections_sort_by_popularity_and_by_groups_count(): void
     {
         $user = User::factory()->create();
@@ -184,6 +198,7 @@ class SearchControllerTest extends TestCase
     #[TestWith(['author=friends', 'author'])]
     #[TestWith(['per_page=100', 'per_page'])]
     #[TestWith(['sort=random', 'sort'])]
+    #[TestWith(['direction=up', 'direction'])]
     public function test_rejects_invalid_filters_with_422(string $query, string $field): void
     {
         $this->actingAs(User::factory()->create())

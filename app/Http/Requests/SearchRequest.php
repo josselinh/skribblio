@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\AuthorFilter;
 use App\Enums\Locale;
 use App\Enums\SearchSort;
+use App\Enums\SortDirection;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -43,6 +44,7 @@ class SearchRequest extends FormRequest
             'language' => ['nullable', Rule::enum(Locale::class)],
             'author' => ['nullable', $this->user() ? Rule::enum(AuthorFilter::class) : Rule::enum(AuthorFilter::class)->only(AuthorFilter::All)],
             'sort' => ['nullable', $this->user() ? Rule::enum(SearchSort::class) : Rule::enum(SearchSort::class)->except(self::MEMBERS_ONLY_SORTS)],
+            'direction' => ['nullable', Rule::enum(SortDirection::class)],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
         ];
     }
@@ -81,6 +83,11 @@ class SearchRequest extends FormRequest
     public function sort(): SearchSort
     {
         return SearchSort::tryFrom((string) $this->validated('sort')) ?? SearchSort::Recent;
+    }
+
+    public function direction(): SortDirection
+    {
+        return SortDirection::tryFrom((string) $this->validated('direction')) ?? $this->sort()->defaultDirection();
     }
 
     public function perPage(): int

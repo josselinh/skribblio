@@ -22,10 +22,28 @@
         "others": "其他人"
     },
     "sorts": {
-        "recent": "最新",
-        "popular": "热门",
-        "largest": "最丰富",
-        "name": "A → Z"
+        "recent": "更新时间",
+        "popular": "热门程度",
+        "largest": "规模",
+        "name": "名称"
+    },
+    "directions": {
+        "recent": {
+            "asc": "最早的在前",
+            "desc": "最新的在前"
+        },
+        "popular": {
+            "asc": "最不热门的在前",
+            "desc": "最热门的在前"
+        },
+        "largest": {
+            "asc": "最少的在前",
+            "desc": "最丰富的在前"
+        },
+        "name": {
+            "asc": "从 A 到 Z",
+            "desc": "从 Z 到 A"
+        }
     },
     "emptyGroupCollections": "未找到合集。",
     "seeAll": {
