@@ -5,7 +5,8 @@ import { computed, onBeforeUnmount, onMounted, onUpdated, ref, useTemplateRef } 
  * Row of pills (filters, sorts) that stays on one line and scrolls horizontally, swiped with a finger, when they do not
  * fit; whatever comes before it (the "Tri :" prefix) stays in place. The scrollbar is hidden: a fade on each side tells
  * that pills are out of view there. On mount, the selected pill (`aria-pressed="true"` or a checked radio) is brought into
- * view. Pass the gap and, for touch screens, the vertical padding that keeps the enlarged hit areas of the pills unclipped.
+ * view. Its padding, offset by a negative margin, keeps the focus rings and the shadows of the pills ("Coloré" style stickers)
+ * unclipped; pass the gap and, for touch screens, a larger vertical padding for the enlarged hit areas of the pills.
  */
 const row = useTemplateRef<HTMLDivElement>('row');
 const isStartHidden = ref(false);
@@ -26,10 +27,14 @@ function update(): void {
 function showSelected(): void {
     const element = row.value;
     const selected = element?.querySelector<HTMLElement>('[aria-pressed="true"], label:has(input:checked)');
-    if (!element || !selected || selected.offsetLeft + selected.offsetWidth <= element.clientWidth) {
+    if (!element || !selected) {
         return;
     }
-    element.scrollLeft = selected.offsetLeft + selected.offsetWidth - element.clientWidth;
+    /** Keeps the padding after the pill in view too, where its shadow falls. */
+    const selectedEnd = selected.offsetLeft + selected.offsetWidth + parseFloat(getComputedStyle(element).paddingRight);
+    if (selectedEnd > element.clientWidth) {
+        element.scrollLeft = selectedEnd - element.clientWidth;
+    }
 }
 
 let resizeObserver: ResizeObserver | null = null;
@@ -62,7 +67,7 @@ const maskStyle = computed(() => {
     <!-- `relative`: keeps what is positioned inside (sr-only inputs, hit areas) within the clipping of the scrolling row. -->
     <div
         ref="row"
-        class="relative flex min-w-0 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        class="relative -m-1 flex min-w-0 items-center overflow-x-auto p-1 overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         :style="maskStyle"
         @scroll.passive="update"
     >
