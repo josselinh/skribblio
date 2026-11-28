@@ -49,6 +49,7 @@
     },
     "revoke": {
         "button": "Remove",
+        "memberLabel": "Remove {name}",
         "processing": "Removing…",
         "title": {
             "access": "Remove access?",

@@ -49,6 +49,7 @@
     },
     "revoke": {
         "button": "移除",
+        "memberLabel": "移除 {name}",
         "processing": "正在移除…",
         "title": {
             "access": "撤销访问权限？",

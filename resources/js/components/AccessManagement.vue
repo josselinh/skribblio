@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchItemAccess, revokeAccess, updateMemberShareType } from '@/api/sharing';
 import AccessRequestItem from '@/components/AccessRequestItem.vue';
+import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import RelativeTime from '@/components/RelativeTime.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -198,11 +199,13 @@ watch(() => props.id, load, { immediate: true });
                             </select>
                             <button
                                 type="button"
-                                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                                class="-m-1.5 rounded-lg p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-800 dark:hover:text-red-300"
                                 aria-haspopup="dialog"
+                                :aria-label="$t('sharing.revoke.memberLabel', { name: member.name })"
+                                :title="$t('sharing.revoke.memberLabel', { name: member.name })"
                                 @click="confirmRevocation(member)"
                             >
-                                {{ $t('sharing.revoke.button') }}
+                                <AppIcon name="delete" />
                             </button>
                         </div>
                     </li>

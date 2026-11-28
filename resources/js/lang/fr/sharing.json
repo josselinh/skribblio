@@ -49,6 +49,7 @@
     },
     "revoke": {
         "button": "Retirer",
+        "memberLabel": "Retirer {name}",
         "processing": "Retrait…",
         "title": {
             "access": "Retirer l’accès ?",
