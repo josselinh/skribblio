@@ -4,6 +4,7 @@ namespace App\Models\Concerns;
 
 use App\Enums\AuthorFilter;
 use App\Enums\SearchSort;
+use App\Enums\SortDirection;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,13 +51,13 @@ trait HasSearchableName
      * @param  Builder<static>  $query
      */
     #[Scope]
-    protected function orderBySearchSort(Builder $query, SearchSort $sort, string $sizeCountColumn): void
+    protected function orderBySearchSort(Builder $query, SearchSort $sort, SortDirection $direction, string $sizeCountColumn): void
     {
         match ($sort) {
-            SearchSort::Recent => null,
-            SearchSort::Popular => $query->withCount('favoritedBy')->orderByDesc('favorited_by_count'),
-            SearchSort::Largest => $query->orderByDesc($sizeCountColumn),
-            SearchSort::Name => $query->orderBy($this->qualifyColumn('name')),
+            SearchSort::Recent => $query->orderBy($this->qualifyColumn('updated_at'), $direction->value),
+            SearchSort::Popular => $query->withCount('favoritedBy')->orderBy('favorited_by_count', $direction->value),
+            SearchSort::Largest => $query->orderBy($sizeCountColumn, $direction->value),
+            SearchSort::Name => $query->orderBy($this->qualifyColumn('name'), $direction->value),
         };
 
         $query->latest($this->qualifyColumn('updated_at'))->latest($this->qualifyColumn('id'));

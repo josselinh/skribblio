@@ -27,7 +27,7 @@ class SearchController extends Controller
             ->withCount('words')
             ->withIsFavorite($request->user())
             ->orderByNameRelevance($request->search())
-            ->orderBySearchSort($request->sort(), 'words_count')
+            ->orderBySearchSort($request->sort(), $request->direction(), 'words_count')
             ->paginate($request->perPage())
             ->withQueryString();
 
@@ -44,7 +44,7 @@ class SearchController extends Controller
             ->withCount('wordGroups')
             ->withIsFavorite($request->user())
             ->orderByNameRelevance($request->search())
-            ->orderBySearchSort($request->sort(), 'word_groups_count')
+            ->orderBySearchSort($request->sort(), $request->direction(), 'word_groups_count')
             ->paginate($request->perPage())
             ->withQueryString();
 

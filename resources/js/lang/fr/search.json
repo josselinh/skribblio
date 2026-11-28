@@ -22,10 +22,28 @@
         "others": "Les autres"
     },
     "sorts": {
-        "recent": "Récents",
-        "popular": "Populaires",
-        "largest": "Les plus fournis",
-        "name": "A → Z"
+        "recent": "Mise à jour",
+        "popular": "Popularité",
+        "largest": "Taille",
+        "name": "Nom"
+    },
+    "directions": {
+        "recent": {
+            "asc": "Les moins récents d’abord",
+            "desc": "Les plus récents d’abord"
+        },
+        "popular": {
+            "asc": "Les moins populaires d’abord",
+            "desc": "Les plus populaires d’abord"
+        },
+        "largest": {
+            "asc": "Les moins fournis d’abord",
+            "desc": "Les plus fournis d’abord"
+        },
+        "name": {
+            "asc": "De A à Z",
+            "desc": "De Z à A"
+        }
     },
     "emptyGroupCollections": "Aucune collection trouvée.",
     "seeAll": {

@@ -13,7 +13,7 @@ import { usePaginatedList } from '@/composables/usePaginatedList';
 import { useToasts } from '@/composables/useToasts';
 import { CONTENT_LOCALES, preferredContentLanguage } from '@/lib/contentLanguage';
 import { useAuthStore } from '@/stores/auth';
-import type { AuthorFilter, Locale, SearchSort } from '@/types/models';
+import type { AuthorFilter, Locale, SearchSort, SortDirection } from '@/types/models';
 
 type TypeFilter = 'all' | 'word-groups' | 'group-collections';
 /** Language of the lists shown, or every language. */
@@ -25,6 +25,8 @@ const PAGE_SIZE = 12;
 const DEFAULT_SORT: SearchSort = 'recent';
 /** Sorts shown to visitors but asking them to log in. */
 const MEMBERS_ONLY_SORTS: readonly SearchSort[] = ['popular', 'largest'];
+/** Direction of each sort when none is chosen, matching `SearchSort::defaultDirection()`; left out of the URL. */
+const DEFAULT_DIRECTIONS: Record<SearchSort, SortDirection> = { recent: 'desc', popular: 'desc', largest: 'desc', name: 'asc' };
 
 const { t } = useI18n();
 const auth = useAuthStore();
@@ -88,6 +90,16 @@ const author = computed(() =>
 const sort = computed(() =>
     queryValue<SearchSort>('sort', (['recent', 'popular', 'largest', 'name'] as const).filter((value) => !isSortLocked(value)), DEFAULT_SORT),
 );
+const direction = computed(() => queryValue<SortDirection>('direction', ['asc', 'desc'], DEFAULT_DIRECTIONS[sort.value]));
+
+/** Choosing a sort applies its natural direction; choosing the active one again reverses it. */
+function chooseSort(option: SearchSort): Promise<unknown> {
+    return updateQuery(
+        option === sort.value
+            ? { direction: direction.value === 'asc' ? 'desc' : 'asc' }
+            : { sort: option, direction: DEFAULT_DIRECTIONS[option] },
+    );
+}
 
 usePageTitle(() => (q.value ? t('search.resultsFor', { q: q.value }) : t('search.title')));
 
@@ -105,6 +117,7 @@ function updateQuery(changes: LocationQueryRaw): Promise<unknown> {
         lang: language.value,
         author: author.value,
         sort: sort.value,
+        direction: direction.value,
         ...changes,
         page: undefined,
     };
@@ -116,6 +129,9 @@ function updateQuery(changes: LocationQueryRaw): Promise<unknown> {
     }
     if (query.author === defaultAuthor(typeof query.q === 'string' ? query.q : '')) {
         query.author = undefined;
+    }
+    if (query.direction === DEFAULT_DIRECTIONS[query.sort as SearchSort]) {
+        query.direction = undefined;
     }
     if (query.sort === DEFAULT_SORT) {
         query.sort = undefined;
@@ -133,11 +149,12 @@ const wordGroups = usePaginatedList(
                   author: author.value,
                   language: language.value === 'all' ? null : language.value,
                   sort: sort.value,
+                  direction: direction.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, language, author, sort],
+    [q, type, language, author, sort, direction],
 );
 
 const groupCollections = usePaginatedList(
@@ -149,11 +166,12 @@ const groupCollections = usePaginatedList(
                   author: author.value,
                   language: language.value === 'all' ? null : language.value,
                   sort: sort.value,
+                  direction: direction.value,
                   page: type.value === 'all' ? 1 : page,
                   perPage: type.value === 'all' ? PREVIEW_SIZE : PAGE_SIZE,
               }),
     'page',
-    [q, type, language, author, sort],
+    [q, type, language, author, sort, direction],
 );
 
 /** In preview mode ("Tout"), link to the full list of one type when there are more results. */
@@ -257,16 +275,22 @@ const pillClass = (isActive: boolean) =>
                     >
                         {{ option.label }}
                     </button>
-                    <label v-else :class="pillClass(sort === option.value)">
-                        <input
-                            type="radio"
-                            name="sort"
-                            class="sr-only"
-                            :checked="sort === option.value"
-                            @change="updateQuery({ sort: option.value })"
-                        />
+                    <!-- The active sort shows its direction with an arrow; clicking it again reverses it. -->
+                    <button
+                        v-else
+                        type="button"
+                        class="inline-flex items-center gap-1"
+                        :class="pillClass(sort === option.value)"
+                        :aria-pressed="sort === option.value"
+                        :title="sort === option.value ? `${$t(`search.directions.${sort}.${direction}`)} · ${$t('words.sort.reverse')}` : undefined"
+                        @click="chooseSort(option.value)"
+                    >
                         {{ option.label }}
-                    </label>
+                        <template v-if="sort === option.value">
+                            <AppIcon :name="direction === 'asc' ? 'arrow-up' : 'arrow-down'" class="size-3.5!" />
+                            <span class="sr-only">{{ $t(`search.directions.${sort}.${direction}`) }} {{ $t('words.sort.reverseHint') }}</span>
+                        </template>
+                    </button>
                 </template>
             </fieldset>
         </div>
