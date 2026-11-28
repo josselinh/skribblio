@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useToasts } from '@/composables/useToasts';
 import { trackBreadcrumb } from '@/lib/breadcrumb';
+import { i18n } from '@/lib/i18n';
 import { trackNavigationProgress } from '@/lib/navigationProgress';
 import { trackPageTransitions } from '@/lib/pageTransition';
 import { consumePendingRedirect, rememberPendingRedirect } from '@/lib/pendingRedirect';
@@ -162,7 +164,7 @@ router.beforeEach(async (to) => {
             rememberPendingRedirect(to.fullPath);
         }
 
-        return { name: 'login', query: to.name !== 'dashboard' ? { redirect: to.fullPath } : {} };
+        return { name: 'login', query: { redirect: to.fullPath } };
     }
 
     if (to.meta.requiresVerified && !auth.isVerified) {
@@ -173,12 +175,14 @@ router.beforeEach(async (to) => {
         return { name: 'verify-email' };
     }
 
-    /* Back from the email verification link: resume the page the user wanted to open. */
+    /*
+     * Back from the email verification link (Fortify sends it to the dashboard): welcomes the user, then resumes the
+     * page they were on or wanted to open, otherwise the home page.
+     */
     if (to.name === 'dashboard' && to.query.verified === '1') {
-        const pendingRedirect = consumePendingRedirect();
-        if (pendingRedirect) {
-            return pendingRedirect;
-        }
+        useToasts().showToast(i18n.global.t('dashboard.emailVerified'));
+
+        return consumePendingRedirect() ?? { name: 'home' };
     }
 
     if (to.name === 'verify-email' && auth.isVerified) {

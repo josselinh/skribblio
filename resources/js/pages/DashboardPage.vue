@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { RouterLink } from 'vue-router';
 import { fetchFavoriteGroupCollections, fetchFavoriteWordGroups } from '@/api/favorites';
 import { fetchMyGroupCollections } from '@/api/groupCollections';
 import { fetchReceivedAccessRequests, fetchSharedGroupCollections, fetchSharedWordGroups } from '@/api/sharing';
@@ -14,12 +14,8 @@ import GroupCollectionCard from '@/components/GroupCollectionCard.vue';
 import WordGroupCard from '@/components/WordGroupCard.vue';
 import { usePageTitle } from '@/composables/usePageTitle';
 import { usePaginatedList } from '@/composables/usePaginatedList';
-import { useToasts } from '@/composables/useToasts';
 import type { AccessRequest, FavoriteKind } from '@/types/models';
 
-const route = useRoute();
-const router = useRouter();
-const { showToast } = useToasts();
 const { t } = useI18n();
 usePageTitle(() => t('layout.header.dashboard'));
 
@@ -61,16 +57,6 @@ async function onFavoriteSaved(kind: FavoriteKind, id: string, isFavorite: boole
     }
     await (kind === 'word-groups' ? favoriteWordGroups : favoriteGroupCollections).reload();
 }
-
-/** Back from the email verification link: welcomes the user once, then drops the flag so a reload does not repeat it. */
-onMounted(() => {
-    if (route.query.verified !== '1') {
-        return;
-    }
-    showToast(t('dashboard.emailVerified'));
-    const { verified: _verified, ...query } = route.query;
-    void router.replace({ query });
-});
 
 /**
  * Favorites and shared lists only show once loaded with at least one item (or to offer a retry); they come before
