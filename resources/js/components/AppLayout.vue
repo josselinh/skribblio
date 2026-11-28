@@ -34,7 +34,7 @@ async function search(): Promise<void> {
         <header class="app-header border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" :aria-label="$t('layout.header.mainNavigation')">
-                    <RouterLink :to="{ name: auth.isAuthenticated ? 'dashboard' : 'home' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
+                    <RouterLink :to="{ name: 'home' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
                     <RouterLink v-if="auth.isAuthenticated" :to="{ name: 'dashboard' }" :class="navLinkClass('dashboard')">{{ $t('layout.header.dashboard') }}</RouterLink>
                     <RouterLink :to="{ name: 'explore' }" :class="navLinkClass('explore')">{{ $t('layout.header.explore') }}</RouterLink>
                 </nav>
