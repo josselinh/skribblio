@@ -24,10 +24,21 @@ function isLocale(value: unknown): value is InterfaceLocale {
 }
 
 /**
- * The language of a visitor: the one last chosen on this device, otherwise the first French, English or Chinese
- * one of the browser, otherwise English. Storage may be unavailable (private browsing).
+ * Query parameter asking for an interface language (`?hl=fr`): the address search engines index for each language,
+ * see `App\Http\Pages\IndexedLocales`. It applies to the page opened, without being remembered on the device.
+ */
+const LOCALE_QUERY_PARAMETER = 'hl';
+
+/**
+ * The language of a visitor: the one asked in the address, otherwise the one last chosen on this device, otherwise
+ * the first French, English or Chinese one of the browser, otherwise English. Storage may be unavailable (private
+ * browsing). A logged-in user's own choice replaces it once their account is loaded.
  */
 function detectLocale(): InterfaceLocale {
+    const requested = new URLSearchParams(window.location.search).get(LOCALE_QUERY_PARAMETER);
+    if (isLocale(requested)) {
+        return requested;
+    }
     try {
         const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
         if (isLocale(stored)) {
