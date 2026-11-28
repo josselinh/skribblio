@@ -33,8 +33,8 @@ final class IndexedLocales
     public static function url(string $path, InterfaceLocale $locale): string
     {
         return $locale === self::default() || ! in_array($locale, self::all(), true)
-            ? url($path)
-            : url($path).'?'.self::QUERY_PARAMETER.'='.$locale->value;
+            ? self::absoluteUrl($path)
+            : self::absoluteUrl($path).'?'.self::QUERY_PARAMETER.'='.$locale->value;
     }
 
     /**
@@ -48,8 +48,17 @@ final class IndexedLocales
         foreach (self::all() as $locale) {
             $alternates[$locale->value] = self::url($path, $locale);
         }
-        $alternates['x-default'] = url($path);
+        $alternates['x-default'] = self::absoluteUrl($path);
 
         return $alternates;
+    }
+
+    /**
+     * The absolute address of a path, the home page's ending with its slash ("https://example.com/", then
+     * "https://example.com/?hl=fr"), which `url()` leaves out.
+     */
+    private static function absoluteUrl(string $path): string
+    {
+        return $path === '/' ? url('/').'/' : url($path);
     }
 }
