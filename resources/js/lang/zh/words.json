@@ -9,32 +9,32 @@
         "reverse": "反转顺序",
         "reverseHint": "（反向）",
         "criteria": {
-            "created": "添加日期",
-            "name": "词语",
+            "created": "添加时间",
+            "name": "名称",
             "score": "投票",
             "author": "作者",
-            "updated": "更新日期"
+            "updated": "更新时间"
         },
         "directions": {
             "name": {
-                "asc": "A 到 Z",
-                "desc": "Z 到 A"
+                "asc": "从 A 到 Z",
+                "desc": "从 Z 到 A"
             },
             "author": {
-                "asc": "A 到 Z",
-                "desc": "Z 到 A"
+                "asc": "从 A 到 Z",
+                "desc": "从 Z 到 A"
             },
             "created": {
-                "desc": "最新在前",
-                "asc": "最早在前"
+                "desc": "最新的在前",
+                "asc": "最早的在前"
             },
             "updated": {
-                "desc": "最新在前",
-                "asc": "最早在前"
+                "desc": "最新的在前",
+                "asc": "最早的在前"
             },
             "score": {
-                "desc": "评分最高在前",
-                "asc": "评分最低在前"
+                "desc": "评分最高的在前",
+                "asc": "评分最低的在前"
             }
         }
     },
