@@ -7,7 +7,6 @@
         "legend": "词语排序方式",
         "prefix": "排序：",
         "reverse": "反转顺序",
-        "order": "顺序：",
         "reverseHint": "（反向）",
         "criteria": {
             "created": "添加日期",

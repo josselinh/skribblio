@@ -7,7 +7,6 @@
         "legend": "Trier les mots par",
         "prefix": "Tri :",
         "reverse": "Inverser l’ordre",
-        "order": "Ordre :",
         "reverseHint": "(inverser)",
         "criteria": {
             "created": "Date d’ajout",
