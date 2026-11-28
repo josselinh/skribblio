@@ -8,7 +8,7 @@ import { duplicateWordGroup } from '@/api/wordGroups';
 import AppIcon from '@/components/AppIcon.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import { useToasts } from '@/composables/useToasts';
-import { secondaryButtonClass } from '@/lib/buttons';
+import { labelHiddenOnPhonesClass, secondaryButtonClass } from '@/lib/buttons';
 import { itemKey } from '@/lib/i18n';
 import type { ValidationErrorResponse } from '@/types/api';
 import type { FavoriteKind } from '@/types/models';
@@ -76,7 +76,7 @@ async function duplicate(): Promise<void> {
         @click="askConfirmation"
     >
         <AppIcon name="duplicate" />
-        {{ $t('duplication.button') }}
+        <span :class="labelHiddenOnPhonesClass">{{ $t('duplication.button') }}</span>
     </button>
 
     <ModalDialog v-model:open="isConfirming" :title="title" :is-dismissible="!isDuplicating">

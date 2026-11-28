@@ -6,7 +6,7 @@ import { leaveItem } from '@/api/sharing';
 import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useToasts } from '@/composables/useToasts';
-import { dangerButtonClass } from '@/lib/buttons';
+import { dangerButtonClass, labelHiddenOnPhonesClass } from '@/lib/buttons';
 import { itemKey } from '@/lib/i18n';
 import type { FavoriteKind, Visibility } from '@/types/models';
 
@@ -69,7 +69,7 @@ async function confirmLeave(): Promise<void> {
         @click="askConfirmation"
     >
         <AppIcon name="leave" />
-        {{ $t('leaving.button') }}
+        <span :class="labelHiddenOnPhonesClass">{{ $t('leaving.button') }}</span>
     </button>
 
     <ConfirmDialog

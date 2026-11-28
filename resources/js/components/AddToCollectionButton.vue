@@ -6,7 +6,7 @@ import { attachWordGroup } from '@/api/groupCollections';
 import { fetchCollectionTargets } from '@/api/wordGroups';
 import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import { secondaryButtonClass } from '@/lib/buttons';
+import { labelHiddenOnPhonesClass, secondaryButtonClass } from '@/lib/buttons';
 import ModalDialog from '@/components/ModalDialog.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { useToasts } from '@/composables/useToasts';
@@ -184,7 +184,7 @@ const hint = computed(() => {
             @click="askConfirmation"
         >
             <AppIcon name="add-to-collection" />
-            <span class="truncate">{{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}</span>
+            <span class="truncate" :class="labelHiddenOnPhonesClass">{{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}</span>
         </button>
         <button
             type="button"
@@ -206,7 +206,7 @@ const hint = computed(() => {
         @click="openPicker"
     >
         <AppIcon name="add-to-collection" />
-        {{ $t('addToCollection.button') }}
+        <span :class="labelHiddenOnPhonesClass">{{ $t('addToCollection.button') }}</span>
     </button>
 
     <ConfirmDialog
