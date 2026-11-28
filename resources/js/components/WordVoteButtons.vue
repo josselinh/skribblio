@@ -87,7 +87,9 @@ function emojiClass(vote: WordVote): string {
                 @click="toggle(button.vote)"
             >
                 <span aria-hidden="true" class="transition" :class="emojiClass(button.vote)">{{ button.emoji }}</span>
-                {{ countOf(button.vote) }}
+                <!-- Fixed minimum width: the digits of the "Coloré" font differ in width (no tabular figures), which would shift what
+                     comes before the votes. -->
+                <span class="min-w-4 text-center">{{ countOf(button.vote) }}</span>
             </button>
             <span
                 v-else
@@ -97,7 +99,9 @@ function emojiClass(vote: WordVote): string {
             >
                 <span aria-hidden="true" class="transition" :class="emojiClass(button.vote)">{{ button.emoji }}</span>
                 <span class="sr-only">{{ $t('words.votes.countLabel', { vote: button.label }) }}</span>
-                {{ countOf(button.vote) }}
+                <!-- Fixed minimum width: the digits of the "Coloré" font differ in width (no tabular figures), which would shift what
+                     comes before the votes. -->
+                <span class="min-w-4 text-center">{{ countOf(button.vote) }}</span>
             </span>
         </template>
     </div>
