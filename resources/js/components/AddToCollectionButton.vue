@@ -184,7 +184,7 @@ const hint = computed(() => {
             @click="askConfirmation"
         >
             <AppIcon name="add-to-collection" />
-            <span class="truncate" :class="labelHiddenOnPhonesClass">{{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}</span>
+            <span class="truncate sm:max-w-56" :class="labelHiddenOnPhonesClass">{{ $t('addToCollection.buttonTo', { name: rememberedTarget.name }) }}</span>
         </button>
         <button
             type="button"
