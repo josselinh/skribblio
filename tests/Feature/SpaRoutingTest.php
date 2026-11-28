@@ -12,10 +12,14 @@ class SpaRoutingTest extends TestCase
     #[TestWith(['/login'])]
     #[TestWith(['/reset-password/some-token'])]
     #[TestWith(['/email/verify'])]
-    #[TestWith(['/any/client/side/page'])]
     public function test_renders_spa_shell_for_front_end_paths(string $path): void
     {
         $this->get($path)->assertOk()->assertViewIs('app');
+    }
+
+    public function test_unknown_front_end_path_renders_spa_shell_with_404(): void
+    {
+        $this->get('/any/unknown/page')->assertNotFound()->assertViewIs('app');
     }
 
     public function test_unknown_api_path_returns_404_json(): void

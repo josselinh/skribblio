@@ -4,7 +4,27 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        {{-- Read by search engines and link previews before the SPA runs: see App\Http\Controllers\PageController. --}}
+        <title>{{ $meta->documentTitle() }}</title>
+        <meta name="description" content="{{ $meta->descriptionText() }}">
+        @if ($meta->canonicalUrl() !== null)
+            <link rel="canonical" href="{{ $meta->canonicalUrl() }}">
+        @endif
+        @foreach ($meta->alternateUrls() as $hreflang => $alternateUrl)
+            <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $alternateUrl }}">
+        @endforeach
+        @unless ($meta->indexable)
+            <meta name="robots" content="noindex">
+        @endunless
+        <meta property="og:site_name" content="{{ $meta->siteName() }}">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ $meta->title ?? $meta->siteName() }}">
+        <meta property="og:description" content="{{ $meta->descriptionText() }}">
+        @if ($meta->canonicalUrl() !== null)
+            <meta property="og:url" content="{{ $meta->canonicalUrl() }}">
+        @endif
+        <meta property="og:image" content="{{ url('/icons/icon-512.png') }}">
+        <meta name="twitter:card" content="summary">
 
         {{-- Installable as a web app; the theme colour follows the header, kept in sync by resources/js/lib/theme.ts. --}}
         <link rel="manifest" href="/manifest.webmanifest">
@@ -14,7 +34,7 @@
         <meta name="apple-mobile-web-app-title" content="Skribblio">
         <meta name="theme-color" content="#ffffff">
 
-        {{-- Applies the theme, the style and the language before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
+        {{-- Applies the theme, the style and the language (the one asked with ?hl first) before the first paint, as resources/js/lib/theme.ts and i18n.ts do afterwards. --}}
         <script>
             (() => {
                 let theme = 'system';
@@ -32,6 +52,10 @@
                     document.documentElement.classList.add('dark');
                 }
                 const locales = ['fr', 'en', 'zh'];
+                const requestedLocale = new URLSearchParams(location.search).get('hl');
+                if (locales.includes(requestedLocale)) {
+                    locale = requestedLocale;
+                }
                 if (!locales.includes(locale)) {
                     const browserLocales = navigator.languages.length > 0 ? navigator.languages : [navigator.language];
                     locale = browserLocales.map((tag) => tag.slice(0, 2).toLowerCase()).find((tag) => locales.includes(tag)) ?? 'en';
