@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import ContributionsBadge from '@/components/ContributionsBadge.vue';
 import LanguageBadge from '@/components/LanguageBadge.vue';
 import RelativeTime from '@/components/RelativeTime.vue';
+import ScrollingRow from '@/components/ScrollingRow.vue';
 import UserLink from '@/components/UserLink.vue';
 import VisibilityBadge from '@/components/VisibilityBadge.vue';
 import { itemKey } from '@/lib/i18n';
@@ -12,7 +13,7 @@ import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
  * Read-only page title of a group or collection, built like the cards: a tinted header with the name (on two lines at
  * most) and, in its corner, the `after-title` slot (the favorite star, the actions menu); under it, the language and
  * visibility badges and whether contributions are open, then the creator and the last update date, and last, separated by a
- * line, the `actions` slot (buttons acting on the item: manage, duplicate, leave…), so that the export, under the card, opens
+ * line, the `actions` slot (buttons acting on the item: manage, duplicate, leave…, on one line scrolling horizontally when they do not fit), so that the export, under the card, opens
  * right under its own button. Pass the slot only when it has buttons, as it draws its own row.
  */
 const props = defineProps<{
@@ -59,8 +60,12 @@ const isMembersOnly = computed(() => props.contributionsMembersOnly && props.vis
                 </p>
             </div>
         </div>
-        <div v-if="$slots.actions" class="flex flex-wrap items-center gap-2 border-t border-zinc-200 dark:border-zinc-800 px-4 py-3">
-            <slot name="actions" />
+        <!-- One line scrolling horizontally when the buttons do not fit; the padding keeps their focus ring unclipped. Their dialogs,
+             rendered beside them, keep wrapping their text. -->
+        <div v-if="$slots.actions" class="border-t border-zinc-200 dark:border-zinc-800 px-4 py-3">
+            <ScrollingRow class="-m-1 gap-2 p-1 *:shrink-0 [&>:not(dialog)]:whitespace-nowrap">
+                <slot name="actions" />
+            </ScrollingRow>
         </div>
     </div>
 </template>
