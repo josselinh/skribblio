@@ -31,7 +31,7 @@ async function search(): Promise<void> {
 
 <template>
     <div class="flex min-h-screen flex-col">
-        <header class="border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
+        <header class="app-header border-t-4 border-b border-t-brand-600 border-b-zinc-200 dark:border-b-zinc-800 bg-white dark:bg-zinc-900">
             <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
                 <nav class="flex items-center gap-x-5" :aria-label="$t('layout.header.mainNavigation')">
                     <RouterLink :to="{ name: auth.isAuthenticated ? 'dashboard' : 'explore' }" class="font-semibold tracking-tight text-brand-700 dark:text-brand-300">{{ $t('common.appName') }}</RouterLink>
