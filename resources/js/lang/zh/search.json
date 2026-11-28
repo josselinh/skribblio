@@ -9,8 +9,7 @@
         "typePrefix": "类型：",
         "author": "创建者",
         "authorPrefix": "创建者：",
-        "sort": "排序方式",
-        "toggle": "筛选"
+        "sort": "排序方式"
     },
     "types": {
         "all": "全部",

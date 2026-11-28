@@ -9,8 +9,7 @@
         "typePrefix": "Type:",
         "author": "Created by",
         "authorPrefix": "Created by:",
-        "sort": "Sort by",
-        "toggle": "Filters"
+        "sort": "Sort by"
     },
     "types": {
         "all": "All",
