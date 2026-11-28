@@ -1,4 +1,7 @@
 {
+    "info": {
+        "label": "Informations sur « {name} »"
+    },
     "count": "{n} mot | {n} mots",
     "sort": {
         "legend": "Trier les mots par",

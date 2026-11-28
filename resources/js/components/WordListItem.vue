@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import WordMeta from '@/components/WordMeta.vue';
+import WordInfoButton from '@/components/WordInfoButton.vue';
 import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import type { Word } from '@/types/models';
 
 /**
- * A word of a group, read-only: renaming and deleting happen in `WordListEditor`. On phones, the name and its votes,
- * then the author and the dates on a second line; from `md`, everything on one line.
+ * A word of a group, read-only: renaming and deleting happen in `WordListEditor`. Its name, then the "i" button opening who
+ * added and modified it (`WordInfoButton`) and its votes.
  */
 defineProps<{
     word: Word;
@@ -17,11 +17,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <li class="flex items-start justify-between gap-3 px-4 py-3 md:items-center md:py-2">
-        <div class="min-w-0 md:flex md:flex-1 md:items-baseline md:gap-4">
-            <p class="text-sm font-medium break-words md:w-56 md:shrink-0">{{ word.name }}</p>
-            <WordMeta class="mt-0.5 md:mt-0" :word="word" />
+    <li class="flex items-center justify-between gap-3 px-4 py-3 md:py-2">
+        <p class="min-w-0 text-sm font-medium break-words">{{ word.name }}</p>
+        <div class="flex shrink-0 items-center gap-3">
+            <WordInfoButton :word="word" />
+            <WordVoteButtons :word="word" @updated="emit('updated', $event)" />
         </div>
-        <WordVoteButtons class="shrink-0" :word="word" @updated="emit('updated', $event)" />
     </li>
 </template>
