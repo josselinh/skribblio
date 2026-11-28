@@ -1,15 +1,18 @@
 {
     "names": {
         "fr": "法语",
-        "en": "英语"
+        "en": "英语",
+        "de": "德语"
     },
     "codes": {
         "fr": "FR",
-        "en": "EN"
+        "en": "EN",
+        "de": "DE"
     },
     "badgeHint": {
         "fr": "法语词语",
-        "en": "英语词语"
+        "en": "英语词语",
+        "de": "德语词语"
     },
     "field": {
         "wordGroup": "词语的语言",

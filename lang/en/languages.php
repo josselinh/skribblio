@@ -8,4 +8,5 @@ declare(strict_types=1);
 return [
     'fr' => 'French',
     'en' => 'English',
+    'de' => 'German',
 ];

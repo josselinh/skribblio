@@ -58,7 +58,7 @@ class WordVoteControllerTest extends TestCase
         $this->actingAs($user)
             ->putJson("/api/words/{$word->id}/vote", ['vote' => 'maybe'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['vote' => 'Le champ vote sélectionné est invalide.']);
+            ->assertJsonValidationErrors(['vote' => 'The selected vote is invalid.']);
         $this->assertDatabaseCount('word_votes', 0);
     }
 

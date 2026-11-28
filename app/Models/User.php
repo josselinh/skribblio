@@ -33,8 +33,8 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'locale' => 'fr',
-        'content_locale' => 'fr',
+        'locale' => 'en',
+        'content_locale' => 'en',
     ];
 
     /**
@@ -60,7 +60,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function preferredLocale(): string
     {
-        return ($this->locale ?? InterfaceLocale::Fr)->value;
+        return ($this->locale ?? InterfaceLocale::En)->value;
     }
 
     /**

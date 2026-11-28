@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\Locale;
 use App\Enums\Visibility;
 use App\Models\GroupCollection;
 use App\Models\User;
@@ -31,7 +32,7 @@ class DuplicateWordGroupControllerTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/word-groups/{$wordGroup->id}/duplicate");
 
         $response->assertCreated()
-            ->assertJsonPath('data.name', 'Animaux (copie)')
+            ->assertJsonPath('data.name', 'Animaux (copy)')
             ->assertJsonPath('data.visibility', 'private')
             ->assertJsonPath('data.accepts_contributions', false)
             ->assertJsonPath('data.can.update', true);
@@ -79,13 +80,22 @@ class DuplicateWordGroupControllerTest extends TestCase
         $this->assertSame(['chat'], WordGroup::findOrFail($copyId)->words()->pluck('name')->all());
     }
 
+    public function test_names_the_copy_in_the_language_of_the_group(): void
+    {
+        $wordGroup = WordGroup::factory()->public()->inLanguage(Locale::De)->create(['name' => 'Tiere']);
+
+        $response = $this->actingAs(User::factory()->create())->postJson("/api/word-groups/{$wordGroup->id}/duplicate");
+
+        $response->assertCreated()->assertJsonPath('data.name', 'Tiere (Kopie)')->assertJsonPath('data.language', 'de');
+    }
+
     public function test_truncates_a_long_name_to_fit_the_suffix(): void
     {
         $wordGroup = WordGroup::factory()->public()->create(['name' => str_repeat('a', 255)]);
 
         $response = $this->actingAs(User::factory()->create())->postJson("/api/word-groups/{$wordGroup->id}/duplicate");
 
-        $response->assertCreated()->assertJsonPath('data.name', str_repeat('a', 247).' (copie)');
+        $response->assertCreated()->assertJsonPath('data.name', str_repeat('a', 248).' (copy)');
     }
 
     public function test_returns_404_for_private_group_of_another_user(): void

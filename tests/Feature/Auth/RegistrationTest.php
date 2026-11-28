@@ -39,7 +39,7 @@ class RegistrationTest extends TestCase
         $response = $this->postJson('/register', []);
 
         $response->assertUnprocessable()->assertJsonValidationErrors([
-            'name' => 'Le champ pseudo est obligatoire.',
+            'name' => 'The username field is required.',
             'email',
             'password',
         ]);
@@ -57,7 +57,7 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'a-strong-password',
         ])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'La valeur du champ pseudo est déjà utilisée.']);
+            ->assertJsonValidationErrors(['name' => 'The username has already been taken.']);
 
         $this->assertGuest();
     }

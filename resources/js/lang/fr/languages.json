@@ -1,15 +1,18 @@
 {
     "names": {
         "fr": "Français",
-        "en": "Anglais"
+        "en": "Anglais",
+        "de": "Allemand"
     },
     "codes": {
         "fr": "FR",
-        "en": "EN"
+        "en": "EN",
+        "de": "DE"
     },
     "badgeHint": {
         "fr": "Mots en français",
-        "en": "Mots en anglais"
+        "en": "Mots en anglais",
+        "de": "Mots en allemand"
     },
     "field": {
         "wordGroup": "Langue des mots",

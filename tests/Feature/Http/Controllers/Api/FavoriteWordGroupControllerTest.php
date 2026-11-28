@@ -47,7 +47,7 @@ class FavoriteWordGroupControllerTest extends TestCase
             $item->creator,
             ItemFavorited::class,
             fn (ItemFavorited $notification): bool => $notification->toMail($item->creator)->subject
-                === "{$user->name} a ajouté votre groupe « {$item->name} » à ses favoris",
+                === "{$user->name} added your group “{$item->name}” to their favorites",
         );
     }
 

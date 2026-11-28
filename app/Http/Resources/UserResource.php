@@ -31,8 +31,8 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'theme' => ($this->theme ?? Theme::System)->value,
             'style' => ($this->style ?? Style::Colorful)->value,
-            'locale' => ($this->locale ?? InterfaceLocale::Fr)->value,
-            'content_locale' => ($this->content_locale ?? Locale::Fr)->value,
+            'locale' => ($this->locale ?? InterfaceLocale::En)->value,
+            'content_locale' => ($this->content_locale ?? Locale::En)->value,
             'email_notifications' => $this->emailNotificationPreferences(),
             'created_at' => $this->created_at?->toIso8601String(),
         ];

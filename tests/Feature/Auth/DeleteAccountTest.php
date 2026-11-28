@@ -46,7 +46,7 @@ class DeleteAccountTest extends TestCase
         $this->actingAs($user)
             ->deleteJson('/api/user', ['password' => 'wrong-password'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['password' => 'Le mot de passe est incorrect.']);
+            ->assertJsonValidationErrors(['password' => 'The password is incorrect.']);
 
         $this->assertModelExists($user);
     }

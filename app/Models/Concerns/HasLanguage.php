@@ -17,7 +17,7 @@ trait HasLanguage
     public function initializeHasLanguage(): void
     {
         $this->mergeCasts(['language' => Locale::class]);
-        $this->attributes['language'] ??= Locale::Fr->value;
+        $this->attributes['language'] ??= Locale::En->value;
     }
 
     /**

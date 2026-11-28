@@ -8,4 +8,5 @@ declare(strict_types=1);
 return [
     'fr' => '法语',
     'en' => '英语',
+    'de' => '德语',
 ];

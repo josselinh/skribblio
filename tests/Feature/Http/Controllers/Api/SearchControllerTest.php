@@ -47,10 +47,10 @@ class SearchControllerTest extends TestCase
         $this->actingAs($user)->getJson('/api/search/word-groups')->assertOk()->assertJsonCount(0, 'data');
     }
 
-    #[TestWith(['author=me', 'author', 'Connectez-vous pour filtrer par auteur.'])]
-    #[TestWith(['author=others', 'author', 'Connectez-vous pour filtrer par auteur.'])]
-    #[TestWith(['sort=popular', 'sort', 'Connectez-vous pour utiliser ce tri.'])]
-    #[TestWith(['sort=largest', 'sort', 'Connectez-vous pour utiliser ce tri.'])]
+    #[TestWith(['author=me', 'author', 'Log in to filter by author.'])]
+    #[TestWith(['author=others', 'author', 'Log in to filter by author.'])]
+    #[TestWith(['sort=popular', 'sort', 'Log in to use this sort.'])]
+    #[TestWith(['sort=largest', 'sort', 'Log in to use this sort.'])]
     public function test_rejects_members_only_filters_from_guest_with_422(string $query, string $field, string $message): void
     {
         $this->getJson("/api/search/word-groups?{$query}")

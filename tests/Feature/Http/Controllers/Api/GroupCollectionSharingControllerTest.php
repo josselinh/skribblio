@@ -40,7 +40,7 @@ class GroupCollectionSharingControllerTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->deleteJson("/api/group-collections/{$groupCollection->id}/membership")
             ->assertForbidden()
-            ->assertJsonPath('message', 'Vous n’êtes pas membre de cette collection.');
+            ->assertJsonPath('message', 'You are not a member of this collection.');
     }
 
     public function test_leaving_a_private_collection_keeps_its_favorite_but_hides_it(): void

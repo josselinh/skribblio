@@ -39,7 +39,7 @@ const emailSections: { title: string; notifications: EmailNotification[] }[] = [
 
 const theme = ref<Theme>(auth.user?.theme ?? 'system');
 const style = ref<Style>(auth.user?.style ?? 'colorful');
-const contentLocale = ref<Locale>(auth.user?.content_locale ?? 'fr');
+const contentLocale = ref<Locale>(auth.user?.content_locale ?? 'en');
 
 async function changeContentLocale(newLocale: Locale): Promise<void> {
     const previousLocale = contentLocale.value;

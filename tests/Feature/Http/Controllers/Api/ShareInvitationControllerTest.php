@@ -151,7 +151,7 @@ class ShareInvitationControllerTest extends TestCase
             ->assertJsonPath('data.status', 'pending');
 
         Notification::assertSentTo($wordGroup->creator, AccessRequested::class,
-            fn (AccessRequested $notification): bool => str_contains($notification->toMail($wordGroup->creator)->subject, 'demande à contribuer'));
+            fn (AccessRequested $notification): bool => str_contains($notification->toMail($wordGroup->creator)->subject, 'is asking to contribute'));
 
         $wordGroup->acceptAccessRequest($wordGroup->accessRequests()->sole());
 

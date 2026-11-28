@@ -48,7 +48,7 @@ class GroupCollectionWordGroupControllerTest extends TestCase
         $this->actingAs($creator)
             ->postJson("/api/group-collections/{$groupCollection->id}/word-groups", ['word_group_id' => $privateGroup->id])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_id' => 'Ce groupe est introuvable.']);
+            ->assertJsonValidationErrors(['word_group_id' => 'This group could not be found.']);
 
         $this->assertFalse($groupCollection->wordGroups()->whereKey($privateGroup->id)->exists());
     }
@@ -131,7 +131,7 @@ class GroupCollectionWordGroupControllerTest extends TestCase
         $this->actingAs($creator)
             ->deleteJson("/api/group-collections/{$groupCollection->id}/word-groups", ['word_group_ids' => [$otherGroup->id]])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids.0' => 'Un des groupes sélectionnés n’est plus dans la collection.']);
+            ->assertJsonValidationErrors(['word_group_ids.0' => 'One of the selected groups is no longer in the collection.']);
     }
 
     public function test_destroy_returns_422_without_any_group(): void
@@ -142,7 +142,7 @@ class GroupCollectionWordGroupControllerTest extends TestCase
         $this->actingAs($creator)
             ->deleteJson("/api/group-collections/{$groupCollection->id}/word-groups", ['word_group_ids' => []])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_ids' => 'Sélectionnez au moins un groupe.']);
+            ->assertJsonValidationErrors(['word_group_ids' => 'Select at least one group.']);
     }
 
     public function test_destroy_returns_404_for_a_private_collection_of_another_user(): void

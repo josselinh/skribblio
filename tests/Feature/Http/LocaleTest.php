@@ -19,9 +19,9 @@ class LocaleTest extends TestCase
 
     public function test_guest_gets_messages_in_the_language_sent_by_the_spa(): void
     {
-        $this->postJson('/register', [], ['X-Locale' => 'en'])
+        $this->postJson('/register', [], ['X-Locale' => 'fr'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'The username field is required.']);
+            ->assertJsonValidationErrors(['name' => 'Le champ pseudo est obligatoire.']);
     }
 
     public function test_guest_gets_messages_in_chinese(): void
@@ -31,11 +31,11 @@ class LocaleTest extends TestCase
             ->assertJsonValidationErrors(['name' => '昵称 不能为空。']);
     }
 
-    public function test_unknown_language_falls_back_to_french(): void
+    public function test_unknown_language_falls_back_to_english(): void
     {
         $this->postJson('/register', [], ['X-Locale' => 'de'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'Le champ pseudo est obligatoire.']);
+            ->assertJsonValidationErrors(['name' => 'The username field is required.']);
     }
 
     public function test_logged_in_user_gets_messages_in_their_language_whatever_the_header(): void
@@ -58,15 +58,15 @@ class LocaleTest extends TestCase
             'email' => 'alice@example.com',
             'password' => 'a-strong-password',
             'password_confirmation' => 'a-strong-password',
-        ], ['X-Locale' => 'en'])->assertCreated();
+        ], ['X-Locale' => 'fr'])->assertCreated();
 
         $user = User::firstWhere('email', 'alice@example.com');
-        $this->assertSame(InterfaceLocale::En, $user->locale);
-        $this->assertSame(Locale::En, $user->content_locale);
-        Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'en');
+        $this->assertSame(InterfaceLocale::Fr, $user->locale);
+        $this->assertSame(Locale::Fr, $user->content_locale);
+        Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'fr');
     }
 
-    public function test_registering_in_chinese_browses_english_lists_as_the_content_is_not_offered_in_chinese(): void
+    public function test_registering_in_chinese_browses_french_lists_as_the_content_is_not_offered_in_chinese(): void
     {
         Notification::fake();
 
@@ -79,7 +79,7 @@ class LocaleTest extends TestCase
 
         $user = User::firstWhere('email', 'alice@example.com');
         $this->assertSame(InterfaceLocale::Zh, $user->locale);
-        $this->assertSame(Locale::En, $user->content_locale);
+        $this->assertSame(Locale::Fr, $user->content_locale);
         Notification::assertSentTo($user, VerifyEmail::class, fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'zh');
     }
 

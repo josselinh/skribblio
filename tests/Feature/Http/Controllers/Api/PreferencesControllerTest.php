@@ -73,18 +73,18 @@ class PreferencesControllerTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->patchJson('/api/user/preferences', ['locale' => 'en'])
+            ->patchJson('/api/user/preferences', ['locale' => 'fr'])
             ->assertOk()
-            ->assertJsonPath('data.locale', 'en')
-            ->assertJsonPath('data.content_locale', 'fr');
-        $this->actingAs($user)
-            ->patchJson('/api/user/preferences', ['content_locale' => 'en'])
-            ->assertOk()
+            ->assertJsonPath('data.locale', 'fr')
             ->assertJsonPath('data.content_locale', 'en');
+        $this->actingAs($user)
+            ->patchJson('/api/user/preferences', ['content_locale' => 'de'])
+            ->assertOk()
+            ->assertJsonPath('data.content_locale', 'de');
 
         $user->refresh();
-        $this->assertSame(InterfaceLocale::En, $user->locale);
-        $this->assertSame(Locale::En, $user->content_locale);
+        $this->assertSame(InterfaceLocale::Fr, $user->locale);
+        $this->assertSame(Locale::De, $user->content_locale);
     }
 
     public function test_chinese_is_offered_for_the_interface_but_not_for_the_content(): void
@@ -101,7 +101,7 @@ class PreferencesControllerTest extends TestCase
             ->assertJsonValidationErrors(['content_locale']);
 
         $this->assertSame(InterfaceLocale::Zh, $user->fresh()->locale);
-        $this->assertSame(Locale::Fr, $user->fresh()->content_locale);
+        $this->assertSame(Locale::En, $user->fresh()->content_locale);
     }
 
     public function test_turning_an_email_back_off_stops_it(): void
@@ -123,9 +123,9 @@ class PreferencesControllerTest extends TestCase
             ->patchJson('/api/user/preferences', ['theme' => 'pink', 'style' => 'neon', 'locale' => 'de', 'email_notifications' => ['newsletter' => true]])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
-                'theme' => 'Le champ thème sélectionné est invalide.',
-                'style' => 'Le champ style sélectionné est invalide.',
-                'locale' => 'Le champ langue sélectionné est invalide.',
+                'theme' => 'The selected theme is invalid.',
+                'style' => 'The selected style is invalid.',
+                'locale' => 'The selected language is invalid.',
                 'email_notifications',
             ]);
 

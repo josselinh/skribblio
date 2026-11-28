@@ -1,15 +1,18 @@
 {
     "names": {
         "fr": "French",
-        "en": "English"
+        "en": "English",
+        "de": "German"
     },
     "codes": {
         "fr": "FR",
-        "en": "EN"
+        "en": "EN",
+        "de": "DE"
     },
     "badgeHint": {
         "fr": "Words in French",
-        "en": "Words in English"
+        "en": "Words in English",
+        "de": "Words in German"
     },
     "field": {
         "wordGroup": "Language of the words",

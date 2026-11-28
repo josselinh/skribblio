@@ -11,7 +11,7 @@ declare module 'vue-i18n' {
 }
 
 /** Languages of the interface, in the order they are offered (the content's are `CONTENT_LOCALES`). */
-export const LOCALES: InterfaceLocale[] = ['fr', 'en', 'zh'];
+export const LOCALES: InterfaceLocale[] = ['en', 'fr', 'zh'];
 
 /** Storage key of the language last used on this device, also read by `app.blade.php` before the first paint. */
 export const LOCALE_STORAGE_KEY = 'locale';
@@ -75,7 +75,7 @@ function chinesePluralRule(choice: number, choicesLength: number): number {
 export const i18n = createI18n<[MessageSchema], InterfaceLocale, false>({
     legacy: false,
     locale: detectLocale(),
-    fallbackLocale: 'fr',
+    fallbackLocale: 'en',
     messages: { fr, en, zh },
     pluralRules: { fr: frenchPluralRule, zh: chinesePluralRule },
 });
