@@ -1,4 +1,4 @@
-/** Classes of a secondary button (the actions beside the export of a page, those of an edit page). */
+/** Classes of a secondary button (the actions row of the title of a page, those of an edit page). */
 export const secondaryButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-60 sm:py-2';
 
@@ -9,3 +9,9 @@ export const dangerButtonClass =
 /** Classes of a primary button placed among secondary ones (e.g. "Inviter" while nobody was invited yet). */
 export const primaryButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-lg border border-brand-600 bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:py-2';
+
+/**
+ * Label of a button that only shows its icon on phones (the actions row of the title of a page): the label stays read by
+ * screen readers, and shown from `sm` (`max-sm:` rather than `sm:not-sr-only`, which would undo a `truncate`).
+ */
+export const labelHiddenOnPhonesClass = 'max-sm:sr-only';
