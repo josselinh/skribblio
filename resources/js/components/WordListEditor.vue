@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { deleteWords, updateWords, type WordRename } from '@/api/words';
 import AppIcon from '@/components/AppIcon.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import WordMeta from '@/components/WordMeta.vue';
 import WordVoteButtons from '@/components/WordVoteButtons.vue';
 import { useToasts } from '@/composables/useToasts';
 import { SKRIBBL_MAX_WORD_LENGTH } from '@/lib/skribbl';
@@ -258,6 +259,7 @@ const checkboxClass = 'size-4 pointer-coarse:size-5 shrink-0 rounded border-zinc
                         <p v-else class="py-1 text-sm text-zinc-500 dark:text-zinc-400 break-words" :title="$t('words.editor.notEditable')">
                             {{ word.name }}
                         </p>
+                        <WordMeta class="mt-1" :word="word" />
                     </div>
 
                     <WordVoteButtons class="mt-1.5 shrink-0" :word="word" readonly />

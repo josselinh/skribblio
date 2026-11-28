@@ -37,7 +37,7 @@ class WordController extends Controller
     {
         $words = $wordGroup->words()
             ->when($request->author() === AuthorFilter::Me, fn (Builder $query) => $query->whereBelongsTo($request->user(), 'creator'))
-            ->with('creator')
+            ->with('creator', 'updater')
             ->withVotes($request->user())
             ->orderBySort($request->sort(), $request->direction())
             ->paginate(self::PER_PAGE);
@@ -87,9 +87,9 @@ class WordController extends Controller
 
     public function update(UpdateWordRequest $request, Word $word): WordResource
     {
-        $word->update($request->validated());
+        $word->renameBy($request->validated('name'), $request->user());
 
-        return new WordResource($word->load('creator')->loadVotes($request->user()));
+        return new WordResource($word->load('creator', 'updater')->loadVotes($request->user()));
     }
 
     /**
@@ -110,7 +110,7 @@ class WordController extends Controller
             Word::withoutTouching(function () use ($words, $namesByWordId, $request): void {
                 foreach ($words as $word) {
                     try {
-                        $word->update(['name' => $namesByWordId[$word->id]]);
+                        $word->renameBy($namesByWordId[$word->id], $request->user());
                     } catch (UniqueConstraintViolationException) {
                         $index = array_search($word->id, array_column($request->validated('words'), 'id'), true);
 

@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\DB;
  * A word belongs to exactly one group and has no visibility of its own:
  * it is visible to whoever can see its group. Adding, renaming or deleting
  * a word updates the group's `updated_at`. Its author (`created_by`) becomes null
- * when they delete their account: the word stays in the group.
+ * when they delete their account: the word stays in the group. Whoever renamed it last (`updated_by`) is
+ * recorded the same way, null until it is renamed.
  *
  * In a group open to contributions, users vote for or against a word (`word_votes`); the votes
  * are an indicator for the contributors, and the export may leave out the words whose score is too low.
@@ -60,6 +61,29 @@ class Word extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * The user who renamed the word last.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Renames the word, recording who did it; a name left as it is changes nothing.
+     */
+    public function renameBy(string $name, User $user): void
+    {
+        $this->name = $name;
+        if (! $this->isDirty('name')) {
+            return;
+        }
+        $this->updater()->associate($user);
+        $this->save();
     }
 
     public function isCreatedBy(User $user): bool

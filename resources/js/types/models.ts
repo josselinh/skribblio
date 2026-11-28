@@ -83,6 +83,11 @@ export interface Word {
     name: string;
     /** Null once the author deleted their account; left out for visitors, who do not see the users' names. */
     creator?: Pick<User, 'id' | 'name'> | null;
+    /**
+     * Who renamed the word last: null when it was never renamed, renamed before this was recorded, or by an account since
+     * deleted; left out for visitors.
+     */
+    updater?: Pick<User, 'id' | 'name'> | null;
     upvotes_count: number;
     downvotes_count: number;
     /** The current user's vote, null when they did not vote. */

@@ -5,6 +5,10 @@
         "by": "Ajouté par {user}, {date}",
         "on": "Ajouté {date}"
     },
+    "modification": {
+        "by": "Modifié par {user}, {date}",
+        "on": "Modifié {date}"
+    },
     "deletedAccount": "Compte supprimé",
     "cancel": "Annuler",
     "maintenance": "Skribblio Tools est en maintenance. Réessayez dans quelques minutes.",

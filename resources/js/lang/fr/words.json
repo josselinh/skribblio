@@ -1,7 +1,4 @@
 {
-    "list": {
-        "updatedOn": "modifié {date}"
-    },
     "count": "{n} mot | {n} mots",
     "sort": {
         "legend": "Trier les mots par",
