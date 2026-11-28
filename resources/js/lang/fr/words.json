@@ -9,11 +9,11 @@
         "reverse": "Inverser l’ordre",
         "reverseHint": "(inverser)",
         "criteria": {
-            "created": "Date d’ajout",
-            "name": "Mot",
+            "created": "Ajout",
+            "name": "Nom",
             "score": "Votes",
             "author": "Auteur",
-            "updated": "Date de modification"
+            "updated": "Mise à jour"
         },
         "directions": {
             "name": {
@@ -25,16 +25,16 @@
                 "desc": "De Z à A"
             },
             "created": {
-                "desc": "Plus récents d’abord",
-                "asc": "Plus anciens d’abord"
+                "desc": "Les plus récents d’abord",
+                "asc": "Les moins récents d’abord"
             },
             "updated": {
-                "desc": "Plus récents d’abord",
-                "asc": "Plus anciens d’abord"
+                "desc": "Les plus récents d’abord",
+                "asc": "Les moins récents d’abord"
             },
             "score": {
-                "desc": "Mieux notés d’abord",
-                "asc": "Moins bien notés d’abord"
+                "desc": "Les mieux notés d’abord",
+                "asc": "Les moins bien notés d’abord"
             }
         }
     },

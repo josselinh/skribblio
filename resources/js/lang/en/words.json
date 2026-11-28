@@ -9,11 +9,11 @@
         "reverse": "Reverse the order",
         "reverseHint": "(reverse)",
         "criteria": {
-            "created": "Date added",
-            "name": "Word",
+            "created": "Added",
+            "name": "Name",
             "score": "Votes",
             "author": "Author",
-            "updated": "Date updated"
+            "updated": "Updated"
         },
         "directions": {
             "name": {
@@ -25,12 +25,12 @@
                 "desc": "Z to A"
             },
             "created": {
-                "desc": "Newest first",
-                "asc": "Oldest first"
+                "desc": "Most recent first",
+                "asc": "Least recent first"
             },
             "updated": {
-                "desc": "Newest first",
-                "asc": "Oldest first"
+                "desc": "Most recent first",
+                "asc": "Least recent first"
             },
             "score": {
                 "desc": "Best rated first",
