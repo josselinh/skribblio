@@ -10,6 +10,7 @@ import exports from './exports.json';
 import favorites from './favorites.json';
 import groupCollections from './groupCollections.json';
 import guest from './guest.json';
+import home from './home.json';
 import languages from './languages.json';
 import layout from './layout.json';
 import leaving from './leaving.json';
@@ -35,6 +36,7 @@ export default {
     favorites,
     groupCollections,
     guest,
+    home,
     languages,
     layout,
     leaving,

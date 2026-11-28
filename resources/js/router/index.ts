@@ -27,10 +27,10 @@ export const router = createRouter({
     scrollBehavior,
     routes: [
         {
-            /* Redirected by the guard: to the dashboard for logged-in users, to the Explorer for visitors. */
+            /* The home page of visitors; logged-in users are redirected to the dashboard by the guard. */
             path: '/',
             name: 'home',
-            component: () => import('@/pages/explore/ExplorePage.vue'),
+            component: () => import('@/pages/HomePage.vue'),
             meta: { isPublic: true },
         },
         {
@@ -157,8 +157,8 @@ router.beforeEach(async (to) => {
     const auth = useAuthStore();
     await auth.ensureLoaded();
 
-    if (to.name === 'home') {
-        return auth.isAuthenticated ? { name: 'dashboard' } : { name: 'explore' };
+    if (to.name === 'home' && auth.isAuthenticated) {
+        return { name: 'dashboard' };
     }
 
     if ((to.meta.requiresAuth || to.meta.requiresVerified) && !auth.isAuthenticated) {

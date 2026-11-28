@@ -1,0 +1,54 @@
+{
+    "hero": {
+        "title": "Word lists for Skribbl.io, ready to play or to build together",
+        "subtitle": "Find a ready-made list and copy it in one click, or create your own with your friends.",
+        "explore": "Explore the lists",
+        "howItWorks": "How does it work?"
+    },
+    "steps": {
+        "title": "How it works",
+        "find": {
+            "title": "Find or create",
+            "description": "Browse the lists shared by the community, or create your own on any theme you like."
+        },
+        "together": {
+            "title": "Build it together",
+            "description": "Open your list to contributions: your friends add words and vote for the best ones."
+        },
+        "play": {
+            "title": "Copy and play",
+            "description": "Export the list in one click and paste it into the custom words of your Skribbl.io game."
+        }
+    },
+    "latest": {
+        "title": "Latest shared lists",
+        "empty": "No list has been shared in this language yet."
+    },
+    "faq": {
+        "title": "Frequently asked questions",
+        "customWords": {
+            "question": "How do I play with my own words on Skribbl.io?",
+            "answer": "Create a private room on Skribbl.io: its settings have a custom words field, separated by commas. Export a list here, copy it and paste it into that field. Tick the option that only uses your words if you do not want Skribbl.io's."
+        },
+        "limits": {
+            "question": "How many words do I need?",
+            "answer": "Skribbl.io asks for at least {min} words, {length} characters long at most, and a list of {max} characters at most. The export warns you when a list does not fit these limits, and can pick a random selection that does."
+        },
+        "account": {
+            "question": "Do I need an account?",
+            "answer": "Not to browse the public lists and export word groups. A free account lets you create your lists, contribute to other people's, vote, keep your favorites and export whole collections."
+        },
+        "together": {
+            "question": "Can several people build a list together?",
+            "answer": "Yes: open it to contributions. A public list can take everyone's words or only those of the people you invite, and a private list is shared with an invitation link. Votes help spot the best words, and the export can leave out the poorly rated ones."
+        },
+        "free": {
+            "question": "Is it free?",
+            "answer": "Yes, completely free and open source. Skribblio Tools is an independent project, not affiliated with Skribbl.io."
+        },
+        "languages": {
+            "question": "What languages are the lists in?",
+            "answer": "Word lists are in English, French or German, a single language per list. The interface is available in English, French and Chinese."
+        }
+    }
+}
