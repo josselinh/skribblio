@@ -6,7 +6,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import StatusMessage from '@/components/StatusMessage.vue';
 import { useForm } from '@/composables/useForm';
 import { consumeHistoryStatus } from '@/lib/historyStatus';
-import { consumePendingRedirect } from '@/lib/pendingRedirect';
+import { consumePendingRedirect, rememberPendingRedirect } from '@/lib/pendingRedirect';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore();
@@ -18,22 +18,22 @@ const form = useForm({ email: '', password: '', remember: false });
 const status = consumeHistoryStatus();
 
 /**
- * Only follows internal paths, to avoid open redirects. Without one, goes back to the page remembered when
- * the visitor chose to register (and finally logged in instead), or to the dashboard.
+ * Logging in goes back to the page the user was on: the one given in the `redirect` query (the header's link, a
+ * page that needs an account), remembered on the device at once so that registering or resetting the password
+ * from here, which go through an email opened in another tab, also lead back to it (`@/lib/pendingRedirect`
+ * only keeps internal paths, to avoid open redirects). Without one, the page remembered when the visitor chose
+ * to register, otherwise the home page.
  */
-function redirectTarget(pendingRedirect: string | null): string | { name: string } {
-    const redirect = route.query.redirect;
-
-    return typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')
-        ? redirect
-        : (pendingRedirect ?? { name: 'dashboard' });
+const redirect = route.query.redirect;
+if (typeof redirect === 'string') {
+    rememberPendingRedirect(redirect);
 }
 
 async function submit(): Promise<void> {
     const isSuccessful = await form.submit((data) => auth.login(data));
 
     if (isSuccessful) {
-        await router.push(redirectTarget(consumePendingRedirect()));
+        await router.push(consumePendingRedirect() ?? { name: 'home' });
     } else {
         form.reset('password');
     }
