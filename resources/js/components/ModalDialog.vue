@@ -5,7 +5,8 @@ import { onBeforeUnmount, useId, useTemplateRef, watch } from 'vue';
  * Modal built on the native <dialog> (focus trap, Esc, backdrop): a bottom sheet on phones, a centered card from
  * the `sm` breakpoint. The default slot holds the content, the `actions` slot the buttons (stacked full width on
  * phones, the first one at the bottom). Esc and a click on the backdrop close it unless `isDismissible` is false.
- * Teleported to <body>, so that it shows above the page whatever the position of the button opening it.
+ * Teleported to <body>, so that it shows above the page whatever the position of the button opening it. On phones, it
+ * slides up from the bottom and back down when closed (`.modal-sheet` in `app.css`).
  */
 const isOpen = defineModel<boolean>('open', { required: true });
 
@@ -70,7 +71,7 @@ function onClick(event: MouseEvent): void {
         ref="dialog"
         :role="role"
         :aria-labelledby="titleId"
-        class="mx-0 mt-auto mb-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-2xl bg-white dark:bg-zinc-900 p-0 text-left font-normal whitespace-normal text-zinc-900 dark:text-zinc-100 shadow-xl backdrop:bg-zinc-950/40 dark:backdrop:bg-black/60 sm:m-auto sm:max-w-md sm:rounded-2xl"
+        class="modal-sheet mx-0 mt-auto mb-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-2xl bg-white dark:bg-zinc-900 p-0 text-left font-normal whitespace-normal text-zinc-900 dark:text-zinc-100 shadow-xl backdrop:bg-zinc-950/40 dark:backdrop:bg-black/60 sm:m-auto sm:max-w-md sm:rounded-2xl"
         @cancel="onCancel"
         @click="onClick"
     >
