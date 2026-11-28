@@ -5,10 +5,10 @@ export type Theme = 'system' | 'light' | 'dark';
 export type Style = 'sober' | 'colorful';
 
 /** A language of the content (the words of a group, the groups of a collection). */
-export type Locale = 'fr' | 'en';
+export type Locale = 'en' | 'fr' | 'de';
 
-/** A language of the interface (and of the emails), chosen independently of the content's: it offers more of them. */
-export type InterfaceLocale = Locale | 'zh';
+/** A language of the interface (and of the emails), chosen independently of the content's: neither includes the other. */
+export type InterfaceLocale = 'en' | 'fr' | 'zh';
 
 /** Kinds of emails the user chooses to receive or not (account emails are always sent). */
 export type EmailNotification =

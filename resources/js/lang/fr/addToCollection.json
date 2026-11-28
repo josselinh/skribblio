@@ -10,7 +10,8 @@
         "ownHint": "Aucune de vos collections favorites ne peut recevoir ce groupe : voici vos propres collections. Recherchez une collection pour trouver les autres.",
         "languageHint": {
             "fr": "Seules les collections en français auxquelles vous pouvez contribuer peuvent recevoir ce groupe.",
-            "en": "Seules les collections en anglais auxquelles vous pouvez contribuer peuvent recevoir ce groupe."
+            "en": "Seules les collections en anglais auxquelles vous pouvez contribuer peuvent recevoir ce groupe.",
+            "de": "Seules les collections en allemand auxquelles vous pouvez contribuer peuvent recevoir ce groupe."
         },
         "noSuggestion": "Vous n’avez encore aucune collection qui puisse recevoir ce groupe. Recherchez-en une, ou créez-en une depuis votre tableau de bord.",
         "noResult": "Aucune collection trouvée.",

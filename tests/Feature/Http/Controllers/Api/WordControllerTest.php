@@ -53,7 +53,7 @@ class WordControllerTest extends TestCase
 
         $this->getJson("/api/word-groups/{$wordGroup->id}/words?sort={$sort}")
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['sort' => 'Connectez-vous pour utiliser ce tri.']);
+            ->assertJsonValidationErrors(['sort' => 'Log in to use this sort.']);
     }
 
     public function test_index_rejects_the_author_filter_from_guest_with_422(): void
@@ -62,7 +62,7 @@ class WordControllerTest extends TestCase
 
         $this->getJson("/api/word-groups/{$wordGroup->id}/words?author=me")
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['author' => 'Connectez-vous pour filtrer par auteur.']);
+            ->assertJsonValidationErrors(['author' => 'Log in to filter by author.']);
     }
 
     public function test_index_lists_only_the_words_of_the_current_user_with_the_author_filter(): void
@@ -289,8 +289,8 @@ class WordControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonPath('data.*.name', ['chat', 'tour '.str_repeat('e', 27)])
             ->assertJsonPath('invalid', [
-                ['name' => $tooLongName, 'message' => 'Un mot ne peut pas dépasser 32 caractères.'],
-                ['name' => 'souris, chien', 'message' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.'],
+                ['name' => $tooLongName, 'message' => 'A word cannot be longer than 32 characters.'],
+                ['name' => 'souris, chien', 'message' => 'A word cannot contain a comma: Skribbl.io uses it as a separator.'],
             ]);
     }
 
@@ -316,7 +316,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($user)
             ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => ['  ', '']])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['names' => 'Saisissez au moins un mot.']);
+            ->assertJsonValidationErrors(['names' => 'Enter at least one word.']);
     }
 
     public function test_store_rejects_more_than_500_names_with_422(): void
@@ -327,7 +327,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($user)
             ->postJson("/api/word-groups/{$wordGroup->id}/words", ['names' => array_map(fn (int $index): string => "mot {$index}", range(1, 501))])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['names' => 'Vous pouvez ajouter au plus 500 mots à la fois.']);
+            ->assertJsonValidationErrors(['names' => 'You can add at most 500 words at once.']);
         $this->assertSame(0, $wordGroup->words()->count());
     }
 
@@ -365,7 +365,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($author)
             ->patchJson("/api/words/{$word->id}", ['name' => 'chien'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'Ce mot est déjà dans le groupe.']);
+            ->assertJsonValidationErrors(['name' => 'This word is already in the group.']);
     }
 
     public function test_update_rejects_name_containing_a_comma_with_422(): void
@@ -487,7 +487,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($user)
             ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => [$wordOfAnotherGroup->id]])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_ids.0' => 'Un des mots sélectionnés n’est plus dans le groupe.']);
+            ->assertJsonValidationErrors(['word_ids.0' => 'One of the selected words is no longer in the group.']);
 
         $this->assertModelExists($wordOfAnotherGroup);
     }
@@ -500,7 +500,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($user)
             ->deleteJson("/api/word-groups/{$wordGroup->id}/words", ['word_ids' => []])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_ids' => 'Sélectionnez au moins un mot.']);
+            ->assertJsonValidationErrors(['word_ids' => 'Select at least one word.']);
     }
 
     public function test_update_many_renames_the_words_and_touches_the_group(): void
@@ -588,8 +588,8 @@ class WordControllerTest extends TestCase
             ]])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
-                'words.0.name' => 'Ce mot est déjà dans le groupe.',
-                'words.1.name' => 'Ce mot est déjà dans le groupe.',
+                'words.0.name' => 'This word is already in the group.',
+                'words.1.name' => 'This word is already in the group.',
             ]);
 
         $this->assertSame('chat', $cat->fresh()->name);
@@ -607,7 +607,7 @@ class WordControllerTest extends TestCase
                 ['id' => $second->id, 'name' => 'Chat'],
             ]])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['words.1.name' => 'Vous avez saisi ce mot plusieurs fois.']);
+            ->assertJsonValidationErrors(['words.1.name' => 'You entered this word several times.']);
     }
 
     public function test_update_many_refuses_a_name_with_a_comma(): void
@@ -620,7 +620,7 @@ class WordControllerTest extends TestCase
             ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [['id' => $word->id, 'name' => 'chat, chien']]])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
-                'words.0.name' => 'Un mot ne peut pas contenir de virgule : Skribbl.io s’en sert comme séparateur.',
+                'words.0.name' => 'A word cannot contain a comma: Skribbl.io uses it as a separator.',
             ]);
     }
 
@@ -633,7 +633,7 @@ class WordControllerTest extends TestCase
         $this->actingAs($user)
             ->patchJson("/api/word-groups/{$wordGroup->id}/words", ['words' => [['id' => $wordOfAnotherGroup->id, 'name' => 'chien']]])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['words.0.id' => 'Ce mot n’est plus dans le groupe.']);
+            ->assertJsonValidationErrors(['words.0.id' => 'This word is no longer in the group.']);
 
         $this->assertSame('chat', $wordOfAnotherGroup->fresh()->name);
     }

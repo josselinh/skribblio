@@ -13,6 +13,8 @@ enum Locale: string
 
     case En = 'en';
 
+    case De = 'de';
+
     /**
      * Name of the language in the current interface language, e.g. "anglais".
      */

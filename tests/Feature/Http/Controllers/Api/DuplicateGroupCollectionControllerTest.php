@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Enums\Locale;
 use App\Models\GroupCollection;
 use App\Models\User;
 use App\Models\Word;
@@ -23,10 +24,10 @@ class DuplicateGroupCollectionControllerTest extends TestCase
     public function test_copies_the_collection_and_the_groups_of_others_with_their_words_and_keeps_own_groups(): void
     {
         $user = User::factory()->create();
-        $othersGroup = WordGroup::factory()->public()->openToContributions()->create(['name' => 'Animaux']);
+        $othersGroup = WordGroup::factory()->public()->openToContributions()->inLanguage(Locale::Fr)->create(['name' => 'Animaux']);
         Word::factory()->for($othersGroup)->create(['name' => 'chat']);
-        $ownGroup = WordGroup::factory()->private()->createdBy($user)->create();
-        $groupCollection = GroupCollection::factory()->public()->openToContributions()
+        $ownGroup = WordGroup::factory()->private()->createdBy($user)->inLanguage(Locale::Fr)->create();
+        $groupCollection = GroupCollection::factory()->public()->openToContributions()->inLanguage(Locale::Fr)
             ->hasAttached($othersGroup, ['added_by' => $othersGroup->created_by])
             ->hasAttached($ownGroup, ['added_by' => $user->id])
             ->create(['name' => 'Jeux']);

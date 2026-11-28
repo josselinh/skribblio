@@ -103,7 +103,7 @@ class AccessRequestControllerTest extends TestCase
         $this->actingAs($creator)
             ->postJson("/api/access-requests/word-groups/{$accessRequest->id}/accept")
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['status' => 'Cette demande a déjà été traitée.']);
+            ->assertJsonValidationErrors(['status' => 'This request has already been handled.']);
     }
 
     public function test_refusal_of_a_request_sent_from_a_collection_does_not_disclose_the_group_name(): void

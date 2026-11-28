@@ -33,11 +33,11 @@ class ContentLanguageTest extends TestCase
         $wordGroup = WordGroup::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
-            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => $wordGroup->name, 'visibility' => 'private', 'language' => 'en'])
+            ->patchJson("/api/word-groups/{$wordGroup->id}", ['name' => $wordGroup->name, 'visibility' => 'private', 'language' => 'fr'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['language' => 'La langue d’un groupe ne peut pas être modifiée.']);
+            ->assertJsonValidationErrors(['language' => 'The language of a group cannot be changed.']);
 
-        $this->assertSame(Locale::Fr, $wordGroup->fresh()->language);
+        $this->assertSame(Locale::En, $wordGroup->fresh()->language);
     }
 
     public function test_a_new_collection_is_in_the_users_content_language_unless_another_one_is_given(): void
@@ -57,13 +57,13 @@ class ContentLanguageTest extends TestCase
     public function test_a_group_in_another_language_cannot_be_added_to_a_collection(): void
     {
         $user = User::factory()->create();
-        $groupCollection = GroupCollection::factory()->createdBy($user)->create();
+        $groupCollection = GroupCollection::factory()->createdBy($user)->inLanguage(Locale::Fr)->create();
         $englishGroup = WordGroup::factory()->createdBy($user)->inLanguage(Locale::En)->create();
 
         $this->actingAs($user)
             ->postJson("/api/group-collections/{$groupCollection->id}/word-groups", ['word_group_id' => $englishGroup->id])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['word_group_id' => 'Ce groupe est en anglais, alors que cette collection est en français.']);
+            ->assertJsonValidationErrors(['word_group_id' => 'This group is in English, whereas this collection is in French.']);
 
         $this->assertFalse($groupCollection->wordGroups()->whereKey($englishGroup->id)->exists());
     }
@@ -74,26 +74,26 @@ class ContentLanguageTest extends TestCase
         $groupCollection = GroupCollection::factory()->createdBy($user)->create();
 
         $this->actingAs($user)
-            ->patchJson("/api/group-collections/{$groupCollection->id}", ['name' => $groupCollection->name, 'visibility' => 'private', 'language' => 'en'])
+            ->patchJson("/api/group-collections/{$groupCollection->id}", ['name' => $groupCollection->name, 'visibility' => 'private', 'language' => 'fr'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['language' => 'La langue d’une collection ne peut pas être modifiée.']);
+            ->assertJsonValidationErrors(['language' => 'The language of a collection cannot be changed.']);
 
-        $this->assertSame(Locale::Fr, $groupCollection->fresh()->language);
+        $this->assertSame(Locale::En, $groupCollection->fresh()->language);
     }
 
     public function test_searches_can_be_limited_to_one_language(): void
     {
         $user = User::factory()->create();
-        $frenchGroup = WordGroup::factory()->public()->create(['name' => 'Animaux']);
+        $frenchGroup = WordGroup::factory()->public()->inLanguage(Locale::Fr)->create(['name' => 'Animaux']);
         $englishGroup = WordGroup::factory()->public()->inLanguage(Locale::En)->create(['name' => 'Animals']);
         $englishCollection = GroupCollection::factory()->public()->inLanguage(Locale::En)->create(['name' => 'Animals']);
-        GroupCollection::factory()->public()->create(['name' => 'Animaux']);
+        GroupCollection::factory()->public()->inLanguage(Locale::Fr)->create(['name' => 'Animaux']);
 
         $this->getJson('/api/search/word-groups?q=anim&language=en')->assertOk()->assertJsonPath('data.*.id', [$englishGroup->id]);
         $this->getJson('/api/search/group-collections?q=anim&language=en')->assertOk()->assertJsonPath('data.*.id', [$englishCollection->id]);
         $this->getJson('/api/search/word-groups?q=anim')->assertOk()->assertJsonCount(2, 'data');
         $this->actingAs($user)->getJson('/api/word-groups/search?q=anim&language=fr')->assertOk()->assertJsonPath('data.*.id', [$frenchGroup->id]);
-        $this->getJson('/api/search/word-groups?language=de')->assertUnprocessable()->assertJsonValidationErrors('language');
+        $this->getJson('/api/search/word-groups?language=es')->assertUnprocessable()->assertJsonValidationErrors('language');
     }
 
     public function test_a_copy_keeps_the_language_and_is_named_in_it(): void

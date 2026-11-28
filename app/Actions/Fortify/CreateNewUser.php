@@ -3,7 +3,6 @@
 namespace App\Actions\Fortify;
 
 use App\Enums\InterfaceLocale;
-use App\Enums\Locale;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
@@ -43,8 +42,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
-            'locale' => $locale = InterfaceLocale::tryFrom(App::currentLocale()) ?? InterfaceLocale::Fr,
-            'content_locale' => $locale->contentLocale() ?? Locale::En,
+            'locale' => $locale = InterfaceLocale::tryFrom(App::currentLocale()) ?? InterfaceLocale::En,
+            'content_locale' => $locale->contentLocale(),
         ]);
     }
 }

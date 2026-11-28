@@ -32,12 +32,12 @@ class MaintenanceModeTest extends TestCase
             ->assertSee('Skribblio Tools 正在维护');
     }
 
-    public function test_maintenance_page_defaults_to_french(): void
+    public function test_maintenance_page_defaults_to_english(): void
     {
         $this->withHeader('Accept-Language', 'de-DE')
             ->get('/')
             ->assertServiceUnavailable()
-            ->assertSee('Skribblio Tools est en maintenance');
+            ->assertSee('Skribblio Tools is under maintenance');
     }
 
     public function test_api_requests_get_a_json_503(): void

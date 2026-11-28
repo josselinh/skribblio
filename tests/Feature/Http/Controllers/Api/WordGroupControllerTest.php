@@ -93,7 +93,7 @@ class WordGroupControllerTest extends TestCase
             ->assertJsonPath('data.0', [
                 'id' => $newerGroup->id,
                 'name' => $newerGroup->name,
-                'language' => 'fr',
+                'language' => 'en',
                 'visibility' => 'public',
                 'accepts_contributions' => false,
                 'contributions_members_only' => false,
@@ -141,13 +141,13 @@ class WordGroupControllerTest extends TestCase
         ]);
     }
 
-    public function test_store_with_empty_payload_returns_422_with_french_messages(): void
+    public function test_store_with_empty_payload_returns_422_with_required_errors(): void
     {
         $response = $this->actingAs(User::factory()->create())->postJson('/api/word-groups', []);
 
         $response->assertUnprocessable()->assertJsonValidationErrors([
-            'name' => 'Le champ nom est obligatoire.',
-            'visibility' => 'Le champ visibilité est obligatoire.',
+            'name' => 'The name field is required.',
+            'visibility' => 'The visibility field is required.',
         ]);
     }
 

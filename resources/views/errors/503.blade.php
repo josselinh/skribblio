@@ -4,7 +4,7 @@
      * middleware runs before SetLocale, so the language comes from the browser. Self-contained (inline CSS, no
      * build assets), so that it shows even while a deployment replaces them.
      */
-    $locale = request()->getPreferredLanguage(['fr', 'en', 'zh']) ?? 'fr';
+    $locale = request()->getPreferredLanguage(['en', 'fr', 'zh']) ?? 'en';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">

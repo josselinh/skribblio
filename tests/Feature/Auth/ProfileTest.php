@@ -49,7 +49,7 @@ class ProfileTest extends TestCase
         $this->actingAs($user)
             ->putJson('/user/profile-information', ['name' => $user->name, 'email' => 'taken@example.com'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['email' => 'La valeur du champ adresse e-mail est déjà utilisée.']);
+            ->assertJsonValidationErrors(['email' => 'The email has already been taken.']);
     }
 
     public function test_rejects_pseudo_of_another_user_with_422(): void
@@ -60,7 +60,7 @@ class ProfileTest extends TestCase
         $this->actingAs($user)
             ->putJson('/user/profile-information', ['name' => 'Alice', 'email' => $user->email])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name' => 'La valeur du champ pseudo est déjà utilisée.']);
+            ->assertJsonValidationErrors(['name' => 'The username has already been taken.']);
     }
 
     public function test_password_change_requires_the_current_password(): void
