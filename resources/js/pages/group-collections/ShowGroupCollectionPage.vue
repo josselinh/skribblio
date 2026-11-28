@@ -107,12 +107,7 @@ watch(
                         :name="groupCollection.name"
                     />
                 </template>
-            </ItemHeader>
-
-            <PendingAccessRequests v-if="groupCollection.can.manage_access" class="mt-4" kind="group-collections" :id="groupCollection.id" />
-
-            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :locked="!isMember">
-                <template #actions>
+                <template v-if="canEdit || canDuplicate || groupCollection.can.leave" #actions>
                     <RouterLink
                         v-if="canEdit"
                         :to="{ name: 'group-collections.edit', params: { id: groupCollection.id } }"
@@ -127,11 +122,14 @@ watch(
                         kind="group-collections"
                         :id="groupCollection.id"
                         :visibility="groupCollection.visibility"
-                       
                         @left="onLeft"
                     />
                 </template>
-            </ExportPanel>
+            </ItemHeader>
+
+            <PendingAccessRequests v-if="groupCollection.can.manage_access" class="mt-4" kind="group-collections" :id="groupCollection.id" />
+
+            <ExportPanel class="mt-4" kind="group-collections" :id="groupCollection.id" :locked="!isMember" />
 
             <section class="mt-8" :class="listPanelClass" aria-labelledby="collection-groups-title">
                 <div :class="listPanelHeaderClass">

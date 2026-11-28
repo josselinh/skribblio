@@ -11,7 +11,9 @@ import type { FavoriteKind, Locale, User, Visibility } from '@/types/models';
 /**
  * Read-only page title of a group or collection, built like the cards: a tinted header with the name (on two lines at
  * most) and, in its corner, the `after-title` slot (the favorite star, the actions menu); under it, the language and
- * visibility badges and whether contributions are open, then the creator and the last update date.
+ * visibility badges and whether contributions are open, then the creator and the last update date, and last, separated by a
+ * line, the `actions` slot (buttons acting on the item: manage, duplicate, leave…), so that the export, under the card, opens
+ * right under its own button. Pass the slot only when it has buttons, as it draws its own row.
  */
 const props = defineProps<{
     name: string;
@@ -56,6 +58,9 @@ const isMembersOnly = computed(() => props.contributionsMembersOnly && props.vis
                     </i18n-t>
                 </p>
             </div>
+        </div>
+        <div v-if="$slots.actions" class="flex flex-wrap items-center gap-2 border-t border-zinc-200 dark:border-zinc-800 px-4 py-3">
+            <slot name="actions" />
         </div>
     </div>
 </template>
