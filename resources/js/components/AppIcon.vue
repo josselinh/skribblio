@@ -13,6 +13,7 @@ export type IconName =
     | 'delete'
     | 'duplicate'
     | 'export'
+    | 'info'
     | 'invite'
     | 'leave'
     | 'manage'
@@ -64,6 +65,10 @@ defineProps<{
         <template v-else-if="name === 'add-to-collection'">
             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
             <path d="M12 10v6M9 13h6" />
+        </template>
+        <template v-else-if="name === 'info'">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5M12 8h.01" />
         </template>
         <template v-else-if="name === 'invite'">
             <circle cx="9" cy="8" r="4" />

@@ -1,4 +1,7 @@
 {
+    "info": {
+        "label": "About “{name}”"
+    },
     "count": "{n} word | {n} words",
     "sort": {
         "legend": "Sort the words by",
