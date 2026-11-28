@@ -129,53 +129,63 @@ const linkButtonClass =
             <slot name="actions" />
         </div>
 
-        <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
-            <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
+        <!-- The panel slides down from the button, then its content fades in once loaded. -->
+        <Transition
+            enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+            enter-from-class="-translate-y-2 opacity-0"
+            leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
+            leave-to-class="-translate-y-2 opacity-0"
+        >
+            <div v-if="isOpen" id="export-panel" class="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
+                <Transition mode="out-in" enter-active-class="transition-opacity duration-300 ease-out motion-reduce:transition-none" enter-from-class="opacity-0">
+                    <p v-if="isLoading && words.length === 0 && !isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('common.loading') }}</p>
 
-            <p v-else-if="hasFailed" role="alert" class="text-sm text-red-600 dark:text-red-400">
-                {{ $t('exports.panel.loadFailed') }}
-                <button type="button" class="underline" @click="load">{{ $t('common.retry') }}</button>
-            </p>
+                    <p v-else-if="hasFailed" role="alert" class="text-sm text-red-600 dark:text-red-400">
+                        {{ $t('exports.panel.loadFailed') }}
+                        <button type="button" class="underline" @click="load">{{ $t('common.retry') }}</button>
+                    </p>
 
-            <template v-else>
-                <fieldset v-if="showsSelection" class="mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                    <legend class="text-sm font-medium">
-                        {{ $t('exports.panel.groups') }}
-                        <span class="font-normal text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.selectedCount', { selected: selectedWordGroups.length, total: wordGroups.length }) }}</span>
-                    </legend>
-                    <div class="mt-1 flex gap-3">
-                        <button type="button" :class="linkButtonClass" :disabled="isEverythingSelected" @click="selectAll(true)">
-                            {{ $t('exports.panel.selectAll') }}
-                        </button>
-                        <button type="button" :class="linkButtonClass" :disabled="isNothingSelected" @click="selectAll(false)">
-                            {{ $t('exports.panel.selectNone') }}
-                        </button>
+                    <div v-else>
+                        <fieldset v-if="showsSelection" class="mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                            <legend class="text-sm font-medium">
+                                {{ $t('exports.panel.groups') }}
+                                <span class="font-normal text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.selectedCount', { selected: selectedWordGroups.length, total: wordGroups.length }) }}</span>
+                            </legend>
+                            <div class="mt-1 flex gap-3">
+                                <button type="button" :class="linkButtonClass" :disabled="isEverythingSelected" @click="selectAll(true)">
+                                    {{ $t('exports.panel.selectAll') }}
+                                </button>
+                                <button type="button" :class="linkButtonClass" :disabled="isNothingSelected" @click="selectAll(false)">
+                                    {{ $t('exports.panel.selectNone') }}
+                                </button>
+                            </div>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <label
+                                    v-for="wordGroup in wordGroups"
+                                    :key="wordGroup.id"
+                                    class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        :checked="!excludedIds.has(wordGroup.id)"
+                                        @change="toggleWordGroup(wordGroup.id, ($event.target as HTMLInputElement).checked)"
+                                    />
+                                    {{ wordGroup.name }}
+                                    <span class="text-zinc-500 dark:text-zinc-400">
+                                        · {{ $t('words.count', wordGroup.words.length) }}
+                                    </span>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <p v-if="isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.nothingSelected') }}</p>
+
+                        <p v-else-if="words.length === 0" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.noWords') }}</p>
+
+                        <WordListExport v-else :words="words" :note="note" :is-loading="isLoading" />
                     </div>
-                    <div class="mt-2 flex flex-wrap gap-2">
-                        <label
-                            v-for="wordGroup in wordGroups"
-                            :key="wordGroup.id"
-                            class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm has-checked:border-brand-500 dark:has-checked:border-brand-400 has-checked:bg-brand-50 dark:has-checked:bg-brand-950"
-                        >
-                            <input
-                                type="checkbox"
-                                :checked="!excludedIds.has(wordGroup.id)"
-                                @change="toggleWordGroup(wordGroup.id, ($event.target as HTMLInputElement).checked)"
-                            />
-                            {{ wordGroup.name }}
-                            <span class="text-zinc-500 dark:text-zinc-400">
-                                · {{ $t('words.count', wordGroup.words.length) }}
-                            </span>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <p v-if="isNothingSelected" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.nothingSelected') }}</p>
-
-                <p v-else-if="words.length === 0" class="text-sm text-zinc-500 dark:text-zinc-400">{{ $t('exports.panel.noWords') }}</p>
-
-                <WordListExport v-else :words="words" :note="note" :is-loading="isLoading" />
-            </template>
-        </div>
+                </Transition>
+            </div>
+        </Transition>
     </div>
 </template>
