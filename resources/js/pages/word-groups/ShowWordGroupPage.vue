@@ -131,12 +131,7 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         :name="wordGroup.name"
                     />
                 </template>
-            </ItemHeader>
-
-            <PendingAccessRequests v-if="wordGroup.can.manage_access" class="mt-4" kind="word-groups" :id="wordGroup.id" />
-
-            <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id">
-                <template #actions>
+                <template v-if="canEdit || wordGroup.can.duplicate || isMember || wordGroup.can.leave" #actions>
                     <RouterLink
                         v-if="canEdit"
                         :to="{ name: 'word-groups.edit', params: { id: wordGroup.id } }"
@@ -152,11 +147,14 @@ watch([wordGroupId, currentPage, order], loadWords, { immediate: true });
                         kind="word-groups"
                         :id="wordGroup.id"
                         :visibility="wordGroup.visibility"
-                       
                         @left="onLeft"
                     />
                 </template>
-            </ExportPanel>
+            </ItemHeader>
+
+            <PendingAccessRequests v-if="wordGroup.can.manage_access" class="mt-4" kind="word-groups" :id="wordGroup.id" />
+
+            <ExportPanel class="mt-4" kind="word-groups" :id="wordGroup.id" />
 
             <section class="mt-8" :class="listPanelClass" aria-labelledby="group-words-title">
                 <div :class="listPanelHeaderClass">

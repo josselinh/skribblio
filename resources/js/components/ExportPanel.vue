@@ -11,8 +11,7 @@ import type { FavoriteKind } from '@/types/models';
 /**
  * "Exporter pour Skribbl.io" button of a group or a collection, opening the list of its words
  * ready to paste into Skribbl.io. A collection's export comes with its groups (the visible ones),
- * so that the user picks which of them to export without reloading anything. The `actions` slot puts other
- * buttons beside it (the panel opens under the whole row).
+ * so that the user picks which of them to export without reloading anything. The panel opens right under the button.
  */
 const props = defineProps<{
     kind: FavoriteKind;
@@ -104,30 +103,27 @@ const linkButtonClass =
 
 <template>
     <div>
-        <div class="flex flex-wrap items-center gap-2">
-            <button
-                type="button"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:py-2"
-                :aria-expanded="isOpen"
-                aria-controls="export-panel"
-                @click="toggle"
+        <button
+            type="button"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:py-2"
+            :aria-expanded="isOpen"
+            aria-controls="export-panel"
+            @click="toggle"
+        >
+            <AppIcon name="export" />
+            {{ $t('exports.panel.button') }}
+            <!-- Points down while the panel is closed, up once it is open under the button. -->
+            <svg
+                v-if="!locked"
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="size-4 transition-transform motion-reduce:transition-none"
+                :class="{ 'rotate-180': isOpen }"
             >
-                <AppIcon name="export" />
-                {{ $t('exports.panel.button') }}
-                <!-- Points down while the panel is closed, up once it is open under the button. -->
-                <svg
-                    v-if="!locked"
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="size-4 transition-transform motion-reduce:transition-none"
-                    :class="{ 'rotate-180': isOpen }"
-                >
-                    <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <slot name="actions" />
-        </div>
+                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+        </button>
 
         <!-- The panel slides down from the button, then its content fades in once loaded. -->
         <Transition
