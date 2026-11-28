@@ -60,10 +60,9 @@ const isMembersOnly = computed(() => props.contributionsMembersOnly && props.vis
                 </p>
             </div>
         </div>
-        <!-- One line scrolling horizontally when the buttons do not fit; the padding keeps their focus ring unclipped. Their dialogs,
-             rendered beside them, keep wrapping their text. -->
+        <!-- One line scrolling horizontally when the buttons do not fit. Their dialogs, rendered beside them, keep wrapping their text. -->
         <div v-if="$slots.actions" class="border-t border-zinc-200 dark:border-zinc-800 px-4 py-3">
-            <ScrollingRow class="-m-1 gap-2 p-1 *:shrink-0 [&>:not(dialog)]:whitespace-nowrap">
+            <ScrollingRow class="gap-2 *:shrink-0 [&>:not(dialog)]:whitespace-nowrap">
                 <slot name="actions" />
             </ScrollingRow>
         </div>
