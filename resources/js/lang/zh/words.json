@@ -1,7 +1,4 @@
 {
-    "list": {
-        "updatedOn": "更新于 {date}"
-    },
     "count": "{n} 个词语",
     "sort": {
         "legend": "词语排序方式",

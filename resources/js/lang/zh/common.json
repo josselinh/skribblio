@@ -5,6 +5,10 @@
         "by": "由 {user} 添加于 {date}",
         "on": "添加于 {date}"
     },
+    "modification": {
+        "by": "由 {user} 修改于 {date}",
+        "on": "修改于 {date}"
+    },
     "deletedAccount": "已删除的账号",
     "cancel": "取消",
     "maintenance": "Skribblio Tools 正在维护，请几分钟后重试。",

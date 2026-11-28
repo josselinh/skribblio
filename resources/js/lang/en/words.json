@@ -1,7 +1,4 @@
 {
-    "list": {
-        "updatedOn": "updated {date}"
-    },
     "count": "{n} word | {n} words",
     "sort": {
         "legend": "Sort the words by",

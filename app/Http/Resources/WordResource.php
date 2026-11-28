@@ -30,6 +30,10 @@ class WordResource extends JsonResource
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
             ] : null),
+            'updater' => $this->when($request->user() !== null && $this->relationLoaded('updater'), fn (): ?array => $this->updater ? [
+                'id' => $this->updater->id,
+                'name' => $this->updater->name,
+            ] : null),
             'upvotes_count' => (int) $this->upvotes_count,
             'downvotes_count' => (int) $this->downvotes_count,
             'my_vote' => $this->my_vote === null ? null : WordVote::fromScore((int) $this->my_vote)->value,

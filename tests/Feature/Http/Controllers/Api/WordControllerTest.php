@@ -32,6 +32,7 @@ class WordControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.0.id', $word->id)
             ->assertJsonMissingPath('data.0.creator')
+            ->assertJsonMissingPath('data.0.updater')
             ->assertJsonPath('data.0.upvotes_count', 1)
             ->assertJsonPath('data.0.my_vote', null)
             ->assertJsonPath('data.0.can', ['update' => false, 'delete' => false, 'vote' => false]);
@@ -338,7 +339,8 @@ class WordControllerTest extends TestCase
         $this->actingAs($author)
             ->patchJson("/api/words/{$word->id}", ['name' => 'chat'])
             ->assertOk()
-            ->assertJsonPath('data.name', 'chat');
+            ->assertJsonPath('data.name', 'chat')
+            ->assertJsonPath('data.updater.id', $author->id);
         $this->assertSame('chat', $word->fresh()->name);
     }
 
@@ -349,7 +351,8 @@ class WordControllerTest extends TestCase
 
         $this->actingAs($author)
             ->patchJson("/api/words/{$word->id}", ['name' => 'chat'])
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonPath('data.updater', null);
     }
 
     public function test_update_rejects_name_of_another_word_of_the_group_with_422(): void
@@ -516,7 +519,31 @@ class WordControllerTest extends TestCase
 
         $this->assertSame('chat', $cat->fresh()->name);
         $this->assertSame('chien', $dog->fresh()->name);
+        $this->assertTrue($cat->fresh()->updater->is($user));
         $this->assertTrue($wordGroup->fresh()->updated_at->isToday());
+    }
+
+    public function test_index_includes_who_renamed_each_word_last(): void
+    {
+        $user = User::factory()->create();
+        $wordGroup = WordGroup::factory()->createdBy($user)->create();
+        $word = Word::factory()->for($wordGroup)->create(['name' => 'chta']);
+        $word->renameBy('chat', $user);
+
+        $this->actingAs($user)
+            ->getJson("/api/word-groups/{$wordGroup->id}/words")
+            ->assertJsonPath('data.0.updater', ['id' => $user->id, 'name' => $user->name]);
+    }
+
+    public function test_the_word_forgets_who_renamed_it_once_that_account_is_deleted(): void
+    {
+        $editor = User::factory()->create();
+        $word = Word::factory()->create(['name' => 'chta']);
+        $word->renameBy('chat', $editor);
+
+        $editor->delete();
+
+        $this->assertNull($word->fresh()->updated_by);
     }
 
     public function test_update_many_returns_403_and_renames_nothing_when_one_word_cannot_be_updated(): void
