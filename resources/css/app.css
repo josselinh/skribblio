@@ -82,6 +82,60 @@
 }
 
 /*
+ * Bottom sheets (`ModalDialog` on phones) slide up from the bottom of the screen while their backdrop fades in, and slide
+ * back down when closed. `@starting-style` gives the state they enter from; `display` and `overlay` change at the end of
+ * the closing transition (`allow-discrete`), so that the sheet stays visible while it leaves. Browsers without these
+ * features simply show and hide the sheet. From `sm`, the centered card keeps appearing at once.
+ */
+@media (width < 40rem) and (prefers-reduced-motion: no-preference) {
+    .modal-sheet {
+        transition:
+            translate 200ms ease-in,
+            display 200ms allow-discrete,
+            overlay 200ms allow-discrete;
+    }
+
+    .modal-sheet:not([open]) {
+        translate: 0 100%;
+    }
+
+    .modal-sheet[open] {
+        translate: 0 0;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @starting-style {
+        .modal-sheet[open] {
+            translate: 0 100%;
+        }
+    }
+
+    .modal-sheet::backdrop {
+        transition:
+            opacity 200ms ease-in,
+            display 200ms allow-discrete,
+            overlay 200ms allow-discrete;
+    }
+
+    .modal-sheet:not([open])::backdrop {
+        opacity: 0;
+    }
+
+    .modal-sheet[open]::backdrop {
+        opacity: 1;
+        transition-duration: 300ms;
+        transition-timing-function: ease-out;
+    }
+
+    @starting-style {
+        .modal-sheet[open]::backdrop {
+            opacity: 0;
+        }
+    }
+}
+
+/*
  * "Coloré" style, an original playful look chosen in the preferences (class `style-colorful` on the root element,
  * set by `@/lib/theme` and, before the first paint, by `app.blade.php`):
  * a rounded font, neutrals tinted with plum, a vivid violet accent, rounder corners, and panels, cards and buttons
