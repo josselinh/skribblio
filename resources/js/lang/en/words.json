@@ -7,7 +7,6 @@
         "legend": "Sort the words by",
         "prefix": "Sort:",
         "reverse": "Reverse the order",
-        "order": "Order:",
         "reverseHint": "(reverse)",
         "criteria": {
             "created": "Date added",

@@ -5,6 +5,8 @@
  */
 export type IconName =
     | 'add-to-collection'
+    | 'arrow-down'
+    | 'arrow-up'
     | 'check'
     | 'contribute'
     | 'copy'
@@ -94,6 +96,12 @@ defineProps<{
         <template v-else-if="name === 'security'">
             <rect x="5" y="11" width="14" height="10" rx="2" />
             <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </template>
+        <template v-else-if="name === 'arrow-up'">
+            <path d="M12 19V5M6 11l6-6 6 6" />
+        </template>
+        <template v-else-if="name === 'arrow-down'">
+            <path d="M12 5v14M6 13l6 6 6-6" />
         </template>
         <template v-else-if="name === 'preferences'">
             <path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" />
