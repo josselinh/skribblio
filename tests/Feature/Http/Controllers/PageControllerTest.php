@@ -167,7 +167,8 @@ class PageControllerTest extends TestCase
     {
         $this->get('/')->assertOk()
             ->assertSee('<title>Skribblio Tools</title>', false)
-            ->assertSee('<link rel="canonical" href="'.url('/').'">', false)
+            ->assertSee('<link rel="canonical" href="'.url('/').'/">', false)
+            ->assertSee('<link rel="alternate" hreflang="fr" href="'.url('/').'/?hl=fr">', false)
             ->assertDontSee('noindex');
     }
 

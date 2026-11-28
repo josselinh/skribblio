@@ -30,7 +30,8 @@ class SitemapControllerTest extends TestCase
         $response = $this->get('/sitemap.xml');
 
         $response->assertOk()->assertHeader('Content-Type', 'application/xml');
-        $response->assertSee('<loc>'.url('/').'</loc>', false)
+        $response->assertSee('<loc>'.url('/').'/</loc>', false)
+            ->assertSee('<loc>'.url('/').'/?hl=fr</loc>', false)
             ->assertSee('<loc>'.url('/explore').'</loc>', false)
             ->assertSee('<loc>'.url("/groups/{$publicGroup->id}").'</loc><lastmod>2026-11-20T10:00:00+00:00</lastmod>', false)
             ->assertSee('<loc>'.url("/groups/{$publicGroup->id}").'?hl=fr</loc>', false)
